@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import * as React from "react";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,10 +34,31 @@ app.post("/api/intake", (req, res) => {
   res.json({ ok: true });
 });
 
+// Serve robots.txt manually to avoid extra headers
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.set("Content-Security-Policy", "default-src 'none'");
+  res.removeHeader("Content-Signals");
+  res.send("User-agent: *\nAllow: /\nSitemap: https://www.npsme.com/sitemap.xml");
+});
+
+// --- Serve Vite build ---
 // --- Serve Vite build ---
 const dist = path.join(__dirname, "dist");
-app.use(express.static(dist));
-app.get("*", (_req, res) => res.sendFile(path.join(dist, "index.html")));
 
+// Long cache for hashed assets (Vite puts them in /assets)
+app.use(
+  "/assets",
+  express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
+);
+
+// Short cache for everything else in /dist (images, og-image, etc.)
+app.use(express.static(dist, { maxAge: "1h" }));
+
+// Never cache index.html so deploys are instant
+app.get("*", (_req, res) => {
+  res.set("Cache-Control", "no-cache");
+  res.sendFile(path.join(dist, "index.html"));
+});
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`NPS Me running on :${port}`));

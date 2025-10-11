@@ -42,7 +42,11 @@ app.get("/robots.txt", (req, res) => {
   res.send("User-agent: *\nAllow: /\nSitemap: https://www.npsme.com/sitemap.xml");
 });
 
-// --- Serve Vite build ---
+// Serve sitemap.xml directly
+app.get("/sitemap.xml", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
+});
+
 // --- Serve Vite build ---
 const dist = path.join(__dirname, "dist");
 

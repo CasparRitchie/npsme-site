@@ -1,4 +1,4 @@
-// src/Impact.jsx
+// src/ImpactPage.jsx
 import React from "react";
 
 /**
@@ -11,17 +11,17 @@ import React from "react";
  * Assumptions are shown inline and there’s a disclaimer block.
  */
 
-export default function Impact() {
+export default function ImpactPage() {
   // --- Inputs (with sensible defaults you can tweak) ---
   const [currency, setCurrency] = React.useState("£");
   const [monthlyRevenue, setMonthlyRevenue] = React.useState(50000); // baseline monthly revenue
-  const [grossMarginPct, setGrossMarginPct] = React.useState(55);    // % gross margin
-  const [avgOrderValue, setAvgOrderValue] = React.useState(75);      // AOV
+  const [grossMarginPct, setGrossMarginPct] = React.useState(55); // % gross margin
+  const [avgOrderValue, setAvgOrderValue] = React.useState(75); // AOV
   const [repeatRateLiftPct, setRepeatRateLiftPct] = React.useState(6); // % lift in repeat rate (90-day)
   const [churnReductionPct, setChurnReductionPct] = React.useState(2); // % fewer lost customers / refunds
-  const [ticketsPer1k, setTicketsPer1k] = React.useState(22);        // support tickets per 1,000 orders (WISMO etc.)
+  const [ticketsPer1k, setTicketsPer1k] = React.useState(22); // support tickets per 1,000 orders (WISMO etc.)
   const [ticketReductionPct, setTicketReductionPct] = React.useState(25); // % fewer tickets after improvements
-  const [costPerTicket, setCostPerTicket] = React.useState(3.8);     // blended handling cost per ticket
+  const [costPerTicket, setCostPerTicket] = React.useState(3.8); // blended handling cost per ticket
 
   // --- Deriveds ---
   const ordersPerMonth = safeDivide(monthlyRevenue, avgOrderValue); // simple proxy
@@ -29,7 +29,7 @@ export default function Impact() {
 
   // Revenue effects (directional proxies – simple & explainable)
   const repeatRevenueAdded = monthlyRevenue * pctToRatio(repeatRateLiftPct);
-  const churnRevenueSaved   = monthlyRevenue * pctToRatio(churnReductionPct);
+  const churnRevenueSaved = monthlyRevenue * pctToRatio(churnReductionPct);
 
   // Support savings
   const monthlyTickets = (ordersPerMonth / 1000) * ticketsPer1k;
@@ -38,11 +38,10 @@ export default function Impact() {
 
   // Gross profit impact (rev effects × margin + opex savings)
   const gpImpactMonthly = (repeatRevenueAdded + churnRevenueSaved) * margin + supportSavings;
-  const gpImpactAnnual  = gpImpactMonthly * 12;
+  const gpImpactAnnual = gpImpactMonthly * 12;
 
   // Helpers
-  const fmt = (n) =>
-    `${currency}${Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const fmt = (n) => `${currency}${Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
   const preset = (label) => {
     if (label === "Conservative") {
@@ -68,12 +67,10 @@ export default function Impact() {
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
           <p className="text-xs tracking-widest text-slate-400 uppercase">Impact</p>
         </div>
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
-          Estimate your outcome in minutes
-        </h2>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">Estimate your outcome in minutes</h2>
         <p className="mt-3 text-slate-300 max-w-3xl">
-          A directional calculator to quantify the value of improving CX:
-          repeat purchases ↑, churn ↓, and fewer support tickets.
+          A directional calculator to quantify the value of improving CX: repeat purchases ↑, churn ↓, and fewer support
+          tickets.
         </p>
 
         {/* Presets */}
@@ -104,25 +101,9 @@ export default function Impact() {
         {/* Inputs */}
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <Field
-              label="Monthly revenue"
-              value={monthlyRevenue}
-              onChange={setMonthlyRevenue}
-              prefix={currency}
-            />
-            <Field
-              label="Gross margin (%)"
-              value={grossMarginPct}
-              onChange={setGrossMarginPct}
-              min={0}
-              max={100}
-            />
-            <Field
-              label="Average order value"
-              value={avgOrderValue}
-              onChange={setAvgOrderValue}
-              prefix={currency}
-            />
+            <Field label="Monthly revenue" value={monthlyRevenue} onChange={setMonthlyRevenue} prefix={currency} />
+            <Field label="Gross margin (%)" value={grossMarginPct} onChange={setGrossMarginPct} min={0} max={100} />
+            <Field label="Average order value" value={avgOrderValue} onChange={setAvgOrderValue} prefix={currency} />
             <div className="text-xs text-slate-400">
               Orders/month (derived):{" "}
               <span className="text-slate-300">{Math.round(ordersPerMonth).toLocaleString()}</span>
@@ -130,67 +111,20 @@ export default function Impact() {
           </div>
 
           <div className="space-y-4">
-            <Field
-              label="Repeat purchase lift (%)"
-              value={repeatRateLiftPct}
-              onChange={setRepeatRateLiftPct}
-              min={0}
-              max={30}
-            />
-            <Field
-              label="Churn / refunds reduction (%)"
-              value={churnReductionPct}
-              onChange={setChurnReductionPct}
-              min={0}
-              max={30}
-            />
-            <Field
-              label="Tickets per 1,000 orders (baseline)"
-              value={ticketsPer1k}
-              onChange={setTicketsPer1k}
-              min={0}
-              step={1}
-            />
-            <Field
-              label="Ticket reduction (%)"
-              value={ticketReductionPct}
-              onChange={setTicketReductionPct}
-              min={0}
-              max={80}
-            />
-            <Field
-              label="Cost per ticket"
-              value={costPerTicket}
-              onChange={setCostPerTicket}
-              prefix={currency}
-              step={0.1}
-            />
+            <Field label="Repeat purchase lift (%)" value={repeatRateLiftPct} onChange={setRepeatRateLiftPct} min={0} max={30} />
+            <Field label="Churn / refunds reduction (%)" value={churnReductionPct} onChange={setChurnReductionPct} min={0} max={30} />
+            <Field label="Tickets per 1,000 orders (baseline)" value={ticketsPer1k} onChange={setTicketsPer1k} min={0} step={1} />
+            <Field label="Ticket reduction (%)" value={ticketReductionPct} onChange={setTicketReductionPct} min={0} max={80} />
+            <Field label="Cost per ticket" value={costPerTicket} onChange={setCostPerTicket} prefix={currency} step={0.1} />
           </div>
         </div>
 
         {/* Results */}
         <div className="mt-8 grid gap-6 md:grid-cols-4">
-          <Kpi
-            label="Repeat revenue added (mo.)"
-            value={fmt(repeatRevenueAdded)}
-            note={`${repeatRateLiftPct}% of monthly revenue`}
-          />
-          <Kpi
-            label="Churn revenue saved (mo.)"
-            value={fmt(churnRevenueSaved)}
-            note={`${churnReductionPct}% of monthly revenue`}
-          />
-          <Kpi
-            label="Support savings (mo.)"
-            value={fmt(supportSavings)}
-            note={`${Math.round(ticketsAvoided)} tickets avoided`}
-          />
-          <Kpi
-            label="Gross profit impact (mo.)"
-            value={fmt(gpImpactMonthly)}
-            highlight
-            note={`Annual: ${fmt(gpImpactAnnual)}`}
-          />
+          <Kpi label="Repeat revenue added (mo.)" value={fmt(repeatRevenueAdded)} note={`${repeatRateLiftPct}% of monthly revenue`} />
+          <Kpi label="Churn revenue saved (mo.)" value={fmt(churnRevenueSaved)} note={`${churnReductionPct}% of monthly revenue`} />
+          <Kpi label="Support savings (mo.)" value={fmt(supportSavings)} note={`${Math.round(ticketsAvoided)} tickets avoided`} />
+          <Kpi label="Gross profit impact (mo.)" value={fmt(gpImpactMonthly)} highlight note={`Annual: ${fmt(gpImpactAnnual)}`} />
         </div>
 
         {/* Assumptions & disclaimer */}
@@ -230,9 +164,7 @@ function Field({ label, value, onChange, prefix, min, max, step = 1 }) {
     <label className="block">
       <span className="text-sm text-slate-300">{label}</span>
       <div className="mt-1 relative">
-        {prefix && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">{prefix}</span>
-        )}
+        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">{prefix}</span>}
         <input
           type="number"
           value={value}
@@ -240,8 +172,7 @@ function Field({ label, value, onChange, prefix, min, max, step = 1 }) {
           min={min}
           max={max}
           step={step}
-          className={`w-full rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400
-            ${prefix ? "pl-8" : ""}`}
+          className={`w-full rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400 ${prefix ? "pl-8" : ""}`}
         />
       </div>
     </label>
@@ -263,7 +194,8 @@ function pctToRatio(p) {
   return Number(p) / 100;
 }
 function safeDivide(a, b) {
-  const x = Number(a), y = Number(b);
+  const x = Number(a),
+    y = Number(b);
   if (!isFinite(x) || !isFinite(y) || y === 0) return 0;
   return x / y;
 }

@@ -1,34 +1,10 @@
 import React from "react";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export default function Products() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      {/* Top bar */}
-      <header className="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <span className="text-lg tracking-tight font-semibold">
-              NPS <span className="text-[#7C3AED]">Me</span>
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-            <Link to="/products" className="hover:text-white">Products</Link>
-            <a href="/#method" className="hover:text-white">Method</a>
-            <a href="/#about" className="hover:text-white">About</a>
-            <a href="/#contact" className="hover:text-white">Contact</a>
-          </nav>
-          <a
-            href="/#contact"
-            className="group inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition"
-          >
-            Book discovery
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </header>
+      {/* Global Navbar is rendered by App.jsx */}
 
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -151,7 +127,7 @@ export default function Products() {
   );
 }
 
-function ProductCard({ icon, title, price, bullets, cta, featured=false, footnote }) {
+function ProductCard({ icon, title, price, bullets, cta, featured = false, footnote }) {
   return (
     <div
       className={
@@ -169,7 +145,9 @@ function ProductCard({ icon, title, price, bullets, cta, featured=false, footnot
       </div>
       <div className="mt-2 text-sm text-slate-400">{price}</div>
       <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
-        {bullets.map((b) => <li key={b}>{b}</li>)}
+        {bullets.map((b) => (
+          <li key={b}>{b}</li>
+        ))}
       </ul>
       <a
         href={cta.href}

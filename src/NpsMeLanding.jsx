@@ -1,9 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
 
-// NPS Me one-page landing (React + Tailwind)
+// NPS Me landing (uses global Navbar from App.jsx)
 
 function ContactForm() {
   const [status, setStatus] = React.useState("idle"); // idle | sending | success | error
@@ -71,13 +70,13 @@ function ContactForm() {
         </div>
 
         <textarea
-            required
-            rows={5}
-            placeholder="How can I help? (A couple of lines is perfect.)"
-            value={form.message}
-            onChange={(e) => update("message", e.target.value)}
-            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-            disabled={disabled}
+          required
+          rows={5}
+          placeholder="How can I help? (A couple of lines is perfect.)"
+          value={form.message}
+          onChange={(e) => update("message", e.target.value)}
+          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
+          disabled={disabled}
         />
 
         <button
@@ -230,50 +229,23 @@ function MilestoneNpsSection() {
 export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      {/* Nav */}
-      <header className="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <span className="text-lg tracking-tight font-semibold">
-              NPS <span className="text-[#7C3AED]">Me</span>
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-            <Link to="/products" className="hover:text-white">Products</Link>
-            <Link to="/impact" className="hover:text-white">Impact</Link>
-            <a href="#method" className="hover:text-white">Method</a>
-            <a href="#outcomes" className="hover:text-white">Outcomes</a>
-            <a href="#about" className="hover:text-white">About</a>
-            <a href="#demo" className="hover:text-white">Demo</a>
-            <a href="#intake" className="hover:text-white">Intake</a>
-          </nav>
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition shadow-[0_0_0_0_rgba(124,58,237,0.5)] hover:shadow-[0_0_0_6px_rgba(124,58,237,0.15)]"
-          >
-            Book discovery
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-          </a>
-        </div>
-      </header>
-
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
         <div className="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-7 lg:col-span-6">
             <motion.h1
-  initial={{ opacity: 0, y: 10 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
-  className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
->
-  We help you improve your <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.
-  <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-    Turn feedback into growth.
-  </span>
-</motion.h1>
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
+            >
+              We help you improve your{" "}
+              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.
+              <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
+                Turn feedback into growth.
+              </span>
+            </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -355,7 +327,6 @@ export default function NpsMeLanding() {
 
       <NpsExplainer />
       <MilestoneNpsSection />
-
 
       {/* About */}
       <section id="about" className="mx-auto max-w-7xl px-6 pb-20">

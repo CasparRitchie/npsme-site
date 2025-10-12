@@ -3,10 +3,10 @@ import React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
+// Only show routes that exist today
 const links = [
-  { to: "/milestone-nps", label: "Milestone NPS" },
+  { to: "/products", label: "Products" },
   { to: "/impact", label: "Impact" },
-  { to: "/social-listening", label: "Social Listening" },
 ];
 
 export default function NavBar() {
@@ -18,12 +18,14 @@ export default function NavBar() {
     setOpen(false);
   }, [loc.pathname]);
 
-  // Prevent body scroll when menu open (small UX nicety)
+  // Prevent body scroll when menu is open
   React.useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-      return () => (document.body.style.overflow = "");
-    }
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   return (

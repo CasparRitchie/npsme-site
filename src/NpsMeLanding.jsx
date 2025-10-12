@@ -241,6 +241,7 @@ export default function NpsMeLanding() {
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
             <Link to="/products" className="hover:text-white">Products</Link>
+            <Link to="/impact" className="hover:text-white">Impact</Link>
             <a href="#method" className="hover:text-white">Method</a>
             <a href="#outcomes" className="hover:text-white">Outcomes</a>
             <a href="#about" className="hover:text-white">About</a>

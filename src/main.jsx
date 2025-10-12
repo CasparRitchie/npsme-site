@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NpsMeLanding from "./NpsMeLanding.jsx";
 import Products from "./Products.jsx";
+import Impact from "./Impact.jsx";
 import "./styles.css";
 
 function NotFound() {
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/" element={<NpsMeLanding />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/impact" element={<Impact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

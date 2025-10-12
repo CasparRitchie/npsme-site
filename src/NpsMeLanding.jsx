@@ -261,16 +261,16 @@ export default function NpsMeLanding() {
         <div className="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-7 lg:col-span-6">
             <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl md:text-5xl font-semibold tracking-tight text-white"
-            >
-              We help you improve your <span className="whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-                Turn feedback into growth.
-              </span>
-            </motion.h1>
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
+>
+  We help you improve your <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.
+  <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
+    Turn feedback into growth.
+  </span>
+</motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

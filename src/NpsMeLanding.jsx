@@ -36,9 +36,7 @@ function ContactForm() {
     <>
       <form
         onSubmit={onSubmit}
-        className={`mt-8 grid gap-4 max-w-xl mx-auto text-left transition ${
-          disabled ? "opacity-60 pointer-events-none" : ""
-        }`}
+        className={`mt-8 grid gap-4 max-w-xl mx-auto text-left transition ${disabled ? "opacity-60 pointer-events-none" : ""}`}
         aria-disabled={disabled}
       >
         {/* Honeypot (hidden) */}
@@ -72,13 +70,13 @@ function ContactForm() {
         </div>
 
         <textarea
-          required
-          rows={5}
-          placeholder="How can I help? (A couple of lines is perfect.)"
-          value={form.message}
-          onChange={(e) => update("message", e.target.value)}
-          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-          disabled={disabled}
+            required
+            rows={5}
+            placeholder="How can I help? (A couple of lines is perfect.)"
+            value={form.message}
+            onChange={(e) => update("message", e.target.value)}
+            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
+            disabled={disabled}
         />
 
         <button
@@ -89,7 +87,6 @@ function ContactForm() {
         </button>
       </form>
 
-      {/* Messages */}
       {status === "success" && (
         <p className="mt-3 text-sm text-[#22C55E]">Thanks! I’ll get back to you shortly.</p>
       )}
@@ -140,9 +137,9 @@ export default function NpsMeLanding() {
               transition={{ duration: 0.6 }}
               className="text-4xl md:text-5xl font-semibold tracking-tight text-white"
             >
-              Boost your <span className="whitespace-nowrap">Net Promoter Score (NPS)®</span>.{" "}
+              We help you improve your <span className="whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-                Elevate every customer moment.
+                Turn feedback into growth.
               </span>
             </motion.h1>
             <motion.p
@@ -151,10 +148,7 @@ export default function NpsMeLanding() {
               transition={{ duration: 0.7, delay: 0.05 }}
               className="mt-5 text-slate-300 max-w-xl"
             >
-              I help companies turn feedback into growth using a pragmatic,
-              data-driven approach: discover what matters, recommend the right
-              changes, implement with teams, and monitor improvements to keep
-              momentum.
+              NPS Me is an independent consultancy. We use NPS descriptively—as one of several metrics—to prioritise the work that actually moves the needle across your customer journey.
             </motion.p>
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <a
@@ -233,6 +227,7 @@ export default function NpsMeLanding() {
         <p className="mt-3 text-slate-300 max-w-2xl">
           I’m an experienced NPS and CX consultant. I combine quantitative analysis with
           hands-on team enablement to remove friction, improve sentiment, and grow revenue.
+          I reference Net Promoter Score (NPS)® descriptively as one of several customer metrics.
         </p>
         <ul className="mt-6 space-y-3 text-sm text-slate-300">
           {[
@@ -274,7 +269,6 @@ export default function NpsMeLanding() {
             </a>
           </div>
 
-          {/* Actual contact form */}
           <ContactForm />
         </div>
       </section>
@@ -289,7 +283,8 @@ export default function NpsMeLanding() {
           </div>
         </div>
         <div className="mx-auto max-w-7xl px-6 pb-8 text-[11px] leading-snug text-slate-500">
-          Net Promoter, NPS, and Net Promoter Score are registered trademarks of Bain &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. NPS Me is an independent consultancy and is not affiliated with or endorsed by those parties.
+          NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc.
+          NPS Me is an independent consultancy and is not affiliated with, sponsored, or endorsed by Bain &amp; Company.
         </div>
       </footer>
     </div>

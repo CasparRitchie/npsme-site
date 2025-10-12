@@ -6,12 +6,13 @@ import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide
 
 function ContactForm() {
   const [status, setStatus] = React.useState("idle"); // idle | sending | success | error
-  const [form, setForm] = React.useState({ name: "", email: "", message: "", company: "" }); // 'company' = honeypot
+  const [form, setForm] = React.useState({ name: "", email: "", message: "", company: "" });
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const disabled = status === "success";
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (form.company) return; // honeypot trip → silently ignore
+    if (form.company) return;
     setStatus("sending");
     try {
       const res = await fetch("https://formspree.io/f/mwprrzro", {
@@ -25,68 +26,77 @@ function ContactForm() {
           _source: "contact-section",
         }),
       });
-      if (res.ok) setStatus("success");
-      else setStatus("error");
+      setStatus(res.ok ? "success" : "error");
     } catch {
       setStatus("error");
     }
   };
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 grid gap-4 max-w-xl mx-auto text-left">
-      {/* Honeypot (hidden) */}
-      <input
-        tabIndex="-1"
-        autoComplete="off"
-        value={form.company}
-        onChange={(e) => update("company", e.target.value)}
-        className="hidden"
-        placeholder="Company"
-      />
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <input
-          required
-          placeholder="Your name"
-          value={form.name}
-          onChange={(e) => update("name", e.target.value)}
-          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-        />
-        <input
-          required
-          type="email"
-          placeholder="Your email"
-          value={form.email}
-          onChange={(e) => update("email", e.target.value)}
-          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-        />
-      </div>
-
-      <textarea
-        required
-        rows={5}
-        placeholder="How can I help? (A couple of lines is perfect.)"
-        value={form.message}
-        onChange={(e) => update("message", e.target.value)}
-        className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-      />
-
-      <button
-        disabled={status === "sending"}
-        className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
+    <>
+      <form
+        onSubmit={onSubmit}
+        className={`mt-8 grid gap-4 max-w-xl mx-auto text-left transition ${
+          disabled ? "opacity-60 pointer-events-none" : ""
+        }`}
+        aria-disabled={disabled}
       >
-        {status === "sending" ? "Sending…" : "Send message"}
-      </button>
+        {/* Honeypot (hidden) */}
+        <input
+          tabIndex="-1"
+          autoComplete="off"
+          value={form.company}
+          onChange={(e) => update("company", e.target.value)}
+          className="hidden"
+          placeholder="Company"
+        />
 
+        <div className="grid md:grid-cols-2 gap-4">
+          <input
+            required
+            placeholder="Your name"
+            value={form.name}
+            onChange={(e) => update("name", e.target.value)}
+            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
+            disabled={disabled}
+          />
+          <input
+            required
+            type="email"
+            placeholder="Your email"
+            value={form.email}
+            onChange={(e) => update("email", e.target.value)}
+            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
+            disabled={disabled}
+          />
+        </div>
+
+        <textarea
+          required
+          rows={5}
+          placeholder="How can I help? (A couple of lines is perfect.)"
+          value={form.message}
+          onChange={(e) => update("message", e.target.value)}
+          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
+          disabled={disabled}
+        />
+
+        <button
+          disabled={status === "sending" || disabled}
+          className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
+        >
+          {status === "sending" ? "Sending…" : "Send message"}
+        </button>
+      </form>
+
+      {/* Messages */}
       {status === "success" && (
-        <p className="text-sm text-[#22C55E]">Thanks! I’ll get back to you shortly.</p>
+        <p className="mt-3 text-sm text-[#22C55E]">Thanks! I’ll get back to you shortly.</p>
       )}
       {status === "error" && (
-        <p className="text-sm text-red-400">Sorry—something went wrong. Please email hello@npsme.com.</p>
+        <p className="mt-3 text-sm text-red-400">Sorry—something went wrong. Please email hello@npsme.com.</p>
       )}
-
-      <p className="text-xs text-slate-400">By submitting, you agree to our Privacy & Terms.</p>
-    </form>
+    </>
   );
 }
 

@@ -97,6 +97,135 @@ function ContactForm() {
   );
 }
 
+function NpsExplainer() {
+  return (
+    <section id="nps-explainer" className="mx-auto max-w-7xl px-6 pb-20">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+        <h3 className="text-xl md:text-2xl font-semibold text-white">
+          What is Net Promoter Score (NPS)®?
+        </h3>
+
+        <div className="mt-3 grid gap-6 md:grid-cols-2">
+          <div className="text-slate-300 text-sm leading-relaxed">
+            <p>
+              Net Promoter Score (NPS)® is a customer sentiment metric that groups
+              respondents by their likelihood to recommend a company on a 0–10 scale:
+            </p>
+            <ul className="mt-3 space-y-2 list-disc pl-5">
+              <li><span className="text-white font-medium">Promoters</span>: 9–10</li>
+              <li><span className="text-white font-medium">Passives</span>: 7–8</li>
+              <li><span className="text-white font-medium">Detractors</span>: 0–6</li>
+            </ul>
+            <p className="mt-3">
+              The score is calculated as <span className="text-white font-medium">% Promoters − % Detractors</span>.
+            </p>
+          </div>
+
+          <div className="text-slate-300 text-sm leading-relaxed">
+            <p className="text-white font-medium">Where it fits</p>
+            <ul className="mt-2 space-y-2 list-disc pl-5">
+              <li><span className="text-white">Relationship NPS</span>: periodic, brand-level sentiment.</li>
+              <li><span className="text-white">Transactional / stage-based</span>: sent after key milestones (e.g., order placed, onboarding, delivery).</li>
+              <li>Best used alongside CSAT, CES, retention and review velocity.</li>
+            </ul>
+            <p className="mt-3 text-white font-medium">Good practice & cautions</p>
+            <ul className="mt-2 space-y-2 list-disc pl-5">
+              <li>Use representative sampling and avoid “gaming”.</li>
+              <li>Close the loop with respondents and track root causes.</li>
+              <li>NPS is directional—not a single source of truth.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-[11px] leading-relaxed text-slate-400">
+          <p>
+            Terminology & attribution: NPS® and Net Promoter Score® are registered service marks of
+            Bain &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References here are descriptive only.
+            NPS Me is independent and not affiliated with or endorsed by those parties.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MilestoneNpsSection() {
+  return (
+    <section id="milestone-nps" className="mx-auto max-w-7xl px-6 pb-20">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+        <h2 className="text-2xl md:text-3xl font-semibold text-white">
+          Milestone (Transactional) NPS & Survey Signals
+        </h2>
+        <p className="mt-3 text-slate-300 max-w-3xl">
+          Beyond a periodic, brand-level measure, milestone surveys capture sentiment at specific
+          journey moments (e.g., order placed, onboarding completed, first delivery). We use this
+          <span className="whitespace-nowrap"> “NPS®-style”</span> question and complementary signals
+          to expose friction in context and prioritise the right fixes.
+        </p>
+
+        {/* Examples grid */}
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          {[
+            {
+              title: "Order placed",
+              q: "Based on your ordering experience, how likely are you to recommend us (0–10)?",
+              why: "Test checkout clarity, pricing transparency, and payment reliability.",
+            },
+            {
+              title: "Onboarding finished",
+              q: "After onboarding, how likely are you to recommend us (0–10)?",
+              why: "Gauge setup friction, documentation gaps, enablement quality.",
+            },
+            {
+              title: "First delivery/use",
+              q: "After your first delivery/use, how likely are you to recommend us (0–10)?",
+              why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX.",
+            },
+          ].map((card) => (
+            <div key={card.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div className="text-white font-semibold">{card.title}</div>
+              <div className="mt-2 text-sm text-slate-200">{card.q}</div>
+              <div className="mt-2 text-xs text-slate-400">{card.why}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Implementation checklist */}
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+            <div className="text-white font-semibold">Implementation in 5 steps</div>
+            <ol className="mt-3 space-y-2 list-decimal pl-5 text-sm text-slate-300">
+              <li>Map milestones (checkout, onboarding, first value, renewal, support closure).</li>
+              <li>Trigger surveys via your stack (ESP, product, helpdesk, CDP).</li>
+              <li>Ask 0–10 + one open text; keep it short.</li>
+              <li>Pipe results to a central view; tag by milestone.</li>
+              <li>Close the loop and run monthly root-cause reviews.</li>
+            </ol>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+            <div className="text-white font-semibold">What we track</div>
+            <ul className="mt-3 space-y-2 list-disc pl-5 text-sm text-slate-300">
+              <li>Score distribution by milestone (Promoters/Passives/Detractors).</li>
+              <li>Theme frequency & impact (effort vs. volume).</li>
+              <li>Time-to-contact & close-the-loop rates.</li>
+              <li>Downstream effects (repeat tickets, churn risk, review velocity).</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Compliance-safe note */}
+        <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-[11px] leading-relaxed text-slate-400">
+          <p>
+            We reference the 0–10 “likelihood to recommend” question and terminology descriptively.
+            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld,
+            and Satmetrix Systems, Inc. We are independent and not affiliated with those parties.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -220,6 +349,10 @@ export default function NpsMeLanding() {
           <DemoWidget />
         </div>
       </section>
+
+      <NpsExplainer />
+      <MilestoneNpsSection />
+
 
       {/* About */}
       <section id="about" className="mx-auto max-w-7xl px-6 pb-20">

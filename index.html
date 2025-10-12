@@ -30,8 +30,13 @@
     <meta name="twitter:image" content="https://www.npsme.com/og-image.jpg?v=3" />
 
     <meta name="theme-color" content="#0B0F19" />
-    <link rel="icon" type="image/svg" href="/favicon.svg" />
+    <!-- SVG for modern browsers (transparent, crisp) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
+    <!-- PNG fallbacks for Google Search & legacy browsers -->
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <link rel="shortcut icon" href="/favicon.ico">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {

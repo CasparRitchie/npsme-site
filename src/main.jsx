@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NpsMeLanding from "./NpsMeLanding.jsx";
 import Products from "./Products.jsx";
-import "./index.css";
+import "./styles.css";
 
 function NotFound() {
   return (

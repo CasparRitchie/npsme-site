@@ -3,14 +3,15 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "engines": {
-    "node": ">=18"
-  },
+  "engines": { "node": ">=20 <21" },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "node server.js",
-    "heroku-postbuild": "npm run build"
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "start": "node server.js",
+  "heroku-postbuild": "npm run build",
+  "lint": "eslint .",
+  "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "express": "^4.19.2",

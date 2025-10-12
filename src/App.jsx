@@ -1,7 +1,7 @@
 // src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import NavBar from "./Navbar";
+import NavBar from "./components/Navbar";
 
 // Pages
 import NpsMeLanding from "./NpsMeLanding";

@@ -8,6 +8,8 @@ import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
 import ImpactPage from "./ImpactPage";          // wrapper that renders <Impact />
 // import SocialListening from "./SocialListening";
+import CxPulseSample from "./CxPulseSample";
+
 
 export default function App() {
   return (
@@ -18,6 +20,7 @@ export default function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/impact" element={<ImpactPage />} />
         {/* <Route path="/social-listening" element={<SocialListening />} /> */}
+        <Route path="/cx-pulse-sample" element={<CxPulseSample />} />
         {/* Fallback: send unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

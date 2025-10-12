@@ -57,7 +57,7 @@ export default function Products() {
               "Top themes, sentiment & competitor pulse",
               "1-page actionable summary + next steps"
             ]}
-            cta={{ label: "See sample report (PDF)", href: "#" }}
+            cta={{ label: "See sample report (PDF)", href: "/cx-pulse-sample" }}
             footnote="Starts manual, scales with automation. Cancel anytime."
           />
         </div>

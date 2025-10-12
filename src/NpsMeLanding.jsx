@@ -241,9 +241,9 @@ export default function NpsMeLanding() {
               className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
               We help you improve your{" "}
-              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience. 
+              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-                Turn feedback into growth.
+                 &nbsp;Turn feedback into growth.
               </span>
             </motion.h1>
             <motion.p
@@ -330,11 +330,11 @@ export default function NpsMeLanding() {
 
       {/* About */}
       <section id="about" className="mx-auto max-w-7xl px-6 pb-20">
-        <h2 className="text-2xl md:text-3xl font-semibold text-white">About me</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold text-white">About us</h2>
         <p className="mt-3 text-slate-300 max-w-2xl">
-          I’m an experienced NPS and CX consultant. I combine quantitative analysis with
+          We are experienced NPS and CX consultants. We combine quantitative analysis with
           hands-on team enablement to remove friction, improve sentiment, and grow revenue.
-          I reference Net Promoter Score (NPS)® descriptively as one of several customer metrics.
+          We reference Net Promoter Score (NPS)® descriptively as one of several customer metrics.
         </p>
         <ul className="mt-6 space-y-3 text-sm text-slate-300">
           {[

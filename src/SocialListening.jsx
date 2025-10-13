@@ -94,7 +94,7 @@ export default function SocialListening() {
           delighted — and where they’re dropping off.
         </p>
         <a
-          href="/impact"
+          href="/cx-pulse-sample"
           className="inline-block rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#22C55E] px-6 py-3 font-medium text-white hover:opacity-90 transition"
         >
           View Sample Report →

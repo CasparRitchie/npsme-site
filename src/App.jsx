@@ -1,7 +1,6 @@
 // src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import NavBar from "./components/Navbar";
 
 // Pages
 import NpsMeLanding from "./NpsMeLanding";
@@ -21,7 +20,6 @@ import Layout from "./Layout";
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <NavBar />
       <ScrollToTop />
       <Routes>
         <Route element={<Layout />}>

@@ -11,7 +11,6 @@ import CxPulseSample from "./CxPulseSample";
 import MilestoneNps from "./MilestoneNps";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
-import Footer from "./components/Footer"
 import ScrollToTop from "./components/ScrollToTop";
 import Layout from "./Layout";
 
@@ -35,7 +34,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-      <Footer />
     </div>
   );
 }

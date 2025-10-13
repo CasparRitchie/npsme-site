@@ -5,24 +5,25 @@ import { ArrowRight, TrendingUp, MessageSquare, AlertTriangle, CheckCircle2 } fr
 
 export default function CxPulseSample() {
   // ---------- Fake-but-realistic sample data ----------
-  const weekOnWeek = { // non-linear, small dips for realism
-    sentimentScore: [48, 46, 51, 49, 55, 57, 54, 60], // %
-    npsStyle:       [12,  8, 14, 13, 18, 21, 19, 24], // index
+  // Made the two series' shapes different on purpose (small dips & plateaus).
+  const weekOnWeek = {
+    sentimentScore: [46, 49, 48, 52, 51, 56, 54, 59], // smoother rise, dip mid-run
+    npsStyle:       [11,  9, 13, 10, 15, 14, 18, 22], // more volatility & later lift
   };
 
   const themes = [
-    { name: "Onboarding clarity", change: "+17%", sev: "good",   notes: "New 3-step checklist cut confusion. Fewer ‘how do I start?’ posts." },
-    { name: "Delivery reliability", change: "+9%",  sev: "mid",    notes: "Intermittent delays still mentioned. Clear ETA emails reduced WISMO." },
-    { name: "Billing transparency", change: "+3%",  sev: "mid",    notes: "Edge cases around discounts/refunds improved; still pops up monthly." },
-    { name: "Support responsiveness", change: "+22%", sev: "good", notes: "Macro replies removed; first-response SLA posted publicly." },
-    { name: "Mobile app stability", change: "-4%",  sev: "bad",    notes: "New version introduced a crash loop for a subset of devices." },
+    { name: "Onboarding clarity",     change: "+17%", sev: "good", notes: "New 3-step checklist cut confusion. Fewer ‘how do I start?’ posts." },
+    { name: "Delivery reliability",    change: "+9%",  sev: "mid",  notes: "Intermittent delays still mentioned. Clear ETA emails reduced WISMO." },
+    { name: "Billing transparency",    change: "+3%",  sev: "mid",  notes: "Edge cases around discounts/refunds improved; still pops up monthly." },
+    { name: "Support responsiveness",  change: "+22%", sev: "good", notes: "Macro replies removed; first-response SLA posted publicly." },
+    { name: "Mobile app stability",    change: "-4%",  sev: "bad",  notes: "New version introduced a crash loop for a subset of devices." },
   ];
 
   const quotes = [
-    { src: "Twitter", txt: "The welcome checklist made day 1 so much easier. Actually knew what to do next 👏" },
+    { src: "Twitter",    txt: "The welcome checklist made day 1 so much easier. Actually knew what to do next 👏" },
     { src: "Trustpilot", txt: "Had a delivery hiccup, but their ETA email and follow-up made it painless." },
-    { src: "Reddit", txt: "Please fix the latest Android build—keeps freezing on sign-in." },
-    { src: "App Store", txt: "Support replied quickly AND with a real solution. Big improvement from last month." },
+    { src: "Reddit",     txt: "Please fix the latest Android build—keeps freezing on sign-in." },
+    { src: "App Store",  txt: "Support replied quickly AND with a real solution. Big improvement from last month." },
   ];
 
   const implemented = [
@@ -39,14 +40,20 @@ export default function CxPulseSample() {
   };
 
   // ---------- Small helpers ----------
-  const brandGreen = "#22C55E";
+  const brandGreen  = "#22C55E";
   const brandPurple = "#7C3AED";
-  const red = "#ef4444";
+  const red   = "#ef4444";
   const amber = "#f59e0b";
   const green = "#22c55e";
 
   const sevColor = (s) => (s === "good" ? green : s === "mid" ? amber : red);
+  const parseChangePct = (s) => {
+    // "+17%" -> 17, "-4%" -> -4
+    const m = String(s).match(/(-?\d+(\.\d+)?)%/);
+    return m ? Number(m[1]) : 0;
+  };
 
+  // Simple bar (0..max) used in Support load proxy
   const Bar = ({ value, max = 100, color = brandPurple, label }) => (
     <div className="w-full">
       <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -59,28 +66,74 @@ export default function CxPulseSample() {
     </div>
   );
 
-  const Spark = ({ series, color = brandGreen }) => (
-    <svg viewBox="0 0 100 28" className="w-full h-10">
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        points={series
-          .map((v, i) => {
-            const x = (i / (series.length - 1)) * 100;
-            const y = 26 - ((v - Math.min(...series)) / (Math.max(...series) - Math.min(...series) || 1)) * 24;
-            return `${x},${y}`;
-          })
-          .join(" ")}
-      />
-    </svg>
-  );
+  // Zero-centered bar: negatives go left (red), positives go right (amber/green)
+  const BarZero = ({
+    value = 0,            // can be negative or positive
+    min = -30,            // left bound
+    max =  30,            // right bound
+    leftColor = red,      // negative color (left)
+    rightColor = green,   // positive color (right)
+    label,
+  }) => {
+    // Clamp to [min,max]
+    const v = Math.max(min, Math.min(max, value));
+    const rangeL = Math.abs(min);
+    const rangeR = Math.abs(max);
+
+    // Percentage widths relative to each side
+    const leftPct = v < 0 ? (Math.abs(v) / rangeL) * 50 : 0;  // up to 50% width
+    const rightPct = v > 0 ? (v / rangeR) * 50 : 0;           // up to 50% width
+
+    return (
+      <div>
+        <div className="relative h-3 rounded-full bg-white/10 overflow-hidden">
+          {/* center marker */}
+          <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
+          {/* left (negative) */}
+          {leftPct > 0 && (
+            <div
+              className="absolute top-0 bottom-0 right-1/2 rounded-l-full"
+              style={{ width: `${leftPct}%`, backgroundColor: leftColor }}
+            />
+          )}
+          {/* right (positive) */}
+          {rightPct > 0 && (
+            <div
+              className="absolute top-0 bottom-0 left-1/2 rounded-r-full"
+              style={{ width: `${rightPct}%`, backgroundColor: rightColor }}
+            />
+          )}
+        </div>
+        {label && <div className="mt-1 text-xs text-slate-400">{label}</div>}
+      </div>
+    );
+  };
+
+  const Spark = ({ series, color = brandGreen }) => {
+    const min = Math.min(...series);
+    const max = Math.max(...series);
+    const span = Math.max(1, max - min);
+    return (
+      <svg viewBox="0 0 100 28" className="w-full h-10">
+        <polyline
+          fill="none"
+          stroke={color}
+          strokeWidth="2"
+          points={series
+            .map((v, i) => {
+              const x = (i / (series.length - 1)) * 100;
+              const y = 26 - ((v - min) / span) * 24;
+              return `${x},${y}`;
+            })
+            .join(" ")}
+        />
+      </svg>
+    );
+  };
 
   const Footer = () => (
     <div className="mt-10 text-[11px] leading-relaxed text-slate-500">
-      <div className="text-slate-400">
-        © {new Date().getFullYear()} NPS Me. All rights reserved.
-      </div>
+      <div className="text-slate-400">© {new Date().getFullYear()} NPS Me. All rights reserved.</div>
       <div className="mt-2">
         NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld,
         and Satmetrix Systems, Inc. References here are descriptive only. NPS Me is independent and not
@@ -118,13 +171,13 @@ export default function CxPulseSample() {
       <section className="mx-auto max-w-7xl px-6 py-10 grid md:grid-cols-3 gap-6">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">Headline sentiment</div>
-          <div className="mt-1 text-2xl font-semibold text-white">+12 pts WoW</div>
+          <div className="mt-1 text-2xl font-semibold text-white">+13 pts WoW</div>
           <Spark series={weekOnWeek.sentimentScore} color={brandGreen} />
           <div className="text-xs text-slate-400">Composite positivity score (0–100)</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">NPS-style index</div>
-          <div className="mt-1 text-2xl font-semibold text-white">+6 vs. Week 1</div>
+          <div className="mt-1 text-2xl font-semibold text-white">+11 vs. Week 1</div>
           <Spark series={weekOnWeek.npsStyle} color={brandPurple} />
           <div className="text-xs text-slate-400">Detractors vs Promoters balance (scaled)</div>
         </div>
@@ -159,24 +212,37 @@ export default function CxPulseSample() {
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-white">Top themes & movement</h2>
           <div className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {themes.map((t) => (
-              <div key={t.name} className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold text-white">{t.name}</div>
-                  <span className="text-xs px-2 py-0.5 rounded-lg" style={{ backgroundColor: sevColor(t.sev), color: "#0B0F19" }}>
-                    {t.change}
-                  </span>
+            {themes.map((t) => {
+              const delta = parseChangePct(t.change); // e.g. "+17%" -> 17, "-4%" -> -4
+              return (
+                <div key={t.name} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-white">{t.name}</div>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-lg"
+                      style={{ backgroundColor: sevColor(t.sev), color: "#0B0F19" }}
+                    >
+                      {t.change}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <BarZero
+                      value={delta}
+                      min={-30}
+                      max={30}
+                      leftColor={red}
+                      rightColor={sevColor(t.sev)}
+                      label="Theme movement (− left / + right)"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-slate-300">{t.notes}</p>
                 </div>
-                <div className="mt-3">
-                  <Bar value={Math.random() * 100} color={sevColor(t.sev)} label="Theme volume (relative)" />
-                </div>
-                <p className="mt-2 text-sm text-slate-300">{t.notes}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="mt-4 flex items-center gap-3 text-xs text-slate-400">
             <AlertTriangle className="h-4 w-4 text-amber-400" />
-            Movement is week-on-week; ‘volume’ bars are normalised to protect privacy.
+            Movement is week-on-week; bars are centred at zero and normalised to protect privacy.
           </div>
         </div>
       </section>

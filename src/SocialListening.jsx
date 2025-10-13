@@ -57,7 +57,7 @@ export default function SocialListening() {
         </h2>
         <p className="text-slate-400 mb-5 max-w-3xl">
           In a recent anonymised study, we analysed 2,000+ social mentions for a
-          childcare brand. Our sentiment model revealed three key drivers of
+          healthcare brand. Our sentiment model revealed three key drivers of
           dissatisfaction — support delays, unclear pricing, and inconsistency
           in tone. By closing these loops, the brand saw a 14-point NPS lift in
           just one quarter.
@@ -68,7 +68,7 @@ export default function SocialListening() {
             <h4 className="text-lg text-white mb-2">Top Positive Themes</h4>
             <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
               <li>Engaged and friendly staff</li>
-              <li>High educational value</li>
+              <li>High health value</li>
               <li>Personalised communication</li>
             </ul>
           </div>

@@ -14,6 +14,8 @@ import Privacy from "./Privacy";
 import Terms from "./Terms";
 import Footer from "./components/Footer"
 import ScrollToTop from "./components/ScrollToTop";
+import Layout from "./Layout";
+
 
 
 export default function App() {
@@ -22,16 +24,18 @@ export default function App() {
       <NavBar />
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<NpsMeLanding />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/impact" element={<ImpactPage />} />
-        <Route path="/social-listening" element={<SocialListening />} />
-        <Route path="/cx-pulse-sample" element={<CxPulseSample />} />
-        <Route path="/milestone-nps" element={<MilestoneNps />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        {/* Fallback: send unknown routes to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<NpsMeLanding />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/impact" element={<ImpactPage />} />
+          <Route path="/social-listening" element={<SocialListening />} />
+          <Route path="/cx-pulse-sample" element={<CxPulseSample />} />
+          <Route path="/milestone-nps" element={<MilestoneNps />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          {/* Fallback: send unknown routes to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
       <Footer />
     </div>

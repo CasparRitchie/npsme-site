@@ -243,7 +243,7 @@ export default function NpsMeLanding() {
               We help you improve your{" "}
               <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-              &nbsp;Turn feedback into growth.
+              Turn feedback into growth.
               </span>
             </motion.h1>
             <motion.p

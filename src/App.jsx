@@ -7,10 +7,11 @@ import NavBar from "./components/Navbar";
 import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
 import ImpactPage from "./ImpactPage";          // wrapper that renders <Impact />
-// import SocialListening from "./SocialListening";
+import SocialListening from "./SocialListening";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
+import Footer from "./components/Footer"
 
 
 export default function App() {
@@ -21,13 +22,14 @@ export default function App() {
         <Route path="/" element={<NpsMeLanding />} />
         <Route path="/products" element={<Products />} />
         <Route path="/impact" element={<ImpactPage />} />
-        {/* <Route path="/social-listening" element={<SocialListening />} /> */}
+        <Route path="/social-listening" element={<SocialListening />} />
         <Route path="/cx-pulse-sample" element={<CxPulseSample />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         {/* Fallback: send unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </div>
   );
 }

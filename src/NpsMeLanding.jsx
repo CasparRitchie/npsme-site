@@ -379,21 +379,6 @@ export default function NpsMeLanding() {
           <ContactForm />
         </div>
       </section>
-
-      {/* Footer + attribution */}
-      <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6 py-8 text-sm text-slate-400 flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-          <div>© {new Date().getFullYear()} NPS Me. All rights reserved.</div>
-          <div className="flex gap-6">
-            <a href="/privacy" className="hover:text-slate-200">Privacy</a>
-            <a href="/terms" className="hover:text-slate-200">Terms</a>
-          </div>
-        </div>
-        <div className="mx-auto max-w-7xl px-6 pb-8 text-[11px] leading-snug text-slate-500">
-          NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld, and
-          Satmetrix Systems, Inc. NPS Me is independent and is not affiliated with, sponsored, or endorsed by Bain &amp; Company.
-        </div>
-      </footer>
     </div>
   );
 }

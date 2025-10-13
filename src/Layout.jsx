@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "./components/Navbar";
-import SiteFooter from "./components/SiteFooter";
+import Footer from "./components/Footer";
 
 export default function Layout() {
   // Scroll to top on route change (nice with internal nav / footer links)
@@ -14,7 +14,7 @@ export default function Layout() {
       <main className="flex-1">
         <Outlet />
       </main>
-      <SiteFooter />
+      <Footer />
     </div>
   );
 }

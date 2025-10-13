@@ -5,3 +5,6 @@ dist/
 npm-debug.log*
 yarn-*.log*
 pnpm-lock.yaml
+node_modules
+dist
+.DS_Store

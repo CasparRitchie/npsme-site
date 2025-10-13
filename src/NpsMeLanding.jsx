@@ -241,7 +241,7 @@ export default function NpsMeLanding() {
               className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
               We help you improve your{" "}
-              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.&nsbp;
+              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.&nbsp;
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
               Turn feedback into growth.
               </span>

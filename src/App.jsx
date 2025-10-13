@@ -12,12 +12,14 @@ import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
 import Footer from "./components/Footer"
+import ScrollToTop from "./components/ScrollToTop";
 
 
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <NavBar />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<NpsMeLanding />} />
         <Route path="/products" element={<Products />} />

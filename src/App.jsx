@@ -9,6 +9,7 @@ import Products from "./Products";
 import ImpactPage from "./ImpactPage";          // wrapper that renders <Impact />
 import SocialListening from "./SocialListening";
 import CxPulseSample from "./CxPulseSample";
+import MilestoneNps from "./MilestoneNps";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
 import Footer from "./components/Footer"
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/impact" element={<ImpactPage />} />
         <Route path="/social-listening" element={<SocialListening />} />
         <Route path="/cx-pulse-sample" element={<CxPulseSample />} />
+        <Route path="/milestone-nps" element={<MilestoneNps />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         {/* Fallback: send unknown routes to home */}

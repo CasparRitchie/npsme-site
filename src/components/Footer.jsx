@@ -1,4 +1,4 @@
-import Footer from "./components/Footer";
+// import Footer from "./components/Footer";
 
 export default function App() {
   return (
@@ -11,7 +11,7 @@ export default function App() {
         <Route path="/social-listening" element={<SocialListening />} />
         <Route path="*" element={<NpsMeLanding />} />
       </Routes>
-      <Footer />  {/* 👈 unified footer */}
+      {/* <Footer />  👈 unified footer */}
     </div>
   );
 }

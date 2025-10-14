@@ -247,11 +247,13 @@ export default function NpsMeLanding() {
               transition={{ duration: 0.6 }}
               className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
-              Customer Experience (CX) consulting to improve
-              {" "}
-              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span>, retention, and revenue.{" "}
+              Customer Experience (CX) consulting to improve{" "}
+              <span className="md:whitespace-nowrap">
+                Net Promoter Score (NPS)®,
+              </span>{" "}
+              retention, and revenue.{" "}
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-              Turn feedback into growth.
+                Turn feedback into growth.
               </span>
             </motion.h1>
 

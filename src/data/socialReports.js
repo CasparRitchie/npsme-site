@@ -3,6 +3,78 @@
 
 export const REPORTS = [
   {
+    slug: "auto-sector",
+    clientName: "Auto Sector Client",
+    industry: "Auto/Retail",
+    period: "Last 8 weeks (rolling)",
+    sources: ["X/Twitter", "Google Reviews", "Reddit"],
+    sentimentSeries: [42, 45, 47, 46, 50, 53, 51, 55],
+    npsStyleSeries: [9, 6, 10, 11, 14, 17, 15, 19],
+    kpis: {
+      ticketsDown: 0.24,
+      repeatLift: 0.05,
+      churnDown: 0.02
+    },
+    themes: [
+      { name: "Pricing transparency", change: "+14%", sev: "good", notes: "Better cost breakdown helped reduce pushback on hidden fees." },
+      { name: "Delivery promise vs reality", change: "+6%", sev: "mid", notes: "ETA notifications reduced complaints, though delays still present." },
+      { name: "After-sales follow-up", change: "+3%", sev: "mid", notes: "Post-sale check-ins improved sentiment marginally." },
+      { name: "Support responsiveness", change: "+18%", sev: "good", notes: "Faster answers and personalized replies boosted trust." },
+      { name: "App / ordering stability", change: "-2%", sev: "bad", notes: "Some hiccups with checkout crashes on mobile." }
+    ],
+    quotes: [
+      { src: "Google Reviews", txt: "Price structure is now clearer — much appreciated." },
+      { src: "X/Twitter", txt: "Received ETA email before delivery — better communication." },
+      { src: "Reddit", txt: "App crash when submitting order details. Needs patching." },
+      { src: "Google Reviews", txt: "Support actually replied with a fix instead of a generic message." }
+    ],
+    actions: [
+      "Launched clearer pricing breakdown and FAQ hover tooltips.",
+      "Enabled delivery ETA emails with status tracking link.",
+      "Introduced post-sale satisfaction check emails.",
+      "Switched to faster, human-tailored customer support responses."
+    ],
+    nextSteps: [
+      "Deploy app patch to fix the occasional checkout crash.",
+      "A/B test placing pricing detail tooltips near cost lines.",
+      "Monitor review velocity post-ETA rollout.",
+      "Extend follow-up to 7-day and 30-day satisfaction surveys."
+    ]
+  },
+  {
+    slug: "hospitality-sector",
+    clientName: "Hospitality Sector Client",
+    industry: "Hospitality / F&B",
+    period: "Last 8 weeks (rolling)",
+    sources: ["X/Twitter", "TripAdvisor", "Reddit"],
+    sentimentSeries: [48, 46, 44, 45, 48, 52, 50, 54],
+    npsStyleSeries: [11, 9, 8, 10, 13, 16, 14, 18],
+    kpis: {
+      ticketsDown: 0.20,
+      repeatLift: 0.04,
+      churnDown: 0.017
+    },
+    themes: [
+      { name: "Waiting times", change: "+12%", sev: "good", notes: "Expanded seating staff reduced perceived delay in busy hours." },
+      { name: "Menu clarity", change: "+5%", sev: "mid", notes: "Better menu instructions helped reduce order mistakes." },
+      { name: "Reservation system", change: "+7%", sev: "good", notes: "More reliable booking confirmations improved user confidence." }
+    ],
+    quotes: [
+      { src: "TripAdvisor", txt: "Wait time shorter than last visit. Appreciate the update screens." },
+      { src: "X/Twitter", txt: "Menu layout is clearer now; easier to pick." }
+    ],
+    actions: [
+      "Increased front-of-house staff during peak hours.",
+      "Redesigned menu layout with helpful descriptions.",
+      "Enhanced reservation confirmation interface and alerts."
+    ],
+    nextSteps: [
+      "Test SMS reminders 1 hour before booking.",
+      "Add live wait-time indicator to reservation page.",
+      "Survey guests 24h after visit for sentiment feedback."
+    ]
+  },
+  {
     slug: "alpha",
     clientName: "Sample Client Alpha",
     industry: "Marketplace",

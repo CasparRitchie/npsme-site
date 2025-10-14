@@ -11,19 +11,26 @@ const __dirname = dirname(__filename);
 // Change this if you run in another environment
 const BASE_URL = process.env.SITEMAP_BASE_URL || "https://www.npsme.com";
 
-// Filter: enabled, path starts with "/", not hash routes
+// Filter: enabled, valid top-level, not hash, not dynamic (no ":")
 const pages = ROUTES_MANIFEST.filter(
-  (r) => r.enabled && r.path.startsWith("/") && !r.isHash
+  (r) =>
+    r.enabled &&
+    r.path.startsWith("/") &&
+    !r.isHash &&
+    !r.path.includes(":")
 );
 
 // Simple priority/changefreq rules
 function priorityFor(path) {
   if (path === "/") return "1.0";
   if (path === "/products") return "0.9";
-  return "0.8";
+  if (path === "/social-listening") return "0.8";
+  return "0.7";
 }
+
 function changefreqFor(path) {
   if (path === "/") return "weekly";
+  if (path === "/social-listening") return "weekly";
   return "monthly";
 }
 

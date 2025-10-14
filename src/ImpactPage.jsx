@@ -1,5 +1,6 @@
 // src/ImpactPage.jsx
 import React from "react";
+import Seo from "./components/Seo"
 
 /**
  * Impact calculator (NPS Me)
@@ -62,6 +63,11 @@ export default function ImpactPage() {
   return (
     <section id="impact" className="mx-auto max-w-7xl px-6 pb-20">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-10">
+      <Seo
+      path="/impact"
+      title="CX Impact Calculator: Estimate NPS®, Churn & Support Savings | NPS Me"
+      description="Simple calculator to estimate gross profit impact from repeat purchase lift, churn reduction, and support ticket savings."
+      />
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />

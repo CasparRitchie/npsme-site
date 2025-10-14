@@ -1,10 +1,16 @@
 // src/SocialListening.jsx
 import React from "react";
 import { motion } from "framer-motion";
+import Seo from "./components/Seo"
 
 export default function SocialListening() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 text-slate-300">
+      <Seo
+        path="/social-listening"
+        title="Social Listening for CX: Themes, Sentiment & Competitor Pulse | NPS Me"
+        description="Weekly signal from public social channels and reviews—surface themes, track sentiment, and prioritise fixes that move NPS® and retention."
+      />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}

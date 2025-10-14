@@ -2,10 +2,16 @@
 import React from "react";
 import { Star, LineChart, Wrench, Gauge, ClipboardList, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import Seo from "./components/Seo"
 
 export default function MilestoneNps() {
   return (
     <main className="min-h-screen">
+      <Seo
+        path="/milestone-nps"
+        title="Milestone (Transactional) NPS® & Survey Signals | NPS Me"
+        description="Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX."
+      />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />

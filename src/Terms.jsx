@@ -1,12 +1,18 @@
 // src/Terms.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import Seo from "./components/Seo"
 
 export default function Terms() {
   const updated = "12 Oct 2025";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
+      <Seo
+        path="/terms"
+        title="Terms of Service | NPS Me"
+        description="NPS Me terms, scope of services, limitations, and contact details."
+      />
       <section className="mx-auto max-w-3xl px-6 py-14">
         <div className="flex items-center gap-3 mb-3">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />

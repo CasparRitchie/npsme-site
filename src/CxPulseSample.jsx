@@ -144,6 +144,11 @@ export default function CxPulseSample() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
+      <Seo
+        path="/cx-pulse-sample"
+        title="CX Pulse Report (Sample): Themes, Sentiment & Actions | NPS Me"
+        description="Sample weekly CX Pulse: anonymised social feedback, top themes and movement, actions shipped, and measurable impact."
+      />
       {/* Top banner */}
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />

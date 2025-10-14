@@ -1,11 +1,16 @@
 import React from "react";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
+import Seo from "./components/Seo"
 
 export default function Products() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       {/* Global Navbar is rendered by App.jsx */}
-
+      <Seo
+        path="/products"
+        title="Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me"
+        description="Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports."
+      />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />

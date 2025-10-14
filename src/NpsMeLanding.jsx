@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
+import Seo from "./components/Seo"
 
 // NPS Me landing (uses global Navbar from App.jsx)
 
@@ -102,7 +103,7 @@ function NpsExplainer() {
     <section id="nps-explainer" className="mx-auto max-w-7xl px-6 pb-20">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
         <h3 className="text-xl md:text-2xl font-semibold text-white">
-          What is Net Promoter Score (NPS)®?
+          What is Net Promoter Score (NPS)® and how to use it fairly?
         </h3>
 
         <div className="mt-3 grid gap-6 md:grid-cols-2">
@@ -154,7 +155,7 @@ function MilestoneNpsSection() {
     <section id="milestone-nps" className="mx-auto max-w-7xl px-6 pb-20">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
         <h2 className="text-2xl md:text-3xl font-semibold text-white">
-          Milestone (Transactional) NPS & Survey Signals
+          Milestone (transactional) NPS & survey signals for actionable CX
         </h2>
         <p className="mt-3 text-slate-300 max-w-3xl">
           Beyond a periodic, brand-level measure, milestone surveys capture sentiment at specific
@@ -229,6 +230,12 @@ function MilestoneNpsSection() {
 export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
+            {/* SEO meta tags */}
+      <Seo
+        path="/"
+        title="Customer Experience (CX) Consulting & NPS Improvement | NPS Me"
+        description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains—lift NPS®, reduce churn, increase repeat purchase."
+      />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
@@ -240,19 +247,22 @@ export default function NpsMeLanding() {
               transition={{ duration: 0.6 }}
               className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
-              We help you improve your{" "}
-              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span> and customer experience.{' '}
+              Customer Experience (CX) consulting to improve
+              {" "}
+              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span>, retention, and revenue.
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-              Turn feedback into growth.
+                Turn feedback into growth.
               </span>
             </motion.h1>
+
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.05 }}
               className="mt-5 text-slate-300 max-w-xl"
             >
-              NPS Me is an independent consultancy. We use NPS descriptively—as one of several metrics—to prioritise the work that actually moves the needle across your customer journey.
+              NPS Me is a specialist CX consulting firm. We diagnose friction across your journey,
+              prioritise the highest-impact fixes, and implement changes that measurably lift NPS®, reduce churn, and increase repeat purchase.
             </motion.p>
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <a
@@ -282,7 +292,7 @@ export default function NpsMeLanding() {
       <section id="method" className="mx-auto max-w-7xl px-6 py-20">
         <div className="max-w-2xl">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
-            A simple, repeatable 4-stage method
+            A simple, repeatable CX method to lift NPS®
           </h2>
           <p className="mt-3 text-slate-300">
             Clear steps, fast wins, and compounding improvements. I meet you
@@ -319,7 +329,9 @@ export default function NpsMeLanding() {
       {/* Demo Widget */}
       <section id="demo" className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <h3 className="text-xl md:text-2xl font-semibold text-white">Try the NPS®-style demo</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-white">
+            Try the NPS®-style demo (close-the-loop ready)
+          </h3>
           <p className="mt-2 text-slate-300">Rate us 0–10 and leave an optional comment. We’ll show a rolling demo metric on this page.</p>
           <DemoWidget />
         </div>

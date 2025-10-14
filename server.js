@@ -102,18 +102,24 @@ app.get("/sitemap.xml", (_req, res) => {
 });
 
 // ---------- Static assets & caching ----------
+// --- Serve Vite build ---
 const dist = path.join(__dirname, "dist");
 
-// Long cache for hashed Vite assets
+// Long cache for hashed assets (Vite puts them in /assets)
 app.use(
   "/assets",
   express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
 );
 
-// Reasonable cache for other static files (images, favicons, etc.)
-app.use(express.static(dist, { maxAge: "1h" }));
+// Short cache for everything else in /dist, BUT do not let static serve index.html
+app.use(
+  express.static(dist, {
+    maxAge: "1h",
+    index: false, // <— critical: do NOT auto-serve index.html here
+  })
+);
 
-// Never cache index.html so deploys take effect immediately
+// Serve index.html with no-cache for any app route
 app.get("*", (_req, res) => {
   res.set("Cache-Control", "no-cache");
   res.sendFile(path.join(dist, "index.html"));

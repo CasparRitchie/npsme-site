@@ -249,9 +249,9 @@ export default function NpsMeLanding() {
             >
               Customer Experience (CX) consulting to improve
               {" "}
-              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span>, retention, and revenue.
+              <span className="md:whitespace-nowrap">Net Promoter Score (NPS)®</span>, retention, and revenue.{" "}
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
-                Turn feedback into growth.
+              Turn feedback into growth.
               </span>
             </motion.h1>
 
@@ -295,7 +295,7 @@ export default function NpsMeLanding() {
             A simple, repeatable CX method to lift NPS®
           </h2>
           <p className="mt-3 text-slate-300">
-            Clear steps, fast wins, and compounding improvements. I meet you
+            Clear steps, fast wins, and compounding improvements. We meet you
             where you are and prioritise what moves the needle.
           </p>
         </div>

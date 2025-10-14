@@ -92,13 +92,27 @@ app.post("/api/intake", (req, res) => {
 // robots.txt — minimal + cacheless & locked down
 app.get("/robots.txt", (_req, res) => {
   res.type("text/plain");
-  res.set("Content-Security-Policy", "default-src 'none'");
+  res.set({
+    "Content-Security-Policy": "default-src 'none'",
+    "Cache-Control": "public, max-age=0",
+  });
   res.send("User-agent: *\nAllow: /\nSitemap: https://www.npsme.com/sitemap.xml");
 });
 
-// sitemap.xml
 app.get("/sitemap.xml", (_req, res) => {
+  res.set("Cache-Control", "public, max-age=0");
   res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
+});
+
+// Health check (useful for monitors)
+// GET returns 200 "ok"; HEAD also works; never cached.
+app.get("/healthz", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.type("text/plain").send("ok");
+});
+app.head("/healthz", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.status(200).end();
 });
 
 // ---------- Static assets & caching ----------
@@ -119,9 +133,9 @@ app.use(
   })
 );
 
-// Serve index.html with no-cache for any app route
+// Serve index.html for SPA routes with no-store so deploys are instant
 app.get("*", (_req, res) => {
-  res.set("Cache-Control", "no-cache");
+  res.set("Cache-Control", "no-store, must-revalidate");
   res.sendFile(path.join(dist, "index.html"));
 });
 

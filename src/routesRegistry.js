@@ -6,10 +6,13 @@ import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
 import ImpactPage from "./ImpactPage";
 import MilestoneNps from "./MilestoneNps";
-import SocialListening from "./SocialListening";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
+
+// NEW pages
+import SocialListeningIndex from "./pages/SocialListeningIndex";
+import SocialListeningReport from "./pages/SocialListeningReport";
 
 // Map paths to components
 const COMPONENTS = {
@@ -17,7 +20,11 @@ const COMPONENTS = {
   "/products": Products,
   "/impact": ImpactPage,
   "/milestone-nps": MilestoneNps,
-  "/social-listening": SocialListening,
+
+  // Replace old SocialListening with the new pages
+  "/social-listening": SocialListeningIndex,
+  "/social-listening/:slug": SocialListeningReport,
+
   "/cx-pulse-sample": CxPulseSample,
   "/privacy": Privacy,
   "/terms": Terms,

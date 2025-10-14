@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { getReportBySlug } from "../data/socialReports";
-import { Seo } from "../components/Seo";
+import Seo from "../components/Seo";
 import { ArrowRight, TrendingUp, MessageSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 export default function SocialListeningReport() {

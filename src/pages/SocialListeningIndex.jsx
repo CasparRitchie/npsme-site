@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { REPORTS } from "../data/socialReports";
-import { Seo } from "../components/Seo";
+import Seo from "../components/Seo";
 
 export default function SocialListeningIndex() {
   return (

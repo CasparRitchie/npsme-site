@@ -31,19 +31,19 @@ export default function Privacy() {
           <h2>What we collect</h2>
           <ul>
             <li>
-              <strong>Contact details you submit</strong> — name, email, and message content when you use our contact
+              <strong>Contact details you submit</strong> - name, email, and message content when you use our contact
               form or email us.
             </li>
             <li>
-              <strong>Operational/demo data</strong> — if you try our demo widgets (e.g., the “NPS®-style” demo),
+              <strong>Operational/demo data</strong> - if you try our demo widgets (e.g., the “NPS®-style” demo),
               we store your score/comment for demonstration purposes only (no profiling).
             </li>
             <li>
-              <strong>Technical information</strong> — standard logs (IP address, user agent, pages viewed,
+              <strong>Technical information</strong> - standard logs (IP address, user agent, pages viewed,
               referrer) for security and performance.
             </li>
             <li>
-              <strong>Cookies</strong> — minimal, primarily for performance and basic analytics. We don’t run ad
+              <strong>Cookies</strong> - minimal, primarily for performance and basic analytics. We don’t run ad
               trackers or sell personal data.
             </li>
           </ul>
@@ -57,9 +57,9 @@ export default function Privacy() {
 
           <h2>Legal bases (EEA/UK)</h2>
           <ul>
-            <li><strong>Legitimate interests</strong> — running the site, security, light analytics.</li>
-            <li><strong>Consent</strong> — where required (e.g., optional newsletter, if added in future).</li>
-            <li><strong>Contract</strong> — when we discuss or deliver consulting services you request.</li>
+            <li><strong>Legitimate interests</strong> - running the site, security, light analytics.</li>
+            <li><strong>Consent</strong> - where required (e.g., optional newsletter, if added in future).</li>
+            <li><strong>Contract</strong> - when we discuss or deliver consulting services you request.</li>
           </ul>
 
           <h2>Processors & infrastructure</h2>

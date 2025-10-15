@@ -92,7 +92,7 @@ function ContactForm() {
         <p className="mt-3 text-sm text-[#22C55E]">Thanks! I’ll get back to you shortly.</p>
       )}
       {status === "error" && (
-        <p className="mt-3 text-sm text-red-400">Sorry—something went wrong. Please email hello@npsme.com.</p>
+        <p className="mt-3 text-sm text-red-400">Sorry-something went wrong. Please email hello@npsme.com.</p>
       )}
     </>
   );
@@ -133,7 +133,7 @@ function NpsExplainer() {
             <ul className="mt-2 space-y-2 list-disc pl-5">
               <li>Use representative sampling and avoid “gaming”.</li>
               <li>Close the loop with respondents and track root causes.</li>
-              <li>NPS is directional—not a single source of truth.</li>
+              <li>NPS is directional-not a single source of truth.</li>
             </ul>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function NpsMeLanding() {
       <Seo
         path="/"
         title="Customer Experience (CX) Consulting & NPS Improvement | NPS Me"
-        description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains—lift NPS®, reduce churn, increase repeat purchase."
+        description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase."
       />
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -456,7 +456,7 @@ function DemoWidget() {
         </button>
         {sent && <div className="text-sm text-slate-300">Thanks! Response recorded.</div>}
         <div className="text-sm text-slate-400">
-          Rolling demo NPS: <span className="text-white font-semibold">{rolling ?? "—"}</span>
+          Rolling demo NPS: <span className="text-white font-semibold">{rolling ?? "-"}</span>
         </div>
       </div>
     </div>

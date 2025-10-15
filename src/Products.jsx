@@ -19,7 +19,7 @@ export default function Products() {
             Productized services that turn feedback into growth
           </h1>
           <p className="mt-4 text-slate-300 max-w-2xl">
-            Pick the package that fits your stage—from foundations, to enablement,
+            Pick the package that fits your stage-from foundations, to enablement,
             to a weekly CX intelligence feed you can act on.
           </p>
         </div>

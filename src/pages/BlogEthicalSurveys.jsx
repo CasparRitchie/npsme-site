@@ -27,7 +27,7 @@ export default function BlogEthicalSurveys() {
           <p>
             Every company wants to be customer-centric, but few stop to ask whether
             their feedback processes are <em>ethically customer-centric</em>.
-            It’s one thing to measure Net Promoter Score (NPS); it’s another to ensure
+            It’s one thing to measure Net Promoter Score (NPS) - it’s another to ensure
             that the way you collect that feedback actually reflects reality.
           </p>
 
@@ -43,14 +43,14 @@ export default function BlogEthicalSurveys() {
           </p>
           <p>
             On paper, that sounds like a fair process. In practice, however, Account Managers
-            could easily exclude contacts they knew were unhappy — or mark entire Accounts as
+            could easily exclude contacts they knew were unhappy - or mark entire Accounts as
             “Do Not Survey” (DNS). Initially, that decision didn’t require approval,
             meaning anyone who didn’t want a low score could quietly hide detractors from the data.
           </p>
           <p>
             We later introduced a VP approval process to control DNS flags, but the problem was clear:
             when the people being measured control who provides feedback,
-            the resulting NPS isn’t a measure of customer advocacy — it’s a measure of survey design ethics.
+            the resulting NPS isn’t a measure of customer advocacy - it’s a measure of survey design ethics.
           </p>
 
           <h2 className="text-xl font-semibold text-white mt-10">
@@ -63,17 +63,17 @@ export default function BlogEthicalSurveys() {
           </p>
           <p>
             The challenge? Those nudges often crossed ethical lines. While our guidance was
-            clear — encourage participation, but never influence the score — human nature
+            clear - encourage participation, but never influence the score - human nature
             and incentive structures can blur that line.
           </p>
           <blockquote className="border-l-4 border-[#22C55E] pl-4 italic text-slate-400">
-            “Please give us a 9 or 10, otherwise it’s seen as bad” — the classic poster
+            “Please give us a 9 or 10, otherwise it’s seen as bad” - the classic poster
             once found in Mercure hotel lifts, perfectly illustrates this dilemma.
           </blockquote>
           <p>
             This type of “coached feedback” destroys the credibility of the data.
             You end up optimising for a number rather than for genuine improvement.
-            It feels like progress — but it’s performance theatre.
+            It feels like progress - but it’s performance theatre.
           </p>
 
           <h2 className="text-xl font-semibold text-white mt-10">

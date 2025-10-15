@@ -10,7 +10,7 @@ export default function SocialListeningIndex() {
       <Seo
         path="/social-listening"
         title="Social Listening Reports (Anonymised) | NPS Me"
-        description="Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions — how we turn feedback into growth."
+        description="Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions - how we turn feedback into growth."
       />
 
       <section className="relative overflow-hidden border-b border-white/10">

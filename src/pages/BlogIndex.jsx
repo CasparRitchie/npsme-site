@@ -8,7 +8,7 @@ const POSTS = [
     slug: "ethical-surveys",
     title: "When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection",
     excerpt:
-      "How contact selection, DNS flags, and response-pressure can quietly distort NPS — and what to do instead.",
+      "How contact selection, DNS flags, and response-pressure can quietly distort NPS - and what to do instead.",
     date: "2025-10-15",
     readTime: "7 min",
     tags: ["NPS", "Ethics", "Survey Design"],
@@ -21,7 +21,7 @@ export default function BlogIndex() {
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/blog"
-        title="Blog | NPS Me — Practical CX & NPS Insights"
+        title="Blog | NPS Me - Practical CX & NPS Insights"
         description="Opinionated, practitioner-grade guidance on improving customer experience (CX) and Net Promoter Score (NPS) ethically."
       />
 
@@ -31,7 +31,7 @@ export default function BlogIndex() {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <p className="text-xs uppercase tracking-widest text-slate-400">Insights</p>
           <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            Blog — CX & NPS, done properly
+            Blog - CX & NPS, done properly
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
             Pragmatic lessons from real programmes. Fewer buzzwords, more outcomes.

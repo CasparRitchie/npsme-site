@@ -9,7 +9,7 @@ export default function SocialListening() {
       <Seo
         path="/social-listening"
         title="Social Listening for CX: Themes, Sentiment & Competitor Pulse | NPS Me"
-        description="Weekly signal from public social channels and reviews—surface themes, track sentiment, and prioritise fixes that move NPS® and retention."
+        description="Weekly signal from public social channels and reviews-surface themes, track sentiment, and prioritise fixes that move NPS® and retention."
       />
       {/* Header */}
       <motion.div
@@ -22,8 +22,8 @@ export default function SocialListening() {
           Social Listening & Sentiment Insights
         </h1>
         <p className="mt-3 text-lg text-slate-400 max-w-3xl">
-          We analyse what customers are *really saying* about your brand online —
-          across platforms like X (Twitter), Reddit, and Trustpilot — to surface
+          We analyse what customers are *really saying* about your brand online -
+          across platforms like X (Twitter), Reddit, and Trustpilot - to surface
           actionable insights that guide your CX and marketing decisions.
         </p>
       </motion.div>
@@ -33,7 +33,7 @@ export default function SocialListening() {
         {[
           {
             title: "Sentiment Analysis",
-            text: "Understand the tone behind every mention — from praise to frustration — to prioritise improvements.",
+            text: "Understand the tone behind every mention - from praise to frustration - to prioritise improvements.",
           },
           {
             title: "Theme Detection",
@@ -64,7 +64,7 @@ export default function SocialListening() {
         <p className="text-slate-400 mb-5 max-w-3xl">
           In a recent anonymised study, we analysed 2,000+ social mentions for a
           healthcare brand. Our sentiment model revealed three key drivers of
-          dissatisfaction — support delays, unclear pricing, and inconsistency
+          dissatisfaction - support delays, unclear pricing, and inconsistency
           in tone. By closing these loops, the brand saw a 14-point NPS lift in
           just one quarter.
         </p>
@@ -97,7 +97,7 @@ export default function SocialListening() {
         </h2>
         <p className="text-slate-400 mb-6">
           Get a tailored CX Pulse Report showing where your customers are
-          delighted — and where they’re dropping off.
+          delighted - and where they’re dropping off.
         </p>
         <a
           href="/cx-pulse-sample"

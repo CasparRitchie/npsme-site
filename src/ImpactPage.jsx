@@ -151,7 +151,7 @@ export default function ImpactPage() {
             </li>
           </ul>
           <p className="text-xs text-slate-400">
-            Directional estimate for planning—actuals depend on mix, seasonality, sampling, and experimentation. We validate
+            Directional estimate for planning - actuals depend on mix, seasonality, sampling, and experimentation. We validate
             with Finance during engagement (dashboards + cohort analysis).
           </p>
           <p className="text-[11px] text-slate-500">

@@ -23,7 +23,7 @@ export default function CxPulseSample() {
   const quotes = [
     { src: "Twitter",    txt: "The welcome checklist made day 1 so much easier. Actually knew what to do next 👏" },
     { src: "Trustpilot", txt: "Had a delivery hiccup, but their ETA email and follow-up made it painless." },
-    { src: "Reddit",     txt: "Please fix the latest Android build—keeps freezing on sign-in." },
+    { src: "Reddit",     txt: "Please fix the latest Android build - keeps freezing on sign-in." },
     { src: "App Store",  txt: "Support replied quickly AND with a real solution. Big improvement from last month." },
   ];
 
@@ -162,7 +162,7 @@ export default function CxPulseSample() {
             CX Pulse Report – <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">Sample Client</span>
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
-            Weekly signal from public social channels and review sites. Themes, sentiment, and what to do next—summarised on one page.
+            Weekly signal from public social channels and review sites. Themes, sentiment, and what to do next - summarised on one page.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-300">
             <TrendingUp className="h-4 w-4" />

@@ -132,7 +132,7 @@ export default function SocialListeningReport() {
             <p className="text-xs tracking-widest text-slate-400 uppercase">Anonymised report</p>
           </div>
           <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            {r.clientName} — CX Pulse
+            {r.clientName} - CX Pulse
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
             {r.period}. Sources: {r.sources.join(", ")}.

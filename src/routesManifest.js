@@ -13,6 +13,9 @@ export const ROUTES_MANIFEST = [
   { path: "/privacy",         label: "Privacy",            enabled: true,  inHeader: false, inFooter: true  },
   { path: "/terms",           label: "Terms",              enabled: true,  inHeader: false, inFooter: true  },
 
+  // Blogs
+  { path: "/blog/ethical-surveys", label: "Blog: Ethical Surveys", enabled: true, inHeader: false, inFooter: true },
+
   // Hash/anchor (not for sitemap)
   { path: "/#contact",        label: "Contact",            enabled: true,  inHeader: false, inFooter: true, isHash: true },
 ];

@@ -13,17 +13,21 @@ import Terms from "./Terms";
 // NEW pages
 import SocialListeningIndex from "./pages/SocialListeningIndex";
 import SocialListeningReport from "./pages/SocialListeningReport";
+import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 
-// Map paths to components
+// Path to component mapping
 const COMPONENTS = {
   "/": NpsMeLanding,
   "/products": Products,
   "/impact": ImpactPage,
   "/milestone-nps": MilestoneNps,
 
-  // Replace old SocialListening with the new pages
+  // SocialListening pages
   "/social-listening": SocialListeningIndex,
   "/social-listening/:slug": SocialListeningReport,
+
+  // Blogs
+  "/blog/ethical-surveys": BlogEthicalSurveys,
 
   "/cx-pulse-sample": CxPulseSample,
   "/privacy": Privacy,

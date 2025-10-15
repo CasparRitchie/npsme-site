@@ -9,7 +9,7 @@ export default function BlogEthicalSurveys() {
       <Seo
         path="/blog/ethical-surveys"
         title="When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection | NPS Me"
-        description="A reflection by former BT Head of Customer Experience Caspar Ritchie on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems."
+        description="A reflection by former Telco Head of Customer Experience (Europe) on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems."
       />
 
       <div className="mx-auto max-w-3xl px-6 py-12">
@@ -20,7 +20,7 @@ export default function BlogEthicalSurveys() {
           When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection
         </h1>
         <p className="mt-3 text-slate-400 text-sm">
-          By Caspar Ritchie · Former Head of Customer Experience, BT
+          By Former Head of Customer Experience (Europe)
         </p>
 
         <div className="mt-8 space-y-6 text-slate-300 leading-relaxed">
@@ -35,7 +35,7 @@ export default function BlogEthicalSurveys() {
             Contact selection: the invisible bias
           </h2>
           <p>
-            At BT, we used Salesforce to manage “contact selection” for our B2B NPS programme.
+            At my former company, we used Salesforce to manage “contact selection” for our B2B NPS programme.
             Each Account Manager could flag a contact as either
             <strong> “Available for Survey” </strong> or
             <strong> “Not Suitable for Survey.”</strong>

@@ -13,6 +13,7 @@ import Terms from "./Terms";
 // NEW pages
 import SocialListeningIndex from "./pages/SocialListeningIndex";
 import SocialListeningReport from "./pages/SocialListeningReport";
+import BlogIndex from "./pages/BlogIndex";
 import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 
 // Path to component mapping
@@ -27,6 +28,7 @@ const COMPONENTS = {
   "/social-listening/:slug": SocialListeningReport,
 
   // Blogs
+  "/blog": BlogIndex,
   "/blog/ethical-surveys": BlogEthicalSurveys,
 
   "/cx-pulse-sample": CxPulseSample,

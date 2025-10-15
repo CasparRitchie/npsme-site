@@ -52,7 +52,7 @@ export default function Book() {
       <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">Book a discovery session</h1>
         <p className="mt-3 text-slate-300">
-          Choose a preferred date/time and add a line of context. I’ll reply quickly to confirm and send an invite.
+          Choose a preferred date/time and tell us what you're looking for. We’ll reply quickly to confirm and send an invite.
         </p>
 
         <form

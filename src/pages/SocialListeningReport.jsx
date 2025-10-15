@@ -1,6 +1,7 @@
 // src/pages/SocialListeningReport.jsx
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { getReportBySlug } from "../data/socialReports";
 import Seo from "../components/Seo";
 import { ArrowRight, TrendingUp, MessageSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
@@ -16,13 +17,16 @@ export default function SocialListeningReport() {
           <h1 className="text-3xl font-semibold text-white">Report not found</h1>
           <p className="mt-3 text-slate-400">
             The report you’re looking for doesn’t exist.{" "}
-            <Link to="/social-listening" className="text-[#22C55E] underline">View all reports</Link>
+            <Link to="/social-listening" className="text-[#22C55E] underline">
+              View all reports
+            </Link>
           </p>
         </div>
       </div>
     );
   }
 
+  // ----- Brand / color helpers -----
   const brandGreen = "#22C55E";
   const brandPurple = "#7C3AED";
   const red = "#ef4444";
@@ -30,6 +34,7 @@ export default function SocialListeningReport() {
   const green = "#22c55e";
   const sevColor = (s) => (s === "good" ? green : s === "mid" ? amber : red);
 
+  // ----- Tiny sparkline -----
   const Spark = ({ series, color = brandGreen }) => (
     <svg viewBox="0 0 100 28" className="w-full h-10">
       <polyline
@@ -49,10 +54,10 @@ export default function SocialListeningReport() {
     </svg>
   );
 
-  // Diverging bar: negative left, positive right, 0 in the middle
+  // ----- Diverging bar: negative left, positive right -----
   const DivergingBar = ({ value = 0, min = -100, max = 100, colorPos = green, colorNeg = red }) => {
     const clamped = Math.max(min, Math.min(max, value));
-    const pct = ((Math.abs(clamped) / (max - min)) * 100) * 2; // scale into half-width
+    const pct = ((Math.abs(clamped) / (max - min)) * 100) * 2;
     const isNeg = clamped < 0;
     return (
       <div className="w-full">
@@ -67,7 +72,7 @@ export default function SocialListeningReport() {
               borderTopLeftRadius: isNeg ? "9999px" : 0,
               borderBottomLeftRadius: isNeg ? "9999px" : 0,
               borderTopRightRadius: isNeg ? 0 : "9999px",
-              borderBottomRightRadius: isNeg ? 0 : "9999px"
+              borderBottomRightRadius: isNeg ? 0 : "9999px",
             }}
           />
         </div>
@@ -75,13 +80,48 @@ export default function SocialListeningReport() {
     );
   };
 
+  // ----- Simple deltas -----
+  const sentimentDelta = r.sentimentSeries[r.sentimentSeries.length - 1] - r.sentimentSeries[0];
+  const npsDelta = r.npsStyleSeries[r.npsStyleSeries.length - 1] - r.npsStyleSeries[0];
+
+  // ----- Per-page SEO + JSON-LD -----
+  const pagePath = `/social-listening/${r.slug}`;
+  const pageUrl = `https://www.npsme.com${pagePath}`;
+  const title = `${r.industry} Social Listening Insights (Anonymised) | NPS Me`;
+  const description = `An anonymised ${r.industry} CX Pulse report: themes, quotes, actions, and KPI impact across ${r.period}.`;
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${r.industry} Social Listening Insights (Anonymised)`,
+    description,
+    author: { "@type": "Organization", name: "NPS Me" },
+    publisher: {
+      "@type": "Organization",
+      name: "NPS Me",
+      logo: { "@type": "ImageObject", url: "https://www.npsme.com/favicon-512.png" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    datePublished: new Date().toISOString(),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.npsme.com/" },
+      { "@type": "ListItem", position: 2, name: "Social Listening", item: "https://www.npsme.com/social-listening" },
+      { "@type": "ListItem", position: 3, name: r.clientName, item: pageUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <Seo
-        path={`/social-listening/${r.slug}`}
-        title={`${r.clientName} – Social Listening Report (Anonymised) | NPS Me`}
-        description={`Anonymised ${r.industry} CX Pulse report. Themes, quotes, actions, and KPI impact across ${r.period}.`}
-      />
+      <Seo path={pagePath} title={title} description={description} />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+      </Helmet>
 
       {/* Header */}
       <section className="relative overflow-hidden border-b border-white/10">
@@ -109,27 +149,35 @@ export default function SocialListeningReport() {
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">Headline sentiment</div>
           <div className="mt-1 text-2xl font-semibold text-white">
-            {r.sentimentSeries[r.sentimentSeries.length - 1] - r.sentimentSeries[0] >= 0 ? "+" : ""}
-            {r.sentimentSeries[r.sentimentSeries.length - 1] - r.sentimentSeries[0]} pts
+            {sentimentDelta >= 0 ? "+" : ""}
+            {sentimentDelta} pts
           </div>
           <Spark series={r.sentimentSeries} color={brandGreen} />
           <div className="text-xs text-slate-400">Composite positivity (0–100)</div>
         </div>
+
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">NPS-style index</div>
           <div className="mt-1 text-2xl font-semibold text-white">
-            {r.npsStyleSeries[r.npsStyleSeries.length - 1] - r.npsStyleSeries[0] >= 0 ? "+" : ""}
-            {r.npsStyleSeries[r.npsStyleSeries.length - 1] - r.npsStyleSeries[0]}
+            {npsDelta >= 0 ? "+" : ""}
+            {npsDelta}
           </div>
           <Spark series={r.npsStyleSeries} color={brandPurple} />
           <div className="text-xs text-slate-400">Detractors vs Promoters balance (scaled)</div>
         </div>
+
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">Support load proxy</div>
           <div className="mt-1 text-2xl font-semibold text-white">
             −{Math.round(r.kpis.ticketsDown * 100)}% tickets
           </div>
-          <div className="mt-2"><DivergingBar value={Math.round(r.kpis.ticketsDown * 100)} /></div>
+          <div className="mt-2">
+            <DivergingBar
+              value={Math.round(r.kpis.ticketsDown * 100)}
+              colorPos={green}
+              colorNeg={red}
+            />
+          </div>
           <div className="mt-2 text-xs text-slate-400">Tickets per 1k orders (relative)</div>
         </div>
       </section>
@@ -158,13 +206,16 @@ export default function SocialListeningReport() {
           <h2 className="text-xl md:text-2xl font-semibold text-white">Top themes & movement</h2>
           <div className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {r.themes.map((t) => {
-              const changeVal = parseFloat(t.change.replace("%",""));
+              const changeVal = parseFloat(t.change.replace("%", ""));
               const color = sevColor(t.sev);
               return (
                 <div key={t.name} className="rounded-2xl border border-white/10 bg-black/20 p-5">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-white">{t.name}</div>
-                    <span className="text-xs px-2 py-0.5 rounded-lg" style={{ backgroundColor: color, color: "#0B0F19" }}>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-lg"
+                      style={{ backgroundColor: color, color: "#0B0F19" }}
+                    >
                       {t.change}
                     </span>
                   </div>
@@ -197,9 +248,21 @@ export default function SocialListeningReport() {
           </ul>
 
           <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <ImpactCard label="Repeat purchase lift" value={`+${Math.round(r.kpis.repeatLift*100)}%`} note="Cohort repeat rate" />
-            <ImpactCard label="Churn/refunds reduction" value={`−${Math.round(r.kpis.churnDown*100)}%`} note="Refunds per 1k orders" />
-            <ImpactCard label="Tickets per 1k orders" value={`−${Math.round(r.kpis.ticketsDown*100)}%`} note="After comms & SLA revamp" />
+            <ImpactCard
+              label="Repeat purchase lift"
+              value={`+${Math.round(r.kpis.repeatLift * 100)}%`}
+              note="Cohort repeat rate"
+            />
+            <ImpactCard
+              label="Churn/refunds reduction"
+              value={`−${Math.round(r.kpis.churnDown * 100)}%`}
+              note="Refunds per 1k orders"
+            />
+            <ImpactCard
+              label="Tickets per 1k orders"
+              value={`−${Math.round(r.kpis.ticketsDown * 100)}%`}
+              note="After comms & SLA revamp"
+            />
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
@@ -215,11 +278,6 @@ export default function SocialListeningReport() {
             >
               Book discovery <ArrowRight className="h-4 w-4" />
             </a>
-          </div>
-
-          <div className="mt-10 text-[11px] leading-relaxed text-slate-500">
-            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld,
-            and Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and not affiliated with or endorsed by those parties.
           </div>
         </div>
       </section>

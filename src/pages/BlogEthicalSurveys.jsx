@@ -20,7 +20,7 @@ export default function BlogEthicalSurveys() {
           When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection
         </h1>
         <p className="mt-3 text-slate-400 text-sm">
-          By Former Head of Customer Experience (Europe)
+          By a former Head of Customer Experience (Europe) for a large telco
         </p>
 
         <div className="mt-8 space-y-6 text-slate-300 leading-relaxed">
@@ -93,8 +93,7 @@ export default function BlogEthicalSurveys() {
               from the company, not individual account owners, to avoid bias.
             </li>
             <li>
-              <strong>Rotate samples regularly.</strong> Avoid repeatedly surveying the same contacts
-              — it skews sentiment and causes fatigue.
+              <strong>Rotate samples regularly.</strong> Avoid repeatedly surveying the same contacts because it skews sentiment and causes fatigue.
             </li>
             <li>
               <strong>Close the loop transparently.</strong> Publish common themes and show customers
@@ -109,7 +108,7 @@ export default function BlogEthicalSurveys() {
             but by the integrity of the data beneath it.
           </p>
           <p>
-            True improvement comes from facing uncomfortable truths — and ensuring your customers
+            True improvement comes from facing uncomfortable truths... and ensuring your customers
             feel safe enough to tell them.
           </p>
         </div>

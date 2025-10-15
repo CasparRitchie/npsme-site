@@ -38,7 +38,7 @@ export default function BlogEthicalSurveys() {
             At my former company, we used Salesforce to manage “contact selection” for our B2B NPS programme.
             Each Account Manager could flag a contact as either
             <strong> “Available for Survey” </strong> or
-            <strong> “Not Suitable for Survey.”</strong>
+            <strong> “Not Suitable for Survey.” </strong>
             Each month, the system randomly selected a sample from those “available” contacts.
           </p>
           <p>

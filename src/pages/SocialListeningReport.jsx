@@ -139,7 +139,7 @@ export default function SocialListeningReport() {
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-300">
             <TrendingUp className="h-4 w-4" />
-            <span>Realistic trends with dips; privacy-preserving quotes and volumes.</span>
+            <span>Trends and indexes; privacy-preserving quotes and volumes.</span>
           </div>
         </div>
       </section>

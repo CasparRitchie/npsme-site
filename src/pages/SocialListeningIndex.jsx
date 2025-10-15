@@ -44,7 +44,7 @@ export default function SocialListeningIndex() {
               </div>
             </div>
             <div className="mt-4 text-sm text-slate-300">
-              <div>Sentiment ↑ trend with realistic dips.</div>
+              <div>Sentiment ↑ trend.</div>
               <div>NPS-style index improving across 8 weeks.</div>
               <div>Tickets per 1k orders {Math.round(r.kpis.ticketsDown * 100)}% lower.</div>
             </div>

@@ -1,58 +1,73 @@
 // scripts/generate-sitemap.mjs
-// Node ESM script: generates public/sitemap.xml from ROUTES_MANIFEST
+// Generate /public/sitemap.xml from routes + social listening reports
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ROUTES_MANIFEST } from "../src/routesManifest.js";
+
+// --- Import route + report data (ESM) ---
+import { ROUTES_MANIFEST } from "../routesManifest.js";
+import { REPORTS } from "../data/socialReports.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Change this if you run in another environment
 const BASE_URL = process.env.SITEMAP_BASE_URL || "https://www.npsme.com";
+const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-// Filter: enabled, valid top-level, not hash, not dynamic (no ":")
-const pages = ROUTES_MANIFEST.filter(
-  (r) =>
-    r.enabled &&
-    r.path.startsWith("/") &&
-    !r.isHash &&
-    !r.path.includes(":")
-);
+// --- Base pages from manifest (enabled, absolute path, not hash, not dynamic ":") ---
+const basePages = ROUTES_MANIFEST
+  .filter(
+    (r) =>
+      r.enabled &&
+      r.path.startsWith("/") &&
+      !r.isHash &&
+      !r.path.includes(":")
+  )
+  .map((r) => r.path);
 
-// Simple priority/changefreq rules
+// --- Social Listening: index + each report page ---
+const socialIndex = "/social-listening";
+const socialReports = REPORTS.map((r) => `${socialIndex}/${r.slug}`);
+
+// Deduplicate and keep stable order: Home, Products, Impact, Social index, others…
+const allPaths = Array.from(new Set([...basePages, socialIndex, ...socialReports]));
+
+// --- Priority / changefreq rules ---
 function priorityFor(path) {
   if (path === "/") return "1.0";
   if (path === "/products") return "0.9";
-  if (path === "/social-listening") return "0.8";
+  if (path === socialIndex) return "0.8";
+  if (path.startsWith(`${socialIndex}/`)) return "0.7"; // individual reports
   return "0.7";
 }
 
 function changefreqFor(path) {
   if (path === "/") return "weekly";
-  if (path === "/social-listening") return "weekly";
+  if (path === socialIndex) return "weekly";
+  if (path.startsWith(`${socialIndex}/`)) return "weekly"; // you’ll refresh/add reports
   return "monthly";
 }
 
-const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
+// --- Build XML ---
 const xml =
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  pages
+  allPaths
     .map(
-      (r) => `  <url>
-    <loc>${BASE_URL}${r.path === "/" ? "/" : r.path}</loc>
+      (p) => `  <url>
+    <loc>${BASE_URL}${p === "/" ? "/" : p}</loc>
     <lastmod>${today}</lastmod>
-    <changefreq>${changefreqFor(r.path)}</changefreq>
-    <priority>${priorityFor(r.path)}</priority>
+    <changefreq>${changefreqFor(p)}</changefreq>
+    <priority>${priorityFor(p)}</priority>
   </url>`
     )
     .join("\n") +
   `\n</urlset>\n`;
 
-const outDir = resolve(__dirname, "..", "public");
+// --- Write to /public/sitemap.xml ---
+const outDir = resolve(__dirname, "../../public");
 mkdirSync(outDir, { recursive: true });
 const outFile = resolve(outDir, "sitemap.xml");
 writeFileSync(outFile, xml, "utf8");
 console.log(`✓ Wrote sitemap: ${outFile}`);
+console.log(`✓ Included ${allPaths.length} URLs (routes + ${socialReports.length} reports)`);

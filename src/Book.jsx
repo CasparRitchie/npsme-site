@@ -152,11 +152,6 @@ export default function Book() {
               Sorry—something went wrong. Please email <a href="mailto:hello@npsme.com" className="underline">hello@npsme.com</a>.
             </p>
           )}
-
-          <p className="mt-6 text-xs text-slate-400">
-            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld, and
-            Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and not affiliated with those parties.
-          </p>
         </form>
       </section>
     </div>

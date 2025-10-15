@@ -154,10 +154,6 @@ export default function ImpactPage() {
             Directional estimate for planning - actuals depend on mix, seasonality, sampling, and experimentation. We validate
             with Finance during engagement (dashboards + cohort analysis).
           </p>
-          <p className="text-[11px] text-slate-500">
-            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld, and
-            Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and not affiliated with those parties.
-          </p>
         </div>
       </div>
     </section>

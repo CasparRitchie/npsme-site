@@ -138,14 +138,6 @@ function NpsExplainer() {
             </ul>
           </div>
         </div>
-
-        <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-[11px] leading-relaxed text-slate-400">
-          <p>
-            Terminology & attribution: NPS® and Net Promoter Score® are registered service marks of
-            Bain &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References here are descriptive only.
-            NPS Me is independent and not affiliated with or endorsed by those parties.
-          </p>
-        </div>
       </div>
     </section>
   );
@@ -213,15 +205,6 @@ function MilestoneNpsSection() {
               <li>Downstream effects (repeat tickets, churn risk, review velocity).</li>
             </ul>
           </div>
-        </div>
-
-        {/* Compliance-safe note */}
-        <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 text-[11px] leading-relaxed text-slate-400">
-          <p>
-            We reference the 0–10 “likelihood to recommend” question and terminology descriptively.
-            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld,
-            and Satmetrix Systems, Inc. We are independent and not affiliated with those parties.
-          </p>
         </div>
       </div>
     </section>

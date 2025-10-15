@@ -135,11 +135,6 @@ export default function CxPulseSample() {
   const Footer = () => (
     <div className="mt-10 text-[11px] leading-relaxed text-slate-500">
       <div className="text-slate-400">© {new Date().getFullYear()} NPS Me. All rights reserved.</div>
-      <div className="mt-2">
-        NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld,
-        and Satmetrix Systems, Inc. References here are descriptive only. NPS Me is independent and not
-        affiliated with or endorsed by those parties.
-      </div>
     </div>
   );
 

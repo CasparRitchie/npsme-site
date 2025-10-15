@@ -1,16 +1,18 @@
+// src/Products.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
-import Seo from "./components/Seo"
+import Seo from "./components/Seo";
 
 export default function Products() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      {/* Global Navbar is rendered by App.jsx */}
       <Seo
         path="/products"
         title="Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me"
         description="Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports."
       />
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
@@ -19,7 +21,7 @@ export default function Products() {
             Productized services that turn feedback into growth
           </h1>
           <p className="mt-4 text-slate-300 max-w-2xl">
-            Pick the package that fits your stage-from foundations, to enablement,
+            Pick the package that fits your stage—from foundations, to enablement,
             to a weekly CX intelligence feed you can act on.
           </p>
         </div>
@@ -37,7 +39,8 @@ export default function Products() {
               "Baseline NPS®/CSAT/CES & quick wins",
               "Prioritised roadmap (effort/impact)"
             ]}
-            cta={{ label: "Request audit", href: "/#contact" }}
+            // ⬇ changed to /book
+            cta={{ label: "Request audit", href: "/book" }}
           />
 
           <ProductCard
@@ -49,7 +52,8 @@ export default function Products() {
               "Monthly review cycles & dashboards",
               "Measured lift on key outcomes"
             ]}
-            cta={{ label: "Book discovery", href: "/#contact" }}
+            // ⬇ changed to /book
+            cta={{ label: "Book discovery", href: "/book" }}
           />
 
           <ProductCard
@@ -82,11 +86,6 @@ export default function Products() {
               <li>Delivery on the same weekday, every week</li>
             </ul>
           </div>
-          <div className="mt-6 text-[11px] leading-relaxed text-slate-500">
-            NPS® and Net Promoter Score® are registered service marks of Bain &amp; Company, Inc., Fred Reichheld, and
-            Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and not affiliated with or
-            endorsed by those parties.
-          </div>
         </div>
 
         {/* CTA */}
@@ -103,13 +102,14 @@ export default function Products() {
               Email hello@npsme.com
               <ArrowRight className="h-4 w-4" />
             </a>
-            <a
-              href="/#contact"
+            {/* ⬇ changed to internal Link -> /book */}
+            <Link
+              to="/book"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
               Book discovery
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -118,6 +118,12 @@ export default function Products() {
 }
 
 function ProductCard({ icon, title, price, bullets, cta, featured = false, footnote }) {
+  const isInternal = cta?.href && cta.href.startsWith("/") && !cta.href.startsWith("//");
+  const CTA = isInternal ? Link : "a";
+  const ctaProps = isInternal
+    ? { to: cta.href }
+    : { href: cta.href, target: cta.href.startsWith("http") ? "_blank" : undefined, rel: "noreferrer" };
+
   return (
     <div
       className={
@@ -139,13 +145,15 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
           <li key={b}>{b}</li>
         ))}
       </ul>
-      <a
-        href={cta.href}
+
+      <CTA
+        {...ctaProps}
         className="mt-6 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
       >
         {cta.label}
         <ArrowRight className="h-4 w-4" />
-      </a>
+      </CTA>
+
       {footnote && <p className="mt-3 text-[11px] text-slate-500">{footnote}</p>}
     </div>
   );

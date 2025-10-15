@@ -6,6 +6,7 @@ import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
 import ImpactPage from "./ImpactPage";
 import MilestoneNps from "./MilestoneNps";
+import Book from "./Book";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
@@ -22,6 +23,7 @@ const COMPONENTS = {
   "/products": Products,
   "/impact": ImpactPage,
   "/milestone-nps": MilestoneNps,
+  "/book": Book,
 
   // SocialListening pages
   "/social-listening": SocialListeningIndex,

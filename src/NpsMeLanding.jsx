@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
 import Seo from "./components/Seo"
@@ -381,13 +382,13 @@ export default function NpsMeLanding() {
               Email hello@npsme.com
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </a>
-            <a
-              href="#"
+            <Link
+              to="/book"
               className="group inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              Schedule with Calendly
+              Pick a time (no Calendly)
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </a>
+            </Link>
           </div>
 
           <ContactForm />

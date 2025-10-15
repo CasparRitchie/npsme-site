@@ -96,7 +96,25 @@ app.get("/robots.txt", (_req, res) => {
     "Content-Security-Policy": "default-src 'none'",
     "Cache-Control": "public, max-age=0",
   });
-  res.send("User-agent: *\nAllow: /\nSitemap: https://www.npsme.com/sitemap.xml");
+  res.send(`User-agent: *
+Allow: /
+Sitemap: https://www.npsme.com/sitemap.xml
+
+# Optional: allow useful AI search crawlers
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Block generic AI training bots
+User-agent: GPTBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: CommonCrawl
+Disallow: /
+`);
 });
 
 app.get("/sitemap.xml", (_req, res) => {

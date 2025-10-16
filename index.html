@@ -40,17 +40,44 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- JSON-LD -->
+    <!-- Structured data: Organization + Website -->
     <script type="application/ld+json">
     {
-      "@context":"https://schema.org",
-      "@type":"ProfessionalService",
-      "name":"NPS Me",
-      "url":"https://www.npsme.com/",
-      "description":"Customer experience (CX) consulting to improve NPS®, retention, and revenue.",
-      "areaServed":"UK, EU",
-      "founder":"Caspar Ritchie",
-      "knowsAbout": ["Net Promoter Score", "Customer Experience", "Survey design", "Voice of Customer", "Churn reduction", "Review mining"],
-      "sameAs":["https://www.linkedin.com/in/casparritchie"]
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["Organization", "ProfessionalService"],
+          "@id": "https://www.npsme.com/#organization",
+          "name": "NPS Me",
+          "url": "https://www.npsme.com/",
+          "description": "Customer experience (CX) consulting to improve NPS®, retention, and revenue.",
+          "logo": {
+            "@type": "ImageObject",
+            "@id": "https://www.npsme.com/#logo",
+            "url": "https://www.npsme.com/favicon-512.png",
+            "width": 512,
+            "height": 512,
+            "caption": "NPS Me logo"
+          },
+          "founder": {
+            "@type": "Person",
+            "name": "Caspar Ritchie",
+            "sameAs": ["https://www.linkedin.com/in/casparritchie"]
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/npsme"  /* update to your real company URL if different */
+          ],
+          "areaServed": ["GB","FR","EU"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.npsme.com/#website",
+          "url": "https://www.npsme.com/",
+          "name": "NPS Me",
+          "publisher": { "@id": "https://www.npsme.com/#organization" },
+          "inLanguage": "en-GB"
+        }
+      ]
     }
     </script>
   </head>

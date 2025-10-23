@@ -28,7 +28,7 @@ export default function BlogEthicsOfContactSelection() {
         <div className="mt-8 space-y-6 text-slate-300 leading-relaxed">
           <p>
             In CX, data integrity is everything. One of the easiest ways to distort customer truth
-            is deciding <em>who</em> gets surveyed. If sampling can be steered—intentionally or not—
+            is deciding <em>who</em> gets surveyed. If sampling can be steered - intentionally or not -
             the resulting Net Promoter Score (NPS)® becomes a measure of survey design, not advocacy.
           </p>
 
@@ -41,7 +41,7 @@ export default function BlogEthicsOfContactSelection() {
           </p>
           <p>
             Over time this looks like improvement on paper, while real friction persists. Leadership
-            allocates investment based on biased data; customers notice they aren’t being asked—or
+            allocates investment based on biased data; customers notice they aren’t being asked - or
             worse, that their voices don’t count.
           </p>
 
@@ -53,8 +53,8 @@ export default function BlogEthicsOfContactSelection() {
           </p>
 
           <blockquote className="border-l-4 border-[#22C55E] pl-4 italic text-slate-400">
-            “If you’re happy, give us a 9 or 10—anything else counts as bad.”
-            This common message may lift the number—but it destroys credibility.
+            “If you’re happy, give us a 9 or 10 - anything else counts as bad.”
+            This common message may lift the number - but it destroys credibility.
           </blockquote>
 
           <h2 className="text-xl font-semibold text-white mt-10">Guardrails for ethical contact selection</h2>
@@ -89,7 +89,7 @@ export default function BlogEthicsOfContactSelection() {
           <p>
             You’ll know your programme is healthy when: (1) exclusions trend low and are justified,
             (2) response rates climb without coaching language, (3) the distribution of scores is
-            stable and believable, and (4) leaders celebrate problems found and fixed—not just a
+            stable and believable, and (4) leaders celebrate problems found and fixed - not just a
             single number.
           </p>
 

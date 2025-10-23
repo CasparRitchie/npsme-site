@@ -2,76 +2,98 @@
 // Anonymised sample reports. Add more objects to grow the gallery.
 
 export const REPORTS = [
+    // --- Auto / Retail (anonymised) ---
   {
     slug: "auto-sector",
     clientName: "Auto Sector Client",
     industry: "Auto/Retail",
-    period: "Last 8 weeks (rolling)",
+    period: "Rolling 8 weeks • updated 2025-10-23",
+    lastUpdated: "2025-10-23",
     sources: ["X/Twitter", "Google Reviews", "Reddit"],
-    sentimentSeries: [42, 45, 47, 46, 50, 53, 51, 55],
-    npsStyleSeries: [9, 6, 10, 11, 14, 17, 15, 19],
+    // Paste your 8 most recent headline-sentiment points (0–100)
+    // Example scaffold from recent pulse; replace with your ticker values
+    sentimentSeries: [44, 46, 47, 49, 52, 54, 53, 57],
+    // Paste your 8 most recent NPS-style index points (scaled balance)
+    npsStyleSeries:  [8,  9,  10, 12, 14, 17, 16, 20],
+
     kpis: {
-      ticketsDown: 0.24,
-      repeatLift: 0.05,
-      churnDown: 0.02
+      // Relative changes (positive = good, e.g., fewer tickets)
+      ticketsDown: 0.23,   // 23% ↓ tickets/1k orders vs. start of window
+      repeatLift:  0.06,   // 6% ↑ cohort repeat
+      churnDown:   0.018,  // 1.8% ↓ refunds/churn proxy
     },
+
     themes: [
-      { name: "Pricing transparency", change: "+14%", sev: "good", notes: "Better cost breakdown helped reduce pushback on hidden fees." },
-      { name: "Delivery promise vs reality", change: "+6%", sev: "mid", notes: "ETA notifications reduced complaints, though delays still present." },
-      { name: "After-sales follow-up", change: "+3%", sev: "mid", notes: "Post-sale check-ins improved sentiment marginally." },
-      { name: "Support responsiveness", change: "+18%", sev: "good", notes: "Faster answers and personalized replies boosted trust." },
-      { name: "App / ordering stability", change: "-2%", sev: "bad", notes: "Some hiccups with checkout crashes on mobile." }
+      { name: "Pricing transparency",        change: "+12%", sev: "good", notes: "Clearer breakdowns in quotes reduced fee pushback." },
+      { name: "Delivery promise vs reality", change: "+5%",  sev: "mid",  notes: "ETA comms helped; sporadic delays persist at peaks." },
+      { name: "After-sales follow-up",       change: "+4%",  sev: "mid",  notes: "Proactive check-ins nudged satisfaction upward." },
+      { name: "Support responsiveness",      change: "+16%", sev: "good", notes: "Humanised replies + SLA guidance improved trust." },
+      { name: "App / ordering stability",    change: "-3%",  sev: "bad",  notes: "Isolated mobile checkout crash still reported." }
     ],
+
     quotes: [
-      { src: "Google Reviews", txt: "Price structure is now clearer — much appreciated." },
-      { src: "X/Twitter", txt: "Received ETA email before delivery — better communication." },
-      { src: "Reddit", txt: "App crash when submitting order details. Needs patching." },
-      { src: "Google Reviews", txt: "Support actually replied with a fix instead of a generic message." }
+      { src: "Google Reviews", txt: "Quote was itemised—no surprises this time." },
+      { src: "X/Twitter",      txt: "Delivery ETA email helped me plan the handover." },
+      { src: "Reddit",         txt: "Checkout froze once—had to retry on desktop." },
+      { src: "Google Reviews", txt: "Agent actually read my note and solved it fast." }
     ],
+
     actions: [
-      "Launched clearer pricing breakdown and FAQ hover tooltips.",
-      "Enabled delivery ETA emails with status tracking link.",
-      "Introduced post-sale satisfaction check emails.",
-      "Switched to faster, human-tailored customer support responses."
+      "Expanded pricing FAQ + inline fee tooltips in quote flow.",
+      "Enabled ETA emails/SMS with live status link.",
+      "Post-sale check-in sequence (48h / 14d).",
+      "Macro clean-up + first-response coaching; public SLA page."
     ],
+
     nextSteps: [
-      "Deploy app patch to fix the occasional checkout crash.",
-      "A/B test placing pricing detail tooltips near cost lines.",
-      "Monitor review velocity post-ETA rollout.",
-      "Extend follow-up to 7-day and 30-day satisfaction surveys."
+      "Ship mobile checkout hotfix and monitor crash analytics.",
+      "A/B test fee tooltip placement near totals.",
+      "Track review velocity post-ETA rollout (weekly).",
+      "Extend follow-up to 30-day product satisfaction pulse."
     ]
   },
+
+  // --- Hospitality / F&B (anonymised) ---
   {
     slug: "hospitality-sector",
     clientName: "Hospitality Sector Client",
     industry: "Hospitality / F&B",
-    period: "Last 8 weeks (rolling)",
-    sources: ["X/Twitter", "TripAdvisor", "Reddit"],
-    sentimentSeries: [48, 46, 44, 45, 48, 52, 50, 54],
-    npsStyleSeries: [11, 9, 8, 10, 13, 16, 14, 18],
+    period: "Rolling 8 weeks • updated 2025-10-23",
+    lastUpdated: "2025-10-23",
+    sources: ["X/Twitter", "TripAdvisor", "Google Reviews"],
+    // Replace with your latest 8 points from the ticker
+    sentimentSeries: [47, 45, 46, 48, 50, 53, 52, 56],
+    npsStyleSeries:  [10,  9,  10, 11, 13, 16, 15, 19],
+
     kpis: {
-      ticketsDown: 0.20,
-      repeatLift: 0.04,
-      churnDown: 0.017
+      ticketsDown: 0.19,
+      repeatLift:  0.04,
+      churnDown:   0.017
     },
+
     themes: [
-      { name: "Waiting times", change: "+12%", sev: "good", notes: "Expanded seating staff reduced perceived delay in busy hours." },
-      { name: "Menu clarity", change: "+5%", sev: "mid", notes: "Better menu instructions helped reduce order mistakes." },
-      { name: "Reservation system", change: "+7%", sev: "good", notes: "More reliable booking confirmations improved user confidence." }
+      { name: "Waiting times",   change: "+11%", sev: "good", notes: "Extra seating staff shortened weekend queues." },
+      { name: "Menu clarity",    change: "+6%",  sev: "good", notes: "Allergen icons + plain-English descriptions reduced mistakes." },
+      { name: "Reservations UX", change: "+7%",  sev: "good", notes: "More reliable confirmations; fewer double-book reports." },
+      { name: "Staff attention", change: "+3%",  sev: "mid",  notes: "Service warmth mentioned more often; consistency improving." }
     ],
+
     quotes: [
-      { src: "TripAdvisor", txt: "Wait time shorter than last visit. Appreciate the update screens." },
-      { src: "X/Twitter", txt: "Menu layout is clearer now; easier to pick." }
+      { src: "TripAdvisor",     txt: "Shorter wait than last month—host kept us updated." },
+      { src: "Google Reviews",  txt: "Allergen labels made ordering stress-free." },
+      { src: "X/Twitter",       txt: "Booking confirmation landed instantly this time." }
     ],
+
     actions: [
-      "Increased front-of-house staff during peak hours.",
-      "Redesigned menu layout with helpful descriptions.",
-      "Enhanced reservation confirmation interface and alerts."
+      "Peak-hour staffing rota adjusted; host updates every 10–15 min.",
+      "Menu redesign with allergens and clearer dish notes.",
+      "Reservation confirmation retries + SMS fallback."
     ],
+
     nextSteps: [
-      "Test SMS reminders 1 hour before booking.",
-      "Add live wait-time indicator to reservation page.",
-      "Survey guests 24h after visit for sentiment feedback."
+      "Test SMS reminders 60 min pre-booking.",
+      "Add live wait-time widget to reservations page.",
+      "24h post-visit micro-survey on clarity & service warmth."
     ]
   },
   {

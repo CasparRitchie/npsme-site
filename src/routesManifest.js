@@ -14,6 +14,8 @@ export const ROUTES_MANIFEST = [
   { path: "/blog",                             label: "Blog",                           enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/blog/ethical-surveys",             label: "Blog: Ethical Surveys",          enabled: true,  inHeader: false, inFooter: false },
   { path: "/blog/ethics-of-contact-selection", label: "Blog: Contact Selection Ethics", enabled: true,  inHeader: false, inFooter: false },
+  { path: "/blog/closing-the-loop",            label: "Blog: Closing the Loop",         enabled: true,  inHeader: false, inFooter: false },
+
 
   // Regulatory and information
   { path: "/privacy",                          label: "Privacy",                        enabled: true,  inHeader: false, inFooter: true  },

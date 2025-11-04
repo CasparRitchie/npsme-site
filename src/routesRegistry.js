@@ -17,6 +17,7 @@ import SocialListeningReport from "./pages/SocialListeningReport";
 import BlogIndex from "./pages/BlogIndex";
 import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
+import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
 
 // Path to component mapping
 const COMPONENTS = {
@@ -34,6 +35,8 @@ const COMPONENTS = {
   "/blog": BlogIndex,
   "/blog/ethical-surveys": BlogEthicalSurveys,
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
+  "/blog/closing-the-loop": BlogClosingTheLoop,
+
 
 
   "/cx-pulse-sample": CxPulseSample,

@@ -22,6 +22,14 @@ const POSTS = [
     readTime: "7 min",
     tags: ["NPS", "Ethics", "Survey Design"],
   },
+  {
+    slug: "closing-the-loop",
+    title: "Beyond the Score: Why Closing the Loop Builds Trust",
+    excerpt: "NPS is more than a number. Learn why closing the loop with customers builds credibility and drives lasting improvement.",
+    date: "2025-11-04",
+    readTime: "9 min",
+    tags: ["NPS", "Customer Feedback", "Trust"],
+  },
   // Add more posts here as you publish them
 ];
 

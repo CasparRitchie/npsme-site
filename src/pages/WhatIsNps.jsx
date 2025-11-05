@@ -96,23 +96,28 @@ export default function WhatIsNps() {
             <div className="text-xs uppercase tracking-wider text-slate-400">
               NPS scale illustration
             </div>
+
+            {/* The main NPS bar */}
             <div className="mt-2 flex text-[11px] font-medium text-slate-300">
-              <div className="flex-1 bg-[#450a0a] rounded-l-2xl py-2 text-center">
+              {/* Detractors (0–6) */}
+              <div className="flex-[7] bg-[#450a0a] rounded-l-2xl py-2 text-center">
                 Detractors
               </div>
-              <div className="flex-1 bg-[#1e293b] py-2 text-center">
+              {/* Passives (7–8) */}
+              <div className="flex-[2] bg-[#f97316] py-2 text-center">
                 Passives
               </div>
-              <div className="flex-1 bg-[#064e3b] rounded-r-2xl py-2 text-center">
+              {/* Promoters (9–10) */}
+              <div className="flex-[2] bg-[#064e3b] rounded-r-2xl py-2 text-center">
                 Promoters
               </div>
             </div>
-            <div className="mt-2 flex justify-between text-[11px] text-slate-400">
-              <span>0</span>
-              <span>5</span>
-              <span>7</span>
-              <span>8</span>
-              <span>10</span>
+
+            {/* Scale numbers 0–10 */}
+            <div className="mt-2 flex justify-between text-[11px] text-slate-400 font-mono">
+              {[...Array(11).keys()].map((num) => (
+                <span key={num}>{num}</span>
+              ))}
             </div>
           </div>
         </article>

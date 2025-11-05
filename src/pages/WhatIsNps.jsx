@@ -100,7 +100,7 @@ export default function WhatIsNps() {
             {/* The main NPS bar */}
             <div className="mt-2 flex text-[11px] font-medium text-slate-300">
               {/* Detractors (0–6) */}
-              <div className="flex-[7] bg-[#450a0a] rounded-l-2xl py-2 text-center">
+              <div className="flex-[7] bg-[#ef4444] rounded-l-2xl py-2 text-center">
                 Detractors
               </div>
               {/* Passives (7–8) */}
@@ -108,7 +108,7 @@ export default function WhatIsNps() {
                 Passives
               </div>
               {/* Promoters (9–10) */}
-              <div className="flex-[2] bg-[#064e3b] rounded-r-2xl py-2 text-center">
+              <div className="flex-[2] bg-[#22C55E] rounded-r-2xl py-2 text-center">
                 Promoters
               </div>
             </div>

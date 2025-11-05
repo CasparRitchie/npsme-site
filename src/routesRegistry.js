@@ -4,6 +4,7 @@ import { ROUTES_MANIFEST } from "./routesManifest";
 // React components (browser-only)
 import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
+import WhatIsNps from "./pages/WhatIsNPS";
 import ImpactPage from "./ImpactPage";
 import MilestoneNps from "./MilestoneNps";
 import Book from "./Book";
@@ -23,6 +24,7 @@ import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
 const COMPONENTS = {
   "/": NpsMeLanding,
   "/products": Products,
+  "/what-is-nps": WhatIsNps,
   "/impact": ImpactPage,
   "/milestone-nps": MilestoneNps,
   "/book": Book,

@@ -30,7 +30,7 @@ export default function BlogClosingTheLoop() {
           </p>
 
           <p>
-            I’ve seen countless teams track Net Promoter Scores with impressive
+            I've seen countless teams track Net Promoter Scores with impressive
             dashboards and detailed monthly reports, yet the most important part
             of the process is often missing. A number can only tell you so much.
             The real work starts after the results are in.
@@ -41,9 +41,9 @@ export default function BlogClosingTheLoop() {
           </h2>
           <p>
             An NPS report often feels like closure. It lands on an executive’s
-            desk, there’s a quick review of promoters and detractors, and
-            everyone moves on to the next quarter. But feedback isn’t a
-            destination. It’s a mirror. And the reflection it gives is only
+            desk, there's a quick review of promoters and detractors, and
+            everyone moves on to the next quarter. But feedback isn't a
+            destination. It's a mirror. And the reflection it gives is only
             useful if someone acts on it.
           </p>
 

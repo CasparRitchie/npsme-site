@@ -19,6 +19,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.npsme.com/why-nps-me</loc>
+    <lastmod>2025-11-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.npsme.com/milestone-nps</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>

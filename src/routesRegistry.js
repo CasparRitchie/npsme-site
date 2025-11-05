@@ -4,7 +4,7 @@ import { ROUTES_MANIFEST } from "./routesManifest";
 // React components (browser-only)
 import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
-import WhatIsNps from "./pages/WhatIsNPS";
+import WhatIsNps from "./pages/WhatIsNps";
 import ImpactPage from "./ImpactPage";
 import MilestoneNps from "./MilestoneNps";
 import Book from "./Book";

@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Database, Link2, Workflow, BarChart3, Clock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
-import Seo from "./components/Seo";
+import Seo from "../components/Seo";
 
 export default function DataAutomationPage() {
   return (

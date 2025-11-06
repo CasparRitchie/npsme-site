@@ -4,6 +4,8 @@ Allow: /
 Disallow: /api/
 Disallow: /healthz
 
+User-agent: Bingbot
+Allow: /
 Sitemap: https://www.npsme.com/sitemap.xml
 
 # Allow search-oriented AI crawlers

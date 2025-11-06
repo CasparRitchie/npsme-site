@@ -20,6 +20,7 @@ import BlogIndex from "./pages/BlogIndex";
 import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
 import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
+import DataAutomationPage from "./pages/DataAutomationPage";
 
 // Path to component mapping
 const COMPONENTS = {
@@ -30,6 +31,7 @@ const COMPONENTS = {
   "/why-nps-me": WhyNpsMe,
   "/milestone-nps": MilestoneNps,
   "/book": Book,
+  "/data-automation": DataAutomationPage,
 
   // SocialListening pages
   "/social-listening": SocialListeningIndex,
@@ -40,8 +42,6 @@ const COMPONENTS = {
   "/blog/ethical-surveys": BlogEthicalSurveys,
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
   "/blog/closing-the-loop": BlogClosingTheLoop,
-
-
 
   "/cx-pulse-sample": CxPulseSample,
   "/privacy": Privacy,

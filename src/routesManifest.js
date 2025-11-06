@@ -6,7 +6,9 @@ export const ROUTES_MANIFEST = [
   { path: "/why-nps-me",                       label: "Why NPS Me",                     enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/milestone-nps",                    label: "Milestone NPS",                  enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/book",                             label: "Book discovery",                 enabled: true,  inHeader: false, inFooter: true },
-  { path: "/what-is-nps",                      label: "What is NPS?",                  enabled: true,  inHeader: true,  inFooter: true },
+  { path: "/what-is-nps",                      label: "What is NPS?",                   enabled: true,  inHeader: true,  inFooter: true },
+  { path: "/data-automation",                  label: "Data & Automation",              enabled: true,  inHeader: true,  inFooter: true  },
+
   // Social Listening Index + dynamic anonymised reports
   { path: "/social-listening",                 label: "Social Listening",               enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/social-listening/:slug",           label: "Social Listening Report",        enabled: true,  inHeader: false, inFooter: false },

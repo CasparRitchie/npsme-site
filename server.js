@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import compression from "compression";
 import helmet from "helmet";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,8 @@ const PORT = process.env.PORT || 3000;
 
 // --- Adjust if you ever move away from www ---
 const CANONICAL_HOST = "www.npsme.com";
+const dist = path.join(__dirname, "dist");
+const baseIndexHtml = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 
 // Needed behind Heroku/Cloudflare so req.ip / x-forwarded-proto work
 app.set("trust proxy", 1);
@@ -31,8 +34,7 @@ app.use(
   })
 );
 
-// HSTS (only in production). OK for SEO; improves trust.
-// NOTE: After verifying everything is solid, you can submit for preload at hstspreload.org.
+// HSTS (only in production)
 if (PROD) {
   app.use(
     helmet.hsts({
@@ -50,12 +52,10 @@ app.use((req, res, next) => {
   const proto = req.headers["x-forwarded-proto"];
   const host = req.headers.host;
 
-  // Force HTTPS
   if (proto !== "https") {
     return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
   }
 
-  // Force single host (avoid duplicate content for SEO)
   if (host !== CANONICAL_HOST) {
     return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
   }
@@ -89,41 +89,12 @@ app.post("/api/intake", (req, res) => {
   res.json({ ok: true });
 });
 
-// robots.txt — minimal + cacheless & locked down
-app.get("/robots.txt", (_req, res) => {
-  res.type("text/plain");
-  res.set({
-    "Content-Security-Policy": "default-src 'none'",
-    "Cache-Control": "public, max-age=0",
-  });
-  res.send(`User-agent: *
-Allow: /
-Sitemap: https://www.npsme.com/sitemap.xml
-
-# Optional: allow useful AI search crawlers
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-# Block generic AI training bots
-User-agent: GPTBot
-Disallow: /
-User-agent: ClaudeBot
-Disallow: /
-User-agent: CommonCrawl
-Disallow: /
-`);
-});
-
 app.get("/sitemap.xml", (_req, res) => {
   res.set("Cache-Control", "public, max-age=0");
   res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
 });
 
-// Health check (useful for monitors)
-// GET returns 200 "ok"; HEAD also works; never cached.
+// Health check
 app.get("/healthz", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.type("text/plain").send("ok");
@@ -134,8 +105,6 @@ app.head("/healthz", (_req, res) => {
 });
 
 // ---------- Static assets & caching ----------
-// --- Serve Vite build ---
-const dist = path.join(__dirname, "dist");
 
 // Long cache for hashed assets (Vite puts them in /assets)
 app.use(
@@ -143,18 +112,50 @@ app.use(
   express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
 );
 
-// Short cache for everything else in /dist, BUT do not let static serve index.html
+// Short cache for other static assets
 app.use(
   express.static(dist, {
     maxAge: "1h",
-    index: false, // <— critical: do NOT auto-serve index.html here
+    index: false,
   })
 );
 
-// Serve index.html for SPA routes with no-store so deploys are instant
-app.get("*", (_req, res) => {
+// ---------- Inject canonical + og:url for SEO ----------
+app.get("*", (req, res) => {
   res.set("Cache-Control", "no-store, must-revalidate");
-  res.sendFile(path.join(dist, "index.html"));
+
+  const pathOnly = req.originalUrl.split("?")[0] || "/";
+  const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
+
+  let html = baseIndexHtml;
+
+  // Replace or insert canonical tag
+  if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {
+    html = html.replace(
+      /<link\s+rel=["']canonical["'][^>]*>/i,
+      `<link rel="canonical" href="${fullUrl}" />`
+    );
+  } else {
+    html = html.replace(
+      /<\/head>/i,
+      `  <link rel="canonical" href="${fullUrl}" />\n</head>`
+    );
+  }
+
+  // Replace or insert og:url
+  if (html.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
+    html = html.replace(
+      /<meta\s+property=["']og:url["'][^>]*>/i,
+      `<meta property="og:url" content="${fullUrl}" />`
+    );
+  } else {
+    html = html.replace(
+      /<\/head>/i,
+      `  <meta property="og:url" content="${fullUrl}" />\n</head>`
+    );
+  }
+
+  res.type("html").send(html);
 });
 
 app.listen(PORT, () => {

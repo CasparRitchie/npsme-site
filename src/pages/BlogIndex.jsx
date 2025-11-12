@@ -30,6 +30,15 @@ const POSTS = [
     readTime: "9 min",
     tags: ["NPS", "Customer Feedback", "Trust"],
   },
+  {
+    slug: "what-to-do-with-nps-scores",
+    title: "What To Do With Your NPS Scores",
+    excerpt:
+      "Present NPS the right way, avoid small-sample traps, handle repeat responders, and target changes that actually lift the score and the business.",
+    date: "2025-11-12",
+    readTime: "8 min",
+    tags: ["NPS", "Reporting", "CX"],
+  },
   // Add more posts here as you publish them
 ];
 

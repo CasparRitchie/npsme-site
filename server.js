@@ -17,6 +17,67 @@ const mailer = nodemailer.createTransport({
   },
 });
 
+function generateInvitationId() {
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `INV-${ts}-${rand}`;
+}
+
+async function sendInvitationEmail({ email, customerId, stage, surveyId }) {
+  const invitationId = generateInvitationId();
+  const surveyUrl = `https://www.npsme.com/demo-survey?inv=${encodeURIComponent(invitationId)}`;
+
+  const subject = "We’d love your feedback (1–2 minutes)";
+  const plainText = [
+    `Hi,`,
+    "",
+    `We’re running a short customer feedback survey to help improve our experience.`,
+    `It should take 1–2 minutes.`,
+    "",
+    `Take the survey: ${surveyUrl}`,
+    "",
+    `Thank you,`,
+    `NPS Me`,
+  ].join("\n");
+
+  const html = `
+    <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#0f172a">
+      <p>Hi,</p>
+      <p>We’re running a short customer feedback survey to help improve our experience.</p>
+      <p>It should take around <strong>1–2 minutes</strong>.</p>
+      <p>
+        <a href="${surveyUrl}"
+           style="display:inline-block;padding:10px 18px;border-radius:999px;
+                  background:#22c55e;color:#0f172a;text-decoration:none;font-weight:600;">
+          Take the survey
+        </a>
+      </p>
+      <p style="font-size:12px;color:#6b7280;margin-top:16px;">
+        This invitation is linked to a unique reference so we can avoid pestering you with duplicate reminders.
+        If this wasn’t intended for you, you can ignore it.
+      </p>
+      <p>Thank you,<br/>NPS Me</p>
+    </div>
+  `;
+
+  const info = await mailer.sendMail({
+    from: `"NPS Me" <hello@npsme.com>`,
+    to: email,
+    bcc: "hello@npsme.com",
+    subject,
+    text: plainText,
+    html,
+    headers: {
+      "X-Customer-Id": customerId || "",
+      "X-Stage": stage || "",
+      "X-Survey-Id": surveyId || "",
+      "X-Invitation-Id": invitationId,
+    },
+  });
+
+  return { invitationId, info };
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -129,6 +190,21 @@ app.post("/api/send-test-email", async (req, res) => {
     res.json({ ok: true, info });
   } catch (err) {
     console.error("SMTP ERROR", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post("/api/send-invitation", async (req, res) => {
+  const { email, customerId, stage, surveyId } = req.body || {};
+  if (!email) {
+    return res.status(400).json({ ok: false, error: "Missing email" });
+  }
+
+  try {
+    const result = await sendInvitationEmail({ email, customerId, stage, surveyId });
+    res.json({ ok: true, invitationId: result.invitationId });
+  } catch (err) {
+    console.error("INVITE EMAIL ERROR", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });

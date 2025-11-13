@@ -33,13 +33,13 @@ async function sendInvitationEmail({ email, customerId, customerName, stage, sur
   const plainText = [
     `${name}`,
     "",
-    `We’re running a short customer feedback survey to help improve our experience.`,
-    `It should take around 1–2 minutes.`,
+    "We’re running a short customer feedback survey to help improve our experience.",
+    "It should take around 1–2 minutes.",
     "",
     `Take the survey: ${surveyUrl}`,
     "",
-    `Thank you,`,
-    `NPS Me`,
+    "Thank you,",
+    "NPS Me",
   ].join("\n");
 
   const html = `
@@ -61,10 +61,6 @@ async function sendInvitationEmail({ email, customerId, customerName, stage, sur
       <p>Thank you,<br/>NPS Me</p>
     </div>
   `;
-
-  // Return invitationId so that the caller can write it to CSV (Step 2)
-  return { subject, plainText, html, invitationId };
-}
 
   const info = await mailer.sendMail({
     from: `"NPS Me" <hello@npsme.com>`,
@@ -306,7 +302,8 @@ app.post("/api/send-invitation", async (req, res) => {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
+    // 1) Send email via Zoho (and get invitationId + messageId)
+    const { invitationId, info } = await sendInvitationEmail({
       email,
       customerId,
       customerName,
@@ -316,7 +313,7 @@ app.post("/api/send-invitation", async (req, res) => {
 
     const sentAt = new Date().toISOString();
 
-    // 1) Log to Dropbox
+    // 2) Log to Dropbox
     await appendInvitationRow({
       invitationId,
       customerId,
@@ -329,15 +326,6 @@ app.post("/api/send-invitation", async (req, res) => {
       lastSentAt: sentAt,
       status: "sent",
       responseId: "",
-    });
-
-    // 2) Send email via Zoho
-    const info = await transporter.sendMail({
-      from: '"NPS Me" <hello@npsme.com>',
-      to: email,
-      subject,
-      text: plainText,
-      html,
     });
 
     res.json({

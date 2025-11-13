@@ -23,16 +23,18 @@ function generateInvitationId() {
   return `INV-${ts}-${rand}`;
 }
 
-async function sendInvitationEmail({ email, customerId, stage, surveyId }) {
+async function sendInvitationEmail({ email, customerId, customerName, stage, surveyId }) {
+  const name = customerName ? `Hi ${customerName},` : "Hi,";
   const invitationId = generateInvitationId();
   const surveyUrl = `https://www.npsme.com/demo-survey?inv=${encodeURIComponent(invitationId)}`;
 
   const subject = "We’d love your feedback (1–2 minutes)";
+
   const plainText = [
-    `Hi,`,
+    `${name}`,
     "",
     `We’re running a short customer feedback survey to help improve our experience.`,
-    `It should take 1–2 minutes.`,
+    `It should take around 1–2 minutes.`,
     "",
     `Take the survey: ${surveyUrl}`,
     "",
@@ -42,7 +44,7 @@ async function sendInvitationEmail({ email, customerId, stage, surveyId }) {
 
   const html = `
     <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#0f172a">
-      <p>Hi,</p>
+      <p>${name}</p>
       <p>We’re running a short customer feedback survey to help improve our experience.</p>
       <p>It should take around <strong>1–2 minutes</strong>.</p>
       <p>
@@ -59,6 +61,10 @@ async function sendInvitationEmail({ email, customerId, stage, surveyId }) {
       <p>Thank you,<br/>NPS Me</p>
     </div>
   `;
+
+  // Return invitationId so that the caller can write it to CSV (Step 2)
+  return { subject, plainText, html, invitationId };
+}
 
   const info = await mailer.sendMail({
     from: `"NPS Me" <hello@npsme.com>`,
@@ -135,6 +141,104 @@ app.use((req, res, next) => {
   return next();
 });
 
+// ---- Dropbox helpers for invitations.csv ----
+const DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
+const INVITATIONS_PATH = process.env.DROPBOX_INVITATIONS_PATH || "/npsme/invitations.csv";
+
+if (!DROPBOX_TOKEN) {
+  console.warn("[npsme] WARNING: DROPBOX_ACCESS_TOKEN is not set - invitation logging will fail.");
+}
+
+// Small CSV escaper
+function escapeCsv(value) {
+  const v = value == null ? "" : String(value);
+  if (/[",\n]/.test(v)) {
+    return `"${v.replace(/"/g, '""')}"`;
+  }
+  return v;
+}
+
+async function readDropboxFile(path) {
+  const res = await fetch("https://content.dropboxapi.com/2/files/download", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${DROPBOX_TOKEN}`,
+      "Dropbox-API-Arg": JSON.stringify({ path }),
+    },
+  });
+
+  if (res.status === 409) {
+    // File not found
+    return null;
+  }
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Dropbox download failed (${res.status}): ${text}`);
+  }
+
+  return res.text();
+}
+
+async function writeDropboxFile(path, contents) {
+  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${DROPBOX_TOKEN}`,
+      "Content-Type": "application/octet-stream",
+      "Dropbox-API-Arg": JSON.stringify({
+        path,
+        mode: "overwrite",
+        mute: true,
+      }),
+    },
+    body: contents,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Dropbox upload failed (${res.status}): ${text}`);
+  }
+}
+
+// Append a single invitation row into invitations.csv
+async function appendInvitationRow(row) {
+  if (!DROPBOX_TOKEN) {
+    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping invitation logging.");
+    return;
+  }
+
+  const header =
+    "invitationId,customerId,customerName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
+
+  const existing = await readDropboxFile(INVITATIONS_PATH).catch((err) => {
+    console.error("[npsme] Error reading invitations.csv", err);
+    return null;
+  });
+
+  const fields = [
+    row.invitationId,
+    row.customerId || "",
+    row.customerName || "",
+    row.email,
+    row.stage || "",
+    row.surveyId || "",
+    row.sentAt,
+    row.resentCount ?? 0,
+    row.lastSentAt || row.sentAt,
+    row.status || "sent",
+    row.responseId || "",
+  ];
+
+  const line = fields.map(escapeCsv).join(",");
+
+  const contents = existing
+    ? `${existing.replace(/\n*$/, "")}\n${line}\n`
+    : `${header}\n${line}\n`;
+
+  await writeDropboxFile(INVITATIONS_PATH, contents);
+}
+
 // --- Demo API (in-memory) ---
 let demoResponses = [];
 
@@ -195,17 +299,55 @@ app.post("/api/send-test-email", async (req, res) => {
 });
 
 app.post("/api/send-invitation", async (req, res) => {
-  const { email, customerId, stage, surveyId } = req.body || {};
-  if (!email) {
-    return res.status(400).json({ ok: false, error: "Missing email" });
-  }
-
   try {
-    const result = await sendInvitationEmail({ email, customerId, stage, surveyId });
-    res.json({ ok: true, invitationId: result.invitationId });
+    const { email, customerId, customerName, stage, surveyId } = req.body || {};
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
+      email,
+      customerId,
+      customerName,
+      stage,
+      surveyId,
+    });
+
+    const sentAt = new Date().toISOString();
+
+    // 1) Log to Dropbox
+    await appendInvitationRow({
+      invitationId,
+      customerId,
+      customerName,
+      email,
+      stage,
+      surveyId,
+      sentAt,
+      resentCount: 0,
+      lastSentAt: sentAt,
+      status: "sent",
+      responseId: "",
+    });
+
+    // 2) Send email via Zoho
+    const info = await transporter.sendMail({
+      from: '"NPS Me" <hello@npsme.com>',
+      to: email,
+      subject,
+      text: plainText,
+      html,
+    });
+
+    res.json({
+      ok: true,
+      invitationId,
+      messageId: info.messageId,
+    });
   } catch (err) {
-    console.error("INVITE EMAIL ERROR", err);
-    res.status(500).json({ ok: false, error: err.message });
+    console.error("[npsme] Error in /api/send-invitation", err);
+    res.status(500).json({ error: "Failed to send invitation" });
   }
 });
 

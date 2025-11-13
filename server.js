@@ -140,6 +140,7 @@ app.use((req, res, next) => {
 // ---- Dropbox helpers for invitations.csv ----
 const DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
 const INVITATIONS_PATH = process.env.DROPBOX_INVITATIONS_PATH || "/npsme/invitations.csv";
+const DEMO_RESPONSES_PATH = process.env.DROPBOX_DEMO_RESPONSES_PATH || "/npsme/demo-responses.csv";
 
 if (!DROPBOX_TOKEN) {
   console.warn("[npsme] WARNING: DROPBOX_ACCESS_TOKEN is not set - invitation logging will fail.");
@@ -235,6 +236,60 @@ async function appendInvitationRow(row) {
   await writeDropboxFile(INVITATIONS_PATH, contents);
 }
 
+// Parse invitations.csv into an array of objects
+async function loadInvitations() {
+  const csv = await readDropboxFile(INVITATIONS_PATH);
+  if (!csv) return [];
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return [];
+
+  const header = lines[0].split(",");
+  return lines.slice(1).map((line) => {
+    const cols = line.split(",");
+    const obj = {};
+    header.forEach((h, i) => {
+      obj[h] = cols[i] ?? "";
+    });
+    return obj;
+  });
+}
+
+async function findInvitationById(invitationId) {
+  const rows = await loadInvitations();
+  return rows.find((r) => r.invitationId === invitationId) || null;
+}
+
+async function markInvitationResponded(invitationId, responseId) {
+  const csv = await readDropboxFile(INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]]; // keep header
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if (rowObj.invitationId === invitationId) {
+      rowObj.status = "responded";
+      rowObj.responseId = responseId;
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(INVITATIONS_PATH, updatedCsv);
+}
+
 const RESPONSES_PATH = process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
 
 function generateResponseId() {
@@ -271,6 +326,42 @@ async function appendResponseRow(row) {
     : `${header}\n${line}\n`;
 
   await writeDropboxFile(RESPONSES_PATH, contents);
+}
+
+async function appendDemoResponseRow(row) {
+  if (!DROPBOX_TOKEN) {
+    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping demo response logging.");
+    return;
+  }
+
+  const header =
+    "responseId,invitationId,customerId,customerName,email,stage,surveyId,score,comment,createdAt";
+
+  const existing = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
+    console.error("[npsme] Error reading demo-responses.csv", err);
+    return null;
+  });
+
+  const fields = [
+    row.responseId,
+    row.invitationId,
+    row.customerId || "",
+    row.customerName || "",
+    row.email || "",
+    row.stage || "",
+    row.surveyId || "",
+    row.score,
+    row.comment || "",
+    row.createdAt,
+  ];
+
+  const line = fields.map(escapeCsv).join(",");
+
+  const contents = existing
+    ? `${existing.replace(/\n*$/, "")}\n${line}\n`
+    : `${header}\n${line}\n`;
+
+  await writeDropboxFile(DEMO_RESPONSES_PATH, contents);
 }
 
 // --- Demo API (in-memory) ---
@@ -397,6 +488,83 @@ app.post("/api/send-invitation", async (req, res) => {
   } catch (err) {
     console.error("[npsme] Error in /api/send-invitation", err);
     res.status(500).json({ error: "Failed to send invitation" });
+  }
+});
+
+
+// Validate a demo survey link
+app.get("/api/demo-survey/lookup", async (req, res) => {
+  try {
+    const inv = req.query.inv;
+    if (!inv) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
+
+    const invitation = await findInvitationById(inv);
+    if (!invitation) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    if (invitation.responseId) {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    return res.json({
+      ok: true,
+      invitation: {
+        invitationId: invitation.invitationId,
+        customerId: invitation.customerId || "",
+        customerName: invitation.customerName || "",
+        email: invitation.email || "",
+        stage: invitation.stage || "",
+        surveyId: invitation.surveyId || "",
+      },
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-survey/lookup", err);
+    res.status(500).json({ error: "Lookup failed" });
+  }
+});
+
+// Submit a demo survey response
+app.post("/api/demo-survey/submit", async (req, res) => {
+  try {
+    const { invitationId, score, comment } = req.body || {};
+
+    if (!invitationId || typeof score !== "number" || score < 0 || score > 10) {
+      return res.status(400).json({ error: "Invalid payload" });
+    }
+
+    const invitation = await findInvitationById(invitationId);
+    if (!invitation) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+    if (invitation.responseId) {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    const responseId = `RESP-${Date.now().toString(36).toUpperCase()}`;
+    const createdAt = new Date().toISOString();
+
+    await appendDemoResponseRow({
+      responseId,
+      invitationId,
+      customerId: invitation.customerId || "",
+      customerName: invitation.customerName || "",
+      email: invitation.email || "",
+      stage: invitation.stage || "",
+      surveyId: invitation.surveyId || "",
+      score,
+      comment: (comment || "").slice(0, 1000),
+      createdAt,
+    });
+
+    await markInvitationResponded(invitationId, responseId);
+
+    res.json({ ok: true, responseId });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-survey/submit", err);
+    res.status(500).json({ error: "Failed to save response" });
   }
 });
 

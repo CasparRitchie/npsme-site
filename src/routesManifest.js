@@ -21,8 +21,8 @@ export const ROUTES_MANIFEST = [
   { path: "/blog/closing-the-loop",            label: "Blog: Closing the Loop",           enabled: true,  inHeader: false, inFooter: false },
   { path: "/blog/what-to-do-with-nps-scores",  label: "Blog: What To Do With NPS Scores", enabled: true,  inHeader: false, inFooter: false },
 
-  { path: "/demo-survey",              label: "Demo survey",    enabled: true,  inHeader: false, inFooter: false },
-
+  { path: "/demo-survey",                      label: "Demo survey",    enabled: true,  inHeader: false, inFooter: false },
+  { path: "/demo-survey-page",                 label: "Demo survey Page",                    enabled: true,  inHeader: false, inFooter: false },
   // Regulatory and information
   { path: "/privacy",                          label: "Privacy",                          enabled: true,  inHeader: false, inFooter: true  },
   { path: "/terms",                            label: "Terms",                            enabled: true,  inHeader: false, inFooter: true  },

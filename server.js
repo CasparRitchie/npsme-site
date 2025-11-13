@@ -5,6 +5,17 @@ import { fileURLToPath } from "url";
 import compression from "compression";
 import helmet from "helmet";
 import fs from "fs";
+import nodemailer from "nodemailer";
+
+const mailer = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: false, // TLS later
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -102,6 +113,24 @@ app.get("/healthz", (_req, res) => {
 app.head("/healthz", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.status(200).end();
+});
+
+app.post("/api/send-test-email", async (req, res) => {
+  const { to } = req.body;
+
+  try {
+    const info = await mailer.sendMail({
+      from: `"NPS Me" <hello@npsme.com>`,
+      to,
+      subject: "NPS Me SMTP Test",
+      text: "This is a test email from the NPS Me server. Everything works!",
+    });
+
+    res.json({ ok: true, info });
+  } catch (err) {
+    console.error("SMTP ERROR", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
 // ---------- Static assets & caching ----------

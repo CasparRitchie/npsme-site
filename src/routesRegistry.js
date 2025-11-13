@@ -22,6 +22,7 @@ import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
 import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
 import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
 import DataAutomationPage from "./pages/DataAutomationPage";
+import DemoSurvey from "./pages/DemoSurvey";
 
 // Path to component mapping
 const COMPONENTS = {
@@ -44,6 +45,9 @@ const COMPONENTS = {
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
   "/blog/closing-the-loop": BlogClosingTheLoop,
   "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+
+  "/demo-survey": DemoSurvey,
+
 
   "/cx-pulse-sample": CxPulseSample,
   "/privacy": Privacy,

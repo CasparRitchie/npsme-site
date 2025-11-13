@@ -235,16 +235,77 @@ async function appendInvitationRow(row) {
   await writeDropboxFile(INVITATIONS_PATH, contents);
 }
 
+const RESPONSES_PATH = process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
+
+function generateResponseId() {
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `R-${ts}-${rand}`;
+}
+
+async function appendResponseRow(row) {
+  if (!DROPBOX_TOKEN) {
+    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping response logging.");
+    return;
+  }
+
+  const header = "responseId,invitationId,score,comment,createdAt";
+
+  const existing = await readDropboxFile(RESPONSES_PATH).catch((err) => {
+    console.error("[npsme] Error reading responses.csv", err);
+    return null;
+  });
+
+  const fields = [
+    row.responseId,
+    row.invitationId || "",
+    row.score,
+    row.comment || "",
+    row.createdAt,
+  ];
+
+  const line = fields.map(escapeCsv).join(",");
+
+  const contents = existing
+    ? `${existing.replace(/\n*$/, "")}\n${line}\n`
+    : `${header}\n${line}\n`;
+
+  await writeDropboxFile(RESPONSES_PATH, contents);
+}
+
 // --- Demo API (in-memory) ---
 let demoResponses = [];
 
-app.post("/api/demo/response", (req, res) => {
-  const { score, comment } = req.body || {};
-  if (typeof score !== "number" || score < 0 || score > 10) {
-    return res.status(400).json({ error: "Invalid score" });
+app.post("/api/demo/response", async (req, res) => {
+  try {
+    const { score, comment, invitationId } = req.body || {};
+
+    if (typeof score !== "number" || score < 0 || score > 10) {
+      return res.status(400).json({ error: "Invalid score" });
+    }
+
+    const trimmedComment = (comment || "").slice(0, 500);
+
+    // Keep the in-memory demo metric for the homepage widget
+    demoResponses.push({ score, comment: trimmedComment, ts: Date.now() });
+
+    // Log to Dropbox for later analysis
+    const responseId = generateResponseId();
+    const createdAt = new Date().toISOString();
+
+    await appendResponseRow({
+      responseId,
+      invitationId: invitationId || "",
+      score,
+      comment: trimmedComment,
+      createdAt,
+    });
+
+    res.json({ ok: true, responseId });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo/response", err);
+    res.status(500).json({ error: "Failed to save response" });
   }
-  demoResponses.push({ score, comment: (comment || "").slice(0, 500), ts: Date.now() });
-  res.json({ ok: true });
 });
 
 app.get("/api/demo/metrics", (_req, res) => {

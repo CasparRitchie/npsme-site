@@ -23,10 +23,10 @@ function generateInvitationId() {
   return `INV-${ts}-${rand}`;
 }
 
-async function sendInvitationEmail({ email, customerId, customerName, stage, surveyId }) {
+async function sendInvitationEmail({ email, customerId, customerName, businessName, stage, surveyId }) {
   const name = customerName ? `Hi ${customerName},` : "Hi,";
   const invitationId = generateInvitationId();
-  const surveyUrl = `https://www.npsme.com/demo-survey?inv=${encodeURIComponent(invitationId)}`;
+  const surveyUrl = `https://www.npsme.com/demo-invitation-survey?inv=${encodeURIComponent(invitationId)}`;
 
   const subject = "We’d love your feedback (1–2 minutes)";
 
@@ -61,23 +61,7 @@ async function sendInvitationEmail({ email, customerId, customerName, stage, sur
       <p>Thank you,<br/>NPS Me</p>
     </div>
   `;
-
-  const info = await mailer.sendMail({
-    from: `"NPS Me" <hello@npsme.com>`,
-    to: email,
-    bcc: "hello@npsme.com",
-    subject,
-    text: plainText,
-    html,
-    headers: {
-      "X-Customer-Id": customerId || "",
-      "X-Stage": stage || "",
-      "X-Survey-Id": surveyId || "",
-      "X-Invitation-Id": invitationId,
-    },
-  });
-
-  return { invitationId, info };
+  return { invitationId, subject, plainText, html };
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -206,7 +190,7 @@ async function appendInvitationRow(row) {
   }
 
   const header =
-    "invitationId,customerId,customerName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
+  "invitationId,customerId,customerName,businessName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
 
   const existing = await readDropboxFile(INVITATIONS_PATH).catch((err) => {
     console.error("[npsme] Error reading invitations.csv", err);
@@ -217,6 +201,7 @@ async function appendInvitationRow(row) {
     row.invitationId,
     row.customerId || "",
     row.customerName || "",
+    row.businessName || "",
     row.email,
     row.stage || "",
     row.surveyId || "",
@@ -448,28 +433,30 @@ app.post("/api/send-test-email", async (req, res) => {
 
 app.post("/api/send-invitation", async (req, res) => {
   try {
-    const { email, customerId, customerName, stage, surveyId } = req.body || {};
+    const { email, customerId, customerName, businessName, stage, surveyId } = req.body || {};
 
     if (!email) {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    // 1) Send email via Zoho (and get invitationId + messageId)
-    const { invitationId, info } = await sendInvitationEmail({
+    // Build content + ID
+    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
       email,
       customerId,
       customerName,
+      businessName,
       stage,
       surveyId,
     });
 
     const sentAt = new Date().toISOString();
 
-    // 2) Log to Dropbox
+    // 1) Log to Dropbox
     await appendInvitationRow({
       invitationId,
       customerId,
       customerName,
+      businessName,
       email,
       stage,
       surveyId,
@@ -478,6 +465,16 @@ app.post("/api/send-invitation", async (req, res) => {
       lastSentAt: sentAt,
       status: "sent",
       responseId: "",
+    });
+
+    // 2) Send email via Zoho (single send)
+    const info = await mailer.sendMail({
+      from: '"NPS Me" <hello@npsme.com>',
+      to: email,
+      bcc: "hello@npsme.com",
+      subject,
+      text: plainText,
+      html,
     });
 
     res.json({
@@ -515,6 +512,7 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
         invitationId: invitation.invitationId,
         customerId: invitation.customerId || "",
         customerName: invitation.customerName || "",
+        businessName: invitation.businessName || "",
         email: invitation.email || "",
         stage: invitation.stage || "",
         surveyId: invitation.surveyId || "",

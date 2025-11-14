@@ -24,6 +24,8 @@ import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
 import DataAutomationPage from "./pages/DataAutomationPage";
 import DemoSurvey from "./pages/DemoSurvey";
 import DemoSurveyPage from "./pages/DemoSurveyPage";
+import DemoInvitationSurvey from "./pages/DemoInvitationSurvey";
+import DemoThankYou from "./pages/DemoThankYou";
 
 // Path to component mapping
 const COMPONENTS = {
@@ -47,8 +49,10 @@ const COMPONENTS = {
   "/blog/closing-the-loop": BlogClosingTheLoop,
   "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
 
-  "/demo-survey": DemoSurvey,
+  "/demo-survey-legacy": DemoSurvey,
   "/demo-survey-page": DemoSurveyPage,
+  "/demo-invitation-survey": DemoInvitationSurvey,
+  "/demo-survey/thanks": DemoThankYou,
 
 
   "/cx-pulse-sample": CxPulseSample,

@@ -85,7 +85,7 @@ export default function DemoSurvey() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#020617] to-[#020617] text-slate-100">
       <Seo
-        path="/demo-survey"
+        path="/demo-survey-legacy"
         title="Demo NPS Survey | NPS Me"
         description="Try a simple NPS-style survey flow from the customer point of view."
       />

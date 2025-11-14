@@ -3,6 +3,7 @@ import React from "react";
 import Seo from "../components/Seo";
 
 const STAGES = [
+  "Overall NPS",
   "Discovery",
   "Ordering",
   "Delivery",
@@ -58,8 +59,7 @@ export default function DemoSurveyPage() {
   const [email, setEmail] = React.useState("");
   const [customerName, setCustomerName] = React.useState("");
   const [businessName, setBusinessName] = React.useState("");
-  const [stage, setStage] = React.useState("Discovery");
-  const [sending, setSending] = React.useState(false);
+  const [stage, setStage] = React.useState("Overall NPS");  const [sending, setSending] = React.useState(false);
   const [sendError, setSendError] = React.useState("");
   const [sendSuccess, setSendSuccess] = React.useState("");
 
@@ -315,8 +315,8 @@ export default function DemoSurveyPage() {
                   ))}
                 </select>
                 <p className="mt-1 text-[11px] text-slate-500">
-                  In a live set-up, you’d define stages that map to your own journey (e.g. onboarding,
-                  renewal, support ticket closure).
+                  Choose <span className="font-medium text-slate-300">Overall NPS</span> for a general question,
+                  or tag it to a specific journey stage (e.g. delivery, after-sales).
                 </p>
               </div>
 

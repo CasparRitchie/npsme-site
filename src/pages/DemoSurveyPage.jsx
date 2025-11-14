@@ -64,11 +64,12 @@ export default function DemoSurveyPage() {
   const [sendSuccess, setSendSuccess] = React.useState("");
 
   // ----- Results state -----
-  const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
+  const [period, setPeriod] = React.useState("monthly");
   const [responses, setResponses] = React.useState([]);
   const [loadingResults, setLoadingResults] = React.useState(false);
   const [resultsError, setResultsError] = React.useState("");
   const [customerFilter, setCustomerFilter] = React.useState("ALL");
+  const [resultType, setResultType] = React.useState("ALL");
 
   // Load results from backend
   async function loadResults() {
@@ -143,9 +144,27 @@ export default function DemoSurveyPage() {
 
   // ----- Derived results -----
   const filteredResponses = React.useMemo(() => {
-    if (customerFilter === "ALL") return responses;
-    return responses.filter((r) => (r.customerName || "").trim() === customerFilter);
-  }, [responses, customerFilter]);
+    let rows = responses;
+
+    // Filter by customer
+    if (customerFilter !== "ALL") {
+      rows = rows.filter((r) => (r.customerName || "").trim() === customerFilter);
+    }
+
+    // Filter by result type
+    if (resultType === "OVERALL") {
+      rows = rows.filter((r) => (r.stage || "").trim() === "Overall NPS");
+    } else if (resultType === "MILESTONE") {
+      rows = rows.filter(
+        (r) =>
+          r.stage &&
+          r.stage.trim() !== "" &&
+          r.stage.trim() !== "Overall NPS"
+      );
+    }
+
+    return rows;
+  }, [responses, customerFilter, resultType]);
 
   // Period grouping
   const grouped = React.useMemo(() => {
@@ -220,6 +239,19 @@ export default function DemoSurveyPage() {
   const title = "NPS Demo Experience | NPS Me";
   const description =
     "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
+
+  const milestoneStats = React.useMemo(() => {
+  const map = {};
+
+  STAGES.filter(s => s !== "Overall NPS").forEach(stage => {
+    map[stage] = computeNpsStats(
+      responses.filter(r => r.stage === stage)
+    );
+  });
+
+  return map;
+}, [responses]);
+
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -413,6 +445,18 @@ export default function DemoSurveyPage() {
                   <option value="rolling12">Last 12 months</option>
                 </select>
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-slate-400">Result type:</span>
+                <select
+                  value={resultType}
+                  onChange={(e) => setResultType(e.target.value)}
+                  className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                >
+                  <option value="ALL">All</option>
+                  <option value="OVERALL">Overall NPS only</option>
+                  <option value="MILESTONE">Milestone NPS only</option>
+                </select>
+              </div>
             </div>
 
             {/* Results area */}
@@ -439,7 +483,9 @@ export default function DemoSurveyPage() {
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
                   <div>
                     <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
-                      Overall NPS
+                      {resultType === "MILESTONE"
+                        ? "Overall Milestone NPS"
+                        : "Overall NPS"}
                     </p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-semibold text-slate-50">
@@ -531,6 +577,36 @@ export default function DemoSurveyPage() {
                               />
                             )}
                           </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {/* Milestone NPS section */}
+                <div className="space-y-4 rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+                  <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
+                    Milestone NPS
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {STAGES.filter(s => s !== "Overall NPS").map(stage => {
+                      const stats = milestoneStats[stage];
+
+                      return (
+                        <div
+                          key={stage}
+                          className="rounded-2xl border border-slate-800 bg-slate-950/60 p-3 flex flex-col items-center text-center"
+                        >
+                          <p className="text-xs text-slate-400 mb-1">{stage}</p>
+
+                          {/* NPS dial */}
+                          <div className="text-2xl font-semibold text-slate-50 mb-1">
+                            {stats.nps === null ? "–" : stats.nps}
+                          </div>
+
+                          <p className="text-[11px] text-slate-500">
+                            {stats.total} responses
+                          </p>
                         </div>
                       );
                     })}

@@ -320,7 +320,7 @@ async function appendDemoResponseRow(row) {
   }
 
   const header =
-    "responseId,invitationId,customerId,customerName,email,stage,surveyId,score,comment,createdAt";
+    "responseId,invitationId,customerId,customerName,email,stage,surveyId,type,score,comment,createdAt";
 
   const existing = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
     console.error("[npsme] Error reading demo-responses.csv", err);
@@ -335,6 +335,7 @@ async function appendDemoResponseRow(row) {
     row.email || "",
     row.stage || "",
     row.surveyId || "",
+    row.type || "",
     row.score,
     row.comment || "",
     row.createdAt,
@@ -605,6 +606,14 @@ app.post("/api/demo-survey/submit", async (req, res) => {
       return res.status(409).json({ error: "Invitation already responded" });
     }
 
+    // Decide whether this is an overall NPS or milestone NPS response
+    const rawStage = (invitation.stage || "").toLowerCase().trim();
+
+    const type =
+      !rawStage || rawStage === "overall"
+        ? "overall"
+        : "milestone";
+
     const responseId = `RESP-${Date.now().toString(36).toUpperCase()}`;
     const createdAt = new Date().toISOString();
 
@@ -616,6 +625,7 @@ app.post("/api/demo-survey/submit", async (req, res) => {
       email: invitation.email || "",
       stage: invitation.stage || "",
       surveyId: invitation.surveyId || "",
+      type, // 👈 NEW FIELD, matches the header we added
       score,
       comment: (comment || "").slice(0, 1000),
       createdAt,

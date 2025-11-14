@@ -349,6 +349,59 @@ async function appendDemoResponseRow(row) {
   await writeDropboxFile(DEMO_RESPONSES_PATH, contents);
 }
 
+// --- CSV parser for demo responses (handles quoted fields) ---
+function splitCsvLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (ch === '"') {
+      // Toggle quotes, but handle escaped quotes ("")
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++; // skip the second quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+
+  return result;
+}
+
+function parseCsvWithHeader(csvText) {
+  const lines = csvText.trim().split("\n").filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return [];
+
+  const header = splitCsvLine(lines[0]).map((h) => h.trim());
+  const rows = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCsvLine(lines[i]);
+    const obj = {};
+    header.forEach((h, idx) => {
+      let value = cols[idx] ?? "";
+      // Unwrap quotes & unescape
+      if (value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1).replace(/""/g, '"');
+      }
+      obj[h] = value;
+    });
+    rows.push(obj);
+  }
+
+  return rows;
+}
+
 // --- Demo API (in-memory) ---
 let demoResponses = [];
 
@@ -574,6 +627,34 @@ app.post("/api/demo-survey/submit", async (req, res) => {
   } catch (err) {
     console.error("[npsme] Error in /api/demo-survey/submit", err);
     res.status(500).json({ error: "Failed to save response" });
+  }
+});
+
+// Load all demo responses (for the demo dashboard)
+app.get("/api/demo-responses", async (req, res) => {
+  try {
+    const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
+      console.error("[npsme] Error reading demo-responses.csv", err);
+      return null;
+    });
+
+    if (!csv) {
+      return res.json({ rows: [] });
+    }
+
+    const rows = parseCsvWithHeader(csv);
+
+    // Optionally normalise score + createdAt types here
+    const normalised = rows.map((r) => ({
+      ...r,
+      score: r.score !== undefined && r.score !== "" ? Number(r.score) : null,
+      createdAt: r.createdAt || r.createdAt,
+    }));
+
+    res.json({ rows: normalised });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-responses", err);
+    res.status(500).json({ error: "Failed to load demo responses" });
   }
 });
 

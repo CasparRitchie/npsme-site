@@ -497,12 +497,23 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
       return res.status(400).json({ error: "Missing invitation id" });
     }
 
-    const invitation = await findInvitationById(inv);
+        const invitation = await findInvitationById(inv);
     if (!invitation) {
       return res.status(404).json({ error: "Invitation not found" });
     }
 
-    if (invitation.responseId) {
+    // Be defensive: treat as responded only if status is "responded"
+    // OR responseId is present and non-empty
+    const status = (invitation.status || "").toLowerCase().trim();
+    const responseId =
+      typeof invitation.responseId === "string"
+        ? invitation.responseId.trim()
+        : invitation.responseId;
+
+    const alreadyResponded =
+      status === "responded" || (responseId && responseId !== "");
+
+    if (alreadyResponded) {
       return res.status(409).json({ error: "Invitation already responded" });
     }
 

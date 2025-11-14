@@ -241,16 +241,25 @@ export default function DemoSurveyPage() {
     "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
 
   const milestoneStats = React.useMemo(() => {
-  const map = {};
+    const map = {};
 
-  STAGES.filter(s => s !== "Overall NPS").forEach(stage => {
-    map[stage] = computeNpsStats(
-      responses.filter(r => r.stage === stage)
+    // Start from whatever is already filtered by customer + resultType
+    const base = filteredResponses.filter(
+      (r) =>
+        r.stage &&
+        r.stage.trim() !== "" &&
+        r.stage.trim() !== "Overall NPS"
     );
-  });
 
-  return map;
-}, [responses]);
+    STAGES.filter((s) => s !== "Overall NPS").forEach((stage) => {
+      const rowsForStage = base.filter(
+        (r) => (r.stage || "").trim() === stage
+      );
+      map[stage] = computeNpsStats(rowsForStage);
+    });
+
+    return map;
+  }, [filteredResponses]);
 
 
   return (

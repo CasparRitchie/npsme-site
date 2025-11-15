@@ -775,6 +775,7 @@ app.use(
   })
 );
 // --- Social summary endpoint for npsme.com ---
+// --- Social summary endpoint for npsme.com ---
 app.get("/api/social-summary", async (req, res) => {
   try {
     const company = (req.query.company || "").trim();
@@ -784,60 +785,49 @@ app.get("/api/social-summary", async (req, res) => {
         .json({ error: "company query parameter is required" });
     }
 
-    // For now we use small mocked snippets to keep the prompt tiny (cheap).
-    // Later we can plug in real social/report data instead of this.
-    const fakePosts = [
-      {
-        source: "twitter",
-        text: `${company} support was really helpful and quick today.`,
-      },
-      {
-        source: "twitter",
-        text: `Not impressed with ${company}'s latest update, it feels buggy.`,
-      },
-      {
-        source: "reddit",
-        text: `Thinking of switching to ${company}. How good is their onboarding and support?`,
-      },
-    ];
-
-    const snippets = fakePosts
-      .slice(0, 10)
-      .map((p) => `[${p.source}] ${p.text}`)
-      .join("\n");
-
-    const prompt = `
-Summarise recent social/media sentiment for the company: ${company}.
-
-Posts:
-${snippets}
-
-Return:
-- Overall tone (positive/neutral/negative, with nuance)
-- 2–4 key themes you're seeing
-- Any clear CX 'delighters' or red flags relevant for NPS
-
-Max 120 words. Neutral, professional tone.
-`;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini", // cheap + good
-      max_tokens: 150,       // cost control
-      temperature: 0.4,
-      messages: [
-        { role: "system", content: "You are a concise CX & NPS analyst." },
-        { role: "user", content: prompt },
+    // Ask the model to use web search to get real, recent info
+    const response = await openai.responses.create({
+      model: "gpt-4o-mini", // good + cheap
+      tools: [
+        {
+          type: "web_search_preview",
+        },
+      ],
+      input: [
+        {
+          role: "system",
+          content:
+            "You are a concise, neutral CX & NPS analyst. " +
+            "Use web search to ground your answer in real, recent public information. " +
+            "If you find very little about the company, say so explicitly.",
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text:
+                `Using web search, summarise current public social / review sentiment ` +
+                `about the company "${company}". ` +
+                `Prioritise sources like review sites, forums, news and social platforms that are publicly accessible.\n\n` +
+                `Return:\n` +
+                `- Overall tone (positive / neutral / negative, with nuance)\n` +
+                `- 2–4 key themes that customers talk about\n` +
+                `- Any obvious CX 'delighters' and red flags relevant for NPS\n\n` +
+                `Max 160 words. Do NOT invent specifics if you can't find much; be honest about gaps.`,
+            },
+          ],
+        },
       ],
     });
 
     const summary =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "No summary available.";
+      response.output_text?.trim() || "No summary available for this company.";
 
+    // Keep the shape simple; frontend only really needs summary + company
     res.json({
       company,
       summary,
-      samples: fakePosts,
       generated_at: new Date().toISOString(),
     });
   } catch (err) {
@@ -847,6 +837,7 @@ Max 120 words. Neutral, professional tone.
       .json({ error: "Internal error generating social summary" });
   }
 });
+
 
 
 // ---------- Inject canonical + og:url for SEO ----------

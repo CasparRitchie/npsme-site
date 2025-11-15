@@ -22,79 +22,6 @@ const mailer = nodemailer.createTransport({
   },
 });
 
-// --- Social summary endpoint for npsme.com ---
-app.get("/api/social-summary", async (req, res) => {
-  try {
-    const company = (req.query.company || "").trim();
-    if (!company) {
-      return res
-        .status(400)
-        .json({ error: "company query parameter is required" });
-    }
-
-    // For now we use small mocked snippets to keep the prompt tiny (cheap).
-    // Later we can plug in real social/report data instead of this.
-    const fakePosts = [
-      {
-        source: "twitter",
-        text: `${company} support was really helpful and quick today.`,
-      },
-      {
-        source: "twitter",
-        text: `Not impressed with ${company}'s latest update, it feels buggy.`,
-      },
-      {
-        source: "reddit",
-        text: `Thinking of switching to ${company}. How good is their onboarding and support?`,
-      },
-    ];
-
-    const snippets = fakePosts
-      .slice(0, 10)
-      .map((p) => `[${p.source}] ${p.text}`)
-      .join("\n");
-
-    const prompt = `
-Summarise recent social/media sentiment for the company: ${company}.
-
-Posts:
-${snippets}
-
-Return:
-- Overall tone (positive/neutral/negative, with nuance)
-- 2–4 key themes you're seeing
-- Any clear CX 'delighters' or red flags relevant for NPS
-
-Max 120 words. Neutral, professional tone.
-`;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini", // cheap + good
-      max_tokens: 150,       // cost control
-      temperature: 0.4,
-      messages: [
-        { role: "system", content: "You are a concise CX & NPS analyst." },
-        { role: "user", content: prompt },
-      ],
-    });
-
-    const summary =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "No summary available.";
-
-    res.json({
-      company,
-      summary,
-      samples: fakePosts,
-      generated_at: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.error("Error in /api/social-summary:", err);
-    res
-      .status(500)
-      .json({ error: "Internal error generating social summary" });
-  }
-});
 
 
 function generateInvitationId() {
@@ -885,6 +812,81 @@ app.get("*", (req, res) => {
 
   res.type("html").send(html);
 });
+
+// --- Social summary endpoint for npsme.com ---
+app.get("/api/social-summary", async (req, res) => {
+  try {
+    const company = (req.query.company || "").trim();
+    if (!company) {
+      return res
+        .status(400)
+        .json({ error: "company query parameter is required" });
+    }
+
+    // For now we use small mocked snippets to keep the prompt tiny (cheap).
+    // Later we can plug in real social/report data instead of this.
+    const fakePosts = [
+      {
+        source: "twitter",
+        text: `${company} support was really helpful and quick today.`,
+      },
+      {
+        source: "twitter",
+        text: `Not impressed with ${company}'s latest update, it feels buggy.`,
+      },
+      {
+        source: "reddit",
+        text: `Thinking of switching to ${company}. How good is their onboarding and support?`,
+      },
+    ];
+
+    const snippets = fakePosts
+      .slice(0, 10)
+      .map((p) => `[${p.source}] ${p.text}`)
+      .join("\n");
+
+    const prompt = `
+Summarise recent social/media sentiment for the company: ${company}.
+
+Posts:
+${snippets}
+
+Return:
+- Overall tone (positive/neutral/negative, with nuance)
+- 2–4 key themes you're seeing
+- Any clear CX 'delighters' or red flags relevant for NPS
+
+Max 120 words. Neutral, professional tone.
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini", // cheap + good
+      max_tokens: 150,       // cost control
+      temperature: 0.4,
+      messages: [
+        { role: "system", content: "You are a concise CX & NPS analyst." },
+        { role: "user", content: prompt },
+      ],
+    });
+
+    const summary =
+      completion.choices?.[0]?.message?.content?.trim() ||
+      "No summary available.";
+
+    res.json({
+      company,
+      summary,
+      samples: fakePosts,
+      generated_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("Error in /api/social-summary:", err);
+    res
+      .status(500)
+      .json({ error: "Internal error generating social summary" });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`NPS Me running on :${PORT} (${PROD ? "prod" : "dev"})`);

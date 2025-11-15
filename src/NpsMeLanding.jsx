@@ -1,103 +1,12 @@
+// src/NpsMeLanding.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
-import Seo from "./components/Seo"
+import Seo from "./components/Seo";
+import { computeNpsStats } from "../utils/nps";
 
-// NPS Me landing (uses global Navbar from App.jsx)
-
-function ContactForm() {
-  const [status, setStatus] = React.useState("idle"); // idle | sending | success | error
-  const [form, setForm] = React.useState({ name: "", email: "", message: "", company: "" });
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const disabled = status === "success";
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (form.company) return; // honeypot
-    setStatus("sending");
-    try {
-      const res = await fetch("https://formspree.io/f/mwprrzro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          message: form.message,
-          _subject: "New message from npsme.com",
-          _source: "contact-section",
-        }),
-      });
-      setStatus(res.ok ? "success" : "error");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  return (
-    <>
-      <form
-        onSubmit={onSubmit}
-        className={`mt-8 grid gap-4 max-w-xl mx-auto text-left transition ${disabled ? "opacity-60 pointer-events-none" : ""}`}
-        aria-disabled={disabled}
-      >
-        {/* Honeypot (hidden) */}
-        <input
-          tabIndex="-1"
-          autoComplete="off"
-          value={form.company}
-          onChange={(e) => update("company", e.target.value)}
-          className="hidden"
-          placeholder="Company"
-        />
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <input
-            required
-            placeholder="Your name"
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-            disabled={disabled}
-          />
-          <input
-            required
-            type="email"
-            placeholder="Your email"
-            value={form.email}
-            onChange={(e) => update("email", e.target.value)}
-            className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-            disabled={disabled}
-          />
-        </div>
-
-        <textarea
-          required
-          rows={5}
-          placeholder="How can I help? (A couple of lines is perfect.)"
-          value={form.message}
-          onChange={(e) => update("message", e.target.value)}
-          className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
-          disabled={disabled}
-        />
-
-        <button
-          disabled={status === "sending" || disabled}
-          className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
-        >
-          {status === "sending" ? "Sending…" : "Send message"}
-        </button>
-      </form>
-
-      {status === "success" && (
-        <p className="mt-3 text-sm text-[#22C55E]">Thanks! I’ll get back to you shortly.</p>
-      )}
-      {status === "error" && (
-        <p className="mt-3 text-sm text-red-400">Sorry-something went wrong. Please email hello@npsme.com.</p>
-      )}
-    </>
-  );
-}
+// --- NPS explainer ---
 
 function NpsExplainer() {
   return (
@@ -119,7 +28,8 @@ function NpsExplainer() {
               <li><span className="text-white font-medium">Detractors</span>: 0–6</li>
             </ul>
             <p className="mt-3">
-              The score is calculated as <span className="text-white font-medium">% Promoters − % Detractors</span>.
+              The score is calculated as{" "}
+              <span className="text-white font-medium">% Promoters − % Detractors</span>.
             </p>
           </div>
 
@@ -127,14 +37,17 @@ function NpsExplainer() {
             <p className="text-white font-medium">Where it fits</p>
             <ul className="mt-2 space-y-2 list-disc pl-5">
               <li><span className="text-white">Relationship NPS</span>: periodic, brand-level sentiment.</li>
-              <li><span className="text-white">Transactional / stage-based</span>: sent after key milestones (e.g., order placed, onboarding, delivery).</li>
+              <li>
+                <span className="text-white">Transactional / stage-based</span>: sent after key milestones
+                (e.g., order placed, onboarding, delivery).
+              </li>
               <li>Best used alongside CSAT, CES, retention and review velocity.</li>
             </ul>
             <p className="mt-3 text-white font-medium">Good practice & cautions</p>
             <ul className="mt-2 space-y-2 list-disc pl-5">
               <li>Use representative sampling and avoid “gaming”.</li>
               <li>Close the loop with respondents and track root causes.</li>
-              <li>NPS is directional-not a single source of truth.</li>
+              <li>NPS is directional — not a single source of truth.</li>
             </ul>
           </div>
         </div>
@@ -142,6 +55,8 @@ function NpsExplainer() {
     </section>
   );
 }
+
+// --- Milestone NPS explainer (unchanged) ---
 
 function MilestoneNpsSection() {
   return (
@@ -211,15 +126,92 @@ function MilestoneNpsSection() {
   );
 }
 
+// --- New: lightweight demo summary used on the landing ---
+
+function DemoSummaryStrip() {
+  const [stats, setStats] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch("/api/demo-responses");
+        if (!res.ok) throw new Error("Failed to load demo responses");
+        const data = await res.json();
+        const rows = data.rows || [];
+        setStats(computeNpsStats(rows));
+      } catch (err) {
+        console.error("Error loading demo summary", err);
+        setError("We couldn’t load the demo metrics right now.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className="text-sm text-slate-400">
+        Loading live demo metrics…
+      </p>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-sm text-slate-400">
+        {error}
+      </p>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <p className="text-sm text-slate-400">
+        No demo responses yet. Run the demo to see live NPS.
+      </p>
+    );
+  }
+
+  return (
+    <div className="text-sm text-slate-300">
+      <div className="flex items-baseline gap-2">
+        <span className="text-xs uppercase tracking-widest text-slate-400">
+          Live demo NPS
+        </span>
+      </div>
+      <div className="mt-1 flex items-baseline gap-2">
+        <span className="text-2xl font-semibold text-white">
+          {stats.nps === null ? "–" : stats.nps}
+        </span>
+        {stats.nps !== null && (
+          <span className="text-xs text-slate-400">NPS</span>
+        )}
+      </div>
+      <p className="mt-1 text-[11px] text-slate-500">
+        Based on {stats.total} demo responses so far.
+      </p>
+    </div>
+  );
+}
+
+// --- Main landing page ---
+
 export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-            {/* SEO meta tags */}
+      {/* SEO meta tags */}
       <Seo
         path="/"
         title="Customer Experience (CX) Consulting & NPS Improvement | NPS Me"
         description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase."
       />
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
@@ -312,14 +304,35 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
-      {/* Demo Widget */}
+      {/* Demo Widget → now a live summary + link to full demo */}
       <section id="demo" className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <h3 className="text-xl md:text-2xl font-semibold text-white">
-            Try the NPS®-style demo (close-the-loop ready)
-          </h3>
-          <p className="mt-2 text-slate-300">Rate us 0–10 and leave an optional comment. We’ll show a rolling demo metric on this page.</p>
-          <DemoWidget />
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 className="text-xl md:text-2xl font-semibold text-white">
+              Try the NPS®-style demo (close-the-loop ready)
+            </h3>
+            <p className="mt-2 text-slate-300 max-w-xl">
+              The demo shows how invitations, survey responses, and NPS metrics link together.
+              These numbers are live from the demo environment.
+            </p>
+            <div className="mt-4">
+              <DemoSummaryStrip />
+            </div>
+          </div>
+
+          <div className="mt-4 md:mt-0 flex flex-col items-start gap-3">
+            <Link
+              to="/demo-survey-page"
+              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white"
+            >
+              Run the live demo &amp; see full results
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <p className="text-xs text-slate-400 max-w-xs">
+              Opens the dedicated demo page where you can send yourself an invitation,
+              complete the survey, and explore NPS & milestone scores.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -350,10 +363,12 @@ export default function NpsMeLanding() {
         </ul>
       </section>
 
-      {/* Contact CTA + Contact Form */}
+      {/* Contact CTA (no duplicated form – links to /book) */}
       <section id="contact" className="mx-auto max-w-7xl px-6 pb-24">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 md:p-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">Ready to turn feedback into growth?</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            Ready to turn feedback into growth?
+          </h2>
           <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
             Book a free 30-minute discovery session. We’ll review your current scores and identify quick wins.
           </p>
@@ -373,76 +388,8 @@ export default function NpsMeLanding() {
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
           </div>
-
-          <ContactForm />
         </div>
       </section>
-    </div>
-  );
-}
-
-/* --- Embedded demo widget --- */
-function DemoWidget() {
-  const [score, setScore] = React.useState(null);
-  const [comment, setComment] = React.useState("");
-  const [sent, setSent] = React.useState(false);
-  const [rolling, setRolling] = React.useState(null);
-
-  React.useEffect(() => {
-    fetch("/api/demo/metrics")
-      .then((r) => r.json())
-      .then((d) => setRolling(d?.nps ?? null))
-      .catch(() => {});
-  }, []);
-
-  const submit = async () => {
-    if (score === null) return;
-    await fetch("/api/demo/response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ score, comment }),
-    });
-    setSent(true);
-    const d = await fetch("/api/demo/metrics").then((r) => r.json());
-    setRolling(d?.nps ?? null);
-  };
-
-  return (
-    <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto] items-start">
-      <div>
-        <div className="flex flex-wrap gap-2">
-          {Array.from({ length: 11 }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setScore(i)}
-              className={`px-3 py-2 rounded-xl border border-white/10 ${
-                score === i ? "bg-[#7C3AED] text-white" : "bg-white/5 text-slate-200 hover:bg-white/10"
-              }`}
-            >
-              {i}
-            </button>
-          ))}
-        </div>
-        <textarea
-          placeholder="Optional comment"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className="mt-3 w-full rounded-2xl bg-black/30 border border-white/10 p-3 text-sm"
-          rows={3}
-        />
-      </div>
-      <div className="flex flex-col items-start gap-3">
-        <button
-          onClick={submit}
-          className="rounded-2xl px-4 py-2 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
-        >
-          Submit
-        </button>
-        {sent && <div className="text-sm text-slate-300">Thanks! Response recorded.</div>}
-        <div className="text-sm text-slate-400">
-          Rolling demo NPS: <span className="text-white font-semibold">{rolling ?? "-"}</span>
-        </div>
-      </div>
     </div>
   );
 }

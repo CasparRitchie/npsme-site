@@ -2,6 +2,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Seo from "./components/Seo"
+import SocialTicker from "./components/SocialTicker";
+
 
 export default function SocialListening() {
   return (
@@ -106,6 +108,7 @@ export default function SocialListening() {
           View Sample Report →
         </a>
       </div>
+      <SocialTicker />
     </section>
   );
 }

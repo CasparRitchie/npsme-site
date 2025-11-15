@@ -11,6 +11,7 @@ export const ROUTES_MANIFEST = [
 
   // Social Listening Index + dynamic anonymised reports
   { path: "/social-listening",                 label: "Social Listening",                 enabled: true,  inHeader: true,  inFooter: true  },
+  { path: "/social-listening-index",           label: "Social Listening Index",           enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/social-listening/:slug",           label: "Social Listening Report",          enabled: true,  inHeader: false, inFooter: false },
   { path: "/cx-pulse-sample",                  label: "CX Pulse (sample)",                enabled: true,  inHeader: false, inFooter: true  },
 

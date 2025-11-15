@@ -13,7 +13,7 @@ import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
 
-// NEW pages
+import SocialListening from "./SocialListening";
 import SocialListeningIndex from "./pages/SocialListeningIndex";
 import SocialListeningReport from "./pages/SocialListeningReport";
 import BlogIndex from "./pages/BlogIndex";
@@ -39,7 +39,8 @@ const COMPONENTS = {
   "/data-automation": DataAutomationPage,
 
   // SocialListening pages
-  "/social-listening": SocialListeningIndex,
+  "/social-listening": SocialListening,
+  "/social-listening-index": SocialListeningIndex,
   "/social-listening/:slug": SocialListeningReport,
 
   // Blogs

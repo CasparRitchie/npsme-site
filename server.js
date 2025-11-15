@@ -774,45 +774,6 @@ app.use(
     index: false,
   })
 );
-
-// ---------- Inject canonical + og:url for SEO ----------
-app.get("*", (req, res) => {
-  res.set("Cache-Control", "no-store, must-revalidate");
-
-  const pathOnly = req.originalUrl.split("?")[0] || "/";
-  const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
-
-  let html = baseIndexHtml;
-
-  // Replace or insert canonical tag
-  if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {
-    html = html.replace(
-      /<link\s+rel=["']canonical["'][^>]*>/i,
-      `<link rel="canonical" href="${fullUrl}" />`
-    );
-  } else {
-    html = html.replace(
-      /<\/head>/i,
-      `  <link rel="canonical" href="${fullUrl}" />\n</head>`
-    );
-  }
-
-  // Replace or insert og:url
-  if (html.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
-    html = html.replace(
-      /<meta\s+property=["']og:url["'][^>]*>/i,
-      `<meta property="og:url" content="${fullUrl}" />`
-    );
-  } else {
-    html = html.replace(
-      /<\/head>/i,
-      `  <meta property="og:url" content="${fullUrl}" />\n</head>`
-    );
-  }
-
-  res.type("html").send(html);
-});
-
 // --- Social summary endpoint for npsme.com ---
 app.get("/api/social-summary", async (req, res) => {
   try {
@@ -885,6 +846,45 @@ Max 120 words. Neutral, professional tone.
       .status(500)
       .json({ error: "Internal error generating social summary" });
   }
+});
+
+
+// ---------- Inject canonical + og:url for SEO ----------
+app.get("*", (req, res) => {
+  res.set("Cache-Control", "no-store, must-revalidate");
+
+  const pathOnly = req.originalUrl.split("?")[0] || "/";
+  const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
+
+  let html = baseIndexHtml;
+
+  // Replace or insert canonical tag
+  if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {
+    html = html.replace(
+      /<link\s+rel=["']canonical["'][^>]*>/i,
+      `<link rel="canonical" href="${fullUrl}" />`
+    );
+  } else {
+    html = html.replace(
+      /<\/head>/i,
+      `  <link rel="canonical" href="${fullUrl}" />\n</head>`
+    );
+  }
+
+  // Replace or insert og:url
+  if (html.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
+    html = html.replace(
+      /<meta\s+property=["']og:url["'][^>]*>/i,
+      `<meta property="og:url" content="${fullUrl}" />`
+    );
+  } else {
+    html = html.replace(
+      /<\/head>/i,
+      `  <meta property="og:url" content="${fullUrl}" />\n</head>`
+    );
+  }
+
+  res.type("html").send(html);
 });
 
 

@@ -121,13 +121,87 @@ app.use((req, res, next) => {
   return next();
 });
 
-// ---- Dropbox helpers for invitations.csv ----
-const DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
-const INVITATIONS_PATH = process.env.DROPBOX_INVITATIONS_PATH || "/npsme/invitations.csv";
-const DEMO_RESPONSES_PATH = process.env.DROPBOX_DEMO_RESPONSES_PATH || "/npsme/demo-responses.csv";
+// ---- Dropbox token management (auto-refresh) ----
+const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
+const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
+const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
 
-if (!DROPBOX_TOKEN) {
-  console.warn("[npsme] WARNING: DROPBOX_ACCESS_TOKEN is not set - invitation logging will fail.");
+// Legacy fallback (short-lived token) – used only if no refresh token is configured
+const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
+
+const INVITATIONS_PATH =
+  process.env.DROPBOX_INVITATIONS_PATH || "/npsme/invitations.csv";
+const DEMO_RESPONSES_PATH =
+  process.env.DROPBOX_DEMO_RESPONSES_PATH || "/npsme/demo-responses.csv";
+const RESPONSES_PATH =
+  process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
+
+if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+  console.warn(
+    "[npsme] WARNING: No DROPBOX_REFRESH_TOKEN or DROPBOX_ACCESS_TOKEN set - Dropbox logging will fail."
+  );
+}
+
+// In-memory cache for the current access token
+let cachedDropboxToken = null;
+let cachedDropboxExpiry = 0; // unix timestamp (seconds)
+
+/**
+ * Get a valid Dropbox access token.
+ * - If refresh token is configured, use it to fetch/refresh short-lived tokens.
+ * - If not, fall back to legacy DROPBOX_ACCESS_TOKEN (no auto-refresh).
+ */
+async function getDropboxAccessToken() {
+  // No refresh token configured: use legacy static token as a fallback
+  if (!DROPBOX_REFRESH_TOKEN) {
+    if (!LEGACY_DROPBOX_TOKEN) {
+      console.warn(
+        "[npsme] No Dropbox token available; skipping Dropbox operations."
+      );
+      return null;
+    }
+    return LEGACY_DROPBOX_TOKEN;
+  }
+
+  const now = Date.now() / 1000;
+
+  // If we have a cached token that's still valid (with 60s buffer), reuse it
+  if (cachedDropboxToken && now < cachedDropboxExpiry - 60) {
+    return cachedDropboxToken;
+  }
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "refresh_token");
+  params.append("refresh_token", DROPBOX_REFRESH_TOKEN);
+  params.append("client_id", DROPBOX_APP_KEY);
+  params.append("client_secret", DROPBOX_APP_SECRET);
+
+  const resp = await fetch("https://api.dropbox.com/oauth2/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params,
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    console.error(
+      `[npsme] Dropbox token refresh failed (${resp.status}):`,
+      text
+    );
+    throw new Error(
+      `Dropbox token refresh failed (${resp.status}): ${text || "no body"}`
+    );
+  }
+
+  const data = await resp.json();
+  cachedDropboxToken = data.access_token;
+  const expiresIn =
+    typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60;
+  cachedDropboxExpiry = now + expiresIn;
+
+  return cachedDropboxToken;
 }
 
 // Small CSV escaper
@@ -140,10 +214,16 @@ function escapeCsv(value) {
 }
 
 async function readDropboxFile(path) {
+  const token = await getDropboxAccessToken();
+  if (!token) {
+    console.warn("[npsme] readDropboxFile: no Dropbox token available.");
+    return null;
+  }
+
   const res = await fetch("https://content.dropboxapi.com/2/files/download", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${DROPBOX_TOKEN}`,
+      Authorization: `Bearer ${token}`,
       "Dropbox-API-Arg": JSON.stringify({ path }),
     },
   });
@@ -162,10 +242,16 @@ async function readDropboxFile(path) {
 }
 
 async function writeDropboxFile(path, contents) {
+  const token = await getDropboxAccessToken();
+  if (!token) {
+    console.warn("[npsme] writeDropboxFile: no Dropbox token available.");
+    return;
+  }
+
   const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${DROPBOX_TOKEN}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/octet-stream",
       "Dropbox-API-Arg": JSON.stringify({
         path,
@@ -184,8 +270,8 @@ async function writeDropboxFile(path, contents) {
 
 // Append a single invitation row into invitations.csv
 async function appendInvitationRow(row) {
-  if (!DROPBOX_TOKEN) {
-    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping invitation logging.");
+  if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+    console.warn("[npsme] No Dropbox token configured; skipping ...");
     return;
   }
 
@@ -275,8 +361,6 @@ async function markInvitationResponded(invitationId, responseId) {
   await writeDropboxFile(INVITATIONS_PATH, updatedCsv);
 }
 
-const RESPONSES_PATH = process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
-
 function generateResponseId() {
   const ts = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -284,8 +368,8 @@ function generateResponseId() {
 }
 
 async function appendResponseRow(row) {
-  if (!DROPBOX_TOKEN) {
-    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping response logging.");
+  if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+    console.warn("[npsme] No Dropbox token configured; skipping ...");
     return;
   }
 
@@ -314,8 +398,8 @@ async function appendResponseRow(row) {
 }
 
 async function appendDemoResponseRow(row) {
-  if (!DROPBOX_TOKEN) {
-    console.warn("[npsme] No DROPBOX_ACCESS_TOKEN set; skipping demo response logging.");
+  if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+    console.warn("[npsme] No Dropbox token configured; skipping ...");
     return;
   }
 

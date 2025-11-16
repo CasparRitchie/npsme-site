@@ -63,7 +63,7 @@ export default function SocialTicker() {
           type="text"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
-          placeholder="e.g. Tiney, Monzo, Pret a Manger"
+          placeholder="Enter company name here"
           className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent"
         />
         <button

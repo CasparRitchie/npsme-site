@@ -1,15 +1,22 @@
 // src/components/SocialTicker.jsx
 import { useState } from "react";
 
-// Helper: remove markdown links like [trustpilot.com](https://...)
-function stripMarkdownLinks(text) {
+// Helper: clean markdown – remove links + bold markers
+function cleanLLMText(text) {
   if (!text) return "";
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+
+  // [label](url) -> label
+  let cleaned = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+
+  // **bold** -> bold
+  cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, "$1");
+
+  return cleaned;
 }
 
 // Helper: pull out a high-level sentence + bullets for pros/cons
 function parseSummary(raw) {
-  const cleaned = stripMarkdownLinks(raw);
+  const cleaned = cleanLLMText(raw);
 
   // High-level = first sentence
   const highLevel = cleaned.split(/(?<=\.)\s/)[0] || cleaned;
@@ -23,23 +30,28 @@ function parseSummary(raw) {
   let positives = [];
   let negatives = [];
 
+  // Utility: filter out junk bullets (e.g. "**")
+  const normaliseBulletList = (block) =>
+    block
+      .split("-")
+      .map((s) => s.trim())
+      .filter((item) => {
+        if (!item) return false;
+        // Drop items with no letters (e.g. "**", "•")
+        return /[A-Za-z]/.test(item);
+      });
+
   if (delightersIndex !== -1) {
     const start = delightersIndex + delightersLabel.length;
     const end = redFlagsIndex !== -1 ? redFlagsIndex : undefined;
     const block = cleaned.slice(start, end);
-    positives = block
-      .split("-")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    positives = normaliseBulletList(block);
   }
 
   if (redFlagsIndex !== -1) {
     const start = redFlagsIndex + redFlagsLabel.length;
     const block = cleaned.slice(start);
-    negatives = block
-      .split("-")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    negatives = normaliseBulletList(block);
   }
 
   return {
@@ -114,7 +126,7 @@ export default function SocialTicker() {
           type="text"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
-          placeholder="e.g. Tiney, Monzo, Pret a Manger"
+          placeholder="Enter company name here"
           className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent"
         />
         <button
@@ -205,16 +217,15 @@ export default function SocialTicker() {
             </div>
           </div>
 
-          {/* Competitive context (lightweight demo copy) */}
+          {/* Competitive context – uses real backend data if available */}
           <div className="rounded-2xl border border-white/10 bg-[#0C1224] p-5">
             <h3 className="text-sm font-semibold text-white mb-2">
               Competitive context
             </h3>
             <p className="text-sm text-slate-300">
-              This lightweight snapshot focuses on {result.company} only. In a
-              full NPSme engagement, we benchmark your sentiment, themes and CX
-              risks against key competitors in your space so you can see exactly
-              where you&apos;re ahead, and where you&apos;re lagging behind.
+              {result.competitor_summary
+                ? result.competitor_summary
+                : `This lightweight snapshot focuses on ${result.company} only. In a full NPSme engagement, we benchmark your sentiment, themes and CX risks against key competitors in your space so you can see exactly where you're ahead, and where you're lagging behind.`}
             </p>
           </div>
 

@@ -774,7 +774,8 @@ app.use(
     index: false,
   })
 );
-// --- Social summary endpoint for npsme.com ---
+
+
 // --- Social summary endpoint for npsme.com ---
 app.get("/api/social-summary", async (req, res) => {
   try {
@@ -785,21 +786,17 @@ app.get("/api/social-summary", async (req, res) => {
         .json({ error: "company query parameter is required" });
     }
 
-    // Ask the model to use web search to get real, recent info
+    // Use OpenAI + web search to get CX summary + competitor comparison
     const response = await openai.responses.create({
-      model: "gpt-4o-mini", // good + cheap
-      tools: [
-        {
-          type: "web_search_preview",
-        },
-      ],
+      model: "gpt-4o-mini",
+      tools: [{ type: "web_search_preview" }],
       input: [
         {
           role: "system",
           content:
             "You are a concise, neutral CX & NPS analyst. " +
             "Use web search to ground your answer in real, recent public information. " +
-            "If you find very little about the company, say so explicitly.",
+            "Return ONLY valid JSON in the exact schema requested, with no explanation or commentary outside the JSON.",
         },
         {
           role: "user",
@@ -807,27 +804,46 @@ app.get("/api/social-summary", async (req, res) => {
             {
               type: "input_text",
               text:
-                `Using web search, summarise current public social / review sentiment ` +
-                `about the company "${company}". ` +
-                `Prioritise sources like review sites, forums, news and social platforms that are publicly accessible.\n\n` +
-                `Return:\n` +
-                `- Overall tone (positive / neutral / negative, with nuance)\n` +
-                `- 2–4 key themes that customers talk about\n` +
-                `- Any obvious CX 'delighters' and red flags relevant for NPS\n\n` +
-                `Max 160 words. Do NOT invent specifics if you can't find much; be honest about gaps.`,
+                `Using web search, analyse public social / review sentiment about "${company}".\n\n` +
+                `Return JSON of the form:\n` +
+                `{\n` +
+                `  "summary": "string",\n` +
+                `  "competitor_summary": "string"\n` +
+                `}\n\n` +
+                `Where:\n` +
+                `- "summary" (<= 180 words) includes:\n` +
+                `  • Overall tone (positive / neutral / negative, with nuance)\n` +
+                `  • Explicit sections labelled "CX Delighters:" and "CX Red Flags:"\n` +
+                `    Each with 2–4 bullet points, using "- " at the start of each bullet.\n` +
+                `- "competitor_summary" (<= 80 words) briefly compares ${company}'s\n` +
+                `  sentiment and key CX themes with 2–3 named competitors in the same category.\n\n` +
+                `If you find very little data, say so explicitly in BOTH fields.\n` +
+                `Return ONLY the JSON object, no extra text.`,
             },
           ],
         },
       ],
     });
 
-    const summary =
-      response.output_text?.trim() || "No summary available for this company.";
+    const jsonText = response.output_text?.trim() || "";
+    let parsed;
 
-    // Keep the shape simple; frontend only really needs summary + company
+    try {
+      parsed = JSON.parse(jsonText);
+    } catch (e) {
+      console.error(
+        "Failed to parse JSON from /api/social-summary:",
+        e,
+        jsonText
+      );
+      // Fallback: treat the whole text as a plain summary
+      parsed = { summary: jsonText, competitor_summary: "" };
+    }
+
     res.json({
       company,
-      summary,
+      summary: parsed.summary || "No summary available for this company.",
+      competitor_summary: parsed.competitor_summary || "",
       generated_at: new Date().toISOString(),
     });
   } catch (err) {

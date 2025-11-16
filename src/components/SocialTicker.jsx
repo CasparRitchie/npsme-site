@@ -1,6 +1,55 @@
 // src/components/SocialTicker.jsx
 import { useState } from "react";
 
+// Helper: remove markdown links like [trustpilot.com](https://...)
+function stripMarkdownLinks(text) {
+  if (!text) return "";
+  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+}
+
+// Helper: pull out a high-level sentence + bullets for pros/cons
+function parseSummary(raw) {
+  const cleaned = stripMarkdownLinks(raw);
+
+  // High-level = first sentence
+  const highLevel = cleaned.split(/(?<=\.)\s/)[0] || cleaned;
+
+  const delightersLabel = "CX Delighters:";
+  const redFlagsLabel = "CX Red Flags:";
+
+  const delightersIndex = cleaned.indexOf(delightersLabel);
+  const redFlagsIndex = cleaned.indexOf(redFlagsLabel);
+
+  let positives = [];
+  let negatives = [];
+
+  if (delightersIndex !== -1) {
+    const start = delightersIndex + delightersLabel.length;
+    const end = redFlagsIndex !== -1 ? redFlagsIndex : undefined;
+    const block = cleaned.slice(start, end);
+    positives = block
+      .split("-")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  if (redFlagsIndex !== -1) {
+    const start = redFlagsIndex + redFlagsLabel.length;
+    const block = cleaned.slice(start);
+    negatives = block
+      .split("-")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  return {
+    highLevel,
+    positives,
+    negatives,
+    raw: cleaned,
+  };
+}
+
 export default function SocialTicker() {
   const [company, setCompany] = useState("");
   const [result, setResult] = useState(null);
@@ -38,6 +87,8 @@ export default function SocialTicker() {
     }
   };
 
+  const parsed = result ? parseSummary(result.summary) : null;
+
   return (
     <section className="mt-16 rounded-3xl border border-white/10 bg-black/40 p-8 shadow-lg shadow-black/40">
       {/* Title + intro */}
@@ -63,7 +114,7 @@ export default function SocialTicker() {
           type="text"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
-          placeholder="Enter company name here"
+          placeholder="e.g. Tiney, Monzo, Pret a Manger"
           className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent"
         />
         <button
@@ -83,8 +134,9 @@ export default function SocialTicker() {
       )}
 
       {/* Result */}
-      {result && (
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 space-y-3">
+      {result && parsed && (
+        <div className="mt-8 space-y-6">
+          {/* Meta */}
           <div className="flex flex-col gap-1 text-xs text-slate-400 md:flex-row md:items-center md:justify-between">
             <span>
               Company:{" "}
@@ -97,8 +149,81 @@ export default function SocialTicker() {
               {new Date(result.generated_at).toLocaleString()}
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-slate-200">
-            {result.summary}
+
+          {/* High-level summary */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 className="text-sm font-semibold text-white mb-2">
+              High-level CX snapshot
+            </h3>
+            <p className="text-sm leading-relaxed text-slate-200">
+              {parsed.highLevel}
+            </p>
+          </div>
+
+          {/* Pros & cons */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+              <h4 className="text-sm font-semibold text-emerald-300 mb-3 flex items-center gap-2">
+                <span className="text-lg">✅</span>
+                CX strengths / delighters
+              </h4>
+              {parsed.positives.length > 0 ? (
+                <ul className="space-y-1 text-sm text-slate-200">
+                  {parsed.positives.map((item, idx) => (
+                    <li key={idx} className="flex gap-2">
+                      <span className="mt-[2px] text-emerald-300">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  No clear delighters extracted from this quick snapshot.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-5">
+              <h4 className="text-sm font-semibold text-red-300 mb-3 flex items-center gap-2">
+                <span className="text-lg">❌</span>
+                CX friction / red flags
+              </h4>
+              {parsed.negatives.length > 0 ? (
+                <ul className="space-y-1 text-sm text-slate-200">
+                  {parsed.negatives.map((item, idx) => (
+                    <li key={idx} className="flex gap-2">
+                      <span className="mt-[2px] text-red-300">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  No clear friction points extracted from this quick snapshot.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Competitive context (lightweight demo copy) */}
+          <div className="rounded-2xl border border-white/10 bg-[#0C1224] p-5">
+            <h3 className="text-sm font-semibold text-white mb-2">
+              Competitive context
+            </h3>
+            <p className="text-sm text-slate-300">
+              This lightweight snapshot focuses on {result.company} only. In a
+              full NPSme engagement, we benchmark your sentiment, themes and CX
+              risks against key competitors in your space so you can see exactly
+              where you&apos;re ahead, and where you&apos;re lagging behind.
+            </p>
+          </div>
+
+          {/* NPSme upsell note */}
+          <p className="text-xs italic text-slate-500">
+            If you were signed up with NPSme, this snapshot would be supported
+            with detailed source breakdowns, channel-level views, and direct
+            links to the underlying comments and posts so your teams can quickly
+            dig deeper and act on what we surface here.
           </p>
         </div>
       )}

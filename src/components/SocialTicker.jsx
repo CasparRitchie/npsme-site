@@ -5,13 +5,21 @@ import { useState } from "react";
 function cleanLLMText(text) {
   if (!text) return "";
 
+  let cleaned = text;
+
+  // Remove code fences if any remain
+  cleaned = cleaned.replace(/```json|```/gi, "");
+
+  // Turn escaped newlines into real spaces/newlines
+  cleaned = cleaned.replace(/\\n/g, "\n");
+
   // [label](url) -> label
-  let cleaned = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 
   // **bold** -> bold
   cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, "$1");
 
-  return cleaned;
+  return cleaned.trim();
 }
 
 // Helper: pull out a high-level sentence + bullets for pros/cons

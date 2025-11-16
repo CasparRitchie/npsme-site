@@ -786,7 +786,6 @@ app.get("/api/social-summary", async (req, res) => {
         .json({ error: "company query parameter is required" });
     }
 
-    // Use OpenAI + web search to get CX summary + competitor comparison
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
       tools: [{ type: "web_search_preview" }],
@@ -796,7 +795,8 @@ app.get("/api/social-summary", async (req, res) => {
           content:
             "You are a concise, neutral CX & NPS analyst. " +
             "Use web search to ground your answer in real, recent public information. " +
-            "Return ONLY valid JSON in the exact schema requested, with no explanation or commentary outside the JSON.",
+            "Return ONLY valid JSON in the exact schema requested, with no explanation or commentary outside the JSON. " +
+            "Do NOT wrap the JSON in code fences or backticks.",
         },
         {
           role: "user",
@@ -813,21 +813,33 @@ app.get("/api/social-summary", async (req, res) => {
                 `Where:\n` +
                 `- "summary" (<= 180 words) includes:\n` +
                 `  • Overall tone (positive / neutral / negative, with nuance)\n` +
-                `  • Explicit sections labelled "CX Delighters:" and "CX Red Flags:"\n` +
-                `    Each with 2–4 bullet points, using "- " at the start of each bullet.\n` +
+                `  • Explicit sections labelled "CX Delighters:" and "CX Red Flags:" on their own lines,\n` +
+                `    each followed by 2–4 bullet points using "- " at the start of each bullet.\n` +
                 `- "competitor_summary" (<= 80 words) briefly compares ${company}'s\n` +
                 `  sentiment and key CX themes with 2–3 named competitors in the same category.\n\n` +
                 `If you find very little data, say so explicitly in BOTH fields.\n` +
-                `Return ONLY the JSON object, no extra text.`,
+                `Return ONLY the JSON object, no extra text, no backticks, no code fences.`,
             },
           ],
         },
       ],
     });
 
-    const jsonText = response.output_text?.trim() || "";
-    let parsed;
+    // Raw model text
+    let jsonText = response.output_text?.trim() || "";
 
+    // 🧹 1) If the model *still* insists on code fences, strip them
+    if (jsonText.startsWith("```")) {
+      jsonText = jsonText.replace(/```json|```/gi, "").trim();
+    }
+
+    // 🧹 2) If there is extra text around the JSON, try to extract the { ... } block
+    const match = jsonText.match(/\{[\s\S]*\}/);
+    if (match) {
+      jsonText = match[0];
+    }
+
+    let parsed;
     try {
       parsed = JSON.parse(jsonText);
     } catch (e) {
@@ -836,14 +848,21 @@ app.get("/api/social-summary", async (req, res) => {
         e,
         jsonText
       );
-      // Fallback: treat the whole text as a plain summary
+      // Fallback: treat everything as a plain summary
       parsed = { summary: jsonText, competitor_summary: "" };
     }
 
+    // 🧼 Normalise strings: unescape '\n' and trim
+    const normalise = (value) =>
+      typeof value === "string" ? value.replace(/\\n/g, "\n").trim() : "";
+
+    const summary = normalise(parsed.summary) || "No summary available for this company.";
+    const competitorSummary = normalise(parsed.competitor_summary);
+
     res.json({
       company,
-      summary: parsed.summary || "No summary available for this company.",
-      competitor_summary: parsed.competitor_summary || "",
+      summary,
+      competitor_summary: competitorSummary,
       generated_at: new Date().toISOString(),
     });
   } catch (err) {
@@ -853,7 +872,6 @@ app.get("/api/social-summary", async (req, res) => {
       .json({ error: "Internal error generating social summary" });
   }
 });
-
 
 
 // ---------- Inject canonical + og:url for SEO ----------

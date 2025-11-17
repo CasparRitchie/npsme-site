@@ -17,7 +17,14 @@ export default function Products() {
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
         <div className="mx-auto max-w-7xl px-6 pt-16 pb-10">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
+              Productized CX services
+            </p>
+          </div>
+
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-white">
             Productized services that turn feedback into growth
           </h1>
           <p className="mt-4 text-slate-300 max-w-2xl">

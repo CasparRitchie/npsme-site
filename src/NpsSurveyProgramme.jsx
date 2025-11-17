@@ -5,33 +5,40 @@ import Seo from "./components/Seo";
 
 export default function NpsSurveyProgramme() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20 text-slate-300">
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/nps-survey-programme"
         title="Your personalised NPS Survey Programme | NPS Me"
         description="Upload your customer list and we'll run a structured NPS survey programme for you - invitations, reminders, dashboards and insight-ready exports."
       />
 
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="mb-10"
-      >
-        <h1 className="text-3xl md:text-4xl font-semibold text-white">
-          Your personalised NPS Survey Programme
-        </h1>
-        <p className="mt-3 text-lg text-slate-400 max-w-3xl">
-          Provide us with a file of your customers' contact information and we'll run a structured NPS
-          programme for you - invitations, reminders, dashboards and
-          export-ready data - so you can focus on acting on the insight, not
-          wrestling with tools.
-        </p>
-      </motion.div>
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="mb-10"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
+              NPS survey programme
+            </p>
+          </div>
 
-      {/* How it works */}
-      <div className="mt-10 grid md:grid-cols-4 gap-6">
+          <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white">
+            Your personalised NPS Survey Programme
+          </h1>
+          <p className="mt-3 text-lg text-slate-400 max-w-3xl">
+            Provide us with a file of your customers' contact information and we'll run a structured NPS
+            programme for you - invitations, reminders, dashboards and export-ready data - so you can
+            focus on acting on the insight, not wrestling with tools.
+          </p>
+        </motion.div>
+
+        {/* How it works */}
+        <div className="mt-10 grid md:grid-cols-4 gap-6">
         {[
           {
             step: "1",
@@ -137,5 +144,6 @@ export default function NpsSurveyProgramme() {
         </a>
       </div>
     </section>
+  </div>
   );
 }

@@ -19,7 +19,7 @@ export default function DataAutomationPage() {
         <div className="relative mx-auto max-w-7xl px-6 py-12">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs tracking-widest text-slate-400 uppercase">
+            <p className="text-xs tracking-widest text-[#22C55E] uppercase">
               Data, automation & insight
             </p>
           </div>

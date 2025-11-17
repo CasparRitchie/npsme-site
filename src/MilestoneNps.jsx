@@ -6,18 +6,26 @@ import Seo from "./components/Seo"
 
 export default function MilestoneNps() {
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/milestone-nps"
         title="Milestone (Transactional) NPS® & Survey Signals | NPS Me"
         description="Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX."
       />
+
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
         <div className="mx-auto max-w-7xl px-6 pt-16 pb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
-            Milestone (Transactional) NPS & Survey Signals
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
+              Milestone / transactional NPS
+            </p>
+          </div>
+
+          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
+            Milestone (Transactional) NPS &amp; Survey Signals
           </h1>
           <p className="mt-4 text-slate-300 max-w-3xl">
             A practical framework to capture feedback at key journey moments, turn it into
@@ -135,6 +143,6 @@ export default function MilestoneNps() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

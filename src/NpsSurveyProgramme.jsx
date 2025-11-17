@@ -82,7 +82,7 @@ export default function NpsSurveyProgramme() {
           Perfect for a rapid, easy to set up, customer pulse
         </h2>
         <p className="text-slate-400 mb-4 max-w-3xl">
-          If you have around 150 customers you want to hear from quickly, we can spin up a focused NPS survey in days - not months.
+          If you have a list of customers you want to hear from quickly, we can spin up a focused NPS survey in days - not months.
           You send the list, we handle the invites and tracking, and you log in
           to see live NPS, completion and comments as they come in.
         </p>
@@ -140,7 +140,7 @@ export default function NpsSurveyProgramme() {
           href="/#contact"
           className="inline-block rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#22C55E] px-6 py-3 font-medium text-white hover:opacity-90 transition"
         >
-          Talk about a survey programme →
+          Talk with us to set up your survey programme →
         </a>
       </div>
     </section>

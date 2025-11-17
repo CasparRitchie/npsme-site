@@ -7,28 +7,37 @@ import SocialTicker from "./components/SocialTicker";
 
 export default function SocialListening() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20 text-slate-300">
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/social-listening"
         title="Social Listening for CX: Themes, Sentiment & Competitor Pulse | NPS Me"
         description="Weekly signal from public social channels and reviews-surface themes, track sentiment, and prioritise fixes that move NPS® and retention."
       />
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="mb-10"
-      >
-        <h1 className="text-3xl md:text-4xl font-semibold text-white">
-          Social Listening & Sentiment Insights
-        </h1>
-        <p className="mt-3 text-lg text-slate-400 max-w-3xl">
-          We analyse what customers are *really saying* about your brand online -
-          across platforms like X (Twitter), Reddit, and Trustpilot - to surface
-          actionable insights that guide your CX and marketing decisions.
-        </p>
-      </motion.div>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="mb-10"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
+              Social listening & sentiment
+            </p>
+          </div>
+
+          <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white">
+            Social Listening &amp; Sentiment Insights
+          </h1>
+          <p className="mt-3 text-lg text-slate-400 max-w-3xl">
+            We analyse what customers are <em>really saying</em> about your brand online —
+            across platforms like X (Twitter), Reddit, and Trustpilot — to surface
+            actionable insights that guide your CX and marketing decisions.
+          </p>
+        </motion.div>
 
       {/* Section: What we track */}
       <div className="mt-10 grid md:grid-cols-3 gap-8">
@@ -110,5 +119,6 @@ export default function SocialListening() {
       </div>
       <SocialTicker />
     </section>
+    </div>
   );
 }

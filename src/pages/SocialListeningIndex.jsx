@@ -59,8 +59,10 @@ export default function SocialListeningIndex() {
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to=[#22C55E]" />
-            <p className="text-xs tracking-widest text-slate-400 uppercase">Gallery</p>
+          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+          <p className="text-xs tracking-widest text-[#22C55E] uppercase">
+            Social listening gallery
+          </p>
           </div>
           <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
             Social Listening Reports (Anonymised)

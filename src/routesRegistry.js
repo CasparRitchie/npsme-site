@@ -8,6 +8,7 @@ import WhatIsNps from "./pages/WhatIsNps";
 import ImpactPage from "./ImpactPage";
 import WhyNpsMe from "./pages/WhyNpsMe";
 import MilestoneNps from "./MilestoneNps";
+import NpsSurveyProgramme from "./NpsSurveyProgramme";
 import Book from "./Book";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
@@ -37,6 +38,8 @@ const COMPONENTS = {
   "/milestone-nps": MilestoneNps,
   "/book": Book,
   "/data-automation": DataAutomationPage,
+  "/nps-survey-programme": NpsSurveyProgramme,
+
 
   // SocialListening pages
   "/social-listening": SocialListening,

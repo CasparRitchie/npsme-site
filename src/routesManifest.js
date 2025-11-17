@@ -5,6 +5,7 @@ export const ROUTES_MANIFEST = [
   { path: "/impact",                           label: "Impact",                           enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/why-nps-me",                       label: "Why NPS Me",                       enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/milestone-nps",                    label: "Milestone NPS",                    enabled: true,  inHeader: true,  inFooter: true  },
+  { path: "/nps-survey-programme",             label: "NPS Survey Programme",             enabled: true,  inHeader: true,  inFooter: true  },
   { path: "/book",                             label: "Book discovery",                   enabled: true,  inHeader: false, inFooter: true },
   { path: "/what-is-nps",                      label: "What is NPS?",                     enabled: true,  inHeader: true,  inFooter: true },
   { path: "/data-automation",                  label: "Data & Automation",                enabled: true,  inHeader: true,  inFooter: true  },

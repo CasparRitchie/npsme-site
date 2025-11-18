@@ -34,12 +34,12 @@ export default function NavBar() {
           {headerLinks.map(({ path, label }) => (
             <NavItem key={path} to={path}>{label}</NavItem>
           ))}
-          <link
+          <Link
             to="/book"
             className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition shadow-[0_0_0_0_rgba(124,58,237,0.5)] hover:shadow-[0_0_0_6px_rgba(124,58,237,0.15)]"
           >
             Book discovery
-          </link>
+          </Link>
         </nav>
 
         {/* Mobile burger */}
@@ -60,12 +60,12 @@ export default function NavBar() {
             {headerLinks.map(({ path, label }) => (
               <NavItem key={path} to={path} mobile>{label}</NavItem>
             ))}
-            <link
+            <Link
               to="/book"
               className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               Book discovery
-            </link>
+            </Link>
           </div>
         </div>
       )}

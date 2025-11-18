@@ -243,13 +243,13 @@ export default function NpsMeLanding() {
               prioritise the highest-impact fixes, and implement changes that measurably lift NPS®, reduce churn, and increase repeat purchase.
             </motion.p>
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <a
-                href="#contact"
+              <Link
+                to="/book"
                 className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
               >
                 Book a free discovery
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </a>
+              </Link>
               <a href="#method" className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white">
                 See the 4-stage method
               </a>

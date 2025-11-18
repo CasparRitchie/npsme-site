@@ -60,12 +60,12 @@ export default function NavBar() {
             {headerLinks.map(({ path, label }) => (
               <NavItem key={path} to={path} mobile>{label}</NavItem>
             ))}
-            <a
-              href="/#contact"
+            <link
+              to="/book"
               className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               Book discovery
-            </a>
+            </link>
           </div>
         </div>
       )}

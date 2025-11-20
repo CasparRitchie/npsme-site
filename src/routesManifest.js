@@ -22,7 +22,7 @@ export const ROUTES_MANIFEST = [
   { path: "/blog/ethics-of-contact-selection", label: "Blog: Contact Selection Ethics",   enabled: true,  inHeader: false, inFooter: false },
   { path: "/blog/closing-the-loop",            label: "Blog: Closing the Loop",           enabled: true,  inHeader: false, inFooter: false },
   { path: "/blog/what-to-do-with-nps-scores",  label: "Blog: What To Do With NPS Scores", enabled: true,  inHeader: false, inFooter: false },
-
+  { path: "/blog/sending-nps-before-christmas",label: "Blog: Sending NPS Before Christmas",enabled: true,    inHeader: false,inFooter: false},
   { path: "/demo-survey-legacy",               label: "Demo survey",                      enabled: false, inHeader: false, inFooter: false },
   { path: "/demo-survey-page",                 label: "Demo survey Page",                 enabled: true,  inHeader: false, inFooter: false },
   { path: "/demo-invitation-survey",           label: "Demo invitation survey",           enabled: true,  inHeader: false, inFooter: false },
@@ -30,7 +30,6 @@ export const ROUTES_MANIFEST = [
   // Regulatory and information
   { path: "/privacy",                          label: "Privacy",                          enabled: true,  inHeader: false, inFooter: true  },
   { path: "/terms",                            label: "Terms",                            enabled: true,  inHeader: false, inFooter: true  },
-
 
   // Hash/anchor (not for sitemap)
   { path: "/#contact",                         label: "Contact",                          enabled: true,  inHeader: false, inFooter: true, isHash: true },

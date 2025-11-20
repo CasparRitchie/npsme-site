@@ -22,6 +22,7 @@ import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
 import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
 import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
+import BlogSendingNpsBeforeChristmas from "./pages/BlogSendingNpsBeforeChristmas";
 import DataAutomationPage from "./pages/DataAutomationPage";
 import DemoSurvey from "./pages/DemoSurvey";
 import DemoSurveyPage from "./pages/DemoSurveyPage";
@@ -52,6 +53,7 @@ const COMPONENTS = {
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
   "/blog/closing-the-loop": BlogClosingTheLoop,
   "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+  "/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
 
   "/demo-survey-legacy": DemoSurvey,
   "/demo-survey-page": DemoSurveyPage,

@@ -39,6 +39,12 @@ const POSTS = [
     readTime: "8 min",
     tags: ["NPS", "Reporting", "CX"],
   },
+  {
+    slug: "sending-nps-before-christmas",
+    title: "Sending an NPS survey before Christmas (without annoying your customers)",
+    description: "How to run a respectful, effective pre-Christmas NPS pulse — and what to do with the insights.",
+    date: "December 2025",
+  },
   // Add more posts here as you publish them
 ];
 

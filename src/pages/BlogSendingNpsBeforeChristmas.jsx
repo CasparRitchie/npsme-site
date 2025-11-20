@@ -187,18 +187,18 @@ export default function BlogSendingNpsBeforeChristmas() {
             <p className="text-xs uppercase tracking-[0.2em] text-[#22C55E] mb-2">
               Example template (English)
             </p>
-            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 overflow-x-auto">
-Subject: Quick question before the holidays?
+            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
+              Subject: Quick question before the holidays?
 
-Hi &#123;&#123;name&#125;&#125;,
-As we wrap up the year, we’re reflecting on how we’re doing. Would you mind answering one quick question?
+              Hi &#123;&#123;name&#125;&#125;,
+              As we wrap up the year, we’re reflecting on how we’re doing. Would you mind answering one quick question?
 
-It takes 10 seconds, and your feedback genuinely helps shape our priorities for next year.
+              It takes 10 seconds, and your feedback genuinely helps shape our priorities for next year.
 
-👉 &#123;&#123;survey_link&#125;&#125;
+              👉 &#123;&#123;survey_link&#125;&#125;
 
-Thank you - it means a lot.
-&#123;&#123;Founder name&#125;&#125;
+              Thank you - it means a lot.
+              &#123;&#123;Founder name&#125;&#125;
             </pre>
           </div>
 
@@ -207,19 +207,19 @@ Thank you - it means a lot.
             <p className="text-xs uppercase tracking-[0.2em] text-[#7C3AED] mb-2">
               Exemple de template (Français)
             </p>
-            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 overflow-x-auto">
-Objet : Une petite question avant les fêtes ?
+            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
+              Objet : Une petite question avant les fêtes ?
 
-Bonjour &#123;&#123;name&#125;&#125;,
-En cette fin d’année, nous prenons un moment pour réfléchir à ce que nous pouvons améliorer.
-Pourriez-vous répondre à une seule question ?
+              Bonjour &#123;&#123;name&#125;&#125;,
+              En cette fin d’année, nous prenons un moment pour réfléchir à ce que nous pouvons améliorer.
+              Pourriez-vous répondre à une seule question ?
 
-Cela prend moins de 20 secondes, et votre avis compte vraiment pour nous.
+              Cela prend moins de 20 secondes, et votre avis compte vraiment pour nous.
 
-👉 &#123;&#123;survey_link&#125;&#125;
+              👉 &#123;&#123;survey_link&#125;&#125;
 
-Merci beaucoup,
-&#123;&#123;Nom du fondateur&#125;&#125;
+              Merci beaucoup,
+              &#123;&#123;Nom du fondateur&#125;&#125;
             </pre>
           </div>
         </ArticleSection>

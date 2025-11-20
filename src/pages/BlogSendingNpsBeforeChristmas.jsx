@@ -9,7 +9,7 @@ export default function BlogSendingNpsBeforeChristmas() {
       <Seo
         path="/blog/sending-nps-before-christmas"
         title="Sending an NPS survey before Christmas (without annoying your customers)"
-        description="How to run a respectful, effective pre-Christmas NPS pulse — and what to do with the insights."
+        description="How to run a respectful, effective pre-Christmas NPS pulse - and what to do with the insights."
       />
 
       {/* Header */}
@@ -23,12 +23,12 @@ export default function BlogSendingNpsBeforeChristmas() {
 
           <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
             <span className="text-[#22C55E]">How to Send an NPS Survey Before Christmas</span>{" "}
-            <span className="text-slate-100">— Even If You’ve Never Done One Before</span>
+            <span className="text-slate-100">- Even If You’ve Never Done One Before</span>
           </h1>
 
           <p className="mt-4 max-w-2xl text-sm sm:text-base text-slate-300">
             A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse
-            before the holidays — without annoying your customers.
+            before the holidays - without annoying your customers.
           </p>
 
           <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#7C3AED] via-[#22C55E] to-transparent rounded-full" />
@@ -47,7 +47,7 @@ export default function BlogSendingNpsBeforeChristmas() {
           </p>
           <p>
             That’s why the period between late November and mid-December is one of the most effective
-            windows of the year to send an NPS survey — especially if you’ve never run one before.
+            windows of the year to send an NPS survey - especially if you’ve never run one before.
           </p>
           <p>
             Better yet: with the right approach, you can launch a clean, branded, high-response NPS
@@ -64,7 +64,7 @@ export default function BlogSendingNpsBeforeChristmas() {
           title="Why Sending an NPS Survey Before Christmas Works So Well"
         >
           <p>
-            It sounds counter-intuitive — December is “busy”, right?
+            It sounds counter-intuitive - December is “busy”, right?
           </p>
           <p>
             Yes and no. Emails about discounts or logistics get ignored. But feedback requests hit
@@ -73,12 +73,12 @@ export default function BlogSendingNpsBeforeChristmas() {
           <ul className="mt-3 space-y-1.5 text-sm sm:text-base">
             <li>• People are reflective and open to giving input</li>
             <li>• Customers appreciate being asked before the new year starts</li>
-            <li>• You get richer qualitative comments — not rushed mid-year replies</li>
+            <li>• You get richer qualitative comments - not rushed mid-year replies</li>
             <li>• January inboxes become chaos, so December has higher engagement</li>
           </ul>
           <p className="mt-4">
-            For small and mid-size businesses — especially those with relationship-based customer
-            models — this window is{" "}
+            For small and mid-size businesses - especially those with relationship-based customer
+            models - this window is{" "}
             <span className="text-[#7C3AED] font-medium">a golden opportunity.</span>
           </p>
         </ArticleSection>
@@ -356,7 +356,7 @@ export default function BlogSendingNpsBeforeChristmas() {
             <li>Send us your customer file (CSV or Excel)</li>
             <li>We build your email invite (English, French, or both)</li>
             <li>We apply your branding (logo, colours, tone)</li>
-            <li>We send your survey — either through your email tool or our own</li>
+            <li>We send your survey - either through your email tool or our own</li>
             <li>
               You get a real-time dashboard showing:
               <ul className="mt-1.5 space-y-1.5 list-disc pl-4 text-[13px] sm:text-sm text-slate-300">
@@ -373,7 +373,7 @@ export default function BlogSendingNpsBeforeChristmas() {
           </ol>
 
           <p className="mt-4">
-            This gives you clarity for Q1 planning — and it requires almost no setup from your side.
+            This gives you clarity for Q1 planning - and it requires almost no setup from your side.
           </p>
         </ArticleSection>
 
@@ -396,7 +396,7 @@ export default function BlogSendingNpsBeforeChristmas() {
           </p>
 
           <p className="mt-4 text-sm sm:text-base">
-            If you’d like help setting it up — or want to try the demo — you can start here:
+            If you’d like help setting it up - or want to try the demo - you can start here:
           </p>
 
           <div className="mt-4 flex flex-col sm:flex-row gap-3">

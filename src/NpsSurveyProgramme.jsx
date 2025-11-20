@@ -143,6 +143,36 @@ export default function NpsSurveyProgramme() {
           Talk with us to set up your survey programme →
         </a>
       </div>
+      {/* Demo CTA – link to live NPS demo */}
+      <div className="mt-20 mx-auto max-w-5xl">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+          {/* Left text */}
+          <div>
+            <h2 className="text-xl md:text-2xl font-semibold text-white">
+              Try the NPS survey demo
+            </h2>
+            <p className="mt-2 text-sm text-slate-300 max-w-xl">
+              See how invitations, reminders, scoring, and dashboards all work —
+              exactly as your customers would experience them. Quick, safe, and
+              designed to show how NPSme runs full programmes.
+            </p>
+          </div>
+
+          {/* CTA */}
+          <div className="flex flex-col items-start gap-2 shrink-0">
+            <a
+              href="/demo-survey-page"
+              className="inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition"
+            >
+              Open the NPS demo
+            </a>
+            <p className="text-[11px] text-slate-400 max-w-[200px]">
+              Sends a real invite and logs your demo response into the metrics.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
   );

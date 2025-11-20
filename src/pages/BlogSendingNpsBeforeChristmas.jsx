@@ -1,387 +1,268 @@
 // src/pages/BlogSendingNpsBeforeChristmas.jsx
 import React from "react";
-import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 
 export default function BlogSendingNpsBeforeChristmas() {
   const title = "Sending an NPS survey before Christmas (without annoying your customers)";
   const description =
-    "Why sending an NPS survey before the holidays is smart - and how to do it in a way that feels thoughtful, low-friction, and genuinely useful for your customers.";
+    "How to run a respectful, effective pre-Christmas NPS pulse - and what to do with the insights.";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#020617] via-[#020617] to-[#020617] text-slate-100">
-      <Seo
-        path="/blog/sending-nps-before-christmas"
-        title={title + " | NPS Me"}
-        description={description}
-      />
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
+      <Seo path="/blog/sending-nps-before-christmas" title={title} description={description} />
 
-      <main className="mx-auto max-w-3xl px-6 pt-16 pb-20">
-        {/* Breadcrumb / back link */}
-        <div className="mb-6 text-xs text-slate-400">
-          <Link to="/blog" className="hover:text-slate-200">
-            ← Back to blog
-          </Link>
-        </div>
-
-        {/* Title + meta */}
-        <header className="mb-8">
-          <p className="text-xs uppercase tracking-[0.18em] text-emerald-400 mb-2">
-            Blog · NPS & CX
-          </p>
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            Sending an NPS survey before Christmas (without annoying your customers)
+      {/* Header */}
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
+        <div className="mx-auto max-w-4xl px-6 py-16">
+          <p className="text-xs uppercase tracking-widest text-[#22C55E]">Insights</p>
+          <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
+            {title}
           </h1>
-          <p className="mt-3 text-sm text-slate-300">{description}</p>
-          <p className="mt-2 text-[11px] text-slate-500">
-            Approx. 6-8 minute read · Seasonal NPS & customer feedback
-          </p>
-        </header>
+          <p className="mt-3 max-w-2xl text-slate-300">{description}</p>
+        </div>
+      </section>
 
-        <article className="prose prose-invert prose-slate max-w-none">
-          {/* Intro */}
-          <p>
-            The run-up to Christmas is a strange time for customer feedback.
-            On the one hand, it's a{" "}
-            <span className="font-medium text-slate-100">
-              high-emotion, high-stakes moment
-            </span>{" "}
-            in many journeys: parents ordering gifts, families booking travel,
-            subscribers deciding whether to renew before year end.
-          </p>
-          <p>
-            On the other hand, inboxes are full, teams are stretched, and nobody
-            wants to be that brand sending a 20-question survey on 22 December.
-          </p>
-          <p>
-            Done well, a short NPS®-style survey before Christmas can give you:
-          </p>
-          <ul>
-            <li>
-              a clean, comparable read on{" "}
-              <span className="font-medium">how this year felt vs. last</span>,
-            </li>
-            <li>
-              early warning on customers who{" "}
-              <span className="font-medium">might churn in Q1</span>,
-            </li>
-            <li>
-              and a pool of{" "}
-              <span className="font-medium">promoters you can thank, feature, or
-              invite into advocacy programmes</span> in the new year.
-            </li>
-          </ul>
-          <p>
-            The key is to design the survey and the comms so they feel{" "}
-            <span className="font-medium">light, respectful, and useful</span>{" "}
-            for your customers - not like another demand on their time.
-          </p>
+      {/* Body */}
+      <article className="mx-auto max-w-3xl px-6 py-12 prose prose-invert prose-slate prose-headings:text-white prose-strong:text-white
+                          prose-li:marker:text-slate-400 prose-a:text-[#22C55E]">
 
-          <hr />
+        {/* 🔒 Your exact text starts here */}
+        <h2>How to Send an NPS Survey Before Christmas - Even If You’ve Never Done One Before</h2>
 
-          {/* Section 1 */}
-          <h2>1. Why the pre-Christmas window is powerful for NPS</h2>
-          <p>
-            If you operate in B2C, education, childcare, e-commerce, or
-            subscription services, the weeks before Christmas are often when:
-          </p>
-          <ul>
-            <li>customers have just experienced key milestones,</li>
-            <li>emotions (good and bad) are fresh, and</li>
-            <li>
-              teams are already looking ahead to{" "}
-              <span className="font-medium">“what we'll fix next year”</span>.
-            </li>
-          </ul>
-          <p>
-            That makes December a great time to ask a{" "}
-            <span className="font-medium">single, well-framed NPS question</span>{" "}
-            plus one short comment box. You're not asking them to audit your
-            whole business - just to tell you how their year with you felt, in
-            their own words.
-          </p>
-          <p>Done right, you get:</p>
-          <ul>
-            <li>
-              A measurable{" "}
-              <span className="font-medium">“end of year sentiment” baseline</span>.
-            </li>
-            <li>
-              A clear list of{" "}
-              <span className="font-medium">recurring themes to fix in Q1</span>.
-            </li>
-            <li>
-              Concrete stories you can share internally to{" "}
-              <span className="font-medium">humanise your CX roadmap</span>.
-            </li>
-          </ul>
+        <p>
+          As the year winds down, many companies enter “reflection mode.” Customers are taking stock of
+          the brands they rely on, inboxes quieten slightly, and people find themselves with just enough
+          mental space to offer thoughtful feedback.
+        </p>
 
-          {/* Section 2 */}
-          <h2>2. How to ask the question without annoying your customers</h2>
-          <p>
-            The biggest risk in December is not “bad scores” - it's{" "}
-            <span className="font-medium">survey fatigue</span>. People are busy
-            and slightly more protective of their time and attention.
-          </p>
-          <p>Some small choices make a big difference:</p>
-          <h3>Keep the survey extremely short</h3>
-          <p>
-            For a pre-Christmas pulse, I usually recommend:
-          </p>
-          <ol>
-            <li>
-              0-10 NPS-style question (e.g. “How likely are you to recommend us
-              to a friend or colleague?”).
-            </li>
-            <li>
-              One open question, such as:
-              <ul>
-                <li>
-                  <em>“What's the main reason for your score?”</em> or
-                </li>
-                <li>
-                  <em>“If we could improve one thing for you next year, what would it be?”</em>
-                </li>
-              </ul>
-            </li>
-          </ol>
-          <p>
-            Tell people upfront that{" "}
-            <span className="font-medium">it takes 30-60 seconds</span> -
-            and then honour that promise.
-          </p>
+        <p>
+          That’s why the period between late November and mid-December is one of the most effective windows
+          of the year to send an NPS survey - especially if you’ve never run one before.
+        </p>
 
-          <h3>Use a warm, human tone</h3>
-          <p>
-            December is a good time to lean into the fact that{" "}
-            <span className="font-medium">humans are behind your brand</span>.
-            For example:
-          </p>
-          <ul>
-            <li>
-              A brief intro from a founder or team lead (&quot;We&apos;ve been
-              working hard on X and Y this year…&quot;).
-            </li>
-            <li>
-              A genuine thank-you for their trust and custom.
-            </li>
-            <li>
-              A clear explanation of{" "}
-              <span className="font-medium">how you'll use the feedback</span>.
-            </li>
-          </ul>
+        <p>
+          Better yet: with the right approach, you can launch a clean, branded, high-response NPS survey
+          in under 48 hours, even if you’re starting from scratch.
+        </p>
 
-          <h3>Be thoughtful about timing</h3>
-          <p>Some options that work well in practice:</p>
-          <ul>
-            <li>
-              <span className="font-medium">Early December</span>: less inbox
-              traffic, still fresh in people&apos;s minds.
-            </li>
-            <li>
-              <span className="font-medium">Right after a key milestone</span>:
-              e.g. renewal confirmation, contract anniversary, or first delivery.
-            </li>
-          </ul>
-          <p>
-            Trying to squeeze a first-ever NPS launch into the last couple of
-            days before Christmas break is possible - but usually not ideal.
-          </p>
+        <p>In this guide, you’ll learn exactly how to do it.</p>
 
-          {/* Section 3 */}
-          <h2>3. What you can do with the results in January</h2>
-          <p>
-            The magic isn't in the NPS number itself - it's in what you{" "}
-            <span className="font-medium">do with the insights</span> in Q1.
-          </p>
-          <p>For example, a December NPS run can feed directly into:</p>
-          <ul>
-            <li>
-              <span className="font-medium">Journey mapping workshops</span>
-              {" "}with real comments pinned to each stage.
-            </li>
-            <li>
-              A prioritised list of{" "}
-              <span className="font-medium">customer experience fixes</span>{" "}
-              for the next quarter.
-            </li>
-            <li>
-              <span className="font-medium">Team coaching and training</span>{" "}
-              using anonymised verbatims.
-            </li>
-            <li>
-              A set of{" "}
-              <span className="font-medium">promoter stories and testimonials</span>{" "}
-              you can (with permission) reuse in marketing.
-            </li>
-          </ul>
-          <p>
-            If you're already calling some customers personally (like many
-            founders and small teams do), the survey acts as a{" "}
-            <span className="font-medium">wide-angle lens</span>, and those
-            calls become the{" "}
-            <span className="font-medium">high-resolution close-ups</span>.
-          </p>
+        <hr />
 
-          {/* Section 4 */}
-          <h2>4. How NPS Me can support a pre-Christmas NPS run</h2>
-          <p>
-            If you're considering a quick but robust NPS run before Christmas,
-            NPS Me can handle the{" "}
-            <span className="font-medium">plumbing and analysis</span> so you
-            can stay focused on your customers.
-          </p>
+        <h3>1. Why Sending an NPS Survey Before Christmas Works So Well</h3>
 
-          <h3>1) Managing the send for you</h3>
-          <p>We can work from a simple export of your customers, for example:</p>
-          <ul>
-            <li>Excel or CSV with name, email, and any key segment tags.</li>
-            <li>
-              Optional grouping (e.g. by region, cohort, or journey stage).
-            </li>
-          </ul>
-          <p>
-            From there, we can either send from our infrastructure or{" "}
-            <span className="font-medium">
-              integrate with your own email system
-            </span>{" "}
-            so replies appear in a way that feels natural for your customers.
-            We can even CC a shared inbox or team if you'd like to{" "}
-            <span className="font-medium">follow up personally</span>.
-          </p>
+        <p>It sounds counter-intuitive - December is “busy”, right?</p>
 
-          <h3>2) Branded, language-appropriate invitations</h3>
-          <p>
-            We'll customise the survey emails and landing page so they feel
-            like they{" "}
-            <span className="font-medium">belong to your brand</span>, not ours:
-          </p>
-          <ul>
-            <li>Logo, colours, and typography aligned with your style.</li>
-            <li>
-              Wording tailored to your tone of voice (English, French, or
-              bilingual if needed).
-            </li>
-            <li>
-              Microcopy that sets expectations clearly (&quot;one quick
-              question&quot; really means one quick question).
-            </li>
-          </ul>
+        <p>Yes and no. Emails about discounts or logistics get ignored. But feedback requests hit differently in December:</p>
 
-          <h3>3) Live NPS dashboard and response overview</h3>
-          <p>
-            As responses come in, you get a{" "}
-            <span className="font-medium">live view of your NPS</span> and
-            response rates, similar to the demo page on this site:
-          </p>
-          <ul>
-            <li>Overall NPS for the campaign.</li>
-            <li>
-              Breakdowns by segment (e.g. region, cohort, or journey stage).
-            </li>
-            <li>Promoter / Passive / Detractor counts.</li>
-          </ul>
-          <p>
-            If you'd like to see how this looks in practice, you can{" "}
-            <Link
-              to="/demo-survey-page"
-              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-            >
-              try the live NPS demo here
-            </Link>{" "}
-            and watch the metrics update in real time.
-          </p>
+        <ul>
+          <li>People are reflective and open to giving input</li>
+          <li>Customers appreciate being asked before the new year starts</li>
+          <li>You get richer qualitative comments - not rushed mid-year replies</li>
+          <li>January inboxes become chaos, so December has higher engagement</li>
+        </ul>
 
-          <h3>4) Text analytics and themes from comments</h3>
-          <p>
-            The score is only half the story. The open comments tell you{" "}
-            <span className="font-medium">why</span>.
-          </p>
-          <p>
-            We'll group comments into{" "}
-            <span className="font-medium">
-              clear, human-readable themes
-            </span>{" "}
-            (e.g. onboarding clarity, speed of support, ease of billing),
-            highlight what matters most, and pull out a shortlist of{" "}
-            <span className="font-medium">
-              “no-regrets fixes” for early next year
-            </span>.
-          </p>
+        <p>
+          For small and mid-size businesses - especially those with relationship-based customer models -
+          this window is a golden opportunity.
+        </p>
 
-          {/* Section 5 */}
-          <h2>5. Combining surveys with founder-led calls</h2>
-          <p>
-            In some organisations - especially in education, childcare, or
-            high-trust services - founders or senior leaders also{" "}
-            <span className="font-medium">
-              pick up the phone and call customers directly
-            </span>{" "}
-            before Christmas.
-          </p>
-          <p>
-            That's powerful. A short NPS survey can sit alongside those calls,
-            not replace them:
-          </p>
-          <ul>
-            <li>
-              The survey gives you{" "}
-              <span className="font-medium">coverage across your base</span>.
-            </li>
-            <li>
-              The calls let you{" "}
-              <span className="font-medium">
-                go deeper with a subset of customers
-              </span>{" "}
-              - and those conversations feel even more relevant because you're
-              seeing themes in the data.
-            </li>
-          </ul>
-          <p>
-            You can also use survey responses to{" "}
-            <span className="font-medium">
-              prioritise who you call first
-            </span>{" "}
-            (for example, detractors with high lifetime value, or promoters
-            who might be open to advocacy).
-          </p>
+        <hr />
 
-          {/* Closing */}
-          <h2>6. Want to explore a pre-Christmas NPS run?</h2>
-          <p>
-            If you'd like to get a lightweight but robust NPS pulse out before
-            Christmas, or if you're planning something for early in the new
-            year, I'd be happy to help you design it.
-          </p>
-          <p>
-            We can start with a{" "}
-            <Link
-              to="/demo-survey-page"
-              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-            >
-              walkthrough of the demo experience
-            </Link>{" "}
-            and then adapt the flow, wording, and branding to your context.
-          </p>
-          <p>
-            If that sounds useful, you can{" "}
-            <Link
-              to="/book"
-              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-            >
-              book a discovery session
-            </Link>{" "}
-            or just send a quick email with your questions.
-          </p>
-          <p className="mt-4">
-            <span className="font-medium text-slate-100">
-              Either way, the goal is simple:
-            </span>{" "}
-            use this moment in the year to listen well, act on what you hear,
-            and make next year meaningfully better for your customers.
-          </p>
-        </article>
-      </main>
+        <h3>2. What You Need to Send an NPS Survey (It’s Less Than You Think)</h3>
+
+        <p>Here’s everything you need to run an NPS survey:</p>
+
+        <p><strong>✔ A list of customers</strong></p>
+        <p>A simple Excel/CSV with:</p>
+        <ul>
+          <li>First name</li>
+          <li>Last name</li>
+          <li>Company name (optional)</li>
+          <li>Email</li>
+        </ul>
+
+        <p><strong>✔ Your logo + colours</strong><br />To make the email feel branded and trustworthy.</p>
+
+        <p><strong>✔ One question</strong><br />The NPS standard:</p>
+
+        <blockquote>
+          “How likely are you to recommend us to a friend or colleague?”<br />
+          <em>Scale: 0–10</em>
+        </blockquote>
+
+        <p><strong>✔ One optional open-text question</strong></p>
+        <blockquote>“What’s the main reason for your score?”</blockquote>
+
+        <p><strong>✔ A way to send the surveys</strong></p>
+        <p>You can use your ESP (Brevo, Mailjet, HubSpot…), or NPSme can handle everything for you.</p>
+
+        <p><strong>✔ A way to track results</strong></p>
+        <p>You need:</p>
+        <ul>
+          <li>Overall NPS</li>
+          <li>Response rate</li>
+          <li>Score distribution (promoters/passives/detractors)</li>
+          <li>Themes from comments</li>
+        </ul>
+
+        <p>You do not need a CRM or complex automation. A clean, simple setup works perfectly.</p>
+
+        <hr />
+
+        <h3>3. When Exactly Should You Send It?</h3>
+
+        <p>Here’s the surprisingly simple rule:</p>
+        <p><strong>The earlier in December, the better.</strong></p>
+
+        <p>But even mid-December works if you time it well.</p>
+
+        <p>Best windows:</p>
+        <ul>
+          <li>1–14 December → Highest quality responses</li>
+          <li>15–20 December → Still safe, especially for digital businesses</li>
+          <li>Avoid 21–25 December (unless B2C retail or hospitality)</li>
+        </ul>
+
+        <p>Within those windows:</p>
+        <ul>
+          <li>Send Mon–Wed mornings</li>
+          <li>Around 9:00–11:00am</li>
+          <li>Avoid Friday afternoons</li>
+        </ul>
+
+        <p>Responses typically land within 24–48 hours.</p>
+
+        <hr />
+
+        <h3>4. How to Craft the Email for Maximum Response</h3>
+
+        <p>The email is everything. If the email feels long or corporate, response rate collapses.</p>
+
+        <p>Principles:</p>
+        <ul>
+          <li>✔ Write like a human</li>
+          <li>✔ Keep it short</li>
+          <li>✔ Make it founder-led</li>
+          <li>✔ Reassure: 10–20 seconds max</li>
+          <li>✔ Avoid marketing language</li>
+        </ul>
+
+        <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 overflow-x-auto">
+          Subject: Quick question before the holidays?
+
+          Hi &#123;&#123;name&#125;&#125;,
+          As we wrap up the year, we’re reflecting on how we’re doing. Would you mind answering one quick question?
+
+          It takes less than 30 seconds, and your feedback genuinely helps shape our priorities for next year.
+
+          👉 &#123;&#123;survey_link&#125;&#125;
+
+          Thank you - it means a lot.
+          &#123;&#123;Founder name&#125;&#125;
+        </pre>
+        <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 overflow-x-auto">
+          Objet : Une petite question avant les fêtes ?
+
+          Bonjour &#123;&#123;name&#125;&#125;,
+          En cette fin d’année, nous prenons un moment pour réfléchir à ce que nous pouvons améliorer. Pourriez-vous répondre à une seule question ?
+
+          Cela prend moins de 30 secondes, et votre avis compte vraiment pour nous.
+
+          👉 &#123;&#123;survey_link&#125;&#125;
+
+          Merci beaucoup,
+          &#123;&#123;Nom du fondateur&#125;&#125;
+        </pre>
+
+        <hr />
+
+        <h3>5. Avoid These Common Mistakes</h3>
+
+        <ul>
+          <li>❌ Sending from a “no-reply” address</li>
+          <li>❌ Asking too many questions</li>
+          <li>❌ Mixing transactional and overall NPS</li>
+          <li>❌ Not closing the loop</li>
+          <li>❌ Incentivising answers</li>
+        </ul>
+
+        <hr />
+
+        <h3>6. What to Do With the Results</h3>
+
+        <p>Promoters (9–10)</p>
+        <ul>
+          <li>Ask for testimonials</li>
+          <li>Encourage reviews</li>
+          <li>Identify delight factors</li>
+        </ul>
+
+        <p>Passives (7–8)</p>
+        <ul>
+          <li>Ask what almost made it a 9</li>
+          <li>Look for easy fixes</li>
+        </ul>
+
+        <p>Detractors (0–6)</p>
+        <ul>
+          <li>Callback quickly</li>
+          <li>Sort by theme: speed, clarity, service, price…</li>
+          <li>Fix early-Q1 root causes</li>
+        </ul>
+
+        <hr />
+
+        <h3>7. Tools to Run Your Survey</h3>
+
+        <p><strong>Beginner option (free)</strong></p>
+        <ul><li>Google Forms + manual NPS</li></ul>
+
+        <p><strong>Mid-range</strong></p>
+        <ul><li>Your ESP + simple survey link</li></ul>
+
+        <p><strong>Turnkey (NPSme)</strong></p>
+        <ul>
+          <li>Branded emails</li>
+          <li>English/French survey</li>
+          <li>Personalised messaging</li>
+          <li>One-time or milestone-based</li>
+          <li>Response dashboard</li>
+          <li>Text analytics</li>
+          <li>Exportable Excel/PDF</li>
+        </ul>
+
+        <p>Setup time: <strong>24–48 hours</strong> after receiving your file.</p>
+
+        <hr />
+
+        <h3>8. How NPSme Can Run Your Pre-Christmas Survey</h3>
+
+        <ol>
+          <li>Send your customer file</li>
+          <li>We build the email (EN/FR)</li>
+          <li>We apply your branding</li>
+          <li>We send it (your ESP or ours)</li>
+          <li>You get a real-time dashboard</li>
+          <li>We prepare a January CX insights deck</li>
+        </ol>
+
+        <hr />
+
+        <h3>Conclusion</h3>
+
+        <p>
+          Sending an NPS survey before Christmas is one of the simplest, highest-ROI actions a business
+          can take. And you can launch a professional, branded version in under 48 hours.
+        </p>
+
+        <p>
+          👉 <a href="/demo-survey-page">Try the demo</a><br />
+          👉 <a href="/book">Book a discovery call</a>
+        </p>
+        {/* 🔒 Your exact text ends here */}
+      </article>
     </div>
   );
 }

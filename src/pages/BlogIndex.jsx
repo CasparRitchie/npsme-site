@@ -69,27 +69,10 @@ export default function BlogIndex() {
       {/* Header */}
       <PageHeader
         tag="CX & NPS / Blog"
-        accent="Are We Asking the Right People?"
-        title="The Ethics of Contact Selection in Customer Feedback"
-        subtitle="Cherry-picking who receives a survey can inflate NPS and damage credibility. Here’s how to keep sampling fair, representative, and actionable."
+        accent="Insights"
+        title="Pragmatic lessons from real programmes."
+        subtitle="Fewer buzzwords, more outcomes."
       />
-      {/* <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-              Insights
-            </p>
-          </div>
-          <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            Blog  -  CX &amp; NPS, done properly
-          </h1>
-          <p className="mt-3 max-w-2xl text-slate-300">
-            Pragmatic lessons from real programmes. Fewer buzzwords, more outcomes.
-          </p>
-        </div>
-      </section> */}
 
       {/* Posts grid */}
       <section className="mx-auto max-w-7xl px-6 py-10">

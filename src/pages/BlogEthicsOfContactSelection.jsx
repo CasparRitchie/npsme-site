@@ -12,9 +12,15 @@ export default function BlogEthicsOfContactSelection() {
         description="Cherry-picking who receives a survey can inflate NPS® and damage credibility. Principles and guardrails to keep feedback fair, representative, and actionable."
       />
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
+      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
         {/* Meta header */}
-        <header>
+        <PageHeader
+          tag="CX & NPS / Blog"
+          accent="Are We Asking the Right People?"
+          title="The Ethics of Contact Selection in Customer Feedback"
+          subtitle="Cherry-picking who receives a survey can inflate NPS and damage credibility. Here’s how to keep sampling fair, representative, and actionable."
+        />
+        {/* <header>
           <p className="text-[11px] uppercase tracking-[0.25em] text-[#22C55E] mb-2">
             Blog • Customer Experience
           </p>
@@ -28,7 +34,7 @@ export default function BlogEthicsOfContactSelection() {
           </p>
 
           <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#22C55E] via-[#7C3AED] to-transparent" />
-        </header>
+        </header> */}
 
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

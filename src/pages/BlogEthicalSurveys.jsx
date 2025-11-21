@@ -39,7 +39,7 @@ export default function BlogEthicalSurveys() {
         </header> */}
 
         {/* Intro */}
-      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
+        <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">
           <p className="text-sm md:text-base text-slate-200 leading-relaxed">
             Every company wants to be customer-centric, but few stop to ask whether
             their feedback processes are <em>ethically customer-centric</em>.

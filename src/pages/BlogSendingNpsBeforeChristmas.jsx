@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
 
 export default function BlogSendingNpsBeforeChristmas() {
   return (
@@ -13,27 +14,13 @@ export default function BlogSendingNpsBeforeChristmas() {
       />
 
       {/* Header */}
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_15%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_85%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-10 md:py-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-            CX &amp; NPS / Blog
-          </div>
 
-          <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
-            <span className="text-[#22C55E]">How to Send an NPS Survey Before Christmas</span>{" "}
-            <span className="text-slate-100">- Even If You’ve Never Done One Before</span>
-          </h1>
-
-          <p className="mt-4 max-w-2xl text-sm sm:text-base text-slate-300">
-            A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse
-            before the holidays - without annoying your customers.
-          </p>
-
-          <div className="mt-6 h-px w-full bg-gradient-to-r from-[#7C3AED] via-[#22C55E] to-transparent" />
-        </div>
-      </section>
+      <PageHeader
+        tag="CX & NPS / Blog"
+        accent="How to Send an NPS Survey Before Christmas"
+        title="- Even If You’ve Never Done One Before"
+        subtitle="A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse before the holidays."
+      />
 
       {/* Content */}
       <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">

@@ -13,7 +13,6 @@ export default function BlogEthicsOfContactSelection() {
         description="Cherry-picking who receives a survey can inflate NPS® and damage credibility. Principles and guardrails to keep feedback fair, representative, and actionable."
       />
 
-      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
         {/* Meta header */}
         <PageHeader
           iconLabel="Sampling Integrity"
@@ -23,6 +22,7 @@ export default function BlogEthicsOfContactSelection() {
           subtitle="Cherry-picking who receives a survey can inflate NPS and damage credibility. Here’s how to keep sampling fair, representative, and actionable."
         />
 
+      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">
           <p className="text-sm md:text-base text-slate-200 leading-relaxed">

@@ -9,7 +9,7 @@ export default function BlogEthicalSurveys() {
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/blog/ethical-surveys"
-        title="When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection | NPS Me"
+        title="When Feedback Fatigue Sets In: The Ethics of customer experience surveys | NPS Me"
         description="A reflection by a former Telco Head of Customer Experience (Europe) on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems."
       />
       {/* Meta header */}
@@ -17,7 +17,7 @@ export default function BlogEthicalSurveys() {
         iconLabel="Ethical NPS"
         tag="CX & NPS / Blog"
         accent="When Feedback Fatigue Sets In:"
-        title="The Ethics of Customer Contact Selection"
+        title="The ethics of customer experience and surveys"
         subtitle="How to build trustworthy, bias-resistant NPS programmes."
       />
       <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">

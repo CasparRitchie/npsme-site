@@ -2,6 +2,7 @@
 import React from "react";
 import Seo from "../components/Seo";
 import DemoResultsPanel from "../components/DemoResultsPanel";
+import PageHeader from "../components/PageHeader";
 
 
 const STAGES = [

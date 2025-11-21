@@ -2,6 +2,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "./components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 /**
  * Impact calculator (NPS Me)

@@ -7,6 +7,7 @@ export default function PageHeader({
   subtitle = "",
   tag = "CX & NPS / Page",
   accent = "",
+  iconLabel = "NPS Me",
 }) {
   return (
     <section className="relative overflow-hidden border-b border-white/10">
@@ -19,6 +20,13 @@ export default function PageHeader({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
+          {/* Icon + label row */}
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
+              {iconLabel}
+            </p>
+          </div>
           {/* Tag pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300">
             <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />

@@ -15,9 +15,10 @@ export default function BlogSendingNpsBeforeChristmas() {
 
       {/* Header */}
       <PageHeader
+        iconLabel="NPS Survey"
         tag="CX & NPS / Blog"
         accent="How to Send an NPS Survey Before Christmas"
-        title="- Even If You’ve Never Done One Before"
+        title="Even If You’ve Never Done One Before"
         subtitle="A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse before the holidays."
       />
 

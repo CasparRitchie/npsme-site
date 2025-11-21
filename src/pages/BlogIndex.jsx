@@ -2,6 +2,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 const POSTS = [
   {
@@ -65,7 +67,13 @@ export default function BlogIndex() {
       />
 
       {/* Header */}
-      <section className="relative overflow-hidden border-b border-white/10">
+      <PageHeader
+        tag="CX & NPS / Blog"
+        accent="Are We Asking the Right People?"
+        title="The Ethics of Contact Selection in Customer Feedback"
+        subtitle="Cherry-picking who receives a survey can inflate NPS and damage credibility. Here’s how to keep sampling fair, representative, and actionable."
+      />
+      {/* <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="flex items-center gap-3">
@@ -81,7 +89,7 @@ export default function BlogIndex() {
             Pragmatic lessons from real programmes. Fewer buzzwords, more outcomes.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Posts grid */}
       <section className="mx-auto max-w-7xl px-6 py-10">

@@ -3,6 +3,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
 import Seo from "./components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function Products() {
   return (

@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

@@ -3,6 +3,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import { CheckCircle2, ArrowRight, LineChart, Users, Wrench } from "lucide-react";
+import PageHeader from "../components/PageHeader";
+
 
 export default function WhyNpsMe() {
   return (

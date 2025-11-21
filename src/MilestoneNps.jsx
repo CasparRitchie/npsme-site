@@ -2,7 +2,9 @@
 import React from "react";
 import { Star, LineChart, Wrench, Gauge, ClipboardList, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Seo from "./components/Seo"
+import Seo from "./components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function MilestoneNps() {
   return (

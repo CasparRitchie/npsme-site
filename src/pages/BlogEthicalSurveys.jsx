@@ -12,38 +12,22 @@ export default function BlogEthicalSurveys() {
         title="When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection | NPS Me"
         description="A reflection by a former Telco Head of Customer Experience (Europe) on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems."
       />
-
-
-        {/* Meta header */}
-        <PageHeader
-          tag="CX & NPS / Blog"
-          accent="When Feedback Fatigue Sets In:"
-          title="The Ethics of Customer Contact Selection"
-          subtitle="How contact selection, DNS flags, and coaching language can quietly distort your NPS – and what to do instead."
-        />
+      {/* Meta header */}
+      <PageHeader
+        iconLabel="Ethical NPS"
+        tag="CX & NPS / Blog"
+        accent="When Feedback Fatigue Sets In:"
+        title="The Ethics of Customer Contact Selection"
+        subtitle="How to build trustworthy, bias-resistant NPS programmes."
+      />
       <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
-        {/* <header>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#22C55E] mb-2">
-            Blog • Customer Experience
-          </p>
-
-          <h1 className="text-3xl md:text-4xl font-semibold text-white leading-tight">
-            When Feedback Fatigue Sets In: The Ethics of Customer Contact Selection
-          </h1>
-
-          <p className="mt-3 text-xs md:text-sm text-slate-400">
-            By a former Head of Customer Experience (Europe) for a large telco
-          </p>
-
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#22C55E] via-[#7C3AED] to-transparent" />
-        </header> */}
 
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">
           <p className="text-sm md:text-base text-slate-200 leading-relaxed">
             Every company wants to be customer-centric, but few stop to ask whether
             their feedback processes are <em>ethically customer-centric</em>.
-            It’s one thing to measure Net Promoter Score (NPS) — it’s another to ensure
+            It's one thing to measure Net Promoter Score (NPS) — it's another to ensure
             that the way you collect that feedback actually reflects reality.
           </p>
         </section>
@@ -92,7 +76,7 @@ export default function BlogEthicalSurveys() {
             </p>
 
             <blockquote className="border-l-4 border-[#22C55E] pl-4 italic text-slate-400">
-              “Please give us a 9 or 10, otherwise it’s seen as bad.”
+              “Please give us a 9 or 10, otherwise it's seen as bad.”
               <br />A real poster once found in a Mercure hotel lift.
             </blockquote>
 
@@ -147,7 +131,7 @@ export default function BlogEthicalSurveys() {
 
           <div className="mt-3 space-y-3 text-sm md:text-base text-slate-200 leading-relaxed">
             <p>
-              Ethical feedback systems aren’t about dodging criticism — they’re about
+              Ethical feedback systems aren't about dodging criticism — they're about
               earning credibility. A healthy CX programme measures itself not just by the
               height of the NPS bar, but by the integrity behind it.
             </p>

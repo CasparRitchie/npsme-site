@@ -14,12 +14,13 @@ export default function BlogClosingTheLoop() {
       />
 
         {/* Meta header */}
-        <PageHeader
-          tag="CX & NPS / Blog"
-          accent="Beyond the Score:"
-          title="Why Closing the Loop Builds Trust"
-          subtitle="By a former Head of Customer Experience (Europe) for a large telco"
-        />
+      <PageHeader
+        iconLabel="Closing the Loop"
+        tag="CX & NPS / Blog"
+        accent="Beyond the Score:"
+        title="Why Closing the Loop Builds Trust"
+        subtitle="Why acting on feedback matters more than measuring it."
+      />
       <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
 
         {/* Intro block */}

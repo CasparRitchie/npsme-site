@@ -2,6 +2,8 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function DemoSurvey() {
   const [searchParams] = useSearchParams();

@@ -3,6 +3,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { REPORTS } from "../data/socialReports";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 // ---------- helpers (outside the component) ----------
 const fmtPct = (n) => `${Math.round(n * 100)}%`;

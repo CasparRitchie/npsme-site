@@ -5,6 +5,8 @@ import { Helmet } from "react-helmet-async";
 import { getReportBySlug } from "../data/socialReports";
 import Seo from "../components/Seo";
 import { ArrowRight, TrendingUp, MessageSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
+import PageHeader from "../components/PageHeader";
+
 
 export default function SocialListeningReport() {
   const { slug } = useParams();

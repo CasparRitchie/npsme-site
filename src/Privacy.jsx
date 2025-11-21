@@ -1,7 +1,9 @@
 // src/Privacy.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import Seo from "./components/Seo"
+import Seo from "./components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function Privacy() {
   const updated = "12 Oct 2025";

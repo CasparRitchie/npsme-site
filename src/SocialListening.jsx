@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Seo from "./components/Seo"
 import SocialTicker from "./components/SocialTicker";
+import PageHeader from "../components/PageHeader";
 
 
 export default function SocialListening() {

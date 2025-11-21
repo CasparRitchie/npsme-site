@@ -2,6 +2,8 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function DemoThankYou() {
   const location = useLocation();

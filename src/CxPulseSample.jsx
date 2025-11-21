@@ -2,7 +2,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, TrendingUp, MessageSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
-import Seo from "./components/Seo"
+import Seo from "./components/Seo";
+import PageHeader from "../components/PageHeader";
+
 
 export default function CxPulseSample() {
   // ---------- Fake-but-realistic sample data ----------

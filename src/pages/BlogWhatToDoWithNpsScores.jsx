@@ -2,6 +2,8 @@
 import React from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
+
 
 export default function BlogWhatToDoWithNpsScores() {
   return (
@@ -14,22 +16,13 @@ export default function BlogWhatToDoWithNpsScores() {
 
       <main className="mx-auto max-w-3xl px-6 py-12">
         {/* Meta header */}
-        <header>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#22C55E] mb-2">
-            Blog • Customer Experience
-          </p>
-
-          <h1 className="text-3xl md:text-4xl font-semibold text-white leading-tight">
-            What To Do With Your NPS Scores
-          </h1>
-
-          <p className="mt-3 text-xs md:text-sm text-slate-400">
-            Practical ways to present, interpret, and act on NPS so it changes customer
-            outcomes, not just dashboards.
-          </p>
-
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#22C55E] via-[#7C3AED] to-transparent" />
-        </header>
+        <PageHeader
+          iconLabel="Interpreting NPS"
+          tag="CX & NPS / Blog"
+          accent="What To Do With Your NPS Scores"
+          title="Practical ways to present, interpret, and act on NPS"
+          subtitle="so it changes customer outcomes, not just dashboards."
+        />
 
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

@@ -1,7 +1,7 @@
 // src/Book.jsx
 import React from "react";
 import Seo from "./components/Seo";
-import PageHeader from "../components/PageHeader";
+import PageHeader from "./components/PageHeader";
 
 
 export default function Book() {

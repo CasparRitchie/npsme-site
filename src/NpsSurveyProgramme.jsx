@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Seo from "./components/Seo";
-import PageHeader from "../components/PageHeader";
+import PageHeader from "./components/PageHeader";
 
 
 export default function NpsSurveyProgramme() {

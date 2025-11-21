@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "./components/Seo";
-import PageHeader from "../components/PageHeader";
+import PageHeader from "./components/PageHeader";
 
 
 /**

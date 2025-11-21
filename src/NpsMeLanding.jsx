@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
 import Seo from "./components/Seo";
 import { computeNpsStats } from "../utils/nps";
-import PageHeader from "../components/PageHeader";
+import PageHeader from "./components/PageHeader";
 
 
 // --- NPS explainer ---

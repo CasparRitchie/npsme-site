@@ -31,7 +31,7 @@ export default function BlogSendingNpsBeforeChristmas() {
             before the holidays - without annoying your customers.
           </p>
 
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#7C3AED] via-[#22C55E] to-transparent rounded-full" />
+          <div className="mt-6 h-px w-full bg-gradient-to-r from-[#7C3AED] via-[#22C55E] to-transparent" />
         </div>
       </section>
 

@@ -68,9 +68,10 @@ export default function BlogIndex() {
 
       {/* Header */}
       <PageHeader
+        iconLabel="Insights"
         tag="CX & NPS / Blog"
-        accent="Insights"
-        title="Pragmatic lessons from real programmes."
+        accent="Pragmatic lessons"
+        title=" from real programmes."
         subtitle="Fewer buzzwords, more outcomes."
       />
 

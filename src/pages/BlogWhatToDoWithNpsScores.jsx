@@ -19,8 +19,8 @@ export default function BlogWhatToDoWithNpsScores() {
           iconLabel="Interpreting NPS"
           tag="CX & NPS / Blog"
           accent="What To Do With Your NPS Scores. "
-          title="Practical ways to present, interpret, and act on NPS"
-          subtitle="so it changes customer outcomes, not just dashboards."
+          title="Practical ways to present, interpret, and act on NPS..."
+          subtitle="...so it changes customer outcomes, not just dashboards."
         />
       <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
 

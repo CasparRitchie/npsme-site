@@ -2,6 +2,7 @@
 import React from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 
 export default function BlogEthicsOfContactSelection() {
   return (

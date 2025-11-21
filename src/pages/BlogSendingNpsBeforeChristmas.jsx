@@ -14,7 +14,6 @@ export default function BlogSendingNpsBeforeChristmas() {
       />
 
       {/* Header */}
-
       <PageHeader
         tag="CX & NPS / Blog"
         accent="How to Send an NPS Survey Before Christmas"

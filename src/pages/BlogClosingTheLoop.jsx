@@ -2,6 +2,7 @@
 import React from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 
 export default function BlogClosingTheLoop() {
   return (
@@ -14,22 +15,12 @@ export default function BlogClosingTheLoop() {
 
       <main className="mx-auto max-w-3xl px-6 py-12">
         {/* Meta header */}
-        <header>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#22C55E] mb-2">
-            Blog • Customer Experience
-          </p>
-
-          <h1 className="text-3xl md:text-4xl font-semibold text-white leading-tight">
-            Beyond the Score: Why Closing the Loop Builds Trust
-          </h1>
-
-          <p className="mt-3 text-xs md:text-sm text-slate-400">
-            By a former Head of Customer Experience (Europe) for a large telco
-          </p>
-
-          {/* Gradient accent rule (not full width) */}
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#22C55E] via-[#7C3AED] to-transparent" />
-        </header>
+        <PageHeader
+          tag="CX & NPS / Blog"
+          accent="Beyond the Score:"
+          title="Why Closing the Loop Builds Trust"
+          subtitle="By a former Head of Customer Experience (Europe) for a large telco"
+        />
 
         {/* Intro block */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

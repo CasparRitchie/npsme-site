@@ -14,15 +14,15 @@ export default function BlogWhatToDoWithNpsScores() {
         description="How to present NPS the right way, avoid small-sample traps, handle repeat responders, and target changes that actually lift the score and the business."
       />
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
         {/* Meta header */}
         <PageHeader
           iconLabel="Interpreting NPS"
           tag="CX & NPS / Blog"
-          accent="What To Do With Your NPS Scores"
+          accent="What To Do With Your NPS Scores. "
           title="Practical ways to present, interpret, and act on NPS"
           subtitle="so it changes customer outcomes, not just dashboards."
         />
+      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
 
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

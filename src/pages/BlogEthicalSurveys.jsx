@@ -2,6 +2,7 @@
 import React from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 
 export default function BlogEthicalSurveys() {
   return (
@@ -15,7 +16,13 @@ export default function BlogEthicalSurveys() {
       <main className="mx-auto max-w-3xl px-6 py-12">
 
         {/* Meta header */}
-        <header>
+        <PageHeader
+          tag="CX & NPS / Blog"
+          accent="When Feedback Fatigue Sets In:"
+          title="The Ethics of Customer Contact Selection"
+          subtitle="How contact selection, DNS flags, and coaching language can quietly distort your NPS – and what to do instead."
+        />
+        {/* <header>
           <p className="text-[11px] uppercase tracking-[0.25em] text-[#22C55E] mb-2">
             Blog • Customer Experience
           </p>
@@ -29,7 +36,7 @@ export default function BlogEthicalSurveys() {
           </p>
 
           <div className="mt-6 h-px w-24 bg-gradient-to-r from-[#22C55E] via-[#7C3AED] to-transparent" />
-        </header>
+        </header> */}
 
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

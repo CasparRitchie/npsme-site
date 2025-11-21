@@ -13,7 +13,6 @@ export default function BlogClosingTheLoop() {
         description="Customer feedback isn't valuable until you act on it. Learn why closing the loop, reading beyond the NPS score, and understanding cultural context build lasting customer trust."
       />
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
         {/* Meta header */}
         <PageHeader
           tag="CX & NPS / Blog"
@@ -21,6 +20,7 @@ export default function BlogClosingTheLoop() {
           title="Why Closing the Loop Builds Trust"
           subtitle="By a former Head of Customer Experience (Europe) for a large telco"
         />
+      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
 
         {/* Intro block */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">

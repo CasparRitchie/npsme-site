@@ -8,6 +8,7 @@ export default function PageHeader({
   tag = "CX & NPS / Page",
   accent = "",
   iconLabel = "NPS Me",
+  useGradientAccent = false,
 }) {
   return (
     <section className="relative overflow-hidden border-b border-white/10">
@@ -35,7 +36,17 @@ export default function PageHeader({
 
           {/* Title */}
           <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
-            {accent && <span className="text-[#22C55E]">{accent} </span>}
+            {accent && (
+              <span
+                className={
+                  useGradientAccent
+                    ? "text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]"
+                    : "text-[#22C55E]"
+                }
+              >
+                {accent}{" "}
+              </span>
+            )}
             <span className="text-slate-100">{title}</span>
           </h1>
 

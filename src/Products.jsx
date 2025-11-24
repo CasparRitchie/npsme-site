@@ -15,26 +15,13 @@ export default function Products() {
         description="Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports."
       />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 pt-16 pb-10">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-              Productized CX services
-            </p>
-          </div>
-
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-white">
-            Productized services that turn feedback into growth
-          </h1>
-          <p className="mt-4 text-slate-300 max-w-2xl">
-            Pick the package that fits your stage—from foundations, to enablement,
-            to a weekly CX intelligence feed you can act on.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        iconLabel="Productized CX services"
+        tag="NPS Me / Services"
+        accent="Productized services"
+        title="that turn feedback into growth"
+        subtitle="Pick the package that fits your stage—from foundations, to enablement, to a weekly CX intelligence feed you can act on."
+      />
 
       {/* Product cards */}
       <section className="mx-auto max-w-7xl px-6 pb-20">

@@ -16,12 +16,13 @@ export default function Privacy() {
         description="How NPS Me handles data, cookies, and third-party services. Contact details for privacy requests."
       />
       <section className="mx-auto max-w-3xl px-6 py-14">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-          <span className="text-xs tracking-widest text-slate-400 uppercase">Policy</span>
-        </div>
-        <h1 className="text-3xl font-semibold text-white">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-slate-400">Last updated: {updated}</p>
+        <PageHeader
+          iconLabel="Policy"
+          tag="NPS Me / Policy"
+          accent="Privacy Policy"
+          title=""
+          subtitle={`Last updated: ${updated}`}
+        />
 
         <div className="prose prose-invert prose-slate mt-8">
           <p>

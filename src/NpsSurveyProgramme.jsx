@@ -15,29 +15,13 @@ export default function NpsSurveyProgramme() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="mb-10"
-        >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-              NPS survey programme
-            </p>
-          </div>
-
-          <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white">
-            Your personalised NPS Survey Programme
-          </h1>
-          <p className="mt-3 text-lg text-slate-400 max-w-3xl">
-            Provide us with a file of your customers' contact information and we'll run a structured NPS
-            programme for you - invitations, reminders, dashboards and export-ready data - so you can
-            focus on acting on the insight, not wrestling with tools.
-          </p>
-        </motion.div>
+        <PageHeader
+          iconLabel="NPS survey programme"
+          tag="NPS Me / Survey Programme"
+          accent="Your personalised NPS Survey Programme"
+          title=""
+          subtitle="Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you — invitations, reminders, dashboards and export-ready data — so you can focus on acting on the insight, not wrestling with tools."
+        />
 
         {/* How it works */}
         <div className="mt-10 grid md:grid-cols-4 gap-6">

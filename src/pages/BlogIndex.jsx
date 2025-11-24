@@ -17,7 +17,7 @@ const POSTS = [
   },
   {
     slug: "ethical-surveys",
-    title: "When Feedback Fatigue Sets In: The Ethics of customer experience surveys",
+    title: "When Feedback Fatigue Sets In: The ethics of customer experience surveys",
     excerpt:
       "How contact selection, DNS flags, and response-pressure can quietly distort NPS  -  and what to do instead.",
     date: "2025-10-15",

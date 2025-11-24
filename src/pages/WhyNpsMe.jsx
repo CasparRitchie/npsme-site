@@ -17,38 +17,39 @@ export default function WhyNpsMe() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 py-12 relative">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-              Why NPS Me
+        <PageHeader
+          iconLabel="Why NPS Me"
+          tag="NPS Me / Why NPS Me"
+        >
+          <>
+            <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
+              CX consulting that connects feedback to the bottom line
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-slate-300">
+              NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it
+              into fewer churn events, more repeat revenue, and less firefighting in support.
+              We help you do that, quickly, without a huge consulting army on your payroll.
             </p>
-          </div>
-          <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            CX consulting that connects feedback to the bottom line
-          </h1>
-          <p className="mt-4 max-w-2xl text-slate-300">
-            NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it
-            into fewer churn events, more repeat revenue, and less firefighting in support.
-            We help you do that, quickly, without a huge consulting army on your payroll.
-          </p>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/book"
-              className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
-            >
-              Book a discovery call
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <a
-              href="/#demo"
-              className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
-            >
-              Try the NPS style demo
-            </a>
-          </div>
-        </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <Link
+                to="/book"
+                className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
+              >
+                Book a discovery call
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <a
+                href="/#demo"
+                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+              >
+                Try the NPS style demo
+              </a>
+            </div>
+          </>
+        </PageHeader>
       </section>
 
       {/* What we actually do */}

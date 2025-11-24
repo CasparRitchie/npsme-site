@@ -22,7 +22,7 @@ export default function Privacy() {
           title=""
           subtitle={`Last updated: ${updated}`}
         />
-      <section className="mx-auto max-w-3xl px-6 py-14">
+      <section className="mx-auto max-w-3xl px-6">
 
         <div className="prose prose-invert prose-slate mt-8">
           <p>

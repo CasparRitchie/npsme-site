@@ -14,7 +14,6 @@ export default function NpsSurveyProgramme() {
         description="Upload your customer list and we'll run a structured NPS survey programme for you - invitations, reminders, dashboards and insight-ready exports."
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
         <PageHeader
           iconLabel="NPS survey programme"
           tag="NPS Me / Survey Programme"
@@ -23,6 +22,7 @@ export default function NpsSurveyProgramme() {
           subtitle="Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you — invitations, reminders, dashboards and export-ready data — so you can focus on acting on the insight, not wrestling with tools."
         />
 
+      <section className="mx-auto max-w-6xl px-6 py-20">
         {/* How it works */}
         <div className="mt-10 grid md:grid-cols-4 gap-6">
         {[

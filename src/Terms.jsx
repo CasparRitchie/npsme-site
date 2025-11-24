@@ -14,13 +14,14 @@ export default function Terms() {
         title="Terms of Service | NPS Me"
         description="NPS Me terms, scope of services, limitations, and contact details."
       />
-      <section className="mx-auto max-w-3xl px-6 py-14">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-          <span className="text-xs tracking-widest text-slate-400 uppercase">Terms</span>
-        </div>
-        <h1 className="text-3xl font-semibold text-white">Website Terms &amp; Conditions</h1>
-        <p className="mt-2 text-sm text-slate-400">Last updated: {updated}</p>
+      <PageHeader
+        iconLabel="Policy"
+        tag="NPS Me / Terms"
+        title="Terms of Service"
+        subtitle={`Last updated: ${updated}`}
+      />
+
+      <section className="mx-auto max-w-3xl px-6 py-10">
 
         <div className="prose prose-invert prose-slate mt-8">
           <p>

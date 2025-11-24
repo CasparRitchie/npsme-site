@@ -15,13 +15,12 @@ export default function WhatIsNps() {
       />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="relative mx-auto max-w-5xl px-6 py-12">
-          <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-            Guide • Customer Experience
-          </p>
-          <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white leading-tight">
+      <PageHeader
+        iconLabel="What is NPS?"
+        tag="Guide / Customer Experience"
+      >
+        <>
+          <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white leading-tight max-w-3xl">
             What is Net Promoter Score (NPS)?
           </h1>
           <p className="mt-4 text-slate-300 max-w-2xl">
@@ -29,8 +28,8 @@ export default function WhatIsNps() {
             and how to use it as a starting point for real customer improvement rather than
             just a number on a dashboard.
           </p>
-        </div>
-      </section>
+        </>
+      </PageHeader>
 
       {/* Content */}
       <section className="mx-auto max-w-4xl px-6 py-10 space-y-10 text-slate-300">

@@ -8,7 +8,7 @@ export default function PageHeader({
   tag = "CX & NPS / Page",
   accent = "",
   iconLabel = "CX & NPS",
-  children,          // <-- NEW: optional custom content
+  children,
 }) {
   const hasCustomContent = Boolean(children);
 

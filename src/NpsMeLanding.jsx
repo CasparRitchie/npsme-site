@@ -224,7 +224,7 @@ export default function NpsMeLanding() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-4xl md:text-6xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
+              className="text-3xl sm:text-4xl md:text-4xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
               Customer Experience (CX) consulting to improve{" "}
               <span className="md:whitespace-nowrap">

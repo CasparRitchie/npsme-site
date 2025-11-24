@@ -16,16 +16,11 @@ export default function DataAutomationPage() {
       />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-12">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs tracking-widest text-[#22C55E] uppercase">
-              Data, automation & insight
-            </p>
-          </div>
-
+      <PageHeader
+        iconLabel="Data, automation & insight"
+        tag="CX • Data • Automation"
+      >
+        <>
           <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
             Your data should work for you, not the other way around
           </h1>
@@ -36,6 +31,7 @@ export default function DataAutomationPage() {
             customer experience, revenue and retention.
           </p>
 
+          {/* CTA buttons – preserved exactly */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
               to="/book"
@@ -44,6 +40,7 @@ export default function DataAutomationPage() {
               Book a discovery call
               <ArrowRight className="h-4 w-4" />
             </Link>
+
             <Link
               to="/impact"
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
@@ -58,8 +55,8 @@ export default function DataAutomationPage() {
             no eight–week slide decks. Just practical changes that free your people from manual
             reporting and make it obvious where to act.
           </p>
-        </div>
-      </section>
+        </>
+      </PageHeader>
 
       {/* The problem */}
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-8 md:grid-cols-2">

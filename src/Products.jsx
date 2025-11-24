@@ -73,7 +73,7 @@ export default function Products() {
           <div className="mt-4 grid md:grid-cols-2 gap-6 text-sm text-slate-300">
             <ul className="space-y-2 list-disc pl-5">
               <li>Sentiment pulse (WoW change, drivers)</li>
-              <li>Emerging topics (3–5 themes with examples)</li>
+              <li>Emerging topics (3-5 themes with examples)</li>
               <li>Competitor comparison (optional)</li>
             </ul>
             <ul className="space-y-2 list-disc pl-5">

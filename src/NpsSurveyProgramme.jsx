@@ -129,7 +129,7 @@ export default function NpsSurveyProgramme() {
           Talk with us to set up your survey programme →
         </a>
       </div>
-      {/* Demo CTA – link to live NPS demo */}
+      {/* Demo CTA - link to live NPS demo */}
       <div className="mt-20 mx-auto max-w-5xl">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 

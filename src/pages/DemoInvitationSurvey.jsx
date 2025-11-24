@@ -9,7 +9,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const npsScale = Array.from({ length: 11 }, (_, i) => i); // 0–10
+const npsScale = Array.from({ length: 11 }, (_, i) => i); // 0-10
 
 export default function DemoInvitationSurvey() {
   const [searchParams] = useSearchParams();

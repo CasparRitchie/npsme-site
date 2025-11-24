@@ -32,7 +32,7 @@ export default function BlogEthicalSurveys() {
           </p>
         </section>
 
-        {/* 1 – Contact selection */}
+        {/* 1 - Contact selection */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -60,7 +60,7 @@ export default function BlogEthicalSurveys() {
           </div>
         </section>
 
-        {/* 2 – Response rates vs authenticity */}
+        {/* 2 - Response rates vs authenticity */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -87,7 +87,7 @@ export default function BlogEthicalSurveys() {
           </div>
         </section>
 
-        {/* 3 – How to rebuild trust */}
+        {/* 3 - How to rebuild trust */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -120,7 +120,7 @@ export default function BlogEthicalSurveys() {
           </ul>
         </section>
 
-        {/* 4 – Final thoughts */}
+        {/* 4 - Final thoughts */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">

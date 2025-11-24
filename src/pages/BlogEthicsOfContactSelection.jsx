@@ -32,7 +32,7 @@ export default function BlogEthicsOfContactSelection() {
           </p>
         </section>
 
-        {/* 1 – Temptation to shape the sample */}
+        {/* 1 - Temptation to shape the sample */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -57,7 +57,7 @@ export default function BlogEthicsOfContactSelection() {
           </div>
         </section>
 
-        {/* 2 – Response rates vs authenticity */}
+        {/* 2 - Response rates vs authenticity */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -70,7 +70,7 @@ export default function BlogEthicsOfContactSelection() {
             <p>
               Driving responses is good; coaching scores is not. Reminders should focus on{" "}
               <em>participation</em> (“Your feedback helps us improve”), not outcomes
-              (“Please give us 9–10”). The latter erodes trust and undermines the very purpose of feedback.
+              (“Please give us 9-10”). The latter erodes trust and undermines the very purpose of feedback.
             </p>
 
             <blockquote className="border-l-4 border-[#22C55E] pl-4 italic text-slate-400">
@@ -85,7 +85,7 @@ export default function BlogEthicsOfContactSelection() {
           </div>
         </section>
 
-        {/* 3 – Guardrails */}
+        {/* 3 - Guardrails */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -122,7 +122,7 @@ export default function BlogEthicsOfContactSelection() {
           </ul>
         </section>
 
-        {/* 4 – What “good” looks like */}
+        {/* 4 - What “good” looks like */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -146,7 +146,7 @@ export default function BlogEthicsOfContactSelection() {
           </div>
         </section>
 
-        {/* 5 – Key takeaways + attribution */}
+        {/* 5 - Key takeaways + attribution */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">

@@ -81,7 +81,7 @@ export default function Privacy() {
           <h2>Data retention</h2>
           <p>
             Contact messages are kept as long as needed to respond and for routine business records. Demo inputs may be
-            cleared periodically. Server logs typically rotate within 30–90 days unless required for security or legal
+            cleared periodically. Server logs typically rotate within 30-90 days unless required for security or legal
             reasons.
           </p>
 

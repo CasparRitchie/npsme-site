@@ -85,17 +85,17 @@ export default function MilestoneNps() {
             {[
               {
                 title: "Order placed",
-                q: "Based on your ordering experience, how likely are you to recommend us (0–10)?",
+                q: "Based on your ordering experience, how likely are you to recommend us (0-10)?",
                 why: "Test checkout clarity, pricing transparency and payment reliability."
               },
               {
                 title: "Onboarding finished",
-                q: "After onboarding, how likely are you to recommend us (0–10)?",
+                q: "After onboarding, how likely are you to recommend us (0-10)?",
                 why: "Gauge setup friction, documentation gaps, enablement quality."
               },
               {
                 title: "First delivery/use",
-                q: "After your first delivery/use, how likely are you to recommend us (0–10)?",
+                q: "After your first delivery/use, how likely are you to recommend us (0-10)?",
                 why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX."
               },
             ].map((card) => (
@@ -120,7 +120,7 @@ export default function MilestoneNps() {
             <ol className="mt-3 space-y-2 list-decimal pl-5 text-sm text-slate-300">
               <li>Map milestones (checkout, onboarding, first value, renewal, support closure).</li>
               <li>Trigger surveys via your existing stack (ESP, product, helpdesk, CDP).</li>
-              <li>Ask 0–10 + one open text; keep it short.</li>
+              <li>Ask 0-10 + one open text; keep it short.</li>
               <li>Pipe results into a central view and tag by milestone.</li>
               <li>Close the loop and run monthly root-cause reviews.</li>
             </ol>

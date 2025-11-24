@@ -31,7 +31,7 @@ export default function DataAutomationPage() {
             customer experience, revenue and retention.
           </p>
 
-          {/* CTA buttons – preserved exactly */}
+          {/* CTA buttons - preserved exactly */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
               to="/book"
@@ -52,7 +52,7 @@ export default function DataAutomationPage() {
 
           <p className="mt-4 text-xs text-slate-400 max-w-xl">
             NPS Me combines CX, data and engineering skills in one place. No army of juniors,
-            no eight–week slide decks. Just practical changes that free your people from manual
+            no eight-week slide decks. Just practical changes that free your people from manual
             reporting and make it obvious where to act.
           </p>
         </>
@@ -146,7 +146,7 @@ export default function DataAutomationPage() {
             </div>
             <p className="mt-3 text-sm text-slate-300">
               Replace manual exports with scripts and APIs that refresh dashboards on a schedule.
-              Less copy–paste, fewer errors, more time to interpret what the numbers mean.
+              Less copy-paste, fewer errors, more time to interpret what the numbers mean.
             </p>
           </div>
 
@@ -222,11 +222,11 @@ export default function DataAutomationPage() {
             </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Joining NPS verbatims to refund and ticket data to size the real cost of problems.</li>
-              <li>Automating weekly CX packs that used to take several hours of copy–paste work.</li>
+              <li>Automating weekly CX packs that used to take several hours of copy-paste work.</li>
               <li>Feeding “you said, we did” themes straight from analysis into internal comms.</li>
             </ul>
             <p className="text-xs text-slate-400">
-              These are not off–the–shelf products. They are tailored to your stack and maturity,
+              These are not off-the-shelf products. They are tailored to your stack and maturity,
               and built to be maintained by your own team rather than a long term external dependency.
             </p>
           </div>

@@ -22,12 +22,12 @@ function NpsExplainer() {
           <div className="text-slate-300 text-sm leading-relaxed">
             <p>
               Net Promoter Score (NPS)® is a customer sentiment metric that groups
-              respondents by their likelihood to recommend a company on a 0–10 scale:
+              respondents by their likelihood to recommend a company on a 0-10 scale:
             </p>
             <ul className="mt-3 space-y-2 list-disc pl-5">
-              <li><span className="text-white font-medium">Promoters</span>: 9–10</li>
-              <li><span className="text-white font-medium">Passives</span>: 7–8</li>
-              <li><span className="text-white font-medium">Detractors</span>: 0–6</li>
+              <li><span className="text-white font-medium">Promoters</span>: 9-10</li>
+              <li><span className="text-white font-medium">Passives</span>: 7-8</li>
+              <li><span className="text-white font-medium">Detractors</span>: 0-6</li>
             </ul>
             <p className="mt-3">
               The score is calculated as{" "}
@@ -79,17 +79,17 @@ function MilestoneNpsSection() {
           {[
             {
               title: "Order placed",
-              q: "Based on your ordering experience, how likely are you to recommend us (0–10)?",
+              q: "Based on your ordering experience, how likely are you to recommend us (0-10)?",
               why: "Test checkout clarity, pricing transparency, and payment reliability.",
             },
             {
               title: "Onboarding finished",
-              q: "After onboarding, how likely are you to recommend us (0–10)?",
+              q: "After onboarding, how likely are you to recommend us (0-10)?",
               why: "Gauge setup friction, documentation gaps, enablement quality.",
             },
             {
               title: "First delivery/use",
-              q: "After your first delivery/use, how likely are you to recommend us (0–10)?",
+              q: "After your first delivery/use, how likely are you to recommend us (0-10)?",
               why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX.",
             },
           ].map((card) => (
@@ -108,7 +108,7 @@ function MilestoneNpsSection() {
             <ol className="mt-3 space-y-2 list-decimal pl-5 text-sm text-slate-300">
               <li>Map milestones (checkout, onboarding, first value, renewal, support closure).</li>
               <li>Trigger surveys via your stack (ESP, product, helpdesk, CDP).</li>
-              <li>Ask 0–10 + one open text; keep it short.</li>
+              <li>Ask 0-10 + one open text; keep it short.</li>
               <li>Pipe results to a central view; tag by milestone.</li>
               <li>Close the loop and run monthly root-cause reviews.</li>
             </ol>
@@ -189,7 +189,7 @@ function DemoSummaryStrip() {
       </div>
       <div className="mt-1 flex items-baseline gap-2">
         <span className="text-2xl font-semibold text-white">
-          {stats.nps === null ? "–" : stats.nps}
+          {stats.nps === null ? "-" : stats.nps}
         </span>
         {stats.nps !== null && (
           <span className="text-xs text-slate-400">NPS</span>
@@ -369,7 +369,7 @@ export default function NpsMeLanding() {
         </ul>
       </section>
 
-      {/* Contact CTA (no duplicated form – links to /book) */}
+      {/* Contact CTA (no duplicated form - links to /book) */}
       <section id="contact" className="mx-auto max-w-7xl px-6 pb-24">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 md:p-12 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">

@@ -54,19 +54,19 @@ export default function WhatIsNps() {
             <div className="font-semibold text-white">Three groups</div>
             <div className="mt-3 grid gap-4 md:grid-cols-3">
               <div>
-                <div className="text-[#ef4444] font-semibold">Detractors (0–6)</div>
+                <div className="text-[#ef4444] font-semibold">Detractors (0-6)</div>
                 <p className="mt-1 text-xs text-slate-300">
                   At risk, unhappy, or blocked. More likely to churn, complain, or warn others.
                 </p>
               </div>
               <div>
-                <div className="text-[#f97316] font-semibold">Passives (7–8)</div>
+                <div className="text-[#f97316] font-semibold">Passives (7-8)</div>
                 <p className="mt-1 text-xs text-slate-300">
                   Reasonably satisfied but not enthusiastic. Could be tempted by a competitor.
                 </p>
               </div>
               <div>
-                <div className="text-[#22C55E] font-semibold">Promoters (9–10)</div>
+                <div className="text-[#22C55E] font-semibold">Promoters (9-10)</div>
                 <p className="mt-1 text-xs text-slate-300">
                   Loyal advocates who are more likely to stay, expand, and recommend you.
                 </p>
@@ -84,8 +84,8 @@ export default function WhatIsNps() {
             The NPS formula is intentionally simple. For a given sample of responses:
           </p>
           <ol className="mt-3 list-decimal list-inside space-y-2 text-sm">
-            <li>Work out the percentage of Promoters (9–10).</li>
-            <li>Work out the percentage of Detractors (0–6).</li>
+            <li>Work out the percentage of Promoters (9-10).</li>
+            <li>Work out the percentage of Detractors (0-6).</li>
             <li>Subtract Detractors from Promoters.</li>
           </ol>
           <p className="mt-4 text-sm">
@@ -100,21 +100,21 @@ export default function WhatIsNps() {
 
             {/* The main NPS bar */}
             <div className="mt-2 flex text-[11px] font-medium text-slate-300">
-              {/* Detractors (0–6) */}
+              {/* Detractors (0-6) */}
               <div className="flex-[7] bg-[#ef4444] rounded-l-2xl py-2 text-center">
                 Detractors
               </div>
-              {/* Passives (7–8) */}
+              {/* Passives (7-8) */}
               <div className="flex-[2] bg-[#f97316] py-2 text-center">
                 Passives
               </div>
-              {/* Promoters (9–10) */}
+              {/* Promoters (9-10) */}
               <div className="flex-[2] bg-[#22C55E] rounded-r-2xl py-2 text-center">
                 Promoters
               </div>
             </div>
 
-            {/* Scale numbers 0–10 */}
+            {/* Scale numbers 0-10 */}
             <div className="mt-2 flex justify-between text-[11px] text-slate-400 font-mono">
               {[...Array(11).keys()].map((num) => (
                 <span key={num}>{num}</span>

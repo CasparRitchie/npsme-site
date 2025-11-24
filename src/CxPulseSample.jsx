@@ -156,7 +156,7 @@ export default function CxPulseSample() {
             <p className="text-xs tracking-widest text-slate-400 uppercase">Sample</p>
           </div>
           <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            CX Pulse Report – <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">Sample Client</span>
+            CX Pulse Report - <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">Sample Client</span>
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
             Weekly signal from public social channels and review sites. Themes, sentiment, and what to do next - summarised on one page.
@@ -176,7 +176,7 @@ export default function CxPulseSample() {
           <div className="text-xs uppercase tracking-wider text-slate-400">Headline sentiment</div>
           <div className="mt-1 text-2xl font-semibold text-white">+13 pts WoW</div>
           <Spark series={weekOnWeek.sentimentScore} color={brandGreen} />
-          <div className="text-xs text-slate-400">Composite positivity score (0–100)</div>
+          <div className="text-xs text-slate-400">Composite positivity score (0-100)</div>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <div className="text-xs uppercase tracking-wider text-slate-400">NPS-style index</div>
@@ -265,7 +265,7 @@ export default function CxPulseSample() {
 
           {/* Impact summary */}
           <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <ImpactCard label="Repeat purchase lift" value="+6%" note="Cohort 30–60d repeat rate" color={brandGreen} />
+            <ImpactCard label="Repeat purchase lift" value="+6%" note="Cohort 30-60d repeat rate" color={brandGreen} />
             <ImpactCard label="Churn/refunds reduction" value="−2%" note="Refunds per 1k orders" color={brandGreen} />
             <ImpactCard label="Tickets per 1k orders" value="−25%" note="After ETA emails & SLA revamp" color={brandGreen} />
           </div>

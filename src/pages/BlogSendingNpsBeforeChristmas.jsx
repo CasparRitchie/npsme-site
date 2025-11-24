@@ -96,7 +96,7 @@ export default function BlogSendingNpsBeforeChristmas() {
               “How likely are you to recommend us to a friend or colleague?”
             </span>
             <br />
-            Scale: <span className="font-medium text-[#22C55E]">0–10</span>
+            Scale: <span className="font-medium text-[#22C55E]">0-10</span>
           </p>
 
           <KeyLabel className="mt-4">✔ One optional open-text question</KeyLabel>
@@ -138,20 +138,20 @@ export default function BlogSendingNpsBeforeChristmas() {
 
           <KeyLabel className="mt-4">Best windows:</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• <span className="font-medium text-[#22C55E]">1–14 December</span> → Highest quality responses</li>
-            <li>• <span className="font-medium">15–20 December</span> → Still safe, especially if your product is digital or operational</li>
-            <li>• Avoid <span className="font-medium">21–25 December</span> (unless B2C retail or hospitality)</li>
+            <li>• <span className="font-medium text-[#22C55E]">1-14 December</span> → Highest quality responses</li>
+            <li>• <span className="font-medium">15-20 December</span> → Still safe, especially if your product is digital or operational</li>
+            <li>• Avoid <span className="font-medium">21-25 December</span> (unless B2C retail or hospitality)</li>
           </ul>
 
           <p className="mt-4">Within those windows:</p>
           <ul className="mt-2 space-y-1.5">
-            <li>• Send on Mon–Wed mornings</li>
-            <li>• Around 9:00–11:00am local time</li>
+            <li>• Send on Mon-Wed mornings</li>
+            <li>• Around 9:00-11:00am local time</li>
             <li>• Avoid Friday afternoons</li>
           </ul>
 
           <p className="mt-4">
-            Responses typically land within <span className="font-medium text-[#7C3AED]">24–48 hours.</span>
+            Responses typically land within <span className="font-medium text-[#7C3AED]">24-48 hours.</span>
           </p>
         </ArticleSection>
 
@@ -165,7 +165,7 @@ export default function BlogSendingNpsBeforeChristmas() {
             <li>• Write like a human</li>
             <li>• Keep it short</li>
             <li>• Make it founder-led if possible</li>
-            <li>• Reassure: 10–20 seconds max</li>
+            <li>• Reassure: 10-20 seconds max</li>
             <li>• Avoid marketing language</li>
           </ul>
 
@@ -228,7 +228,7 @@ export default function BlogSendingNpsBeforeChristmas() {
               <span className="text-rose-400 font-semibold">❌ Asking too many questions</span>
               <br />
               <span className="text-sm text-slate-300">
-                NPS works because it’s fast. Stick to 1–2 questions max.
+                NPS works because it’s fast. Stick to 1-2 questions max.
               </span>
             </li>
             <li>
@@ -263,20 +263,20 @@ export default function BlogSendingNpsBeforeChristmas() {
             Once the responses come in, here’s how to use them:
           </p>
 
-          <KeyLabel className="mt-4">Promoters (9–10)</KeyLabel>
+          <KeyLabel className="mt-4">Promoters (9-10)</KeyLabel>
           <ul className="mt-2 space-y-1.5">
             <li>• Ask for permission to use comments as testimonials</li>
             <li>• Encourage them to leave a Trustpilot/Google review</li>
             <li>• Identify what delighted them</li>
           </ul>
 
-          <KeyLabel className="mt-4">Passives (7–8)</KeyLabel>
+          <KeyLabel className="mt-4">Passives (7-8)</KeyLabel>
           <ul className="mt-2 space-y-1.5">
             <li>• Ask what almost made it a 9</li>
             <li>• Often low-effort fixes exist here (small UX or process issues)</li>
           </ul>
 
-          <KeyLabel className="mt-4">Detractors (0–6)</KeyLabel>
+          <KeyLabel className="mt-4">Detractors (0-6)</KeyLabel>
           <ul className="mt-2 space-y-1.5">
             <li>• Prioritise these for callbacks</li>
             <li>• Categorise their feedback: speed, clarity, service, price, etc.</li>
@@ -327,7 +327,7 @@ export default function BlogSendingNpsBeforeChristmas() {
           <p className="mt-4">
             Setup time:{" "}
             <span className="font-medium text-[#7C3AED]">
-              24–48 hours after receiving your customer file.
+              24-48 hours after receiving your customer file.
             </span>
           </p>
         </ArticleSection>

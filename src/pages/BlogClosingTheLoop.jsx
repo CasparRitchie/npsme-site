@@ -195,7 +195,7 @@ export default function BlogClosingTheLoop() {
           </div>
         </section>
 
-        {/* CTA footer – aligned with Christmas blog style */}
+        {/* CTA footer - aligned with Christmas blog style */}
         <footer className="mt-12">
           <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] via-[#0B1120] to-[#0B0F19] p-6 md:p-8 text-center">
             <p className="text-sm md:text-base text-slate-200">

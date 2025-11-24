@@ -34,7 +34,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </p>
         </section>
 
-        {/* 1 – Present in three views */}
+        {/* 1 - Present in three views */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -68,7 +68,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 2 – Sample size & stability */}
+        {/* 2 - Sample size & stability */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -92,7 +92,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 3 – Look beyond the score */}
+        {/* 3 - Look beyond the score */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -116,7 +116,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 4 – Repeat responders */}
+        {/* 4 - Repeat responders */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -141,7 +141,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 5 – Where to focus */}
+        {/* 5 - Where to focus */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
@@ -173,7 +173,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 6 – Cuts that lead to action */}
+        {/* 6 - Cuts that lead to action */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
@@ -204,7 +204,7 @@ export default function BlogWhatToDoWithNpsScores() {
           </div>
         </section>
 
-        {/* 7 – Close the loop */}
+        {/* 7 - Close the loop */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
           <h2 className="flex items-center gap-3 text-lg md:text-xl font-semibold text-white">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">

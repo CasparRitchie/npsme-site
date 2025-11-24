@@ -155,7 +155,7 @@ export default function SocialListeningReport() {
             {sentimentDelta} pts
           </div>
           <Spark series={r.sentimentSeries} color={brandGreen} />
-          <div className="text-xs text-slate-400">Composite positivity (0–100)</div>
+          <div className="text-xs text-slate-400">Composite positivity (0-100)</div>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">

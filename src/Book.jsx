@@ -55,7 +55,7 @@ export default function Book() {
         iconLabel="Discovery call"
         tag="NPS Me / Book"
         title="Book a free discovery call"
-        subtitle="Share a bit about your current CX and NPS setup and we’ll explore where we can help – no obligation."
+        subtitle="Share a bit about your current CX and NPS setup and we’ll explore where we can help - no obligation."
       />
 
       <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">

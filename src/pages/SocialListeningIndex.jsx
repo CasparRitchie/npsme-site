@@ -57,23 +57,12 @@ export default function SocialListeningIndex() {
         description="Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions — how we turn feedback into growth."
       />
 
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-          <p className="text-xs tracking-widest text-[#22C55E] uppercase">
-            Social listening gallery
-          </p>
-          </div>
-          <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-            Social Listening Reports (Anonymised)
-          </h1>
-          <p className="mt-3 max-w-2xl text-slate-300">
-            Examples of our weekly CX Pulse format using anonymised client data. Each shows top themes, quote snippets, actions, and impact.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        iconLabel="Social listening gallery"
+        tag="CX Pulse / Social listening"
+        title="Social Listening Reports (Anonymised)"
+        subtitle="Examples of our weekly CX Pulse format using anonymised client data. Each shows top themes, quote snippets, actions, and impact."
+      />
 
       <section className="mx-auto max-w-7xl px-6 py-10 grid gap-6 md:grid-cols-3">
         {REPORTS.map((r) => {

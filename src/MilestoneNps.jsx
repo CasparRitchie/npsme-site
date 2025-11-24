@@ -15,17 +15,11 @@ export default function MilestoneNps() {
         description="Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX."
       />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 pt-16 pb-12">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-            <p className="text-xs uppercase tracking-widest text-[#22C55E]">
-              Milestone / transactional NPS
-            </p>
-          </div>
-
+      <PageHeader
+        iconLabel="Milestone / Transactional NPS"
+        tag="CX & NPS / Milestone"
+      >
+        <>
           <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
             Milestone (Transactional) NPS &amp; Survey Signals
           </h1>
@@ -34,7 +28,7 @@ export default function MilestoneNps() {
             prioritised work, and measure lift. We reference Net Promoter Score (NPS)®
             descriptively alongside CSAT, CES and behavioral data.
           </p>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex gap-3 flex-wrap">
             <Link
               to="/impact"
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
@@ -48,8 +42,8 @@ export default function MilestoneNps() {
               Book discovery
             </a>
           </div>
-        </div>
-      </section>
+        </>
+      </PageHeader>
 
       {/* 4-Stage method */}
       <section className="mx-auto max-w-7xl px-6 py-12">

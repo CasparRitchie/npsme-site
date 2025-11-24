@@ -7,9 +7,11 @@ export default function PageHeader({
   subtitle = "",
   tag = "CX & NPS / Page",
   accent = "",
-  iconLabel = "NPS Me",
-  useGradientAccent = false,
+  iconLabel = "CX & NPS",
+  children,          // <-- NEW: optional custom content
 }) {
+  const hasCustomContent = Boolean(children);
+
   return (
     <section className="relative overflow-hidden border-b border-white/10">
       {/* Background gradients */}
@@ -28,33 +30,33 @@ export default function PageHeader({
               {iconLabel}
             </p>
           </div>
+
           {/* Tag pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300">
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300">
             <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
             {tag}
           </div>
 
-          {/* Title */}
-          <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
-            {accent && (
-              <span
-                className={
-                  useGradientAccent
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]"
-                    : "text-[#22C55E]"
-                }
-              >
-                {accent}{" "}
-              </span>
-            )}
-            <span className="text-slate-100">{title}</span>
-          </h1>
+          {/* Either: custom content OR default title/subtitle */}
+          {hasCustomContent ? (
+            <div className="mt-4">
+              {children}
+            </div>
+          ) : (
+            <>
+              {/* Default title */}
+              <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
+                {accent && <span className="text-[#22C55E]">{accent} </span>}
+                <span className="text-slate-100">{title}</span>
+              </h1>
 
-          {/* Subtitle */}
-          {subtitle && (
-            <p className="mt-4 max-w-2xl text-sm sm:text-base text-slate-300">
-              {subtitle}
-            </p>
+              {/* Default subtitle */}
+              {subtitle && (
+                <p className="mt-4 max-w-2xl text-sm sm:text-base text-slate-300">
+                  {subtitle}
+                </p>
+              )}
+            </>
           )}
 
           {/* Gradient divider */}

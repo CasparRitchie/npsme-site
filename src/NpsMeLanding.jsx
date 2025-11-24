@@ -207,24 +207,18 @@ function DemoSummaryStrip() {
 export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      {/* SEO meta tags */}
       <Seo
         path="/"
         title="Customer Experience (CX) Consulting & NPS Improvement | NPS Me"
         description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase."
       />
 
-      {/* Hero */}
+      {/* Hero using PageHeader wrapper + custom content */}
       <PageHeader
         iconLabel="NPS Me"
         tag="NPS Me / Home"
-        accent="Customer feedback,"
-        title="made simple."
-        subtitle="Launch clean, branded NPS surveys without tools, complexity, or wasted time."
-      />
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_80%_30%,#22C55E_0%,transparent_25%)]" />
-        <div className="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-12 gap-10">
+      >
+        <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-7 lg:col-span-6">
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
@@ -251,6 +245,7 @@ export default function NpsMeLanding() {
               NPS Me is a specialist CX consulting firm. We diagnose friction across your journey,
               prioritise the highest-impact fixes, and implement changes that measurably lift NPS®, reduce churn, and increase repeat purchase.
             </motion.p>
+
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 to="/book"
@@ -266,6 +261,7 @@ export default function NpsMeLanding() {
                 Try the NPS®-style demo
               </a>
             </div>
+
             <div className="mt-10 flex items-center gap-6 text-sm text-slate-400">
               <div className="flex items-center gap-2"><Star className="h-4 w-4" /> Review mining</div>
               <div className="flex items-center gap-2"><Wrench className="h-4 w-4" /> Hands-on enablement</div>
@@ -273,7 +269,8 @@ export default function NpsMeLanding() {
             </div>
           </div>
         </div>
-      </section>
+      </PageHeader>
+
 
       {/* 4-Stage Method */}
       <section id="method" className="mx-auto max-w-7xl px-6 py-20">

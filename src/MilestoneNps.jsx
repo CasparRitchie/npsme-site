@@ -16,34 +16,34 @@ export default function MilestoneNps() {
       />
 
       <PageHeader
-        iconLabel="Milestone / Transactional NPS"
-        tag="CX & NPS / Milestone"
-      >
-        <>
-          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
-            Milestone (Transactional) NPS &amp; Survey Signals
-          </h1>
-          <p className="mt-4 text-slate-300 max-w-3xl">
-            A practical framework to capture feedback at key journey moments, turn it into
-            prioritised work, and measure lift. We reference Net Promoter Score (NPS)®
-            descriptively alongside CSAT, CES and behavioral data.
-          </p>
-          <div className="mt-6 flex gap-3 flex-wrap">
-            <Link
-              to="/impact"
-              className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
-            >
-              Estimate your impact
-            </Link>
-            <a
-              href="/#contact"
-              className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
-            >
-              Book discovery
-            </a>
-          </div>
-        </>
-      </PageHeader>
+          iconLabel="Milestone / transactional NPS"
+          tag="NPS Me / Milestone NPS"
+        >
+          <>
+            <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
+              Milestone (Transactional) NPS &amp; Survey Signals
+            </h1>
+            <p className="mt-4 text-slate-300 max-w-3xl">
+              A practical framework to capture feedback at key journey moments, turn it into
+              prioritised work, and measure lift. We reference Net Promoter Score (NPS)®
+              descriptively alongside CSAT, CES and behavioral data.
+            </p>
+            <div className="mt-6 flex gap-3 flex-wrap">
+              <Link
+                to="/impact"
+                className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
+              >
+                Estimate your impact
+              </Link>
+              <a
+                href="/#contact"
+                className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
+              >
+                Book discovery
+              </a>
+            </div>
+          </>
+        </PageHeader>
 
       {/* 4-Stage method */}
       <section className="mx-auto max-w-7xl px-6 py-12">

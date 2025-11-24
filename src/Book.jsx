@@ -51,12 +51,14 @@ export default function Book() {
         title="Book a discovery session | NPS Me"
         description="Pick a time that works for you and we’ll confirm a 30-minute discovery call to discuss CX and NPS improvement."
       />
-      <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">Book a discovery session</h1>
-        <p className="mt-3 text-slate-300">
-          Choose a preferred date/time and tell us what you're looking for. We’ll reply quickly to confirm and send an invite.
-        </p>
+      <PageHeader
+        iconLabel="Discovery call"
+        tag="NPS Me / Book"
+        title="Book a free discovery call"
+        subtitle="Share a bit about your current CX and NPS setup and we’ll explore where we can help – no obligation."
+      />
 
+      <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">
         <form
           onSubmit={onSubmit}
           className={`mt-8 grid gap-4 text-left transition ${disabled ? "opacity-60 pointer-events-none" : ""}`}

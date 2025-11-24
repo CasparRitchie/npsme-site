@@ -213,7 +213,7 @@ export default function NpsMeLanding() {
         description="Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase."
       />
 
-      {/* Hero using PageHeader wrapper + custom content */}
+      {/* Hero using shared PageHeader shell + custom content */}
       <PageHeader
         iconLabel="NPS Me"
         tag="NPS Me / Home"
@@ -224,7 +224,7 @@ export default function NpsMeLanding() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-4xl md:text-4xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
+              className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
             >
               Customer Experience (CX) consulting to improve{" "}
               <span className="md:whitespace-nowrap">

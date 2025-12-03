@@ -53,7 +53,6 @@ const POSTS = [
   {
     slug: "why-nps-isnt-improving",
     title: "Why your NPS isn't improving — even when your CX looks better",
-    category: "Customer Experience",
     excerpt:
       "When your CX feels better but your NPS refuses to move, it's usually not the score that's broken. It's sampling, expectations, or where the fixes are landing.",
     date: "2025-12-03",

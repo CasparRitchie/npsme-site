@@ -15,7 +15,7 @@ export default function BlogWhyNpsIsntImproving() {
 
       {/* Shared blog hero */}
       <PageHeader
-        iconLabel="CX & NPS / Blog"
+        iconLabel="Understanding NPS and CX"
         tag="CX & NPS / Blog"
         title="Why your NPS isn't improving - even when your CX looks better"
         subtitle="A practical guide to understanding flat NPS, invisible friction, sampling drift, and what to fix first when scores won't move."

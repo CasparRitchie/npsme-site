@@ -51,7 +51,7 @@ const POSTS = [
     tags: ["NPS", "Seasonal", "SMB"],
   },
   {
-    slug: "/blog/why-nps-isnt-improving",
+    slug: "why-nps-isnt-improving",
     title: "Why your NPS isn't improving — even when your CX looks better",
     category: "Customer Experience",
     excerpt:

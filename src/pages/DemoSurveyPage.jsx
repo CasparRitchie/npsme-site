@@ -128,6 +128,7 @@ export default function DemoSurveyPage() {
                     id="demo-contact-name"
                     name="contactName"
                     type="text"
+                    autoComplete="name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
@@ -146,6 +147,7 @@ export default function DemoSurveyPage() {
                     id="demo-business-name"
                     name="businessName"
                     type="text"
+                    autoComplete="organization"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
@@ -165,6 +167,7 @@ export default function DemoSurveyPage() {
                   id="demo-email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"

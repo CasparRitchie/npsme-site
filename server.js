@@ -211,14 +211,21 @@ async function getDropboxAccessToken() {
   return cachedDropboxToken;
 }
 
-// Small CSV escaper
-function escapeCsv(value) {
-  const v = value == null ? "" : String(value);
-  if (/[",\n]/.test(v)) {
-    return `"${v.replace(/"/g, '""')}"`;
+// Small CSV escaper (supports , or ;)
+  function escapeCsv(value, delimiter = ",") {
+    const v = value == null ? "" : String(value);
+
+    // We must quote if the value contains a quote, newline, or the delimiter itself
+    const pattern =
+      delimiter === ","
+        ? /[",\n]/
+        : new RegExp(`[\"${delimiter}\n]`);
+
+    if (pattern.test(v)) {
+      return `"${v.replace(/"/g, '""')}"`;
+    }
+    return v;
   }
-  return v;
-}
 
 async function readDropboxFile(path) {
   const token = await getDropboxAccessToken();
@@ -410,13 +417,33 @@ async function appendDemoResponseRow(row) {
     return;
   }
 
-  const header =
-    "responseId,invitationId,customerId,customerName,businessName,email,stage,surveyId,type,score,comment,createdAt";
-
   const existing = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
     console.error("[npsme] Error reading demo-responses.csv", err);
     return null;
   });
+
+  // Decide delimiter: if file exists and clearly uses ;, keep that, otherwise use ,
+  let delimiter = ",";
+  if (existing) {
+    const firstLine = existing.split(/\r?\n/)[0] || "";
+    delimiter = detectDelimiter(firstLine);
+  }
+
+  const headerFields = [
+    "responseId",
+    "invitationId",
+    "customerId",
+    "customerName",
+    "businessName",
+    "email",
+    "stage",
+    "surveyId",
+    "type",
+    "score",
+    "comment",
+    "createdAt",
+  ];
+  const header = headerFields.join(delimiter);
 
   const fields = [
     row.responseId,
@@ -433,7 +460,7 @@ async function appendDemoResponseRow(row) {
     row.createdAt,
   ];
 
-  const line = fields.map(escapeCsv).join(",");
+  const line = fields.map((v) => escapeCsv(v, delimiter)).join(delimiter);
 
   const contents = existing
     ? `${existing.replace(/\n*$/, "")}\n${line}\n`
@@ -442,8 +469,19 @@ async function appendDemoResponseRow(row) {
   await writeDropboxFile(DEMO_RESPONSES_PATH, contents);
 }
 
-// --- CSV parser for demo responses (handles quoted fields) ---
-function splitCsvLine(line) {
+// --- CSV helpers for demo responses (handles , and ;) ---
+
+function detectDelimiter(headerLine) {
+  const commaCount = (headerLine.match(/,/g) || []).length;
+  const semiCount = (headerLine.match(/;/g) || []).length;
+
+  if (semiCount && !commaCount) return ";";
+  if (commaCount && !semiCount) return ",";
+  // If both or neither are present, default to comma
+  return ",";
+}
+
+function splitCsvLine(line, delimiter) {
   const result = [];
   let current = "";
   let inQuotes = false;
@@ -459,7 +497,7 @@ function splitCsvLine(line) {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if (ch === "," && !inQuotes) {
+    } else if (ch === delimiter && !inQuotes) {
       result.push(current);
       current = "";
     } else {
@@ -472,23 +510,35 @@ function splitCsvLine(line) {
 }
 
 function parseCsvWithHeader(csvText) {
-  const lines = csvText.trim().split("\n").filter((l) => l.trim().length > 0);
+  // Split CRLF / LF robustly and trim each line
+  const lines = csvText
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
   if (lines.length < 2) return [];
 
-  const header = splitCsvLine(lines[0]).map((h) => h.trim());
+  // Detect whether we're dealing with , or ;
+  const delimiter = detectDelimiter(lines[0]);
+
+  const header = splitCsvLine(lines[0], delimiter).map((h) => h.trim());
   const rows = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const cols = splitCsvLine(lines[i]);
+    const cols = splitCsvLine(lines[i], delimiter);
     const obj = {};
+
     header.forEach((h, idx) => {
       let value = cols[idx] ?? "";
+
       // Unwrap quotes & unescape
       if (value.startsWith('"') && value.endsWith('"')) {
         value = value.slice(1, -1).replace(/""/g, '"');
       }
-      obj[h] = value;
+
+      obj[h] = value.trim();
     });
+
     rows.push(obj);
   }
 

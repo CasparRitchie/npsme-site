@@ -24,6 +24,7 @@ import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
 import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
 import BlogSendingNpsBeforeChristmas from "./pages/BlogSendingNpsBeforeChristmas";
 import BlogWhyNpsIsntImproving from "./pages/BlogWhyNpsIsntImproving";
+import BlogDataVisualisation from "./pages/BlogDataVisualisation";
 import DataAutomationPage from "./pages/DataAutomationPage";
 import DemoSurvey from "./pages/DemoSurvey";
 import DemoSurveyPage from "./pages/DemoSurveyPage";
@@ -56,6 +57,7 @@ const COMPONENTS = {
   "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
   "/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
   "/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
+  "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
 
   "/demo-survey-legacy": DemoSurvey,
   "/demo-survey-page": DemoSurveyPage,

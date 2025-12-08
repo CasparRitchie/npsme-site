@@ -59,6 +59,15 @@ const POSTS = [
     readTime: "6 min",
     tags: ["NPS", "CX", "Fundamentals"],
   },
+    {
+    slug: "data-visualisation-cx-insights",
+    title: "How to Use Data Visualisation to Unlock Hidden CX Insights",
+    excerpt:
+      "Move beyond pretty dashboards into visuals that reveal patterns, friction points, and expectation gaps your teams can act on.",
+    date: "2025-12-08",
+    readTime: "7 min",
+    tags: ["CX", "Data", "Visualisation"],
+  },
   // Add more posts here as you publish them
 ];
 

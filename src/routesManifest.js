@@ -28,6 +28,8 @@ export const ROUTES_MANIFEST = [
   { path: "/demo-invitation-survey",           label: "Demo invitation survey",           enabled: true,  inHeader: false,  inFooter: false },
   { path: "/demo-survey/thanks",               label: "Demo survey thanks",               enabled: true,  inHeader: false,  inFooter: false },
   { path: "/blog/why-nps-isnt-improving",      label: "Blog: Why NPS Isn’t Improving",    enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/blog/data-visualisation-cx-insights", label: "Blog: Data Visualisation & CX Insights", enabled: true, inHeader: false, inFooter: false },
+
   // Regulatory and information
   { path: "/privacy",                          label: "Privacy",                          enabled: true,  inHeader: false,  inFooter: true  },
   { path: "/terms",                            label: "Terms",                            enabled: true,  inHeader: false,  inFooter: true  },

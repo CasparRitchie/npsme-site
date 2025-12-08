@@ -116,8 +116,7 @@ export default function DemoSurveyPage() {
             </p>
 
             <form onSubmit={handleSendDemo} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Contact name */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
                     htmlFor="demo-contact-name"
@@ -129,7 +128,6 @@ export default function DemoSurveyPage() {
                     id="demo-contact-name"
                     name="contactName"
                     type="text"
-                    autoComplete="name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
@@ -137,7 +135,6 @@ export default function DemoSurveyPage() {
                   />
                 </div>
 
-                {/* Business name */}
                 <div>
                   <label
                     htmlFor="demo-business-name"
@@ -149,7 +146,6 @@ export default function DemoSurveyPage() {
                     id="demo-business-name"
                     name="businessName"
                     type="text"
-                    autoComplete="organization"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
@@ -158,7 +154,6 @@ export default function DemoSurveyPage() {
                 </div>
               </div>
 
-              {/* Email */}
               <div>
                 <label
                   htmlFor="demo-email"
@@ -170,7 +165,6 @@ export default function DemoSurveyPage() {
                   id="demo-email"
                   name="email"
                   type="email"
-                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
@@ -179,7 +173,6 @@ export default function DemoSurveyPage() {
                 />
               </div>
 
-              {/* Stage */}
               <div>
                 <label
                   htmlFor="demo-stage"

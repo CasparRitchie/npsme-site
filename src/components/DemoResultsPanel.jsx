@@ -267,12 +267,19 @@ export default function DemoResultsPanel() {
 
   return (
     <div>
-      {/* Filters + Refresh */}
+            {/* Filters + Refresh */}
       <div className="flex flex-wrap gap-3 items-center mb-4">
         {/* Contact filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400">View for:</span>
+          <label
+            htmlFor="drp-customer-filter"
+            className="text-[11px] text-slate-400"
+          >
+            View for:
+          </label>
           <select
+            id="drp-customer-filter"
+            name="customerFilter"
             value={customerFilter}
             onChange={(e) => setCustomerFilter(e.target.value)}
             className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
@@ -288,8 +295,15 @@ export default function DemoResultsPanel() {
 
         {/* Company filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400">Company:</span>
+          <label
+            htmlFor="drp-company-filter"
+            className="text-[11px] text-slate-400"
+          >
+            Company:
+          </label>
           <select
+            id="drp-company-filter"
+            name="companyFilter"
             value={companyFilter}
             onChange={(e) => setCompanyFilter(e.target.value)}
             className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
@@ -305,8 +319,15 @@ export default function DemoResultsPanel() {
 
         {/* Period filter */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400">Period:</span>
+          <label
+            htmlFor="drp-period-filter"
+            className="text-[11px] text-slate-400"
+          >
+            Period:
+          </label>
           <select
+            id="drp-period-filter"
+            name="period"
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
             className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
@@ -319,8 +340,15 @@ export default function DemoResultsPanel() {
 
         {/* Result type */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400">Result type:</span>
+          <label
+            htmlFor="drp-result-type-filter"
+            className="text-[11px] text-slate-400"
+          >
+            Result type:
+          </label>
           <select
+            id="drp-result-type-filter"
+            name="resultType"
             value={resultType}
             onChange={(e) => setResultType(e.target.value)}
             className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"

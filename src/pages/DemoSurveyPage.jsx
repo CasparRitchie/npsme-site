@@ -409,9 +409,186 @@ export default function DemoSurveyPage() {
                   into these metrics.
                 </p>
               </div>
+              <div className="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-[11px] text-slate-300 overflow-hidden">
+                {["monthly", "quarterly", "rolling12"].map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    className={classNames(
+                      "px-3 py-1.5",
+                      period === p ? "bg-slate-800 text-emerald-300" : "hover:bg-slate-800/60"
+                    )}
+                  >
+                    {p === "monthly" && "Monthly"}
+                    {p === "quarterly" && "Quarterly"}
+                    {p === "rolling12" && "Last 12 months"}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <DemoResultsPanel />
+                        {/* New: example visualisations built from the same data */}
+            <div className="mt-8 border-t border-slate-800 pt-6 space-y-6">
+              <h3 className="text-sm font-semibold text-slate-200">
+                3. Example CX visualisations built from this demo data
+              </h3>
+
+              {/* Card 1: Overall NPS snapshot */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      Overall NPS (filtered view)
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-50">
+                      {overallStats.nps ?? "–"}
+                      {overallStats.nps !== null && (
+                        <span className="ml-1 text-sm text-slate-400">/ 100</span>
+                      )}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {overallStats.total
+                        ? `${overallStats.total} responses • ${overallStats.promoters} Promoters • ${overallStats.passives} Passives • ${overallStats.detractors} Detractors`
+                        : "Once you and a few colleagues complete the demo survey, this panel will populate with a live NPS snapshot."}
+                    </p>
+                  </div>
+
+                  {overallStats.total > 0 && (
+                    <div className="mt-2 sm:mt-0 w-full sm:w-56">
+                      <div className="text-[11px] text-slate-400 mb-1">
+                        Promoter / Passive / Detractor mix
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-900 flex overflow-hidden">
+                        {["promoters", "passives", "detractors"].map((k) => {
+                          const value = overallStats[k];
+                          const width =
+                            overallStats.total > 0
+                              ? `${(value / overallStats.total) * 100}%`
+                              : "0%";
+                          const label =
+                            k === "promoters"
+                              ? "Promoters"
+                              : k === "passives"
+                              ? "Passives"
+                              : "Detractors";
+                          return (
+                            <div
+                              key={k}
+                              className={
+                                k === "promoters"
+                                  ? "bg-emerald-400"
+                                  : k === "passives"
+                                  ? "bg-amber-400"
+                                  : "bg-rose-500"
+                              }
+                              style={{ width }}
+                              aria-label={label}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Card 2: NPS over time (by chosen period) */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+                      NPS trend ({period === "monthly"
+                        ? "by month"
+                        : period === "quarterly"
+                        ? "by quarter"
+                        : "last 12 months"}
+                      )
+                    </p>
+                    <p className="mt-1 text-sm text-slate-300">
+                      A simple bar view showing how NPS moves over time for the current filter.
+                    </p>
+                  </div>
+                </div>
+
+                {grouped.length === 0 ? (
+                  <p className="text-xs text-slate-500">
+                    Submit a few demo responses and refresh to see the trend appear here.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {grouped.map((g) => {
+                      const { nps } = g.stats;
+                      const width =
+                        nps === null
+                          ? "0%"
+                          : `${Math.max(0, ((nps + 100) / 200) * 100).toFixed(1)}%`;
+                      return (
+                        <div key={g.key} className="flex items-center gap-3">
+                          <div className="w-28 text-[11px] text-slate-400">{g.label}</div>
+                          <div className="flex-1">
+                            <div className="h-1.5 rounded-full bg-slate-900 overflow-hidden">
+                              <div
+                                className="h-full bg-emerald-400"
+                                style={{ width }}
+                              />
+                            </div>
+                          </div>
+                          <div className="w-10 text-right text-xs text-slate-300">
+                            {nps === null ? "–" : nps}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Card 3: Journey stage heatmap-style tiles */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
+                <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">
+                  NPS by journey stage
+                </p>
+                <p className="text-sm text-slate-300 mb-4">
+                  Each tile shows NPS for one stage of the journey, based on the demo responses
+                  you&apos;ve collected so far. In a live programme this becomes a quick
+                  friction-map of where customers struggle.
+                </p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {STAGES.filter((s) => s !== "Overall NPS").map((s) => {
+                    const stats = milestoneStats[s] || {
+                      nps: null,
+                      total: 0,
+                    };
+                    let tone = "bg-slate-900/80 border-slate-800";
+                    if (stats.total > 0 && stats.nps !== null) {
+                      if (stats.nps >= 50) tone = "bg-emerald-900/40 border-emerald-500/40";
+                      else if (stats.nps >= 0) tone = "bg-amber-900/40 border-amber-500/40";
+                      else tone = "bg-rose-900/40 border-rose-500/40";
+                    }
+
+                    return (
+                      <div
+                        key={s}
+                        className={`rounded-2xl border px-3 py-2.5 text-xs ${tone}`}
+                      >
+                        <div className="font-medium text-slate-100 truncate">{s}</div>
+                        <div className="mt-1 text-lg font-semibold text-slate-50">
+                          {stats.nps === null ? "–" : stats.nps}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {stats.total
+                            ? `${stats.total} responses`
+                            : "No demo responses yet"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       </main>

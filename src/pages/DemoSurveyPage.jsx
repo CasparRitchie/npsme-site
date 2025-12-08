@@ -2,7 +2,6 @@
 import React from "react";
 import Seo from "../components/Seo";
 import DemoResultsPanel from "../components/DemoResultsPanel";
-import PageHeader from "../components/PageHeader";
 
 const STAGES = [
   "Overall NPS",
@@ -32,7 +31,6 @@ export default function DemoSurveyPage() {
   const description =
     "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
 
-  // Load results is now fully handled inside DemoResultsPanel
   async function handleSendDemo(e) {
     e.preventDefault();
     setSendError("");

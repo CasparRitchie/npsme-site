@@ -56,7 +56,7 @@ function computeNpsStats(responses) {
 
   const total = promoters + passives + detractors;
   if (!total) {
-    return { nps: null, total: 0, promoters, passives, detractors };
+    return { nps: null, total, promoters, passives, detractors };
   }
 
   const nps = Math.round(((promoters - detractors) / total) * 100);
@@ -91,7 +91,7 @@ function buildWordCloudData(responses, maxWords = 30) {
   return items.map(({ word, count }) => {
     const ratio =
       maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount);
-    const fontSize = 0.8 + ratio * 1.0; // rem 0.8–1.8
+    const fontSize = 0.8 + ratio * 1.0; // 0.8–1.8rem
     return { word, count, fontSize };
   });
 }
@@ -144,8 +144,9 @@ export default function DemoResultsPanel() {
   const uniqueCompanies = React.useMemo(() => {
     const names = new Set();
     for (const r of responses) {
-      if (r.businessName && r.businessName.trim()) {
-        names.add(r.businessName.trim());
+      const name = (r.businessName || r.companyName || "").trim();
+      if (name) {
+        names.add(name);
       }
     }
     return Array.from(names).sort();
@@ -160,7 +161,10 @@ export default function DemoResultsPanel() {
     }
 
     if (companyFilter !== "ALL") {
-      rows = rows.filter((r) => (r.businessName || "").trim() === companyFilter);
+      rows = rows.filter((r) => {
+        const name = (r.businessName || r.companyName || "").trim();
+        return name === companyFilter;
+      });
     }
 
     if (resultType === "OVERALL") {
@@ -442,8 +446,7 @@ export default function DemoResultsPanel() {
                       <div className="text-xs text-slate-300">
                         <span className="font-medium">{label}</span>{" "}
                         <span className="text-slate-500">
-                          • NPS{" "}
-                          {stats.nps === null ? "–" : stats.nps}
+                          • NPS {stats.nps === null ? "–" : stats.nps}
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-500">
@@ -490,10 +493,22 @@ export default function DemoResultsPanel() {
                   total: 0,
                 };
 
+                let tone = "bg-slate-950/60 border-slate-800";
+                if (stats.total > 0 && stats.nps !== null) {
+                  if (stats.nps > 20) {
+                    tone = "bg-emerald-900/40 border-emerald-500/40";
+                  } else if (stats.nps < -20) {
+                    tone = "bg-rose-900/40 border-rose-500/40";
+                  } else {
+                    // -20 to +20 band
+                    tone = "bg-amber-900/40 border-amber-500/40";
+                  }
+                }
+
                 return (
                   <div
                     key={stage}
-                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-3 flex flex-col items-center text-center"
+                    className={`rounded-2xl border ${tone} p-3 flex flex-col items-center text-center`}
                   >
                     <p className="text-xs text-slate-400 mb-1">{stage}</p>
 
@@ -502,7 +517,7 @@ export default function DemoResultsPanel() {
                     </div>
 
                     <p className="text-[11px] text-slate-500">
-                      {stats.total} responses
+                      {stats.total} response{stats.total === 1 ? "" : "s"}
                     </p>
                   </div>
                 );

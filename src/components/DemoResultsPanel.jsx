@@ -11,6 +11,12 @@ const STAGES = [
   "Cease / leaving",
 ];
 
+const STOP_WORDS = new Set([
+  "the","and","for","with","this","that","you","your","our","are","was","were",
+  "is","it","to","of","in","on","at","a","an","i","we","they","but","so","very",
+  "really","just","too","be","have","had","has","as","if","or"
+]);
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -57,11 +63,45 @@ function computeNpsStats(responses) {
   return { nps, total, promoters, passives, detractors };
 }
 
+function buildWordCloudData(responses, maxWords = 30) {
+  const counts = new Map();
+
+  for (const r of responses) {
+    const text = (r.comment || r.verbatim || "").toLowerCase();
+    if (!text) continue;
+
+    const words = text.replace(/[^a-z0-9\s]/gi, " ").split(/\s+/);
+    for (const wRaw of words) {
+      const w = wRaw.trim();
+      if (!w || STOP_WORDS.has(w) || w.length <= 2) continue;
+      counts.set(w, (counts.get(w) || 0) + 1);
+    }
+  }
+
+  const items = Array.from(counts.entries())
+    .map(([word, count]) => ({ word, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, maxWords);
+
+  if (!items.length) return [];
+
+  const maxCount = items[0].count;
+  const minCount = items[items.length - 1].count;
+
+  return items.map(({ word, count }) => {
+    const ratio =
+      maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount);
+    const fontSize = 0.8 + ratio * 1.0; // rem 0.8–1.8
+    return { word, count, fontSize };
+  });
+}
+
 export default function DemoResultsPanel() {
   const [responses, setResponses] = React.useState([]);
   const [loadingResults, setLoadingResults] = React.useState(false);
   const [resultsError, setResultsError] = React.useState("");
   const [customerFilter, setCustomerFilter] = React.useState("ALL");
+  const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
   const [resultType, setResultType] = React.useState("ALL"); // ALL | OVERALL | MILESTONE
 
@@ -90,7 +130,7 @@ export default function DemoResultsPanel() {
     loadResults();
   }, []);
 
-  // Unique customers for filter
+  // Unique customers / companies for filters
   const uniqueCustomers = React.useMemo(() => {
     const names = new Set();
     for (const r of responses) {
@@ -101,12 +141,26 @@ export default function DemoResultsPanel() {
     return Array.from(names).sort();
   }, [responses]);
 
-  // Apply filters: customer + result type
+  const uniqueCompanies = React.useMemo(() => {
+    const names = new Set();
+    for (const r of responses) {
+      if (r.businessName && r.businessName.trim()) {
+        names.add(r.businessName.trim());
+      }
+    }
+    return Array.from(names).sort();
+  }, [responses]);
+
+  // Apply filters: customer + company + result type
   const filteredResponses = React.useMemo(() => {
     let rows = responses;
 
     if (customerFilter !== "ALL") {
       rows = rows.filter((r) => (r.customerName || "").trim() === customerFilter);
+    }
+
+    if (companyFilter !== "ALL") {
+      rows = rows.filter((r) => (r.businessName || "").trim() === companyFilter);
     }
 
     if (resultType === "OVERALL") {
@@ -121,7 +175,7 @@ export default function DemoResultsPanel() {
     }
 
     return rows;
-  }, [responses, customerFilter, resultType]);
+  }, [responses, customerFilter, companyFilter, resultType]);
 
   // Group by period
   const grouped = React.useMemo(() => {
@@ -202,10 +256,16 @@ export default function DemoResultsPanel() {
     return map;
   }, [filteredResponses]);
 
+  const wordCloudData = React.useMemo(
+    () => buildWordCloudData(filteredResponses),
+    [filteredResponses]
+  );
+
   return (
     <div>
       {/* Filters + Refresh */}
       <div className="flex flex-wrap gap-3 items-center mb-4">
+        {/* Contact filter */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-slate-400">View for:</span>
           <select
@@ -222,6 +282,24 @@ export default function DemoResultsPanel() {
           </select>
         </div>
 
+        {/* Company filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-400">Company:</span>
+          <select
+            value={companyFilter}
+            onChange={(e) => setCompanyFilter(e.target.value)}
+            className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+          >
+            <option value="ALL">All companies</option>
+            {uniqueCompanies.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Period filter */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-slate-400">Period:</span>
           <select
@@ -235,6 +313,7 @@ export default function DemoResultsPanel() {
           </select>
         </div>
 
+        {/* Result type */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-slate-400">Result type:</span>
           <select
@@ -406,7 +485,10 @@ export default function DemoResultsPanel() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {STAGES.filter((s) => s !== "Overall NPS").map((stage) => {
-                const stats = milestoneStats[stage];
+                const stats = milestoneStats[stage] || {
+                  nps: null,
+                  total: 0,
+                };
 
                 return (
                   <div
@@ -426,6 +508,38 @@ export default function DemoResultsPanel() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Verbatim tag cloud */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
+              Verbatim themes (from comments)
+            </p>
+            <p className="text-sm text-slate-300 mb-4">
+              This tag cloud scales each word by how often it appears in the comments for the
+              current filters (contact, company, period, and result type). In a live programme
+              you&apos;d use this as a starting point for theme coding.
+            </p>
+
+            {wordCloudData.length === 0 ? (
+              <p className="text-xs text-slate-500">
+                Once a few demo comments have been submitted, key words will start to appear
+                here, with more frequent words shown slightly larger.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {wordCloudData.map((item) => (
+                  <span
+                    key={item.word}
+                    className="rounded-full bg-slate-900/80 border border-slate-700 px-2 py-1 text-slate-100"
+                    style={{ fontSize: `${item.fontSize}rem` }}
+                    title={`${item.count} occurrence${item.count > 1 ? "s" : ""}`}
+                  >
+                    {item.word}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

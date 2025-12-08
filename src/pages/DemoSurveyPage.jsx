@@ -14,89 +14,8 @@ const STAGES = [
   "Cease / leaving",
 ];
 
-const STOP_WORDS = new Set([
-  "the","and","for","with","this","that","you","your","our","are","was","were",
-  "is","it","to","of","in","on","at","a","an","i","we","they","but","so","very",
-  "really","just","too","be","have","had","has","as","if","or"
-]);
-
-function buildWordCloudData(responses, maxWords = 30) {
-  const counts = new Map();
-
-  for (const r of responses) {
-    const text = (r.comment || r.verbatim || "").toLowerCase();
-    if (!text) continue;
-
-    // crude tokenisation
-    const words = text.replace(/[^a-z0-9\s]/gi, " ").split(/\s+/);
-    for (const wRaw of words) {
-      const w = wRaw.trim();
-      if (!w || STOP_WORDS.has(w) || w.length <= 2) continue;
-      counts.set(w, (counts.get(w) || 0) + 1);
-    }
-  }
-
-  const items = Array.from(counts.entries())
-    .map(([word, count]) => ({ word, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, maxWords);
-
-  if (!items.length) return [];
-
-  const maxCount = items[0].count;
-  const minCount = items[items.length - 1].count;
-
-  return items.map(({ word, count }) => {
-    // scale font size between 0.8rem and 1.8rem
-    const ratio =
-      maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount);
-    const fontSize = 0.8 + ratio * 1.0; // rem
-    return { word, count, fontSize };
-  });
-}
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
-}
-
-// Helpers to group by period
-function getMonthKey(date) {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return "Unknown";
-  const y = d.getFullYear();
-  const m = d.getMonth() + 1;
-  return `${y}-${String(m).padStart(2, "0")}`;
-}
-
-function getQuarterKey(date) {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return "Unknown";
-  const y = d.getFullYear();
-  const q = Math.floor(d.getMonth() / 3) + 1;
-  return `${y} Q${q}`;
-}
-
-function computeNpsStats(responses) {
-  if (!responses.length) {
-    return { nps: null, total: 0, promoters: 0, passives: 0, detractors: 0 };
-  }
-
-  let promoters = 0;
-  let passives = 0;
-  let detractors = 0;
-
-  for (const r of responses) {
-    if (typeof r.score !== "number" || Number.isNaN(r.score)) continue;
-    if (r.score >= 9) promoters++;
-    else if (r.score >= 7) passives++;
-    else detractors++;
-  }
-
-  const total = promoters + passives + detractors;
-  if (!total) return { nps: null, total: 0, promoters, passives, detractors };
-
-  const nps = Math.round(((promoters - detractors) / total) * 100);
-  return { nps, total, promoters, passives, detractors };
 }
 
 export default function DemoSurveyPage() {
@@ -109,40 +28,11 @@ export default function DemoSurveyPage() {
   const [sendError, setSendError] = React.useState("");
   const [sendSuccess, setSendSuccess] = React.useState("");
 
-  // ----- Results state -----
-  const [period, setPeriod] = React.useState("monthly");
-  const [responses, setResponses] = React.useState([]);
-  const [loadingResults, setLoadingResults] = React.useState(false);
-  const [resultsError, setResultsError] = React.useState("");
-  const [customerFilter, setCustomerFilter] = React.useState("ALL");
-  const [companyFilter, setCompanyFilter] = React.useState("ALL");
-  const [resultType, setResultType] = React.useState("ALL");
+  const title = "NPS Demo Experience | NPS Me";
+  const description =
+    "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
 
-  // Load results from backend
-  async function loadResults() {
-    try {
-      setLoadingResults(true);
-      setResultsError("");
-
-      const res = await fetch("/api/demo-responses");
-      if (!res.ok) {
-        throw new Error("Server returned an error");
-      }
-
-      const data = await res.json();
-      setResponses(data.rows || []);
-    } catch (err) {
-      console.error("Error loading demo responses", err);
-      setResultsError("We couldn’t load demo results. Please try again in a moment.");
-    } finally {
-      setLoadingResults(false);
-    }
-  }
-
-  React.useEffect(() => {
-    loadResults();
-  }, []);
-
+  // Load results is now fully handled inside DemoResultsPanel
   async function handleSendDemo(e) {
     e.preventDefault();
     setSendError("");
@@ -177,156 +67,18 @@ export default function DemoSurveyPage() {
         throw new Error(data.error || "Failed to send invitation");
       }
 
-      setSendSuccess("Invitation sent. Check your inbox and follow the link to complete the survey.");
-      // Soft reset (keep business name for convenience)
-      // setEmail("");
-      // setCustomerName("");
+      setSendSuccess(
+        "Invitation sent. Check your inbox and follow the link to complete the survey."
+      );
     } catch (err) {
       console.error("send demo error", err);
-      setSendError("We couldn’t send that invitation. Please check the details and try again.");
+      setSendError(
+        "We couldn’t send that invitation. Please check the details and try again."
+      );
     } finally {
       setSending(false);
     }
   }
-
-  // ----- Derived results -----
-  const filteredResponses = React.useMemo(() => {
-    let rows = responses;
-
-    // Filter by customer
-    if (customerFilter !== "ALL") {
-      rows = rows.filter((r) => (r.customerName || "").trim() === customerFilter);
-    }
-
-    // Filter by company
-    if (companyFilter !== "ALL") {
-      rows = rows.filter((r) => (r.businessName || "").trim() === companyFilter);
-    }
-
-    // Filter by result type
-    if (resultType === "OVERALL") {
-      rows = rows.filter((r) => (r.stage || "").trim() === "Overall NPS");
-    } else if (resultType === "MILESTONE") {
-      rows = rows.filter(
-        (r) =>
-          r.stage &&
-          r.stage.trim() !== "" &&
-          r.stage.trim() !== "Overall NPS"
-      );
-    }
-
-    return rows;
-  }, [responses, customerFilter, companyFilter, resultType]);
-
-  // Period grouping
-  const grouped = React.useMemo(() => {
-    if (!filteredResponses.length) return [];
-
-    const now = new Date();
-    const groupsMap = new Map();
-
-    for (const r of filteredResponses) {
-      if (!r.createdAt) continue;
-      const d = new Date(r.createdAt);
-      if (Number.isNaN(d.getTime())) continue;
-
-      let key;
-      let label;
-
-      if (period === "monthly") {
-        key = getMonthKey(d);
-        label = key;
-      } else if (period === "quarterly") {
-        key = getQuarterKey(d);
-        label = key;
-      } else {
-        // rolling12 → put everything from last 12 months into a single bucket
-        const twelveMonthsAgo = new Date(
-          now.getFullYear(),
-          now.getMonth() - 11,
-          1
-        );
-        if (d < twelveMonthsAgo) continue;
-        key = "last-12";
-        label = "Last 12 months";
-      }
-
-      if (!groupsMap.has(key)) {
-        groupsMap.set(key, []);
-        groupsMap.get(key).label = label;
-      }
-      groupsMap.get(key).push(r);
-    }
-
-    const result = [];
-    for (const [key, arr] of groupsMap.entries()) {
-      const stats = computeNpsStats(arr);
-      result.push({
-        key,
-        label: groupsMap.get(key).label || key,
-        stats,
-      });
-    }
-
-    // Sort by key so months / quarters are in order
-    result.sort((a, b) => (a.key > b.key ? 1 : -1));
-    return result;
-  }, [filteredResponses, period]);
-
-  const overallStats = React.useMemo(
-    () => computeNpsStats(filteredResponses),
-    [filteredResponses]
-  );
-
-  const uniqueCustomers = React.useMemo(() => {
-    const names = new Set();
-    for (const r of responses) {
-      if (r.customerName && r.customerName.trim()) {
-        names.add(r.customerName.trim());
-      }
-    }
-    return Array.from(names).sort();
-  }, [responses]);
-
-  const uniqueCompanies = React.useMemo(() => {
-    const names = new Set();
-    for (const r of responses) {
-      if (r.businessName && r.businessName.trim()) {
-        names.add(r.businessName.trim());
-      }
-    }
-    return Array.from(names).sort();
-  }, [responses]);
-
-  const title = "NPS Demo Experience | NPS Me";
-  const description =
-    "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
-
-  const milestoneStats = React.useMemo(() => {
-    const map = {};
-
-    // Start from whatever is already filtered by customer + company + resultType
-    const base = filteredResponses.filter(
-      (r) =>
-        r.stage &&
-        r.stage.trim() !== "" &&
-        r.stage.trim() !== "Overall NPS"
-    );
-
-    STAGES.filter((s) => s !== "Overall NPS").forEach((stage) => {
-      const rowsForStage = base.filter(
-        (r) => (r.stage || "").trim() === stage
-      );
-      map[stage] = computeNpsStats(rowsForStage);
-    });
-
-    return map;
-  }, [filteredResponses]);
-
-  const wordCloudData = React.useMemo(
-    () => buildWordCloudData(filteredResponses),
-    [filteredResponses]
-  );
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -340,13 +92,15 @@ export default function DemoSurveyPage() {
               N
             </div>
             <div>
-              <p className="text-xs tracking-widest text-slate-400 uppercase">Demo experience</p>
+              <p className="text-xs tracking-widest text-slate-400 uppercase">
+                Demo experience
+              </p>
               <h1 className="text-2xl sm:text-3xl font-semibold text-slate-50">
                 Try the full NPS Me survey flow
               </h1>
               <p className="mt-1 text-sm text-slate-400 max-w-xl">
                 Send yourself a live invitation, answer the one-question NPS survey, and see the
-                results update here in real time.
+                results update here in real time, including example CX visualisations.
               </p>
             </div>
           </div>
@@ -422,8 +176,9 @@ export default function DemoSurveyPage() {
                   ))}
                 </select>
                 <p className="mt-1 text-[11px] text-slate-500">
-                  Choose <span className="font-medium text-slate-300">Overall NPS</span> for a general question,
-                  or tag it to a specific journey stage (e.g. delivery, after-sales).
+                  Choose{" "}
+                  <span className="font-medium text-slate-300">Overall NPS</span> for a general
+                  question, or tag it to a specific journey stage (e.g. delivery, after-sales).
                 </p>
               </div>
 
@@ -460,7 +215,7 @@ export default function DemoSurveyPage() {
             </form>
           </section>
 
-          {/* RIGHT: Live results */}
+          {/* RIGHT: Live results + visualisations */}
           <section className="rounded-3xl border border-slate-800 bg-slate-950/40 p-5 sm:p-6 lg:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
@@ -469,252 +224,12 @@ export default function DemoSurveyPage() {
                 </h2>
                 <p className="text-xs text-slate-400">
                   Every time someone completes the demo survey, their response is logged and feeds
-                  into these metrics.
+                  into these metrics and visualisations.
                 </p>
-              </div>
-              <div className="flex flex-wrap gap-2 items-center justify-end">
-                <div className="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-[11px] text-slate-300 overflow-hidden">
-                  {["monthly", "quarterly", "rolling12"].map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setPeriod(p)}
-                      className={classNames(
-                        "px-3 py-1.5",
-                        period === p ? "bg-slate-800 text-emerald-300" : "hover:bg-slate-800/60"
-                      )}
-                    >
-                      {p === "monthly" && "Monthly"}
-                      {p === "quarterly" && "Quarterly"}
-                      {p === "rolling12" && "Last 12 months"}
-                    </button>
-                  ))}
-                </div>
-
-                <select
-                  value={customerFilter}
-                  onChange={(e) => setCustomerFilter(e.target.value)}
-                  className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                >
-                  <option value="ALL">All contacts</option>
-                  {uniqueCustomers.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-
-                {/* NEW: Company filter */}
-                <select
-                  value={companyFilter}
-                  onChange={(e) => setCompanyFilter(e.target.value)}
-                  className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                >
-                  <option value="ALL">All companies</option>
-                  {uniqueCompanies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 
             <DemoResultsPanel />
-
-            {/* New: example visualisations built from the same data */}
-            <div className="mt-8 border-t border-slate-800 pt-6 space-y-6">
-              <h3 className="text-sm font-semibold text-slate-200">
-                3. Example CX visualisations built from this demo data
-              </h3>
-
-              {/* Card 1: Overall NPS snapshot */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
-                      Overall NPS (filtered view)
-                    </p>
-                    <p className="mt-1 text-2xl font-semibold text-slate-50">
-                      {overallStats.nps ?? "–"}
-                      {overallStats.nps !== null && (
-                        <span className="ml-1 text-sm text-slate-400">/ 100</span>
-                      )}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      {overallStats.total
-                        ? `${overallStats.total} responses • ${overallStats.promoters} Promoters • ${overallStats.passives} Passives • ${overallStats.detractors} Detractors`
-                        : "Once you and a few colleagues complete the demo survey, this panel will populate with a live NPS snapshot."}
-                    </p>
-                  </div>
-
-                  {overallStats.total > 0 && (
-                    <div className="mt-2 sm:mt-0 w-full sm:w-56">
-                      <div className="text-[11px] text-slate-400 mb-1">
-                        Promoter / Passive / Detractor mix
-                      </div>
-                      <div className="h-2 rounded-full bg-slate-900 flex overflow-hidden">
-                        {["promoters", "passives", "detractors"].map((k) => {
-                          const value = overallStats[k];
-                          const width =
-                            overallStats.total > 0
-                              ? `${(value / overallStats.total) * 100}%`
-                              : "0%";
-                          const label =
-                            k === "promoters"
-                              ? "Promoters"
-                              : k === "passives"
-                              ? "Passives"
-                              : "Detractors";
-                          return (
-                            <div
-                              key={k}
-                              className={
-                                k === "promoters"
-                                  ? "bg-emerald-400"
-                                  : k === "passives"
-                                  ? "bg-amber-400"
-                                  : "bg-rose-500"
-                              }
-                              style={{ width }}
-                              aria-label={label}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Card 2: NPS over time (by chosen period) */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-slate-400">
-                      NPS trend (
-                      {period === "monthly"
-                        ? "by month"
-                        : period === "quarterly"
-                        ? "by quarter"
-                        : "last 12 months"}
-                      )
-                    </p>
-                    <p className="mt-1 text-sm text-slate-300">
-                      A simple bar view showing how NPS moves over time for the current filter.
-                    </p>
-                  </div>
-                </div>
-
-                {grouped.length === 0 ? (
-                  <p className="text-xs text-slate-500">
-                    Submit a few demo responses and refresh to see the trend appear here.
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {grouped.map((g) => {
-                      const { nps } = g.stats;
-                      const width =
-                        nps === null
-                          ? "0%"
-                          : `${Math.max(0, ((nps + 100) / 200) * 100).toFixed(1)}%`;
-                      return (
-                        <div key={g.key} className="flex items-center gap-3">
-                          <div className="w-28 text-[11px] text-slate-400">{g.label}</div>
-                          <div className="flex-1">
-                            <div className="h-1.5 rounded-full bg-slate-900 overflow-hidden">
-                              <div
-                                className="h-full bg-emerald-400"
-                                style={{ width }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-10 text-right text-xs text-slate-300">
-                            {nps === null ? "–" : nps}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Card 3: Journey stage heatmap-style tiles */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
-                <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">
-                  NPS by journey stage
-                </p>
-                <p className="text-sm text-slate-300 mb-4">
-                  Each tile shows NPS for one stage of the journey, based on the demo responses
-                  you&apos;ve collected so far. In a live programme this becomes a quick
-                  friction-map of where customers struggle.
-                </p>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {STAGES.filter((s) => s !== "Overall NPS").map((s) => {
-                    const stats = milestoneStats[s] || {
-                      nps: null,
-                      total: 0,
-                    };
-                    let tone = "bg-slate-900/80 border-slate-800";
-                    if (stats.total > 0 && stats.nps !== null) {
-                      if (stats.nps >= 50) tone = "bg-emerald-900/40 border-emerald-500/40";
-                      else if (stats.nps >= 0) tone = "bg-amber-900/40 border-amber-500/40";
-                      else tone = "bg-rose-900/40 border-rose-500/40";
-                    }
-
-                    return (
-                      <div
-                        key={s}
-                        className={`rounded-2xl border px-3 py-2.5 text-xs ${tone}`}
-                      >
-                        <div className="font-medium text-slate-100 truncate">{s}</div>
-                        <div className="mt-1 text-lg font-semibold text-slate-50">
-                          {stats.nps === null ? "–" : stats.nps}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {stats.total
-                            ? `${stats.total} responses`
-                            : "No demo responses yet"}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Card 4: Verbatim tag cloud */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
-                <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">
-                  Verbatim themes (from comments)
-                </p>
-                <p className="text-sm text-slate-300 mb-4">
-                  This tag cloud scales each word by how often it appears in the comments for the
-                  current filters (period, contact, company, and view type).
-                  In a live programme you&apos;d use this as a starting point for theme coding.
-                </p>
-
-                {wordCloudData.length === 0 ? (
-                  <p className="text-xs text-slate-500">
-                    Once a few demo comments have been submitted, key words will start to appear
-                    here, with more frequent words shown slightly larger.
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {wordCloudData.map((item) => (
-                      <span
-                        key={item.word}
-                        className="rounded-full bg-slate-900/80 border border-slate-700 px-2 py-1 text-slate-100"
-                        style={{ fontSize: `${item.fontSize}rem` }}
-                        title={`${item.count} occurrence${item.count > 1 ? "s" : ""}`}
-                      >
-                        {item.word}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
           </section>
         </div>
       </main>

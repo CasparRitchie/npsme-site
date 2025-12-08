@@ -411,7 +411,7 @@ async function appendDemoResponseRow(row) {
   }
 
   const header =
-    "responseId,invitationId,customerId,customerName,email,stage,surveyId,type,score,comment,createdAt";
+    "responseId,invitationId,customerId,customerName,businessName,email,stage,surveyId,type,score,comment,createdAt";
 
   const existing = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
     console.error("[npsme] Error reading demo-responses.csv", err);
@@ -423,6 +423,7 @@ async function appendDemoResponseRow(row) {
     row.invitationId,
     row.customerId || "",
     row.customerName || "",
+    row.businessName || "",
     row.email || "",
     row.stage || "",
     row.surveyId || "",
@@ -713,10 +714,11 @@ app.post("/api/demo-survey/submit", async (req, res) => {
       invitationId,
       customerId: invitation.customerId || "",
       customerName: invitation.customerName || "",
+      businessName: invitation.businessName || "",
       email: invitation.email || "",
       stage: invitation.stage || "",
       surveyId: invitation.surveyId || "",
-      type, // 👈 NEW FIELD, matches the header we added
+      type,
       score,
       comment: (comment || "").slice(0, 1000),
       createdAt,

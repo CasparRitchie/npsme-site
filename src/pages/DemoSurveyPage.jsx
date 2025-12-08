@@ -4,7 +4,6 @@ import Seo from "../components/Seo";
 import DemoResultsPanel from "../components/DemoResultsPanel";
 import PageHeader from "../components/PageHeader";
 
-
 const STAGES = [
   "Overall NPS",
   "Discovery",
@@ -14,6 +13,47 @@ const STAGES = [
   "After-sales service",
   "Cease / leaving",
 ];
+
+const STOP_WORDS = new Set([
+  "the","and","for","with","this","that","you","your","our","are","was","were",
+  "is","it","to","of","in","on","at","a","an","i","we","they","but","so","very",
+  "really","just","too","be","have","had","has","as","if","or"
+]);
+
+function buildWordCloudData(responses, maxWords = 30) {
+  const counts = new Map();
+
+  for (const r of responses) {
+    const text = (r.comment || r.verbatim || "").toLowerCase();
+    if (!text) continue;
+
+    // crude tokenisation
+    const words = text.replace(/[^a-z0-9\s]/gi, " ").split(/\s+/);
+    for (const wRaw of words) {
+      const w = wRaw.trim();
+      if (!w || STOP_WORDS.has(w) || w.length <= 2) continue;
+      counts.set(w, (counts.get(w) || 0) + 1);
+    }
+  }
+
+  const items = Array.from(counts.entries())
+    .map(([word, count]) => ({ word, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, maxWords);
+
+  if (!items.length) return [];
+
+  const maxCount = items[0].count;
+  const minCount = items[items.length - 1].count;
+
+  return items.map(({ word, count }) => {
+    // scale font size between 0.8rem and 1.8rem
+    const ratio =
+      maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount);
+    const fontSize = 0.8 + ratio * 1.0; // rem
+    return { word, count, fontSize };
+  });
+}
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -37,7 +77,9 @@ function getQuarterKey(date) {
 }
 
 function computeNpsStats(responses) {
-  if (!responses.length) return { nps: null, total: 0, promoters: 0, passives: 0, detractors: 0 };
+  if (!responses.length) {
+    return { nps: null, total: 0, promoters: 0, passives: 0, detractors: 0 };
+  }
 
   let promoters = 0;
   let passives = 0;
@@ -62,7 +104,8 @@ export default function DemoSurveyPage() {
   const [email, setEmail] = React.useState("");
   const [customerName, setCustomerName] = React.useState("");
   const [businessName, setBusinessName] = React.useState("");
-  const [stage, setStage] = React.useState("Overall NPS");  const [sending, setSending] = React.useState(false);
+  const [stage, setStage] = React.useState("Overall NPS");
+  const [sending, setSending] = React.useState(false);
   const [sendError, setSendError] = React.useState("");
   const [sendSuccess, setSendSuccess] = React.useState("");
 
@@ -72,6 +115,7 @@ export default function DemoSurveyPage() {
   const [loadingResults, setLoadingResults] = React.useState(false);
   const [resultsError, setResultsError] = React.useState("");
   const [customerFilter, setCustomerFilter] = React.useState("ALL");
+  const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [resultType, setResultType] = React.useState("ALL");
 
   // Load results from backend
@@ -154,6 +198,11 @@ export default function DemoSurveyPage() {
       rows = rows.filter((r) => (r.customerName || "").trim() === customerFilter);
     }
 
+    // Filter by company
+    if (companyFilter !== "ALL") {
+      rows = rows.filter((r) => (r.businessName || "").trim() === companyFilter);
+    }
+
     // Filter by result type
     if (resultType === "OVERALL") {
       rows = rows.filter((r) => (r.stage || "").trim() === "Overall NPS");
@@ -167,7 +216,7 @@ export default function DemoSurveyPage() {
     }
 
     return rows;
-  }, [responses, customerFilter, resultType]);
+  }, [responses, customerFilter, companyFilter, resultType]);
 
   // Period grouping
   const grouped = React.useMemo(() => {
@@ -239,6 +288,16 @@ export default function DemoSurveyPage() {
     return Array.from(names).sort();
   }, [responses]);
 
+  const uniqueCompanies = React.useMemo(() => {
+    const names = new Set();
+    for (const r of responses) {
+      if (r.businessName && r.businessName.trim()) {
+        names.add(r.businessName.trim());
+      }
+    }
+    return Array.from(names).sort();
+  }, [responses]);
+
   const title = "NPS Demo Experience | NPS Me";
   const description =
     "See the full NPS Me demo: send yourself an invitation, experience the survey, and view live NPS results.";
@@ -246,7 +305,7 @@ export default function DemoSurveyPage() {
   const milestoneStats = React.useMemo(() => {
     const map = {};
 
-    // Start from whatever is already filtered by customer + resultType
+    // Start from whatever is already filtered by customer + company + resultType
     const base = filteredResponses.filter(
       (r) =>
         r.stage &&
@@ -264,6 +323,10 @@ export default function DemoSurveyPage() {
     return map;
   }, [filteredResponses]);
 
+  const wordCloudData = React.useMemo(
+    () => buildWordCloudData(filteredResponses),
+    [filteredResponses]
+  );
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -397,7 +460,7 @@ export default function DemoSurveyPage() {
             </form>
           </section>
 
-                    {/* RIGHT: Live results */}
+          {/* RIGHT: Live results */}
           <section className="rounded-3xl border border-slate-800 bg-slate-950/40 p-5 sm:p-6 lg:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
               <div>
@@ -409,27 +472,57 @@ export default function DemoSurveyPage() {
                   into these metrics.
                 </p>
               </div>
-              <div className="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-[11px] text-slate-300 overflow-hidden">
-                {["monthly", "quarterly", "rolling12"].map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setPeriod(p)}
-                    className={classNames(
-                      "px-3 py-1.5",
-                      period === p ? "bg-slate-800 text-emerald-300" : "hover:bg-slate-800/60"
-                    )}
-                  >
-                    {p === "monthly" && "Monthly"}
-                    {p === "quarterly" && "Quarterly"}
-                    {p === "rolling12" && "Last 12 months"}
-                  </button>
-                ))}
+              <div className="flex flex-wrap gap-2 items-center justify-end">
+                <div className="inline-flex rounded-full border border-slate-700 bg-slate-900/60 text-[11px] text-slate-300 overflow-hidden">
+                  {["monthly", "quarterly", "rolling12"].map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPeriod(p)}
+                      className={classNames(
+                        "px-3 py-1.5",
+                        period === p ? "bg-slate-800 text-emerald-300" : "hover:bg-slate-800/60"
+                      )}
+                    >
+                      {p === "monthly" && "Monthly"}
+                      {p === "quarterly" && "Quarterly"}
+                      {p === "rolling12" && "Last 12 months"}
+                    </button>
+                  ))}
+                </div>
+
+                <select
+                  value={customerFilter}
+                  onChange={(e) => setCustomerFilter(e.target.value)}
+                  className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                >
+                  <option value="ALL">All contacts</option>
+                  {uniqueCustomers.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+
+                {/* NEW: Company filter */}
+                <select
+                  value={companyFilter}
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                  className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                >
+                  <option value="ALL">All companies</option>
+                  {uniqueCompanies.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <DemoResultsPanel />
-                        {/* New: example visualisations built from the same data */}
+
+            {/* New: example visualisations built from the same data */}
             <div className="mt-8 border-t border-slate-800 pt-6 space-y-6">
               <h3 className="text-sm font-semibold text-slate-200">
                 3. Example CX visualisations built from this demo data
@@ -499,7 +592,8 @@ export default function DemoSurveyPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-xs uppercase tracking-wide text-slate-400">
-                      NPS trend ({period === "monthly"
+                      NPS trend (
+                      {period === "monthly"
                         ? "by month"
                         : period === "quarterly"
                         ? "by quarter"
@@ -587,6 +681,38 @@ export default function DemoSurveyPage() {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Card 4: Verbatim tag cloud */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
+                <p className="text-xs uppercase tracking-wide text-slate-400 mb-2">
+                  Verbatim themes (from comments)
+                </p>
+                <p className="text-sm text-slate-300 mb-4">
+                  This tag cloud scales each word by how often it appears in the comments for the
+                  current filters (period, contact, company, and view type).
+                  In a live programme you&apos;d use this as a starting point for theme coding.
+                </p>
+
+                {wordCloudData.length === 0 ? (
+                  <p className="text-xs text-slate-500">
+                    Once a few demo comments have been submitted, key words will start to appear
+                    here, with more frequent words shown slightly larger.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {wordCloudData.map((item) => (
+                      <span
+                        key={item.word}
+                        className="rounded-full bg-slate-900/80 border border-slate-700 px-2 py-1 text-slate-100"
+                        style={{ fontSize: `${item.fontSize}rem` }}
+                        title={`${item.count} occurrence${item.count > 1 ? "s" : ""}`}
+                      >
+                        {item.word}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </section>

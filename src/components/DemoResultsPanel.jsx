@@ -3,12 +3,12 @@ import React from "react";
 
 const STAGES = [
   "Overall NPS",
-  "Discovery",
+  "Online experience",
   "Ordering",
   "Delivery",
-  "Installation & setup",
-  "After-sales service",
-  "Cease / leaving",
+  "In-store support",
+  "Returns",
+  // "Cease / leaving",
 ];
 
 const STOP_WORDS = new Set([

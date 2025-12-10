@@ -104,6 +104,9 @@ export default function DemoResultsPanel() {
   const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
   const [resultType, setResultType] = React.useState("ALL"); // ALL | OVERALL | MILESTONE
+  const [inviteSummary, setInviteSummary] = React.useState(null);
+  const [loadingInvites, setLoadingInvites] = React.useState(false);
+  const [inviteError, setInviteError] = React.useState("");
 
   // Load results from backend
   async function loadResults() {
@@ -126,8 +129,29 @@ export default function DemoResultsPanel() {
     }
   }
 
+    async function loadInvitationSummary() {
+    try {
+      setLoadingInvites(true);
+      setInviteError("");
+
+      const res = await fetch("/api/demo-invitations-summary");
+      if (!res.ok) {
+        throw new Error("Server returned an error");
+      }
+
+      const data = await res.json();
+      setInviteSummary(data);
+    } catch (err) {
+      console.error("Error loading invitation summary", err);
+      setInviteError("We couldn’t load invitation stats. Please try again in a moment.");
+    } finally {
+      setLoadingInvites(false);
+    }
+  }
+
   React.useEffect(() => {
     loadResults();
+    loadInvitationSummary();
   }, []);
 
   // Unique customers / companies for filters
@@ -396,6 +420,140 @@ export default function DemoResultsPanel() {
       {loadingResults && !resultsError && (
         <div className="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-sm text-slate-300">
           Loading demo results…
+        </div>
+      )}
+
+      {/* Invitation funnel / response rate (shown whenever we have data) */}
+      {inviteError && (
+        <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
+          {inviteError}
+        </div>
+      )}
+
+      {inviteSummary && !inviteError && (
+        <div className="space-y-4 mb-4">
+          {/* Overall funnel card */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
+                Invitation funnel (demo)
+              </p>
+              <h3 className="text-sm font-semibold text-slate-50">
+                How many invitations turned into completed surveys?
+              </h3>
+              <p className="mt-1 text-[11px] text-slate-500 max-w-sm">
+                This shows the basic response funnel for the demo environment. In a live
+                programme, we add opens and survey starts so you can see where drop-off happens.
+              </p>
+            </div>
+
+            {(() => {
+              const totals = inviteSummary.totals || {
+                sent: 0,
+                responded: 0,
+                opened: 0,
+                started: 0,
+              };
+              const sent = totals.sent || 0;
+              const completed = totals.responded || 0;
+              const responseRate =
+                sent > 0 ? Math.round((completed / sent) * 100) : null;
+
+              return (
+                <div className="flex flex-col gap-1 text-xs text-slate-200 min-w-[160px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Invitations sent</span>
+                    <span className="font-semibold">{sent}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Completed surveys</span>
+                    <span className="font-semibold">{completed}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Response rate</span>
+                    <span className="font-semibold">
+                      {responseRate === null ? "–" : `${responseRate}%`}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 h-2 w-full rounded-full bg-slate-900 overflow-hidden flex">
+                    {sent > 0 && (
+                      <div
+                        className="bg-emerald-400 transition-all"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            (completed / sent) * 100 || 0
+                          )}%`,
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Response rate by stage */}
+          {inviteSummary.stages && inviteSummary.stages.length > 0 && (
+            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
+                Response rate by journey stage
+              </p>
+              <p className="text-[11px] text-slate-500 mb-3">
+                Each bar shows what proportion of invitations for that stage turned into
+                completed surveys. Use this to see which parts of the journey people are
+                most willing to give feedback on.
+              </p>
+
+              <div className="space-y-2">
+                {inviteSummary.stages
+                  .slice()
+                  // Sort by response rate descending
+                  .sort((a, b) => {
+                    const aRate =
+                      a.sent > 0 ? a.responded / a.sent : 0;
+                    const bRate =
+                      b.sent > 0 ? b.responded / b.sent : 0;
+                    return bRate - aRate;
+                  })
+                  .map((stage) => {
+                    const sent = stage.sent || 0;
+                    const completed = stage.responded || 0;
+                    const rate =
+                      sent > 0 ? Math.round((completed / sent) * 100) : null;
+
+                    return (
+                      <div
+                        key={stage.stage}
+                        className="space-y-1"
+                      >
+                        <div className="flex items-center justify-between text-[11px] text-slate-300">
+                          <span>{stage.stage}</span>
+                          <span className="text-slate-400">
+                            {completed}/{sent}{" "}
+                            {rate === null ? "" : `• ${rate}%`}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-slate-900 overflow-hidden">
+                          {sent > 0 && (
+                            <div
+                              className="h-full bg-emerald-400 transition-all"
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  (completed / sent) * 100 || 0
+                                )}%`,
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

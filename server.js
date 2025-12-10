@@ -578,6 +578,102 @@ function parseCsvWithHeader(csvText) {
 
   return rows;
 }
+// --- Invitation summary helpers (for response rate visuals) ---
+
+function isInvitationResponded(invitation) {
+  const status = (invitation.status || "").toLowerCase().trim();
+  const responseId =
+    typeof invitation.responseId === "string"
+      ? invitation.responseId.trim()
+      : invitation.responseId;
+
+  return status === "responded" || (responseId && responseId !== "");
+}
+
+function getMonthKeyFromDateString(dateString) {
+  if (!dateString) return "Unknown";
+  const d = new Date(dateString);
+  if (Number.isNaN(d.getTime())) return "Unknown";
+
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  return `${y}-${String(m).padStart(2, "0")}`;
+}
+
+async function buildInvitationSummary() {
+  const rows = await loadInvitations();
+  if (!rows || !rows.length) {
+    return {
+      totals: { sent: 0, responded: 0, opened: 0, started: 0 },
+      stages: [],
+      months: [],
+    };
+  }
+
+  const totals = { sent: 0, responded: 0, opened: 0, started: 0 };
+  const stagesMap = new Map();
+  const monthsMap = new Map();
+
+  for (const raw of rows) {
+    totals.sent += 1;
+
+    const responded = isInvitationResponded(raw) ? 1 : 0;
+    totals.responded += responded;
+
+    // opened / started: placeholder for future tracking
+    const opened = 0;
+    const started = 0;
+    totals.opened += opened;
+    totals.started += started;
+
+    // ----- Group by stage -----
+    const stageName = (raw.stage || "Overall NPS").trim() || "Unspecified";
+    if (!stagesMap.has(stageName)) {
+      stagesMap.set(stageName, {
+        stage: stageName,
+        sent: 0,
+        responded: 0,
+        opened: 0,
+        started: 0,
+      });
+    }
+    const stageStats = stagesMap.get(stageName);
+    stageStats.sent += 1;
+    stageStats.responded += responded;
+    stageStats.opened += opened;
+    stageStats.started += started;
+
+    // ----- Group by month (based on sentAt or lastSentAt) -----
+    const sentAt = raw.sentAt || raw.lastSentAt || null;
+    if (sentAt) {
+      const key = getMonthKeyFromDateString(sentAt);
+      if (!monthsMap.has(key)) {
+        monthsMap.set(key, {
+          key,
+          label: key,
+          sent: 0,
+          responded: 0,
+          opened: 0,
+          started: 0,
+        });
+      }
+      const monthStats = monthsMap.get(key);
+      monthStats.sent += 1;
+      monthStats.responded += responded;
+      monthStats.opened += opened;
+      monthStats.started += started;
+    }
+  }
+
+  const stages = Array.from(stagesMap.values()).sort((a, b) =>
+    a.stage.localeCompare(b.stage)
+  );
+  const months = Array.from(monthsMap.values()).sort((a, b) =>
+    a.key > b.key ? 1 : -1
+  );
+
+  return { totals, stages, months };
+}
 
 async function loadDemoResponses() {
   const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {

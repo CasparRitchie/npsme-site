@@ -210,7 +210,7 @@ export default function DemoResultsPanel() {
       );
     }
     return rows;
-  }, [responses, customerFilter, companyFilter, resultType]);
+  }, [responses, customerFilter, companyFilter, resultType, stageFilter]);
 
   // Group by period
   const grouped = React.useMemo(() => {

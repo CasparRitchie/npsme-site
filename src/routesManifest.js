@@ -14,7 +14,11 @@ export const ROUTES_MANIFEST = [
   { path: "/social-listening",                 label: "Social Listening",                 enabled: true,  inHeader: true,   inFooter: true  },
   { path: "/social-listening-index",           label: "Social Listening Index",           enabled: true,  inHeader: true,   inFooter: true  },
   { path: "/social-listening/:slug",           label: "Social Listening Report",          enabled: true,  inHeader: false,  inFooter: false },
+
+  // NPSme data
   { path: "/cx-pulse-sample",                  label: "CX Pulse (sample)",                enabled: true,  inHeader: false,  inFooter: true  },
+  // 🚀 CX Cockpit (demo / spaceship dashboard)
+  { path: "/cx-cockpit",                       label: "CX Cockpit",                       enabled: true,  inHeader: true,   inFooter: true },
 
   // Blogs
   { path: "/blog",                             label: "Blog",                             enabled: true,  inHeader: true,   inFooter: true  },

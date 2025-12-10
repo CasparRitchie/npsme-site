@@ -30,6 +30,7 @@ import DemoSurvey from "./pages/DemoSurvey";
 import DemoSurveyPage from "./pages/DemoSurveyPage";
 import DemoInvitationSurvey from "./pages/DemoInvitationSurvey";
 import DemoThankYou from "./pages/DemoThankYou";
+import CxCockpit from "./pages/CxCockpit";
 
 // Path to component mapping
 const COMPONENTS = {
@@ -42,7 +43,8 @@ const COMPONENTS = {
   "/book": Book,
   "/data-automation": DataAutomationPage,
   "/nps-survey-programme": NpsSurveyProgramme,
-
+  "/privacy": Privacy,
+  "/terms": Terms,
 
   // SocialListening pages
   "/social-listening": SocialListening,
@@ -59,15 +61,15 @@ const COMPONENTS = {
   "/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
   "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
 
+  // Demo survey components
   "/demo-survey-legacy": DemoSurvey,
   "/demo-survey-page": DemoSurveyPage,
   "/demo-invitation-survey": DemoInvitationSurvey,
   "/demo-survey/thanks": DemoThankYou,
 
-
+  // NPSme data
   "/cx-pulse-sample": CxPulseSample,
-  "/privacy": Privacy,
-  "/terms": Terms,
+  "/cx-cockpit": CxCockpit,
 };
 
 export const ROUTES = ROUTES_MANIFEST.map(r => ({

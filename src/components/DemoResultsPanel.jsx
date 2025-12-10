@@ -104,6 +104,7 @@ export default function DemoResultsPanel() {
   const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
   const [resultType, setResultType] = React.useState("ALL"); // ALL | OVERALL | MILESTONE
+  const [stageFilter, setStageFilter] = React.useState("ALL");
   const [inviteSummary, setInviteSummary] = React.useState(null);
   const [loadingInvites, setLoadingInvites] = React.useState(false);
   const [inviteError, setInviteError] = React.useState("");
@@ -203,7 +204,11 @@ export default function DemoResultsPanel() {
           r.stage.trim() !== "Overall NPS"
       );
     }
-
+    if (stageFilter !== "ALL") {
+      rows = rows.filter(
+        (r) => (r.stage || "").trim() === stageFilter
+      );
+    }
     return rows;
   }, [responses, customerFilter, companyFilter, resultType]);
 
@@ -293,8 +298,8 @@ export default function DemoResultsPanel() {
 
   return (
     <div>
-            {/* Filters + Refresh */}
-      <div className="flex flex-wrap gap-3 items-center mb-4">
+        {/* Filters + Refresh */}
+        <div className="flex flex-wrap gap-3 items-center mb-4">
         {/* Contact filter */}
         <div className="flex items-center gap-2">
           <label
@@ -385,8 +390,33 @@ export default function DemoResultsPanel() {
           </select>
         </div>
 
+        {/* 🔹 NEW: Stage filter */}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="drp-stage-filter"
+            className="text-[11px] text-slate-400"
+          >
+            Stage:
+          </label>
+          <select
+            id="drp-stage-filter"
+            name="stageFilter"
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value)}
+            className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+          >
+            <option value="ALL">All stages</option>
+            {STAGES.map((stage) => (
+              <option key={stage} value={stage}>
+                {stage}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex-1" />
 
+        {/* Refresh button ... */}
         <button
           type="button"
           onClick={loadResults}

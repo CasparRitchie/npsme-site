@@ -1060,7 +1060,7 @@ app.get("/api/demo-responses", async (req, res) => {
 
 app.get("/api/demo-funnel", async (req, res) => {
   try {
-    const { customer, company } = req.query;
+    const { customer, company, stage } = req.query;
 
     const invitations = await loadInvitations();
     const demoResponses = await loadDemoResponses();
@@ -1081,6 +1081,11 @@ app.get("/api/demo-funnel", async (req, res) => {
       });
     }
 
+    if (stage) {
+      filteredInvitations = filteredInvitations.filter(
+        (inv) => (inv.stage || "").trim() === stage
+      );
+    }
     // Set of invitationIds that survive the invite filter
     const allowedInvitationIds = new Set(
       filteredInvitations

@@ -131,9 +131,7 @@ export default function DemoResultsPanel() {
     }
   }
 
-  async function loadInvitationSummary(currentFilters) {
-    const { customerFilter, companyFilter, stageFilter } = currentFilters;
-
+  async function loadInvitationSummary() {
     try {
       setLoadingInvites(true);
       setInviteError("");
@@ -175,7 +173,7 @@ export default function DemoResultsPanel() {
 
   // Reload invitation summary whenever global filters change
   React.useEffect(() => {
-    loadInvitationSummary({ customerFilter, companyFilter, stageFilter });
+   loadInvitationSummary();
   }, [customerFilter, companyFilter, stageFilter]);
 
     // Unique customers / companies for filters
@@ -605,24 +603,55 @@ export default function DemoResultsPanel() {
                 : "last 12 months"}
             </p>
 
-            {/* Existing 100% stacked bars */}
-            <div className="space-y-3">
-              {grouped.map(({ key, label, stats }) => {
-                const total = stats.total || 1;
-                const detPct = (stats.detractors / total) * 100;
-                const pasPct = (stats.passives / total) * 100;
-                const proPct = (stats.promoters / total) * 100;
+  {/* Existing 100% stacked bars */}
+  <div className="space-y-3">
+    {grouped.map(({ key, label, stats }) => {
+      const total = stats.total || 1;
+      const detPct = (stats.detractors / total) * 100;
+      const pasPct = (stats.passives / total) * 100;
+      const proPct = (stats.promoters / total) * 100;
 
-                return (
-                  <div
-                    key={key}
-                    className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3"
-                  >
-                    {/* ... existing label + 100% bar ... */}
-                  </div>
-                );
-              })}
+      return (
+        <div
+          key={key}
+          className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs text-slate-300">
+              <span className="font-medium">{label}</span>{" "}
+              <span className="text-slate-500">
+                • NPS {stats.nps === null ? "–" : stats.nps}
+              </span>
             </div>
+            <div className="text-[11px] text-slate-500">
+              {stats.total} response{stats.total === 1 ? "" : "s"}
+            </div>
+          </div>
+
+          <div className="h-3 w-full rounded-full bg-slate-900 overflow-hidden flex">
+            {detPct > 0 && (
+              <div
+                style={{ width: `${detPct}%` }}
+                className="bg-rose-500"
+              />
+            )}
+            {pasPct > 0 && (
+              <div
+                style={{ width: `${pasPct}%` }}
+                className="bg-amber-400"
+              />
+            )}
+            {proPct > 0 && (
+              <div
+                style={{ width: `${proPct}%` }}
+                className="bg-emerald-400"
+              />
+            )}
+          </div>
+        </div>
+      );
+    })}
+  </div>
 
             {/* 🔹 NEW: stacked volume columns */}
             {grouped.length > 0 && (

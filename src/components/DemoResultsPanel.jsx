@@ -129,17 +129,19 @@ export default function DemoResultsPanel() {
     }
   }
 
-    async function loadInvitationSummary() {
+  async function loadInvitationSummary() {
     try {
       setLoadingInvites(true);
       setInviteError("");
 
-      const res = await fetch("/api/demo-invitations-summary");
+      // 🔹 Hit the actual backend endpoint we defined in server.js
+      const res = await fetch("/api/demo-funnel");
       if (!res.ok) {
-        throw new Error("Server returned an error");
+        throw new Error(`Server returned ${res.status}`);
       }
 
       const data = await res.json();
+      // data = { overall, byMonth, byStage }
       setInviteSummary(data);
     } catch (err) {
       console.error("Error loading invitation summary", err);
@@ -448,31 +450,35 @@ export default function DemoResultsPanel() {
             </div>
 
             {(() => {
-              const totals = inviteSummary.totals || {
+              const overall = inviteSummary.overall || {
                 sent: 0,
-                responded: 0,
                 opened: 0,
                 started: 0,
+                completed: 0,
+                startRate: null,
+                responseRate: null,
               };
-              const sent = totals.sent || 0;
-              const completed = totals.responded || 0;
-              const responseRate =
-                sent > 0 ? Math.round((completed / sent) * 100) : null;
+
+              const sent = overall.sent || 0;
+              const started = overall.started || 0;
+              const completed = overall.completed || 0;
 
               return (
-                <div className="flex flex-col gap-1 text-xs text-slate-200 min-w-[160px]">
+                <div className="flex flex-col gap-1 text-xs text-slate-200 min-w-[200px]">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Invitations sent</span>
                     <span className="font-semibold">{sent}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Completed surveys</span>
-                    <span className="font-semibold">{completed}</span>
+                    <span className="text-slate-400">Opened / started*</span>
+                    <span className="font-semibold">
+                      {started} {sent > 0 ? `(${overall.startRate ?? "-"}%)` : ""}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Response rate</span>
+                    <span className="text-slate-400">Completed surveys</span>
                     <span className="font-semibold">
-                      {responseRate === null ? "–" : `${responseRate}%`}
+                      {completed} {sent > 0 ? `(${overall.responseRate ?? "-"}%)` : ""}
                     </span>
                   </div>
 
@@ -481,21 +487,23 @@ export default function DemoResultsPanel() {
                       <div
                         className="bg-emerald-400 transition-all"
                         style={{
-                          width: `${Math.min(
-                            100,
-                            (completed / sent) * 100 || 0
-                          )}%`,
+                          width: `${Math.min(100, (completed / sent) * 100 || 0)}%`,
                         }}
                       />
                     )}
                   </div>
+
+                  <p className="mt-1 text-[10px] text-slate-500">
+                    *For now, “opened / started” uses survey starts; in a full build this would
+                    include email opens.
+                  </p>
                 </div>
               );
             })()}
           </div>
 
           {/* Response rate by stage */}
-          {inviteSummary.stages && inviteSummary.stages.length > 0 && (
+          {inviteSummary.byStage && inviteSummary.byStage.length > 0 && (
             <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
                 Response rate by journey stage
@@ -507,32 +515,25 @@ export default function DemoResultsPanel() {
               </p>
 
               <div className="space-y-2">
-                {inviteSummary.stages
+                {inviteSummary.byStage
                   .slice()
-                  // Sort by response rate descending
                   .sort((a, b) => {
-                    const aRate =
-                      a.sent > 0 ? a.responded / a.sent : 0;
-                    const bRate =
-                      b.sent > 0 ? b.responded / b.sent : 0;
+                    const aRate = a.sent > 0 ? a.completed / a.sent : 0;
+                    const bRate = b.sent > 0 ? b.completed / b.sent : 0;
                     return bRate - aRate;
                   })
                   .map((stage) => {
                     const sent = stage.sent || 0;
-                    const completed = stage.responded || 0;
+                    const completed = stage.completed || 0;
                     const rate =
                       sent > 0 ? Math.round((completed / sent) * 100) : null;
 
                     return (
-                      <div
-                        key={stage.stage}
-                        className="space-y-1"
-                      >
+                      <div key={stage.stage} className="space-y-1">
                         <div className="flex items-center justify-between text-[11px] text-slate-300">
                           <span>{stage.stage}</span>
                           <span className="text-slate-400">
-                            {completed}/{sent}{" "}
-                            {rate === null ? "" : `• ${rate}%`}
+                            {completed}/{sent} {rate === null ? "" : `• ${rate}%`}
                           </span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-slate-900 overflow-hidden">

@@ -432,7 +432,7 @@ export default function DemoResultsPanel() {
         </div>
       )}
 
-      {inviteSummary && !inviteError && (
+        {inviteSummary && !inviteError && (
         <div className="space-y-4 mb-4">
           {/* Overall funnel card */}
           <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
@@ -460,6 +460,7 @@ export default function DemoResultsPanel() {
               };
 
               const sent = overall.sent || 0;
+              const opened = overall.opened || 0;
               const started = overall.started || 0;
               const completed = overall.completed || 0;
 
@@ -494,8 +495,7 @@ export default function DemoResultsPanel() {
                   </div>
 
                   <p className="mt-1 text-[10px] text-slate-500">
-                    *For now, “opened / started” uses survey starts; in a full build this would
-                    include email opens.
+                    *For now, “opened / started” uses survey starts; in a full build this would include email opens.
                   </p>
                 </div>
               );
@@ -553,6 +553,71 @@ export default function DemoResultsPanel() {
                     );
                   })}
               </div>
+            </div>
+          )}
+
+          {/* Race chart: response volume by stage */}
+          {inviteSummary.byStage && inviteSummary.byStage.length > 0 && (
+            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
+                Response volume “race” (by stage)
+              </p>
+              <p className="text-[11px] text-slate-500 mb-3">
+                Stages with more completed surveys have longer bars. In a live programme, this
+                can help you see where most of your feedback is coming from at a glance.
+              </p>
+
+              {(() => {
+                const stages = inviteSummary.byStage
+                  .slice()
+                  .filter((s) => (s.completed || 0) > 0);
+
+                if (!stages.length) {
+                  return (
+                    <p className="text-[11px] text-slate-500">
+                      Once a few demo invitations have been completed, you&apos;ll see a
+                      bar race here showing which stages generate the most feedback.
+                    </p>
+                  );
+                }
+
+                const maxCompleted = Math.max(
+                  ...stages.map((s) => s.completed || 0)
+                );
+
+                return (
+                  <div className="space-y-2">
+                    {stages
+                      .sort((a, b) => (b.completed || 0) - (a.completed || 0))
+                      .map((stage) => {
+                        const completed = stage.completed || 0;
+                        const widthPct = maxCompleted
+                          ? (completed / maxCompleted) * 100
+                          : 0;
+
+                        return (
+                          <div
+                            key={stage.stage}
+                            className="flex items-center gap-3 text-[11px]"
+                          >
+                            <div className="w-28 text-slate-300 truncate">
+                              {stage.stage}
+                            </div>
+                            <div className="flex-1 h-2 rounded-full bg-slate-900 overflow-hidden">
+                              <div
+                                className="h-full bg-violet-400/90 transition-all"
+                                style={{ width: `${Math.min(100, widthPct)}%` }}
+                              />
+                            </div>
+                            <div className="w-10 text-right text-slate-300">
+                              {completed}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

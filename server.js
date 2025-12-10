@@ -1104,7 +1104,16 @@ app.get("/api/demo-responses", async (req, res) => {
   }
 });
 
-
+// Load all LIVE responses (for the live dashboard)
+app.get("/api/live-responses", async (req, res) => {
+  try {
+    const rows = await loadLiveResponses(); // already defined helper
+    res.json({ rows });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-responses", err);
+    res.status(500).json({ error: "Failed to load live responses" });
+  }
+});
 
 app.get("/api/demo-funnel", async (req, res) => {
   try {

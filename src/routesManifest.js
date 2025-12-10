@@ -27,12 +27,21 @@ export const ROUTES_MANIFEST = [
   { path: "/blog/closing-the-loop",            label: "Blog: Closing the Loop",           enabled: true,  inHeader: false,  inFooter: false },
   { path: "/blog/what-to-do-with-nps-scores",  label: "Blog: What To Do With NPS Scores", enabled: true,  inHeader: false,  inFooter: false },
   { path: "/blog/sending-nps-before-christmas",label: "Blog: Sending NPS Before Christmas",enabled: true, inHeader: false,  inFooter: false},
+  { path: "/blog/why-nps-isnt-improving",      label: "Blog: Why NPS Isn’t Improving",    enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/blog/data-visualisation-cx-insights", label: "Blog: Data Visualisation & CX Insights", enabled: true, inHeader: false, inFooter: false },
+
+  // DEMO survey journey
   { path: "/demo-survey-legacy",               label: "Demo survey",                      enabled: false, inHeader: false,  inFooter: false },
   { path: "/demo-survey-page",                 label: "Demo survey Page",                 enabled: true,  inHeader: false,  inFooter: false },
   { path: "/demo-invitation-survey",           label: "Demo invitation survey",           enabled: true,  inHeader: false,  inFooter: false },
   { path: "/demo-survey/thanks",               label: "Demo survey thanks",               enabled: true,  inHeader: false,  inFooter: false },
-  { path: "/blog/why-nps-isnt-improving",      label: "Blog: Why NPS Isn’t Improving",    enabled: true,  inHeader: false,  inFooter: false },
-  { path: "/blog/data-visualisation-cx-insights", label: "Blog: Data Visualisation & CX Insights", enabled: true, inHeader: false, inFooter: false },
+
+  // LIVE survey journey
+  { path: "/live-invitation-survey",           label: "Live invitation survey",           enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/live-survey-page",                 label: "Live survey Page",                 enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/live-survey/thanks",               label: "Live survey thanks",               enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/live-results",                     label: "Live survey results",              enabled: true,  inHeader: false,  inFooter: false },
+
 
   // Regulatory and information
   { path: "/privacy",                          label: "Privacy",                          enabled: true,  inHeader: false,  inFooter: true  },

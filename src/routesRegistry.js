@@ -30,6 +30,11 @@ import DemoSurvey from "./pages/DemoSurvey";
 import DemoSurveyPage from "./pages/DemoSurveyPage";
 import DemoInvitationSurvey from "./pages/DemoInvitationSurvey";
 import DemoThankYou from "./pages/DemoThankYou";
+import LiveInvitationSurvey from "./pages/LiveInvitationSurvey";
+import LiveSurveyPage from "./pages/LiveSurveyPage";
+import LiveThankYou from "./pages/LiveThankYou";
+import LiveResultsPanel from "./pages/LiveResultsPanel";
+
 import CxCockpit from "./pages/CxCockpit";
 
 // Path to component mapping
@@ -66,6 +71,12 @@ const COMPONENTS = {
   "/demo-survey-page": DemoSurveyPage,
   "/demo-invitation-survey": DemoInvitationSurvey,
   "/demo-survey/thanks": DemoThankYou,
+
+  // Live survey components
+  "/live-invitation-survey": LiveInvitationSurvey,
+  "/live-survey": LiveSurveyPage,
+  "/live-thank-you": LiveThankYou,
+  "/live-results": LiveResultsPanel,
 
   // NPSme data
   "/cx-pulse-sample": CxPulseSample,

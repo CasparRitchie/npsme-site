@@ -340,34 +340,38 @@ async function loadInvitations() {
   });
 }
 
-async function findInvitationById(invitationIdRaw) {
-  const invitationId = (invitationIdRaw || "").trim();
+async function findInvitationById(invitationId) {
+  const normalise = (id) =>
+    (id ?? "")
+      .toString()
+      .trim()
+      .replace(/^"+|"+$/g, ""); // strip leading/trailing double quotes if present
+
+  const target = normalise(invitationId);
 
   const rows = await loadInvitations();
-
-  // Optional: small debug log
   console.log(
     "[npsme] findInvitationById: looking for",
-    JSON.stringify(invitationId),
+    JSON.stringify(target),
     "in",
     rows.length,
     "rows"
   );
 
-  const found =
-    rows.find(
-      (r) => ((r.invitationId || "").trim() === invitationId)
-    ) || null;
+  const match =
+    rows.find((r) => normalise(r.invitationId) === target) || null;
 
-  if (!found) {
-    // Debug: log a few IDs so you can see what’s actually in the file
-    console.warn(
-      "[npsme] findInvitationById: not found. Sample IDs:",
-      rows.slice(0, 5).map((r) => JSON.stringify(r.invitationId))
+  if (!match) {
+    const sample = rows.slice(0, 5).map((r) => normalise(r.invitationId));
+    console.log("[npsme] findInvitationById: not found. Sample IDs:", sample);
+  } else {
+    console.log(
+      "[npsme] findInvitationById: found invitation",
+      JSON.stringify(match.invitationId)
     );
   }
 
-  return found;
+  return match;
 }
 
 async function markInvitationResponded(invitationId, responseId) {
@@ -951,18 +955,21 @@ app.post("/api/send-invitation", async (req, res) => {
 app.get("/api/demo-survey/lookup", async (req, res) => {
   try {
     const invRaw = req.query.inv;
+    const inv =
+      typeof invRaw === "string" ? invRaw.trim() : "";
 
-    console.log("[npsme] /api/demo-survey/lookup called with inv =", invRaw);
+    console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
 
-    if (!invRaw) {
+    if (!inv) {
       return res.status(400).json({ error: "Missing invitation id" });
     }
 
-    const inv = String(invRaw).trim();
-
     const invitation = await findInvitationById(inv);
     if (!invitation) {
-      console.warn("[npsme] lookup: no invitation found for id =", inv);
+      console.log(
+        "[npsme] lookup: no invitation found for id =",
+        inv
+      );
       return res.status(404).json({ error: "Invitation not found" });
     }
 
@@ -979,7 +986,7 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
 
     if (alreadyResponded) {
       console.log(
-        "[npsme] lookup: invitation already responded, id =",
+        "[npsme] lookup: invitation already responded:",
         invitation.invitationId,
         "status =",
         status,
@@ -996,7 +1003,7 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
       await markInvitationStarted(invitation.invitationId);
     } catch (e) {
       console.error("[npsme] Failed to mark invitation started", e);
-      // don’t block the user – this is non-fatal
+      // non-fatal
     }
 
     return res.json({

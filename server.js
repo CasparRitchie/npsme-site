@@ -960,18 +960,43 @@ app.get("/api/demo-responses", async (req, res) => {
 });
 
 
-app.get("/api/demo-funnel", async (_req, res) => {
+app.get("/api/demo-funnel", async (req, res) => {
   try {
+    const { customer, company } = req.query;
+
     const invitations = await loadInvitations();
     const demoResponses = await loadDemoResponses();
 
-    const totalSent = invitations.length;
+    // --- 1) Apply filters to invitations ---
+    let filteredInvitations = invitations;
 
-    // Completed = unique invitations with at least one demo response
+    if (customer) {
+      filteredInvitations = filteredInvitations.filter(
+        (inv) => (inv.customerName || "").trim() === customer
+      );
+    }
+
+    if (company) {
+      filteredInvitations = filteredInvitations.filter((inv) => {
+        const name = (inv.businessName || inv.companyName || "").trim();
+        return name === company;
+      });
+    }
+
+    // Set of invitationIds that survive the invite filter
+    const allowedInvitationIds = new Set(
+      filteredInvitations
+        .map((inv) => (inv.invitationId || "").trim())
+        .filter(Boolean)
+    );
+
+    const totalSent = filteredInvitations.length;
+
+    // Completed = unique invitations (from filtered set) with at least one demo response
     const completedIds = new Set(
       demoResponses
         .map((r) => (r.invitationId || "").trim())
-        .filter(Boolean)
+        .filter((id) => id && allowedInvitationIds.has(id))
     );
 
     let started = 0;
@@ -989,7 +1014,8 @@ app.get("/api/demo-funnel", async (_req, res) => {
       return `${y}-${m}`;
     };
 
-    for (const inv of invitations) {
+    // --- 2) Build month + stage buckets based on FILTERED invites ---
+    for (const inv of filteredInvitations) {
       const id = (inv.invitationId || "").trim();
       const stage = (inv.stage || "").trim() || "Unspecified";
       const status = (inv.status || "").toLowerCase().trim();
@@ -1040,7 +1066,7 @@ app.get("/api/demo-funnel", async (_req, res) => {
       }
     }
 
-    // For now, "opened" ~= "started" (we don't yet track email pixels separately)
+    // For now, "opened" ~= "started"
     const opened = started;
 
     const overall = {
@@ -1068,6 +1094,7 @@ app.get("/api/demo-funnel", async (_req, res) => {
     res.status(500).json({ error: "Failed to compute demo funnel" });
   }
 });
+
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

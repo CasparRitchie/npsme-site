@@ -136,13 +136,24 @@ export default function DemoResultsPanel() {
       setLoadingInvites(true);
       setInviteError("");
 
-      const res = await fetch("/api/demo-funnel");
+      const params = new URLSearchParams();
+      if (customerFilter !== "ALL") {
+        params.set("customer", customerFilter);
+      }
+      if (companyFilter !== "ALL") {
+        params.set("company", companyFilter);
+      }
+
+      const url = params.toString()
+        ? `/api/demo-funnel?${params.toString()}`
+        : "/api/demo-funnel";
+
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`Server returned ${res.status}`);
       }
 
       const data = await res.json();
-      // data = { overall, byMonth, byStage }
       setInviteSummary(data);
     } catch (err) {
       console.error("Error loading invitation summary", err);
@@ -152,10 +163,18 @@ export default function DemoResultsPanel() {
     }
   }
 
+  // Load responses once on mount
   React.useEffect(() => {
     loadResults();
-    loadInvitationSummary();
   }, []);
+
+  // Load invitation summary whenever the "global" filters change
+  React.useEffect(() => {
+    loadInvitationSummary({
+      customer: customerFilter,
+      company: companyFilter,
+    });
+  }, [customerFilter, companyFilter]);
 
   // Unique customers / companies for filters
   const uniqueCustomers = React.useMemo(() => {
@@ -432,7 +451,10 @@ export default function DemoResultsPanel() {
         {/* Refresh button */}
         <button
           type="button"
-          onClick={loadResults}
+          onClick={() => {
+            loadResults();
+            loadInvitationSummary();
+          }}
           disabled={loadingResults}
           className={classNames(
             "inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold border",

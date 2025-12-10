@@ -1,0 +1,30 @@
+Generate data into Invitations and Responses csv files
+Differentiate clearly that Customers are businesses and Contacts are employees of businesses who complete the surveys.
+Pretend that we are a clothing distribution company and that the surveys submitted are from contacts who work in retail, either purchasing, sales, or customer service - so the views of the contacts will relate to those types of roles.
+
+Invitations file should contain
+  10000 survey invitations to 20 customers, and between 1 and 15 contacts per customer.
+  Some customers should be sampled more than others. Some customers should only have been invited to complete a survey once.
+  I'd like to see one outlier with a large number of invitations (maybe 10% of the overall number of invitations sent)
+  Sent over the course of 18 months (since June 2024), with some seasonality - a rush of surveys sent in January 2025,
+  
+
+Responses file should contain:
+  8500 survey responses from the 10000 invitations we added in the invitations file
+  Comments should correspond to the score given on most occasions
+  10 surveys should have a very low detractor score, and really happy looking Comments
+  10 surveys should have a 9 or 10 and really damning comments about the service
+  3 surveys should mention that they were told to give a positive score by the account manager, even though they weren't happy
+  3 customers should have extremely high NPS scores (>70), with very few detractors
+  5 customers should have high scores (>20)
+  10 customers should have medium to high NPS scores (above 0 overall NPS up to 20)
+    Within these 10 customers, there should be 1 or 2 vocal contacts with really negative scores
+    It would be interesting if we can "hide" this negativity by other contacts from the same customer having given high scores resulting in the negative scores "disappearing from view" in the "overall" reports. Then we can pull them out of the data using our analytics and showcase the capability of our tools.
+  The remaining 8 customers should be spread from 0 to -100 NPS. in this category we can have 1 or 2 happy contacts whose surveys are drowned out by the negativity from one or two contacts.
+  I would like the NPS scores for the customers to change over time (not just a flat score for each customer).
+  I would like to see at least one customer who started out with a low score progress to promoter territory (we can say that this would have been due to a "You Said, We Did" communication and improvement programme with that particular customer)
+  Comments should be appropriate to the scores given.
+  Comments should be rich in detail to allow us to use word cloud etc to group and analyse the data.
+  Response rate seasonality - I would like to see high response rates in December, and lower response rates in July / August.
+  I would like some customers to have a 100% response rate and others where it is lower, and one customer with a 0% response rate so we can pinpoint that as an issue.
+  I would like to see response rate improve overall, over time. So early on, we'd expect lower response rates and then a couple of step changes in response rate in April 2025 and October 2025 to highlight a change in process making a marked improvement.

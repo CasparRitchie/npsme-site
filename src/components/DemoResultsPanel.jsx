@@ -179,7 +179,7 @@ export default function DemoResultsPanel() {
     return Array.from(names).sort();
   }, [responses]);
 
-  // Apply global filters: customer + company + result type
+  // Apply global filters: customer + company + result type + (optionally) stage
   const filteredResponses = React.useMemo(() => {
     let rows = responses;
 
@@ -207,8 +207,15 @@ export default function DemoResultsPanel() {
       );
     }
 
+    // 🔹 NEW: global stage filter (applies where relevant)
+    if (stageFilter !== "ALL") {
+      rows = rows.filter(
+        (r) => (r.stage || "").trim() === stageFilter
+      );
+    }
+
     return rows;
-  }, [responses, customerFilter, companyFilter, resultType]);
+  }, [responses, customerFilter, companyFilter, stageFilter, resultType]);
 
   // Group by period
   const grouped = React.useMemo(() => {
@@ -396,6 +403,30 @@ export default function DemoResultsPanel() {
           </select>
         </div>
 
+        {/* Stage filter (applies where relevant) */}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="drp-stage-filter"
+            className="text-[11px] text-slate-400"
+          >
+            Stage:
+          </label>
+          <select
+            id="drp-stage-filter"
+            name="stageFilter"
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value)}
+            className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+          >
+            <option value="ALL">All journey stages</option>
+            {STAGES.map((stage) => (
+              <option key={stage} value={stage}>
+                {stage}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex-1" />
 
         {/* Refresh button */}
@@ -559,29 +590,9 @@ export default function DemoResultsPanel() {
               <p className="text-xs text-slate-400 uppercase tracking-widest">
                 Milestone NPS
               </p>
-
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="drp-stage-filter-milestone"
-                  className="text-[11px] text-slate-400"
-                >
-                  Stage:
-                </label>
-                <select
-                  id="drp-stage-filter-milestone"
-                  name="stageFilterMilestone"
-                  value={stageFilter}
-                  onChange={(e) => setStageFilter(e.target.value)}
-                  className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                >
-                  <option value="ALL">All journey stages</option>
-                  {STAGES.filter((s) => s !== "Overall NPS").map((stage) => (
-                    <option key={stage} value={stage}>
-                      {stage}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <p className="text-[11px] text-slate-500">
+                Filtered by the global controls above (contact, company, period, result type, stage).
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -632,8 +643,7 @@ export default function DemoResultsPanel() {
               Verbatim themes (from comments)
             </p>
             <p className="text-sm text-slate-300 mb-4">
-              This tag cloud scales each word by how often it appears in the comments for the
-              current filters (contact, company, period, and result type). In a live programme
+              This tag cloud scales each word by how often it appears in the comments for the current filters (contact, company, stage, period, and result type). In a live programme
               you&apos;d use this as a starting point for theme coding.
             </p>
 
@@ -745,29 +755,9 @@ export default function DemoResultsPanel() {
                 <p className="text-xs text-slate-400 uppercase tracking-widest">
                   Response rate by journey stage
                 </p>
-
-                <div className="flex items-center gap-2">
-                  <label
-                    htmlFor="drp-stage-filter-invites"
-                    className="text-[11px] text-slate-400"
-                  >
-                    Stage:
-                  </label>
-                  <select
-                    id="drp-stage-filter-invites"
-                    name="stageFilterInvites"
-                    value={stageFilter}
-                    onChange={(e) => setStageFilter(e.target.value)}
-                    className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                  >
-                    <option value="ALL">All journey stages</option>
-                    {STAGES.filter((s) => s !== "Overall NPS").map((stage) => (
-                      <option key={stage} value={stage}>
-                        {stage}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <p className="text-[11px] text-slate-500">
+                  Uses the same filters as the top of the cockpit, including Stage.
+                </p>
               </div>
 
               <p className="text-[11px] text-slate-500 mb-3">

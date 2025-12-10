@@ -1246,6 +1246,314 @@ app.get("/api/demo-funnel", async (req, res) => {
   }
 });
 
+
+// PSEUDO PATHS – adjust to your actual Dropbox paths
+const LIVE_INVITATIONS_PATH = "/npsme/live/invitations.csv";
+const LIVE_RESPONSES_PATH   = "/npsme/live/responses.csv";
+
+async function loadLiveInvitations() {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
+  if (!csv) return [];
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return [];
+
+  const header = lines[0].split(",");
+  return lines.slice(1).map((line) => {
+    const cols = line.split(",");
+    const obj = {};
+    header.forEach((h, i) => {
+      obj[h] = cols[i] ?? "";
+    });
+    return obj;
+  });
+}
+
+async function appendLiveInvitationRow(row) {
+  if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+    console.warn("[npsme] No Dropbox token configured; skipping ...");
+    return;
+  }
+
+  const header =
+    "invitationId,customerId,customerName,businessName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
+
+  const existing = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
+    console.error("[npsme] Error reading live invitations.csv", err);
+    return null;
+  });
+
+  const fields = [
+    row.invitationId,
+    row.customerId || "",
+    row.customerName || "",
+    row.businessName || "",
+    row.email,
+    row.stage || "",
+    row.surveyId || "",
+    row.sentAt,
+    row.resentCount ?? 0,
+    row.lastSentAt || row.sentAt,
+    row.status || "sent",
+    row.responseId || "",
+  ];
+
+  const line = fields.map(escapeCsv).join(",");
+
+  const contents = existing
+    ? `${existing.replace(/\n*$/, "")}\n${line}\n`
+    : `${header}\n${line}\n`;
+
+  await writeDropboxFile(LIVE_INVITATIONS_PATH, contents);
+}
+
+async function loadLiveResponses() {
+  const csv = await readDropboxFile(LIVE_RESPONSES_PATH).catch((err) => {
+    console.error("[npsme] Error reading live-responses.csv in loadLiveResponses", err);
+    return null;
+  });
+
+  if (!csv) return [];
+  return parseCsvWithHeader(csv);
+}
+
+async function appendLiveResponseRow(row) {
+  if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
+    console.warn("[npsme] No Dropbox token configured; skipping ...");
+    return;
+  }
+
+  const existing = await readDropboxFile(LIVE_RESPONSES_PATH).catch((err) => {
+    console.error("[npsme] Error reading live-responses.csv", err);
+    return null;
+  });
+
+  let delimiter = ",";
+  if (existing) {
+    const firstLine = existing.split(/\r?\n/)[0] || "";
+    delimiter = detectDelimiter(firstLine);
+  }
+
+  const headerFields = [
+    "responseId",
+    "invitationId",
+    "customerId",
+    "customerName",
+    "businessName",
+    "email",
+    "stage",
+    "surveyId",
+    "type",
+    "score",
+    "comment",
+    "createdAt",
+  ];
+  const header = headerFields.join(delimiter);
+
+  const fields = [
+    row.responseId,
+    row.invitationId,
+    row.customerId || "",
+    row.customerName || "",
+    row.businessName || "",
+    row.email || "",
+    row.stage || "",
+    row.surveyId || "",
+    row.type || "",
+    row.score,
+    row.comment || "",
+    row.createdAt,
+  ];
+
+  const line = fields.map((v) => escapeCsv(v, delimiter)).join(delimiter);
+
+  const contents = existing
+    ? `${existing.replace(/\n*$/, "")}\n${line}\n`
+    : `${header}\n${line}\n`;
+
+  await writeDropboxFile(LIVE_RESPONSES_PATH, contents);
+}
+
+async function findLiveInvitationById(invitationId) {
+  const rows = await loadLiveInvitations();
+  return (
+    rows.find(
+      (r) => (r.invitationId || "").trim() === (invitationId || "").trim()
+    ) || null
+  );
+}
+
+async function markLiveInvitationStarted(invitationId) {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if (rowObj.invitationId === invitationId) {
+      const currentStatus = (rowObj.status || "").toLowerCase().trim();
+      if (!currentStatus || currentStatus === "sent") {
+        rowObj.status = "started";
+      }
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
+}
+
+async function markLiveInvitationResponded(invitationId, responseId) {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if (rowObj.invitationId === invitationId) {
+      rowObj.status = "responded";
+      rowObj.responseId = responseId;
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
+}
+
+app.get("/api/live-survey/lookup", async (req, res) => {
+  try {
+    const inv = req.query.inv;
+    console.log("[npsme] /api/live-survey/lookup called with inv =", inv);
+
+    if (!inv) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
+
+    const invitation = await findLiveInvitationById(inv);
+    if (!invitation) {
+      console.warn("[npsme] live lookup: no invitation found for id =", inv);
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    const status = (invitation.status || "").toLowerCase().trim();
+    const responseId =
+      typeof invitation.responseId === "string"
+        ? invitation.responseId.trim()
+        : invitation.responseId;
+
+    const alreadyResponded =
+      status === "responded" || (responseId && responseId !== "");
+
+    if (alreadyResponded) {
+      return res
+        .status(409)
+        .json({ error: "Invitation already responded" });
+    }
+
+    // Mark as started (best effort)
+    try {
+      await markLiveInvitationStarted(invitation.invitationId);
+    } catch (e) {
+      console.error("[npsme] LIVE: failed to mark invitation started", e);
+    }
+
+    return res.json({
+      ok: true,
+      invitation: {
+        invitationId: invitation.invitationId,
+        customerId: invitation.customerId || "",
+        customerName: invitation.customerName || "",
+        businessName: invitation.businessName || "",
+        email: invitation.email || "",
+        stage: invitation.stage || "",
+        surveyId: invitation.surveyId || "",
+        typeOfDevice: invitation.typeOfDevice || "",
+        assistanceMaternelle: invitation.assistanceMaternelle || "",
+      },
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-survey/lookup", err);
+    res.status(500).json({ error: "Lookup failed" });
+  }
+});
+
+app.post("/api/live-survey/submit", async (req, res) => {
+  try {
+    const { invitationId, score, comment } = req.body || {};
+
+    if (!invitationId) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
+    if (typeof score !== "number" || Number.isNaN(score)) {
+      return res.status(400).json({ error: "Score must be a number" });
+    }
+
+    const invitation = await findLiveInvitationById(invitationId);
+    if (!invitation) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    const status = (invitation.status || "").toLowerCase().trim();
+    const existingResponseId =
+      typeof invitation.responseId === "string"
+        ? invitation.responseId.trim()
+        : invitation.responseId;
+
+    const alreadyResponded =
+      status === "responded" || (existingResponseId && existingResponseId !== "");
+
+    if (alreadyResponded) {
+      return res
+        .status(409)
+        .json({ error: "Invitation already responded" });
+    }
+
+    const responseId = generateResponseId(); // same helper as demo, e.g. RESP-...
+
+    const createdAt = new Date().toISOString();
+
+    await appendLiveResponseRow({
+      responseId,
+      invitationId,
+      score,
+      comment: (comment || "").trim(),
+      createdAt,
+    });
+
+    await markLiveInvitationResponded(invitationId, responseId);
+
+    return res.json({ ok: true, responseId });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-survey/submit", err);
+    res.status(500).json({ error: "Failed to save response" });
+  }
+});
+
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

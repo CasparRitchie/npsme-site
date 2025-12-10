@@ -1,10 +1,16 @@
 Caspar to do
+1) French language for relevant pages
+4) Create live survey page and journey - instead of the demo journey as we'll have real customers on it soon.
+5) Link 1 and 4 in one shot
 
-French language for relevant pages
-Link to airtable for sending / timings - wait til next time and set up schedule for next year
-Fix invitation and ability to respond
+Caspar Completed:
+3) Fix invitation and ability to respond - done
 
-Nic to do
+Caspar scheduled for next phase:
+2) Link to airtable for sending / timings - wait til next time and set up schedule for next year
+
+
+Nic to do:
 Send Caspar a draft of the mail
 Later - And details about the Airtable so I can work out rules on sending timings
 Agree actual data : Name, Still a customer?, email

@@ -131,22 +131,27 @@ export default function DemoResultsPanel() {
     }
   }
 
-  async function loadInvitationSummary() {
+  async function loadInvitationSummary(currentFilters) {
+    const { customerFilter, companyFilter, stageFilter } = currentFilters;
+
     try {
       setLoadingInvites(true);
       setInviteError("");
 
       const params = new URLSearchParams();
+
       if (customerFilter !== "ALL") {
         params.set("customer", customerFilter);
       }
       if (companyFilter !== "ALL") {
         params.set("company", companyFilter);
       }
+      if (stageFilter !== "ALL") {
+        params.set("stage", stageFilter);
+      }
 
-      const url = params.toString()
-        ? `/api/demo-funnel?${params.toString()}`
-        : "/api/demo-funnel";
+      const qs = params.toString();
+      const url = qs ? `/api/demo-funnel?${qs}` : "/api/demo-funnel";
 
       const res = await fetch(url);
       if (!res.ok) {
@@ -163,78 +168,75 @@ export default function DemoResultsPanel() {
     }
   }
 
-  // Load responses once on mount
+  // Load raw responses once on mount
   React.useEffect(() => {
     loadResults();
   }, []);
 
-  // Load invitation summary whenever the "global" filters change
+  // Reload invitation summary whenever global filters change
   React.useEffect(() => {
-    loadInvitationSummary({
-      customer: customerFilter,
-      company: companyFilter,
-    });
-  }, [customerFilter, companyFilter]);
+    loadInvitationSummary({ customerFilter, companyFilter, stageFilter });
+  }, [customerFilter, companyFilter, stageFilter]);
 
-  // Unique customers / companies for filters
-  const uniqueCustomers = React.useMemo(() => {
-    const names = new Set();
-    for (const r of responses) {
-      if (r.customerName && r.customerName.trim()) {
-        names.add(r.customerName.trim());
+    // Unique customers / companies for filters
+    const uniqueCustomers = React.useMemo(() => {
+      const names = new Set();
+      for (const r of responses) {
+        if (r.customerName && r.customerName.trim()) {
+          names.add(r.customerName.trim());
+        }
       }
-    }
-    return Array.from(names).sort();
-  }, [responses]);
+      return Array.from(names).sort();
+    }, [responses]);
 
-  const uniqueCompanies = React.useMemo(() => {
-    const names = new Set();
-    for (const r of responses) {
-      const name = (r.businessName || r.companyName || "").trim();
-      if (name) {
-        names.add(name);
-      }
-    }
-    return Array.from(names).sort();
-  }, [responses]);
-
-  // Apply global filters: customer + company + result type + (optionally) stage
-  const filteredResponses = React.useMemo(() => {
-    let rows = responses;
-
-    if (customerFilter !== "ALL") {
-      rows = rows.filter(
-        (r) => (r.customerName || "").trim() === customerFilter
-      );
-    }
-
-    if (companyFilter !== "ALL") {
-      rows = rows.filter((r) => {
+    const uniqueCompanies = React.useMemo(() => {
+      const names = new Set();
+      for (const r of responses) {
         const name = (r.businessName || r.companyName || "").trim();
-        return name === companyFilter;
-      });
-    }
+        if (name) {
+          names.add(name);
+        }
+      }
+      return Array.from(names).sort();
+    }, [responses]);
 
-    if (resultType === "OVERALL") {
-      rows = rows.filter((r) => (r.stage || "").trim() === "Overall NPS");
-    } else if (resultType === "MILESTONE") {
-      rows = rows.filter(
-        (r) =>
-          r.stage &&
-          r.stage.trim() !== "" &&
-          r.stage.trim() !== "Overall NPS"
-      );
-    }
+    // Apply global filters: customer + company + result type + (optionally) stage
+    const filteredResponses = React.useMemo(() => {
+      let rows = responses;
 
-    // 🔹 NEW: global stage filter (applies where relevant)
-    if (stageFilter !== "ALL") {
-      rows = rows.filter(
-        (r) => (r.stage || "").trim() === stageFilter
-      );
-    }
+      if (customerFilter !== "ALL") {
+        rows = rows.filter(
+          (r) => (r.customerName || "").trim() === customerFilter
+        );
+      }
 
-    return rows;
-  }, [responses, customerFilter, companyFilter, stageFilter, resultType]);
+      if (companyFilter !== "ALL") {
+        rows = rows.filter((r) => {
+          const name = (r.businessName || r.companyName || "").trim();
+          return name === companyFilter;
+        });
+      }
+
+      if (resultType === "OVERALL") {
+        rows = rows.filter((r) => (r.stage || "").trim() === "Overall NPS");
+      } else if (resultType === "MILESTONE") {
+        rows = rows.filter(
+          (r) =>
+            r.stage &&
+            r.stage.trim() !== "" &&
+            r.stage.trim() !== "Overall NPS"
+        );
+      }
+
+      // 🔹 NEW: global stage filter (applies where relevant)
+      if (stageFilter !== "ALL") {
+        rows = rows.filter(
+          (r) => (r.stage || "").trim() === stageFilter
+        );
+      }
+
+      return rows;
+    }, [responses, customerFilter, companyFilter, stageFilter, resultType]);
 
   // Group by period
   const grouped = React.useMemo(() => {
@@ -492,58 +494,105 @@ export default function DemoResultsPanel() {
 
       {/* If we have responses, show NPS sections */}
       {filteredResponses.length > 0 && (
-        <div className="space-y-6">
-          {/* Overall NPS – higher up the page now */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
-            <div>
-              <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
-                {resultType === "MILESTONE"
-                  ? "Overall Milestone NPS"
-                  : "Overall NPS"}
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-semibold text-slate-50">
-                  {overallStats.nps === null ? "–" : overallStats.nps}
-                </span>
-                {overallStats.nps !== null && (
-                  <span className="text-sm text-slate-400">NPS</span>
-                )}
+      <div className="space-y-6">
+        {/* 🔹 Sticky KPI strip */}
+        <div className="sticky top-0 z-10 -mx-4 -mt-2 mb-4 bg-gradient-to-b from-[#0B0F19]/95 via-[#0B0F19]/92 to-transparent backdrop-blur supports-[backdrop-filter]:bg-[#0B0F19]/80">
+          <div className="px-4 pt-3 pb-2 flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-4">
+            {/* Overall NPS */}
+            <div className="flex-1 rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 flex items-center justify-between shadow-[0_18px_45px_rgba(0,0,0,0.5)]">
+              <div>
+                <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">
+                  {resultType === "MILESTONE"
+                    ? "Overall Milestone NPS"
+                    : "Overall NPS"}
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold text-slate-50">
+                    {overallStats.nps === null ? "–" : overallStats.nps}
+                  </span>
+                  {overallStats.nps !== null && (
+                    <span className="text-sm text-slate-400">NPS</span>
+                  )}
+                </div>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Based on {overallStats.total} responses.
+                </p>
               </div>
-              <p className="mt-1 text-[11px] text-slate-500">
-                Based on {overallStats.total} responses in this demo.
-              </p>
+
+              <div className="hidden sm:flex flex-col gap-1 text-[11px] text-slate-300 ml-4">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
+                  <span>
+                    Detractors:{" "}
+                    <span className="font-semibold">
+                      {overallStats.detractors}
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
+                  <span>
+                    Passives:{" "}
+                    <span className="font-semibold">
+                      {overallStats.passives}
+                    </span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
+                  <span>
+                    Promoters:{" "}
+                    <span className="font-semibold">
+                      {overallStats.promoters}
+                    </span>
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1 text-xs text-slate-300">
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
-                <span>
-                  Detractors:{" "}
-                  <span className="font-semibold">
-                    {overallStats.detractors}
-                  </span>
-                </span>
+            {/* 🔸 Placeholder KPI tiles – response rate, top / bottom customer */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Response rate % – from inviteSummary.overall if present */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 flex flex-col justify-center">
+                <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">
+                  Response rate
+                </p>
+                <p className="mt-1 text-xl font-semibold text-slate-50">
+                  {inviteSummary?.overall?.responseRate ?? "–"}%
+                </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Of demo invitations completed.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
-                <span>
-                  Passives:{" "}
-                  <span className="font-semibold">
-                    {overallStats.passives}
-                  </span>
-                </span>
+
+              {/* You can later compute and fill these properly */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 flex flex-col justify-center">
+                <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">
+                  Top customer
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-50 truncate">
+                  Coming soon
+                </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Highest average NPS.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
-                <span>
-                  Promoters:{" "}
-                  <span className="font-semibold">
-                    {overallStats.promoters}
-                  </span>
-                </span>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 flex flex-col justify-center">
+                <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">
+                  Lowest customer
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-50 truncate">
+                  Coming soon
+                </p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Lowest average NPS.
+                </p>
               </div>
             </div>
           </div>
+        </div>
+        {/* END sticky KPI strip */}
 
           {/* Period bar “chart” */}
           <div className="space-y-3">
@@ -556,6 +605,7 @@ export default function DemoResultsPanel() {
                 : "last 12 months"}
             </p>
 
+            {/* Existing 100% stacked bars */}
             <div className="space-y-3">
               {grouped.map(({ key, label, stats }) => {
                 const total = stats.total || 1;
@@ -568,42 +618,86 @@ export default function DemoResultsPanel() {
                     key={key}
                     className="rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-xs text-slate-300">
-                        <span className="font-medium">{label}</span>{" "}
-                        <span className="text-slate-500">
-                          • NPS {stats.nps === null ? "–" : stats.nps}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {stats.total} response{stats.total === 1 ? "" : "s"}
-                      </div>
-                    </div>
-
-                    <div className="h-3 w-full rounded-full bg-slate-900 overflow-hidden flex">
-                      {detPct > 0 && (
-                        <div
-                          style={{ width: `${detPct}%` }}
-                          className="bg-rose-500"
-                        />
-                      )}
-                      {pasPct > 0 && (
-                        <div
-                          style={{ width: `${pasPct}%` }}
-                          className="bg-amber-400"
-                        />
-                      )}
-                      {proPct > 0 && (
-                        <div
-                          style={{ width: `${proPct}%` }}
-                          className="bg-emerald-400"
-                        />
-                      )}
-                    </div>
+                    {/* ... existing label + 100% bar ... */}
                   </div>
                 );
               })}
             </div>
+
+            {/* 🔹 NEW: stacked volume columns */}
+            {grouped.length > 0 && (
+              <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+                <p className="text-[11px] text-slate-400 mb-2">
+                  Response volumes by period (stacked column)
+                </p>
+
+                {(() => {
+                  const maxTotal = Math.max(
+                    ...grouped.map(({ stats }) => stats.total || 0),
+                    0
+                  );
+
+                  if (!maxTotal) {
+                    return (
+                      <p className="text-[11px] text-slate-500">
+                        Once you have responses in multiple periods, this chart will show
+                        total volume per period with detractors, passives and promoters stacked.
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="flex items-end gap-3 overflow-x-auto pb-2">
+                      {grouped.map(({ key, label, stats }) => {
+                        const total = stats.total || 0;
+                        const heightPct = maxTotal ? (total / maxTotal) * 100 : 0;
+
+                        const detHeight =
+                          total > 0 ? (stats.detractors / total) * heightPct : 0;
+                        const pasHeight =
+                          total > 0 ? (stats.passives / total) * heightPct : 0;
+                        const proHeight =
+                          total > 0 ? (stats.promoters / total) * heightPct : 0;
+
+                        return (
+                          <div
+                            key={`${key}-col`}
+                            className="flex flex-col items-center gap-1 min-w-[50px]"
+                          >
+                            <div className="relative h-32 w-7 rounded-md bg-slate-900 overflow-hidden flex flex-col-reverse">
+                              {proHeight > 0 && (
+                                <div
+                                  className="bg-emerald-400"
+                                  style={{ height: `${proHeight}%` }}
+                                />
+                              )}
+                              {pasHeight > 0 && (
+                                <div
+                                  className="bg-amber-400"
+                                  style={{ height: `${pasHeight}%` }}
+                                />
+                              )}
+                              {detHeight > 0 && (
+                                <div
+                                  className="bg-rose-500"
+                                  style={{ height: `${detHeight}%` }}
+                                />
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 text-center truncate max-w-[60px]">
+                              {label}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {total}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
           </div>
 
           {/* Milestone NPS section, with LOCAL stage filter */}

@@ -340,9 +340,34 @@ async function loadInvitations() {
   });
 }
 
-async function findInvitationById(invitationId) {
+async function findInvitationById(invitationIdRaw) {
+  const invitationId = (invitationIdRaw || "").trim();
+
   const rows = await loadInvitations();
-  return rows.find((r) => r.invitationId === invitationId) || null;
+
+  // Optional: small debug log
+  console.log(
+    "[npsme] findInvitationById: looking for",
+    JSON.stringify(invitationId),
+    "in",
+    rows.length,
+    "rows"
+  );
+
+  const found =
+    rows.find(
+      (r) => ((r.invitationId || "").trim() === invitationId)
+    ) || null;
+
+  if (!found) {
+    // Debug: log a few IDs so you can see what’s actually in the file
+    console.warn(
+      "[npsme] findInvitationById: not found. Sample IDs:",
+      rows.slice(0, 5).map((r) => JSON.stringify(r.invitationId))
+    );
+  }
+
+  return found;
 }
 
 async function markInvitationResponded(invitationId, responseId) {
@@ -925,31 +950,20 @@ app.post("/api/send-invitation", async (req, res) => {
 // Validate a demo survey link
 app.get("/api/demo-survey/lookup", async (req, res) => {
   try {
-    // 🔹 Normalise + log the incoming invitation id
-    const rawInv = req.query.inv;
-    const inv =
-      typeof rawInv === "string" ? rawInv.trim() : "";
+    const invRaw = req.query.inv;
 
-    console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
+    console.log("[npsme] /api/demo-survey/lookup called with inv =", invRaw);
 
-    if (!inv) {
-      console.warn("[npsme] lookup: missing invitation id in query");
-      return res
-        .status(400)
-        .json({ ok: false, error: "Missing invitation id" });
+    if (!invRaw) {
+      return res.status(400).json({ error: "Missing invitation id" });
     }
 
-    // 🔹 Look up invitation by id
-    const invitation = await findInvitationById(inv);
+    const inv = String(invRaw).trim();
 
+    const invitation = await findInvitationById(inv);
     if (!invitation) {
-      console.warn(
-        "[npsme] lookup: no invitation found for id =",
-        inv
-      );
-      return res
-        .status(404)
-        .json({ ok: false, error: "Invitation not found" });
+      console.warn("[npsme] lookup: no invitation found for id =", inv);
+      return res.status(404).json({ error: "Invitation not found" });
     }
 
     // Be defensive: treat as responded only if status is "responded"
@@ -964,27 +978,27 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
       status === "responded" || (responseId && responseId !== "");
 
     if (alreadyResponded) {
-      console.warn(
-        "[npsme] lookup: invitation already responded for id =",
-        invitation.invitationId
+      console.log(
+        "[npsme] lookup: invitation already responded, id =",
+        invitation.invitationId,
+        "status =",
+        status,
+        "responseId =",
+        responseId
       );
       return res
         .status(409)
-        .json({ ok: false, error: "Invitation already responded" });
+        .json({ error: "Invitation already responded" });
     }
 
     // 🔹 Mark this invitation as "started" the first time the survey is opened
     try {
       await markInvitationStarted(invitation.invitationId);
     } catch (e) {
-      console.error(
-        "[npsme] Failed to mark invitation started",
-        e
-      );
+      console.error("[npsme] Failed to mark invitation started", e);
       // don’t block the user – this is non-fatal
     }
 
-    // 🔹 Success payload
     return res.json({
       ok: true,
       invitation: {
@@ -999,9 +1013,7 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
     });
   } catch (err) {
     console.error("[npsme] Error in /api/demo-survey/lookup", err);
-    res
-      .status(500)
-      .json({ ok: false, error: "Lookup failed" });
+    res.status(500).json({ error: "Lookup failed" });
   }
 });
 

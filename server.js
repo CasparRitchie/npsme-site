@@ -375,6 +375,40 @@ async function markInvitationResponded(invitationId, responseId) {
   await writeDropboxFile(INVITATIONS_PATH, updatedCsv);
 }
 
+async function markInvitationStarted(invitationId) {
+  const csv = await readDropboxFile(INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]]; // keep header
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if (rowObj.invitationId === invitationId) {
+      const currentStatus = (rowObj.status || "").toLowerCase().trim();
+
+      // Only move from empty / "sent" → "started"
+      if (!currentStatus || currentStatus === "sent") {
+        rowObj.status = "started";
+      }
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(INVITATIONS_PATH, updatedCsv);
+}
+
 function generateResponseId() {
   const ts = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -545,6 +579,16 @@ function parseCsvWithHeader(csvText) {
   return rows;
 }
 
+async function loadDemoResponses() {
+  const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
+    console.error("[npsme] Error reading demo-responses.csv in loadDemoResponses", err);
+    return null;
+  });
+
+  if (!csv) return [];
+  return parseCsvWithHeader(csv);
+}
+
 // --- Demo API (in-memory) ---
 let demoResponses = [];
 
@@ -709,8 +753,16 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
     const alreadyResponded =
       status === "responded" || (responseId && responseId !== "");
 
-    if (alreadyResponded) {
+        if (alreadyResponded) {
       return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    // 🔹 Mark this invitation as "started" the first time the survey is opened
+    try {
+      await markInvitationStarted(invitation.invitationId);
+    } catch (e) {
+      console.error("[npsme] Failed to mark invitation started", e);
+      // don’t block the user – this is non-fatal
     }
 
     return res.json({
@@ -811,6 +863,115 @@ app.get("/api/demo-responses", async (req, res) => {
   }
 });
 
+
+app.get("/api/demo-funnel", async (_req, res) => {
+  try {
+    const invitations = await loadInvitations();
+    const demoResponses = await loadDemoResponses();
+
+    const totalSent = invitations.length;
+
+    // Completed = unique invitations with at least one demo response
+    const completedIds = new Set(
+      demoResponses
+        .map((r) => (r.invitationId || "").trim())
+        .filter(Boolean)
+    );
+
+    let started = 0;
+    let completed = 0;
+
+    const byMonthMap = new Map();
+    const byStageMap = new Map();
+
+    const monthKeyFromDate = (dateStr) => {
+      if (!dateStr) return "Unknown";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "Unknown";
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`;
+    };
+
+    for (const inv of invitations) {
+      const id = (inv.invitationId || "").trim();
+      const stage = (inv.stage || "").trim() || "Unspecified";
+      const status = (inv.status || "").toLowerCase().trim();
+      const isCompleted = id && completedIds.has(id);
+
+      if (isCompleted) completed++;
+
+      // "started" means survey link opened or completed
+      if (status === "started" || status === "responded" || isCompleted) {
+        started++;
+      }
+
+      // --- By month (based on sentAt) ---
+      const monthKey = monthKeyFromDate(inv.sentAt);
+      if (!byMonthMap.has(monthKey)) {
+        byMonthMap.set(monthKey, {
+          month: monthKey,
+          sent: 0,
+          started: 0,
+          completed: 0,
+        });
+      }
+      const monthBucket = byMonthMap.get(monthKey);
+      monthBucket.sent++;
+      if (status === "started" || status === "responded" || isCompleted) {
+        monthBucket.started++;
+      }
+      if (isCompleted) {
+        monthBucket.completed++;
+      }
+
+      // --- By stage ---
+      if (!byStageMap.has(stage)) {
+        byStageMap.set(stage, {
+          stage,
+          sent: 0,
+          started: 0,
+          completed: 0,
+        });
+      }
+      const stageBucket = byStageMap.get(stage);
+      stageBucket.sent++;
+      if (status === "started" || status === "responded" || isCompleted) {
+        stageBucket.started++;
+      }
+      if (isCompleted) {
+        stageBucket.completed++;
+      }
+    }
+
+    // For now, "opened" ~= "started" (we don't yet track email pixels separately)
+    const opened = started;
+
+    const overall = {
+      sent: totalSent,
+      opened,
+      started,
+      completed,
+      startRate: totalSent ? +((started / totalSent) * 100).toFixed(1) : null,
+      responseRate: totalSent ? +((completed / totalSent) * 100).toFixed(1) : null,
+    };
+
+    const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
+      a.month > b.month ? 1 : -1
+    );
+
+    const byStage = Array.from(byStageMap.values());
+
+    res.json({
+      overall,
+      byMonth,
+      byStage,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-funnel", err);
+    res.status(500).json({ error: "Failed to compute demo funnel" });
+  }
+});
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

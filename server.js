@@ -925,14 +925,31 @@ app.post("/api/send-invitation", async (req, res) => {
 // Validate a demo survey link
 app.get("/api/demo-survey/lookup", async (req, res) => {
   try {
-    const inv = req.query.inv;
+    // 🔹 Normalise + log the incoming invitation id
+    const rawInv = req.query.inv;
+    const inv =
+      typeof rawInv === "string" ? rawInv.trim() : "";
+
+    console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
+
     if (!inv) {
-      return res.status(400).json({ error: "Missing invitation id" });
+      console.warn("[npsme] lookup: missing invitation id in query");
+      return res
+        .status(400)
+        .json({ ok: false, error: "Missing invitation id" });
     }
 
-        const invitation = await findInvitationById(inv);
+    // 🔹 Look up invitation by id
+    const invitation = await findInvitationById(inv);
+
     if (!invitation) {
-      return res.status(404).json({ error: "Invitation not found" });
+      console.warn(
+        "[npsme] lookup: no invitation found for id =",
+        inv
+      );
+      return res
+        .status(404)
+        .json({ ok: false, error: "Invitation not found" });
     }
 
     // Be defensive: treat as responded only if status is "responded"
@@ -946,18 +963,28 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
     const alreadyResponded =
       status === "responded" || (responseId && responseId !== "");
 
-        if (alreadyResponded) {
-      return res.status(409).json({ error: "Invitation already responded" });
+    if (alreadyResponded) {
+      console.warn(
+        "[npsme] lookup: invitation already responded for id =",
+        invitation.invitationId
+      );
+      return res
+        .status(409)
+        .json({ ok: false, error: "Invitation already responded" });
     }
 
     // 🔹 Mark this invitation as "started" the first time the survey is opened
     try {
       await markInvitationStarted(invitation.invitationId);
     } catch (e) {
-      console.error("[npsme] Failed to mark invitation started", e);
+      console.error(
+        "[npsme] Failed to mark invitation started",
+        e
+      );
       // don’t block the user – this is non-fatal
     }
 
+    // 🔹 Success payload
     return res.json({
       ok: true,
       invitation: {
@@ -972,7 +999,9 @@ app.get("/api/demo-survey/lookup", async (req, res) => {
     });
   } catch (err) {
     console.error("[npsme] Error in /api/demo-survey/lookup", err);
-    res.status(500).json({ error: "Lookup failed" });
+    res
+      .status(500)
+      .json({ ok: false, error: "Lookup failed" });
   }
 });
 

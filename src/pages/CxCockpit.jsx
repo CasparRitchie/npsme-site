@@ -9,14 +9,15 @@ export default function CxCockpit() {
     "Explore your customer experience cockpit: NPS, journey stages, response funnels and verbatim themes in one place.";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#020617] via-slate-950 to-black text-slate-100">
+    <>
       <Seo path="/cx-cockpit" title={title} description={description} />
 
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 space-y-8">
+      {/* Layout already provides the background; this is just the page container */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 space-y-8">
         {/* Header / hero */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-3xl bg-gradient-to-tr from-[#0B0F19] via-[#0C1224] to-[#0B0F19] flex items-center justify-center text-xs font-semibold shadow-lg shadow-emerald-500/40">
+            <div className="h-10 w-10 rounded-3xl bg-gradient-to-tr from-[#7C3AED] via-[#4F46E5] to-[#22C55E] flex items-center justify-center text-xs font-semibold shadow-lg shadow-emerald-500/40">
               CX
             </div>
             <div>
@@ -47,13 +48,13 @@ export default function CxCockpit() {
 
         {/* Main cockpit grid */}
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start">
-          {/* Left: all your existing NPS charts + funnel + word cloud */}
+          {/* Left: NPS charts + funnel + word cloud */}
           <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 sm:p-6 shadow-2xl shadow-black/40">
             <h2 className="text-sm font-semibold text-slate-100 mb-1">
               NPS & journey instrumentation
             </h2>
             <p className="text-[11px] text-slate-500 mb-4">
-              Filter by contact, company, stage and period to see how your NPS is behaving
+              Filter by contact, company, result type and stage to see how your NPS is behaving
               across the customer journey.
             </p>
 
@@ -62,7 +63,7 @@ export default function CxCockpit() {
 
           {/* Right: placeholders for future “dials” */}
           <div className="space-y-4">
-            {/* Placeholder 1: Race chart */}
+            {/* Placeholder 1: Race chart over time / segments */}
             <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 sm:p-5">
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
                 Upcoming dial
@@ -99,7 +100,7 @@ export default function CxCockpit() {
             </div>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

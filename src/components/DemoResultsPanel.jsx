@@ -104,7 +104,7 @@ export default function DemoResultsPanel() {
   const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
   const [resultType, setResultType] = React.useState("ALL"); // ALL | OVERALL | MILESTONE
-  const [stageFilter, setStageFilter] = React.useState("ALL"); // LOCAL to milestone tiles
+  const [stageFilter, setStageFilter] = React.useState("ALL");
 
   const [inviteSummary, setInviteSummary] = React.useState(null);
   const [loadingInvites, setLoadingInvites] = React.useState(false);
@@ -179,7 +179,7 @@ export default function DemoResultsPanel() {
     return Array.from(names).sort();
   }, [responses]);
 
-  // GLOBAL filters: customer + company + result type
+  // Apply global filters: customer + company + result type
   const filteredResponses = React.useMemo(() => {
     let rows = responses;
 
@@ -207,7 +207,6 @@ export default function DemoResultsPanel() {
       );
     }
 
-    // NOTE: stageFilter is NOT applied here – it’s local to milestone tiles
     return rows;
   }, [responses, customerFilter, companyFilter, resultType]);
 
@@ -272,6 +271,7 @@ export default function DemoResultsPanel() {
 
   const milestoneStats = React.useMemo(() => {
     const map = {};
+
     const base = filteredResponses.filter(
       (r) =>
         r.stage &&
@@ -294,16 +294,17 @@ export default function DemoResultsPanel() {
     [filteredResponses]
   );
 
-  // LOCAL list of stages to show in the milestone tiles
-  const visibleMilestoneStages = React.useMemo(() => {
-    const allMilestones = STAGES.filter((s) => s !== "Overall NPS");
-    if (stageFilter === "ALL") return allMilestones;
-    return allMilestones.filter((s) => s === stageFilter);
-  }, [stageFilter]);
+  // Stage-filtered version of inviteSummary.byStage (for response rate + race chart)
+  const stageFilteredInviteStages = React.useMemo(() => {
+    if (!inviteSummary || !inviteSummary.byStage) return [];
+    const all = inviteSummary.byStage.slice();
+    if (stageFilter === "ALL") return all;
+    return all.filter((s) => s.stage === stageFilter);
+  }, [inviteSummary, stageFilter]);
 
   return (
     <div>
-      {/* Global filters + Refresh */}
+      {/* Global Filters + Refresh */}
       <div className="flex flex-wrap gap-3 items-center mb-4">
         {/* Contact filter */}
         <div className="flex items-center gap-2">
@@ -413,7 +414,7 @@ export default function DemoResultsPanel() {
         </button>
       </div>
 
-      {/* Results area states */}
+      {/* Results area – errors & empty states */}
       {resultsError && (
         <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
           {resultsError}
@@ -436,207 +437,10 @@ export default function DemoResultsPanel() {
         </div>
       )}
 
-      {/* Invitation funnel / response rate */}
-      {inviteError && (
-        <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
-          {inviteError}
-        </div>
-      )}
-
-      {inviteSummary && !inviteError && (
-        <div className="space-y-4 mb-4">
-          {/* Overall funnel card */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
-            <div>
-              <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
-                Invitation funnel (demo)
-              </p>
-              <h3 className="text-sm font-semibold text-slate-50">
-                How many invitations turned into completed surveys?
-              </h3>
-              <p className="mt-1 text-[11px] text-slate-500 max-w-sm">
-                This shows the basic response funnel for the demo environment. In a live
-                programme, we add opens and survey starts so you can see where drop-off happens.
-              </p>
-            </div>
-
-            {(() => {
-              const overall = inviteSummary.overall || {
-                sent: 0,
-                opened: 0,
-                started: 0,
-                completed: 0,
-                startRate: null,
-                responseRate: null,
-              };
-
-              const sent = overall.sent || 0;
-              const started = overall.started || 0;
-              const completed = overall.completed || 0;
-
-              return (
-                <div className="flex flex-col gap-1 text-xs text-slate-200 min-w-[200px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Invitations sent</span>
-                    <span className="font-semibold">{sent}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Opened / started*</span>
-                    <span className="font-semibold">
-                      {started} {sent > 0 ? `(${overall.startRate ?? "-"}%)` : ""}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Completed surveys</span>
-                    <span className="font-semibold">
-                      {completed} {sent > 0 ? `(${overall.responseRate ?? "-"}%)` : ""}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 h-2 w-full rounded-full bg-slate-900 overflow-hidden flex">
-                    {sent > 0 && (
-                      <div
-                        className="bg-emerald-400 transition-all"
-                        style={{
-                          width: `${Math.min(100, (completed / sent) * 100 || 0)}%`,
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  <p className="mt-1 text-[10px] text-slate-500">
-                    *For now, “opened / started” uses survey starts; in a full build this would include email opens.
-                  </p>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Response rate by stage */}
-          {inviteSummary.byStage && inviteSummary.byStage.length > 0 && (
-            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
-              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
-                Response rate by journey stage
-              </p>
-              <p className="text-[11px] text-slate-500 mb-3">
-                Each bar shows what proportion of invitations for that stage turned into
-                completed surveys. Use this to see which parts of the journey people are
-                most willing to give feedback on.
-              </p>
-
-              <div className="space-y-2">
-                {inviteSummary.byStage
-                  .slice()
-                  .sort((a, b) => {
-                    const aRate = a.sent > 0 ? a.completed / a.sent : 0;
-                    const bRate = b.sent > 0 ? b.completed / b.sent : 0;
-                    return bRate - aRate;
-                  })
-                  .map((stage) => {
-                    const sent = stage.sent || 0;
-                    const completed = stage.completed || 0;
-                    const rate =
-                      sent > 0 ? Math.round((completed / sent) * 100) : null;
-
-                    return (
-                      <div key={stage.stage} className="space-y-1">
-                        <div className="flex items-center justify-between text-[11px] text-slate-300">
-                          <span>{stage.stage}</span>
-                          <span className="text-slate-400">
-                            {completed}/{sent} {rate === null ? "" : `• ${rate}%`}
-                          </span>
-                        </div>
-                        <div className="h-2 w-full rounded-full bg-slate-900 overflow-hidden">
-                          {sent > 0 && (
-                            <div
-                              className="h-full bg-emerald-400 transition-all"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  (completed / sent) * 100 || 0
-                                )}%`,
-                              }}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
-
-          {/* Race chart: response volume by stage */}
-          {inviteSummary.byStage && inviteSummary.byStage.length > 0 && (
-            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
-              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
-                Response volume “race” (by stage)
-              </p>
-              <p className="text-[11px] text-slate-500 mb-3">
-                Stages with more completed surveys have longer bars. In a live programme, this
-                can help you see where most of your feedback is coming from at a glance.
-              </p>
-
-              {(() => {
-                const stages = inviteSummary.byStage
-                  .slice()
-                  .filter((s) => (s.completed || 0) > 0);
-
-                if (!stages.length) {
-                  return (
-                    <p className="text-[11px] text-slate-500">
-                      Once a few demo invitations have been completed, you&apos;ll see a
-                      bar race here showing which stages generate the most feedback.
-                    </p>
-                  );
-                }
-
-                const maxCompleted = Math.max(
-                  ...stages.map((s) => s.completed || 0)
-                );
-
-                return (
-                  <div className="space-y-2">
-                    {stages
-                      .sort((a, b) => (b.completed || 0) - (a.completed || 0))
-                      .map((stage) => {
-                        const completed = stage.completed || 0;
-                        const widthPct = maxCompleted
-                          ? (completed / maxCompleted) * 100
-                          : 0;
-
-                        return (
-                          <div
-                            key={stage.stage}
-                            className="flex items-center gap-3 text-[11px]"
-                          >
-                            <div className="w-28 text-slate-300 truncate">
-                              {stage.stage}
-                            </div>
-                            <div className="flex-1 h-2 rounded-full bg-slate-900 overflow-hidden">
-                              <div
-                                className="h-full bg-violet-400/90 transition-all"
-                                style={{ width: `${Math.min(100, widthPct)}%` }}
-                              />
-                            </div>
-                            <div className="w-10 text-right text-slate-300">
-                              {completed}
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* NPS charts + milestone tiles + word cloud */}
+      {/* If we have responses, show NPS sections */}
       {filteredResponses.length > 0 && (
         <div className="space-y-6">
-          {/* Overall NPS */}
+          {/* Overall NPS – higher up the page now */}
           <div className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
             <div>
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
@@ -662,21 +466,27 @@ export default function DemoResultsPanel() {
                 <span className="inline-block h-2 w-2 rounded-full bg-rose-500" />
                 <span>
                   Detractors:{" "}
-                  <span className="font-semibold">{overallStats.detractors}</span>
+                  <span className="font-semibold">
+                    {overallStats.detractors}
+                  </span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
                 <span>
                   Passives:{" "}
-                  <span className="font-semibold">{overallStats.passives}</span>
+                  <span className="font-semibold">
+                    {overallStats.passives}
+                  </span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
                 <span>
                   Promoters:{" "}
-                  <span className="font-semibold">{overallStats.promoters}</span>
+                  <span className="font-semibold">
+                    {overallStats.promoters}
+                  </span>
                 </span>
               </div>
             </div>
@@ -743,14 +553,13 @@ export default function DemoResultsPanel() {
             </div>
           </div>
 
-          {/* Milestone NPS section + local stage filter */}
+          {/* Milestone NPS section, with LOCAL stage filter */}
           <div className="space-y-4 rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
               <p className="text-xs text-slate-400 uppercase tracking-widest">
                 Milestone NPS
               </p>
 
-              {/* Local stage filter – only affects these tiles */}
               <div className="flex items-center gap-2">
                 <label
                   htmlFor="drp-stage-filter-milestone"
@@ -776,40 +585,44 @@ export default function DemoResultsPanel() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {visibleMilestoneStages.map((stage) => {
-                const stats = milestoneStats[stage] || {
-                  nps: null,
-                  total: 0,
-                };
+              {STAGES.filter((s) => s !== "Overall NPS")
+                .filter((s) =>
+                  stageFilter === "ALL" ? true : s === stageFilter
+                )
+                .map((stage) => {
+                  const stats = milestoneStats[stage] || {
+                    nps: null,
+                    total: 0,
+                  };
 
-                let tone = "bg-slate-950/60 border-slate-800";
-                if (stats.total > 0 && stats.nps !== null) {
-                  if (stats.nps > 20) {
-                    tone = "bg-emerald-900/40 border-emerald-500/40";
-                  } else if (stats.nps < -20) {
-                    tone = "bg-rose-900/40 border-rose-500/40";
-                  } else {
-                    tone = "bg-amber-900/40 border-amber-500/40";
+                  let tone = "bg-slate-950/60 border-slate-800";
+                  if (stats.total > 0 && stats.nps !== null) {
+                    if (stats.nps > 20) {
+                      tone = "bg-emerald-900/40 border-emerald-500/40";
+                    } else if (stats.nps < -20) {
+                      tone = "bg-rose-900/40 border-rose-500/40";
+                    } else {
+                      tone = "bg-amber-900/40 border-amber-500/40";
+                    }
                   }
-                }
 
-                return (
-                  <div
-                    key={stage}
-                    className={`rounded-2xl border ${tone} p-3 flex flex-col items-center text-center`}
-                  >
-                    <p className="text-xs text-slate-400 mb-1">{stage}</p>
+                  return (
+                    <div
+                      key={stage}
+                      className={`rounded-2xl border ${tone} p-3 flex flex-col items-center text-center`}
+                    >
+                      <p className="text-xs text-slate-400 mb-1">{stage}</p>
 
-                    <div className="text-2xl font-semibold text-slate-50 mb-1">
-                      {stats.nps === null ? "–" : stats.nps}
+                      <div className="text-2xl font-semibold text-slate-50 mb-1">
+                        {stats.nps === null ? "–" : stats.nps}
+                      </div>
+
+                      <p className="text-[11px] text-slate-500">
+                        {stats.total} response{stats.total === 1 ? "" : "s"}
+                      </p>
                     </div>
-
-                    <p className="text-[11px] text-slate-500">
-                      {stats.total} response{stats.total === 1 ? "" : "s"}
-                    </p>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </div>
 
@@ -844,6 +657,232 @@ export default function DemoResultsPanel() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Invitation funnel / response rate */}
+      {inviteError && (
+        <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
+          {inviteError}
+        </div>
+      )}
+
+      {inviteSummary && !inviteError && (
+        <div className="space-y-4 mt-6">
+          {/* Overall funnel card */}
+          <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
+                Invitation funnel (demo)
+              </p>
+              <h3 className="text-sm font-semibold text-slate-50">
+                How many invitations turned into completed surveys?
+              </h3>
+              <p className="mt-1 text-[11px] text-slate-500 max-w-sm">
+                This shows the basic response funnel for the demo environment. In a live
+                programme, we add opens and survey starts so you can see where drop-off happens.
+              </p>
+            </div>
+
+            {(() => {
+              const overall = inviteSummary.overall || {
+                sent: 0,
+                opened: 0,
+                started: 0,
+                completed: 0,
+                startRate: null,
+                responseRate: null,
+              };
+
+              const sent = overall.sent || 0;
+              const started = overall.started || 0;
+              const completed = overall.completed || 0;
+
+              return (
+                <div className="flex flex-col gap-1 text-xs text-slate-200 min-w-[200px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Invitations sent</span>
+                    <span className="font-semibold">{sent}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Opened / started*</span>
+                    <span className="font-semibold">
+                      {started} {sent > 0 ? `(${overall.startRate ?? "-"}%)` : ""}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Completed surveys</span>
+                    <span className="font-semibold">
+                      {completed}{" "}
+                      {sent > 0 ? `(${overall.responseRate ?? "-"}%)` : ""}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 h-2 w-full rounded-full bg-slate-900 overflow-hidden flex">
+                    {sent > 0 && (
+                      <div
+                        className="bg-emerald-400 transition-all"
+                        style={{
+                          width: `${Math.min(100, (completed / sent) * 100 || 0)}%`,
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <p className="mt-1 text-[10px] text-slate-500">
+                    *For now, “opened / started” uses survey starts; in a full build this
+                    would include email opens.
+                  </p>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Response rate by stage – uses stageFilter */}
+          {stageFilteredInviteStages.length > 0 && (
+            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                <p className="text-xs text-slate-400 uppercase tracking-widest">
+                  Response rate by journey stage
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="drp-stage-filter-invites"
+                    className="text-[11px] text-slate-400"
+                  >
+                    Stage:
+                  </label>
+                  <select
+                    id="drp-stage-filter-invites"
+                    name="stageFilterInvites"
+                    value={stageFilter}
+                    onChange={(e) => setStageFilter(e.target.value)}
+                    className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                  >
+                    <option value="ALL">All journey stages</option>
+                    {STAGES.filter((s) => s !== "Overall NPS").map((stage) => (
+                      <option key={stage} value={stage}>
+                        {stage}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-500 mb-3">
+                Each bar shows what proportion of invitations for that stage turned into
+                completed surveys. Use this to see which parts of the journey people are
+                most willing to give feedback on.
+              </p>
+
+              <div className="space-y-2">
+                {stageFilteredInviteStages
+                  .slice()
+                  .sort((a, b) => {
+                    const aRate = a.sent > 0 ? a.completed / a.sent : 0;
+                    const bRate = b.sent > 0 ? b.completed / b.sent : 0;
+                    return bRate - aRate;
+                  })
+                  .map((stage) => {
+                    const sent = stage.sent || 0;
+                    const completed = stage.completed || 0;
+                    const rate =
+                      sent > 0 ? Math.round((completed / sent) * 100) : null;
+
+                    return (
+                      <div key={stage.stage} className="space-y-1">
+                        <div className="flex items-center justify-between text-[11px] text-slate-300">
+                          <span>{stage.stage}</span>
+                          <span className="text-slate-400">
+                            {completed}/{sent} {rate === null ? "" : `• ${rate}%`}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-slate-900 overflow-hidden">
+                          {sent > 0 && (
+                            <div
+                              className="h-full bg-emerald-400 transition-all"
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  (completed / sent) * 100 || 0
+                                )}%`,
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* Race chart: response volume by stage – also stage-filtered */}
+          {stageFilteredInviteStages.length > 0 && (
+            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
+              <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
+                Response volume “race” (by stage)
+              </p>
+              <p className="text-[11px] text-slate-500 mb-3">
+                Stages with more completed surveys have longer bars. In a live programme, this
+                can help you see where most of your feedback is coming from at a glance.
+              </p>
+
+              {(() => {
+                const stages = stageFilteredInviteStages.filter(
+                  (s) => (s.completed || 0) > 0
+                );
+
+                if (!stages.length) {
+                  return (
+                    <p className="text-[11px] text-slate-500">
+                      Once a few demo invitations have been completed, you&apos;ll see a
+                      bar race here showing which stages generate the most feedback.
+                    </p>
+                  );
+                }
+
+                const maxCompleted = Math.max(
+                  ...stages.map((s) => s.completed || 0)
+                );
+
+                return (
+                  <div className="space-y-2">
+                    {stages
+                      .slice()
+                      .sort((a, b) => (b.completed || 0) - (a.completed || 0))
+                      .map((stage) => {
+                        const completed = stage.completed || 0;
+                        const widthPct = maxCompleted
+                          ? (completed / maxCompleted) * 100
+                          : 0;
+
+                        return (
+                          <div
+                            key={stage.stage}
+                            className="flex items-center gap-3 text-[11px]"
+                          >
+                            <div className="w-28 text-slate-300 truncate">
+                              {stage.stage}
+                            </div>
+                            <div className="flex-1 h-2 rounded-full bg-slate-900 overflow-hidden">
+                              <div
+                                className="h-full bg-violet-400/90 transition-all"
+                                style={{ width: `${Math.min(100, widthPct)}%` }}
+                              />
+                            </div>
+                            <div className="w-10 text-right text-slate-300">
+                              {completed}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       )}
     </div>

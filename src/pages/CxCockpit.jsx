@@ -16,7 +16,7 @@ export default function CxCockpit() {
         {/* Header / hero */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-3xl bg-gradient-to-tr from-emerald-400 via-cyan-400 to-violet-500 flex items-center justify-center text-xs font-semibold shadow-lg shadow-emerald-500/40">
+            <div className="h-10 w-10 rounded-3xl bg-gradient-to-tr from-[#0B0F19] via-[#0C1224] to-[#0B0F19] flex items-center justify-center text-xs font-semibold shadow-lg shadow-emerald-500/40">
               CX
             </div>
             <div>

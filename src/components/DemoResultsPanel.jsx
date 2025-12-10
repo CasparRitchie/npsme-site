@@ -104,7 +104,8 @@ export default function DemoResultsPanel() {
   const [companyFilter, setCompanyFilter] = React.useState("ALL");
   const [period, setPeriod] = React.useState("monthly"); // 'monthly' | 'quarterly' | 'rolling12'
   const [resultType, setResultType] = React.useState("ALL"); // ALL | OVERALL | MILESTONE
-  const [stageFilter, setStageFilter] = React.useState("ALL");
+  const [stageFilter, setStageFilter] = React.useState("ALL"); // LOCAL to milestone tiles
+
   const [inviteSummary, setInviteSummary] = React.useState(null);
   const [loadingInvites, setLoadingInvites] = React.useState(false);
   const [inviteError, setInviteError] = React.useState("");
@@ -135,7 +136,6 @@ export default function DemoResultsPanel() {
       setLoadingInvites(true);
       setInviteError("");
 
-      // 🔹 Hit the actual backend endpoint we defined in server.js
       const res = await fetch("/api/demo-funnel");
       if (!res.ok) {
         throw new Error(`Server returned ${res.status}`);
@@ -179,12 +179,14 @@ export default function DemoResultsPanel() {
     return Array.from(names).sort();
   }, [responses]);
 
-  // Apply filters: customer + company + result type
+  // GLOBAL filters: customer + company + result type
   const filteredResponses = React.useMemo(() => {
     let rows = responses;
 
     if (customerFilter !== "ALL") {
-      rows = rows.filter((r) => (r.customerName || "").trim() === customerFilter);
+      rows = rows.filter(
+        (r) => (r.customerName || "").trim() === customerFilter
+      );
     }
 
     if (companyFilter !== "ALL") {
@@ -204,13 +206,10 @@ export default function DemoResultsPanel() {
           r.stage.trim() !== "Overall NPS"
       );
     }
-    if (stageFilter !== "ALL") {
-      rows = rows.filter(
-        (r) => (r.stage || "").trim() === stageFilter
-      );
-    }
+
+    // NOTE: stageFilter is NOT applied here – it’s local to milestone tiles
     return rows;
-  }, [responses, customerFilter, companyFilter, resultType, stageFilter]);
+  }, [responses, customerFilter, companyFilter, resultType]);
 
   // Group by period
   const grouped = React.useMemo(() => {
@@ -273,7 +272,6 @@ export default function DemoResultsPanel() {
 
   const milestoneStats = React.useMemo(() => {
     const map = {};
-
     const base = filteredResponses.filter(
       (r) =>
         r.stage &&
@@ -296,10 +294,17 @@ export default function DemoResultsPanel() {
     [filteredResponses]
   );
 
+  // LOCAL list of stages to show in the milestone tiles
+  const visibleMilestoneStages = React.useMemo(() => {
+    const allMilestones = STAGES.filter((s) => s !== "Overall NPS");
+    if (stageFilter === "ALL") return allMilestones;
+    return allMilestones.filter((s) => s === stageFilter);
+  }, [stageFilter]);
+
   return (
     <div>
-        {/* Filters + Refresh */}
-        <div className="flex flex-wrap gap-3 items-center mb-4">
+      {/* Global filters + Refresh */}
+      <div className="flex flex-wrap gap-3 items-center mb-4">
         {/* Contact filter */}
         <div className="flex items-center gap-2">
           <label
@@ -390,33 +395,9 @@ export default function DemoResultsPanel() {
           </select>
         </div>
 
-        {/* 🔹 NEW: Stage filter */}
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="drp-stage-filter"
-            className="text-[11px] text-slate-400"
-          >
-            Stage:
-          </label>
-          <select
-            id="drp-stage-filter"
-            name="stageFilter"
-            value={stageFilter}
-            onChange={(e) => setStageFilter(e.target.value)}
-            className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-          >
-            <option value="ALL">All stages</option>
-            {STAGES.map((stage) => (
-              <option key={stage} value={stage}>
-                {stage}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="flex-1" />
 
-        {/* Refresh button ... */}
+        {/* Refresh button */}
         <button
           type="button"
           onClick={loadResults}
@@ -432,7 +413,7 @@ export default function DemoResultsPanel() {
         </button>
       </div>
 
-      {/* Results area */}
+      {/* Results area states */}
       {resultsError && (
         <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
           {resultsError}
@@ -455,14 +436,14 @@ export default function DemoResultsPanel() {
         </div>
       )}
 
-      {/* Invitation funnel / response rate (shown whenever we have data) */}
+      {/* Invitation funnel / response rate */}
       {inviteError && (
         <div className="rounded-2xl border border-rose-500/60 bg-rose-950/40 px-3 py-2 text-xs text-rose-100 mb-3">
           {inviteError}
         </div>
       )}
 
-        {inviteSummary && !inviteError && (
+      {inviteSummary && !inviteError && (
         <div className="space-y-4 mb-4">
           {/* Overall funnel card */}
           <div className="rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4 flex flex-wrap gap-4 items-center justify-between">
@@ -490,7 +471,6 @@ export default function DemoResultsPanel() {
               };
 
               const sent = overall.sent || 0;
-              const opened = overall.opened || 0;
               const started = overall.started || 0;
               const completed = overall.completed || 0;
 
@@ -653,6 +633,7 @@ export default function DemoResultsPanel() {
         </div>
       )}
 
+      {/* NPS charts + milestone tiles + word cloud */}
       {filteredResponses.length > 0 && (
         <div className="space-y-6">
           {/* Overall NPS */}
@@ -762,14 +743,40 @@ export default function DemoResultsPanel() {
             </div>
           </div>
 
-          {/* Milestone NPS section */}
+          {/* Milestone NPS section + local stage filter */}
           <div className="space-y-4 rounded-3xl border border-slate-800 bg-slate-950/80 px-4 py-4">
-            <p className="text-xs text-slate-400 uppercase tracking-widest mb-2">
-              Milestone NPS
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+              <p className="text-xs text-slate-400 uppercase tracking-widest">
+                Milestone NPS
+              </p>
+
+              {/* Local stage filter – only affects these tiles */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="drp-stage-filter-milestone"
+                  className="text-[11px] text-slate-400"
+                >
+                  Stage:
+                </label>
+                <select
+                  id="drp-stage-filter-milestone"
+                  name="stageFilterMilestone"
+                  value={stageFilter}
+                  onChange={(e) => setStageFilter(e.target.value)}
+                  className="rounded-2xl border border-slate-800 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                >
+                  <option value="ALL">All journey stages</option>
+                  {STAGES.filter((s) => s !== "Overall NPS").map((stage) => (
+                    <option key={stage} value={stage}>
+                      {stage}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {STAGES.filter((s) => s !== "Overall NPS").map((stage) => {
+              {visibleMilestoneStages.map((stage) => {
                 const stats = milestoneStats[stage] || {
                   nps: null,
                   total: 0,
@@ -782,7 +789,6 @@ export default function DemoResultsPanel() {
                   } else if (stats.nps < -20) {
                     tone = "bg-rose-900/40 border-rose-500/40";
                   } else {
-                    // -20 to +20 band
                     tone = "bg-amber-900/40 border-amber-500/40";
                   }
                 }

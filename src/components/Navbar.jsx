@@ -3,10 +3,13 @@ import React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { ROUTES } from "../routesRegistry";
+import { useLanguage } from "../i18n/LanguageContext.jsx";
+import { t } from "../i18n/translations.js";
 
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
   const loc = useLocation();
+  const { lang, setLang } = useLanguage();
 
   const headerLinks = ROUTES.filter(r => r.enabled && r.inHeader);
 
@@ -17,7 +20,9 @@ export default function NavBar() {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
   }, [open]);
-
+    const toggleLang = () => {
+    setLang(lang === "en" ? "fr" : "en");
+  };
   return (
     <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -32,13 +37,35 @@ export default function NavBar() {
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
           {headerLinks.map(({ path, label }) => (
-            <NavItem key={path} to={path}>{label}</NavItem>
+            <NavItem key={path} to={path}>
+              {label}
+            </NavItem>
           ))}
+
+          {/* Language toggle */}
+          <button
+            type="button"
+            onClick={toggleLang}
+            className="inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
+          >
+            <span
+              className={lang === "en" ? "font-semibold" : "opacity-60"}
+            >
+              {t(lang, "navbar.languageEn", "EN")}
+            </span>
+            <span className="mx-1 text-slate-500">/</span>
+            <span
+              className={lang === "fr" ? "font-semibold" : "opacity-60"}
+            >
+              {t(lang, "navbar.languageFr", "FR")}
+            </span>
+          </button>
+
           <Link
             to="/book"
             className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition shadow-[0_0_0_0_rgba(124,58,237,0.5)] hover:shadow-[0_0_0_6px_rgba(124,58,237,0.15)]"
           >
-            Book discovery
+            {t(lang, "navbar.bookDiscovery", "Book discovery")}
           </Link>
         </nav>
 
@@ -53,18 +80,40 @@ export default function NavBar() {
         </button>
       </div>
 
-      {/* Mobile panel */}
+            {/* Mobile panel */}
       {open && (
         <div className="md:hidden border-t border-white/10 bg-[#0B0F19]/95 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
             {headerLinks.map(({ path, label }) => (
-              <NavItem key={path} to={path} mobile>{label}</NavItem>
+              <NavItem key={path} to={path} mobile>
+                {label}
+              </NavItem>
             ))}
+
+            {/* Language toggle (mobile) */}
+            <button
+              type="button"
+              onClick={toggleLang}
+              className="mt-1 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
+            >
+              <span
+                className={lang === "en" ? "font-semibold" : "opacity-60"}
+              >
+                {t(lang, "navbar.languageEn", "EN")}
+              </span>
+              <span className="mx-1 text-slate-500">/</span>
+              <span
+                className={lang === "fr" ? "font-semibold" : "opacity-60"}
+              >
+                {t(lang, "navbar.languageFr", "FR")}
+              </span>
+            </button>
+
             <Link
               to="/book"
               className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              Book discovery
+              {t(lang, "navbar.bookDiscovery", "Book discovery")}
             </Link>
           </div>
         </div>

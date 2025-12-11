@@ -122,8 +122,13 @@ export default function LiveSurveyPage() {
 
   if (loading) {
     return (
-      <div className="survey-page">
-        <div className="survey-card">
+      <div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
           <p>Chargement du questionnaire…</p>
         </div>
       </div>
@@ -132,8 +137,13 @@ export default function LiveSurveyPage() {
 
   if (error && !invitation) {
     return (
-      <div className="survey-page">
-        <div className="survey-card">
+      <div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
           <h1>Oups…</h1>
           <p>{error}</p>
         </div>
@@ -144,8 +154,13 @@ export default function LiveSurveyPage() {
   const businessName = invitation?.businessName || "notre service";
 
   return (
-    <div className="survey-page">
-      <div className="survey-card">
+    <div className="survey-page envola-theme">
+      <div className="survey-card envola-card">
+        <div className="envola-brand-bar">
+          {/* replace this with a real logo img later if you like */}
+          <span className="envola-logo-text">Envola</span>
+          <span className="envola-badge">Questionnaire de satisfaction</span>
+        </div>
         <h1>Merci de nous donner votre avis</h1>
         <p style={{ marginTop: "1rem" }}>
           Sur une échelle de 0 à 10, quelle est la probabilité que vous

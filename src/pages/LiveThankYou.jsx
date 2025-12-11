@@ -22,8 +22,13 @@ export default function LiveThankYou() {
   }
 
   return (
-    <div className="survey-page">
-      <div className="survey-card">
+<div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
         <h1>{headline}</h1>
         <p style={{ marginTop: "1rem" }}>
           Votre avis nous aide à comprendre ce qui fonctionne bien et ce que

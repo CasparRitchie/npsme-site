@@ -71,8 +71,13 @@ export default function LiveInvitationSurvey() {
 
   if (loading) {
     return (
-      <div className="survey-page">
-        <div className="survey-card">
+      <div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
           <p>Chargement du questionnaire…</p>
         </div>
       </div>
@@ -81,8 +86,13 @@ export default function LiveInvitationSurvey() {
 
   if (error) {
     return (
-      <div className="survey-page">
-        <div className="survey-card">
+      <div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
           <h1>Oups…</h1>
           <p>{error}</p>
         </div>
@@ -92,8 +102,13 @@ export default function LiveInvitationSurvey() {
 
   if (!invitation) {
     return (
-      <div className="survey-page">
-        <div className="survey-card">
+      <div className="survey-page envola-theme">
+        <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
           <h1>Oups…</h1>
           <p>
             Une erreur inattendue s'est produite. Merci de réessayer plus tard.
@@ -111,8 +126,13 @@ export default function LiveInvitationSurvey() {
   };
 
   return (
-    <div className="survey-page">
-      <div className="survey-card">
+    <div className="survey-page envola-theme">
+      <div className="survey-card envola-card">
+        <div className="envola-brand-bar">
+            {/* replace this with a real logo img later if you like */}
+            <span className="envola-logo-text">Envola</span>
+            <span className="envola-badge">Questionnaire de satisfaction</span>
+          </div>
         <h1>Votre avis compte beaucoup pour nous</h1>
         <p style={{ marginTop: "1rem" }}>
           Bonjour {displayName},

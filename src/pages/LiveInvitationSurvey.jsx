@@ -107,7 +107,7 @@ export default function LiveInvitationSurvey() {
     invitation.customerName || invitation.email || "cher client";
 
   const handleStart = () => {
-    navigate(`/live-survey?inv=${encodeURIComponent(invitation.invitationId)}`);
+    navigate(`/live-survey-page?inv=${encodeURIComponent(invitation.invitationId)}`);
   };
 
   return (

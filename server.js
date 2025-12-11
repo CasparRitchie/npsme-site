@@ -1828,6 +1828,7 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
   }
 });
 
+
 app.post("/api/live-survey/submit", async (req, res) => {
   try {
     const { invitationId, score, comment } = req.body || {};

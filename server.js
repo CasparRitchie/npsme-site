@@ -78,14 +78,15 @@ async function sendLiveInvitationEmail({
   businessName,
   stage,
   surveyId,
-  fromName,   // e.g. "Nicholas from Envola"
-  fromEmail,  // not used in body, but handy if you want later
+  fromName,
+  fromEmail,
+  invitationId: explicitInvitationId, // <– allow override
 }) {
   const politeName = customerName
     ? `Bonjour ${customerName},`
     : "Bonjour,";
 
-  const invitationId = generateInvitationId();
+  const invitationId = explicitInvitationId || generateInvitationId();
   const surveyUrl = `https://www.npsme.com/live-invitation-survey?inv=${encodeURIComponent(
     invitationId
   )}`;
@@ -1600,6 +1601,48 @@ async function markLiveInvitationStarted(invitationId) {
   await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
 }
 
+async function markLiveInvitationSent(invitationId, sentAtIso) {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if ((rowObj.invitationId || "").trim() === (invitationId || "").trim()) {
+      const currentResent = Number(rowObj.resentCount || 0);
+      const alreadyHadSentAt = !!rowObj.sentAt;
+
+      const now = sentAtIso || new Date().toISOString();
+      if (!alreadyHadSentAt) {
+        // first time we send this one
+        rowObj.sentAt = now;
+        rowObj.resentCount = currentResent;
+      } else {
+        // resend
+        rowObj.resentCount = currentResent + 1;
+      }
+      rowObj.lastSentAt = now;
+      rowObj.status = "sent";
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
+}
+
 async function markLiveInvitationResponded(invitationId, responseId) {
   const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
   if (!csv) return;
@@ -1684,6 +1727,104 @@ app.get("/api/live-survey/lookup", async (req, res) => {
   } catch (err) {
     console.error("[npsme] Error in /api/live-survey/lookup", err);
     res.status(500).json({ error: "Lookup failed" });
+  }
+});
+
+// Load ALL live invitations for the admin page
+app.get("/api/live-invitations", async (req, res) => {
+  try {
+    const rows = await loadLiveInvitations();
+
+    // Optional: filter out ones already sent/responded if you only want "to send"
+    const filtered = rows.filter((row) => {
+      const status = (row.status || "").toLowerCase().trim();
+      return !status || status === "pending" || status === "started";
+    });
+
+    res.json({ rows: filtered });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-invitations", err);
+    res.status(500).json({ error: "Failed to load live invitations" });
+  }
+});
+
+// Send a batch of LIVE invitations selected in the admin UI
+app.post("/api/live-invitations/send-batch", async (req, res) => {
+  try {
+    const { invitationIds } = req.body || {};
+
+    if (!Array.isArray(invitationIds) || invitationIds.length === 0) {
+      return res.status(400).json({ error: "invitationIds must be a non-empty array" });
+    }
+
+    const allRows = await loadLiveInvitations();
+
+    const byId = new Map(
+      allRows.map((row) => [(row.invitationId || "").trim(), row])
+    );
+
+    const results = [];
+
+    for (const rawId of invitationIds) {
+      const id = (rawId || "").trim();
+      const row = byId.get(id);
+
+      if (!row) {
+        results.push({ invitationId: id, ok: false, error: "Not found in CSV" });
+        continue;
+      }
+
+      const status = (row.status || "").toLowerCase().trim();
+      if (status === "sent" || status === "responded") {
+        results.push({
+          invitationId: id,
+          ok: false,
+          error: `Already ${status}`,
+        });
+        continue;
+      }
+
+      try {
+        // Build the live email using the *existing* invitationId from the CSV
+        const { subject, plainText, html } = await sendLiveInvitationEmail({
+          email: row.email,
+          customerId: row.customerId || "",
+          customerName: row.customerName || "",
+          businessName: row.businessName || "",
+          stage: row.stage || "",
+          surveyId: row.surveyId || "",
+          fromName: "Nicholas d'Envola",
+          fromEmail: process.env.ZOHO_FROM_EMAIL,
+          invitationId: id, // <- reuse existing ID
+        });
+
+        if (!process.env.ZOHO_FROM_EMAIL) {
+          throw new Error("ZOHO_FROM_EMAIL not configured");
+        }
+
+        await mailer.sendMail({
+          from: `"Nicholas d'Envola" <${process.env.ZOHO_FROM_EMAIL}>`,
+          to: row.email,
+          replyTo: process.env.ZOHO_FROM_EMAIL,
+          bcc: "hello@npsme.com",
+          subject,
+          text: plainText,
+          html,
+        });
+
+        await markLiveInvitationSent(id);
+
+        results.push({ invitationId: id, ok: true });
+      } catch (e) {
+        console.error("[npsme] Error sending live invitation", id, e);
+        results.push({ invitationId: id, ok: false, error: e.message });
+      }
+    }
+
+    res.json({ ok: true, results });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-invitations/send-batch", err);
+    res.status(500).json({ error: "Failed to send batch invitations" });
   }
 });
 

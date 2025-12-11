@@ -39,6 +39,7 @@ export const ROUTES_MANIFEST = [
   // LIVE survey journey
   { path: "/live-invitation-survey",           label: "Live invitation survey",           enabled: true,  inHeader: false,  inFooter: false },
   { path: "/live-survey-page",                 label: "Live survey Page",                 enabled: true,  inHeader: false,  inFooter: false },
+  { path: "/live-survey-admin-page",           label: "Live survey Admin Page",           enabled: true,  inHeader: false,  inFooter: false },
   { path: "/live-survey/thanks",               label: "Live survey thanks",               enabled: true,  inHeader: false,  inFooter: false },
   { path: "/live-results",                     label: "Live survey results",              enabled: true,  inHeader: false,  inFooter: false },
 

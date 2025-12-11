@@ -31,6 +31,7 @@ import DemoSurveyPage from "./pages/DemoSurveyPage";
 import DemoInvitationSurvey from "./pages/DemoInvitationSurvey";
 import DemoThankYou from "./pages/DemoThankYou";
 import LiveInvitationSurvey from "./pages/LiveInvitationSurvey";
+import LiveSurveyAdminPage from "./pages/LiveSurveyAdminPage";
 import LiveSurveyPage from "./pages/LiveSurveyPage";
 import LiveThankYou from "./pages/LiveThankYou";
 import LiveResultsPanel from "./pages/LiveResultsPanel";
@@ -77,6 +78,7 @@ const COMPONENTS = {
   "/live-survey-page": LiveSurveyPage,
   "/live-survey/thanks": LiveThankYou,
   "/live-results": LiveResultsPanel,
+  "/live-survey-admin-page": LiveSurveyAdminPage,
 
   // NPSme data
   "/cx-pulse-sample": CxPulseSample,

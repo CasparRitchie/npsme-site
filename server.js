@@ -1285,12 +1285,7 @@ async function appendLiveInvitationRow(row) {
   }
 
   const header =
-    "invitationId,customerId,customerName,businessName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
-
-  const existing = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
-    console.error("[npsme] Error reading live invitations.csv", err);
-    return null;
-  });
+    "invitationId,customerId,customerName,businessName,email,stage,surveyId,typeOfDevice,assistanceMaternelle,sentAt,resentCount,lastSentAt,status,responseId";
 
   const fields = [
     row.invitationId,
@@ -1300,12 +1295,18 @@ async function appendLiveInvitationRow(row) {
     row.email,
     row.stage || "",
     row.surveyId || "",
+    row.typeOfDevice || "",
+    row.assistanceMaternelle || "",
     row.sentAt,
     row.resentCount ?? 0,
     row.lastSentAt || row.sentAt,
     row.status || "sent",
     row.responseId || "",
   ];
+    const existing = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
+      console.error("[npsme] Error reading live invitations.csv", err);
+      return null;
+    });
 
   const line = fields.map(escapeCsv).join(",");
 
@@ -1332,49 +1333,22 @@ async function appendLiveResponseRow(row) {
     return;
   }
 
+  const header = "responseId,invitationId,score,comment,createdAt";
+
   const existing = await readDropboxFile(LIVE_RESPONSES_PATH).catch((err) => {
     console.error("[npsme] Error reading live-responses.csv", err);
     return null;
   });
 
-  let delimiter = ",";
-  if (existing) {
-    const firstLine = existing.split(/\r?\n/)[0] || "";
-    delimiter = detectDelimiter(firstLine);
-  }
-
-  const headerFields = [
-    "responseId",
-    "invitationId",
-    "customerId",
-    "customerName",
-    "businessName",
-    "email",
-    "stage",
-    "surveyId",
-    "type",
-    "score",
-    "comment",
-    "createdAt",
-  ];
-  const header = headerFields.join(delimiter);
-
   const fields = [
     row.responseId,
-    row.invitationId,
-    row.customerId || "",
-    row.customerName || "",
-    row.businessName || "",
-    row.email || "",
-    row.stage || "",
-    row.surveyId || "",
-    row.type || "",
+    row.invitationId || "",
     row.score,
     row.comment || "",
     row.createdAt,
   ];
 
-  const line = fields.map((v) => escapeCsv(v, delimiter)).join(delimiter);
+  const line = fields.map((v) => escapeCsv(v, ",")).join(",");
 
   const contents = existing
     ? `${existing.replace(/\n*$/, "")}\n${line}\n`

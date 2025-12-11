@@ -71,6 +71,87 @@ async function sendInvitationEmail({ email, customerId, customerName, businessNa
   return { invitationId, subject, plainText, html };
 }
 
+async function sendLiveInvitationEmail({
+  email,
+  customerId,
+  customerName,
+  businessName,
+  stage,
+  surveyId,
+  fromName,   // e.g. "Nicholas from Envola"
+  fromEmail,  // not used in body, but handy if you want later
+}) {
+  const politeName = customerName
+    ? `Bonjour ${customerName},`
+    : "Bonjour,";
+
+  const invitationId = generateInvitationId();
+  const surveyUrl = `https://www.npsme.com/live-invitation-survey?inv=${encodeURIComponent(
+    invitationId
+  )}`;
+
+  const _businessName = businessName || "Envola";
+  const _fromName = fromName || "Nicholas d'Envola"; // 🔹 with the H
+
+  const subject = `Votre avis compte beaucoup pour ${_businessName}`;
+
+  const plainTextLines = [
+    politeName,
+    "",
+    `Nous vous invitons à répondre à un court questionnaire de satisfaction (1–2 minutes) pour nous aider à améliorer l'expérience proposée par ${_businessName}.`,
+    "",
+    `Répondre au questionnaire : ${surveyUrl}`,
+    "",
+    "Merci beaucoup pour votre aide,",
+    _fromName,
+  ];
+
+  const plainText = plainTextLines.join("\n");
+
+  const html = `
+    <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#152238; background:#f5f7ff; padding:24px;">
+      <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:20px;border:1px solid #e0e7ff;box-shadow:0 20px 40px rgba(15,23,42,0.06);padding:24px 28px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-weight:700;font-size:18px;letter-spacing:0.04em;color:#263b87;">
+            Envola
+          </div>
+          <div style="font-size:12px;padding:4px 10px;border-radius:999px;background:#e3ebff;color:#263b87;font-weight:500;">
+            Questionnaire de satisfaction
+          </div>
+        </div>
+
+        <p style="margin:0 0 12px 0;">${politeName}</p>
+        <p style="margin:0 0 8px 0;">
+          Nous vous invitons à répondre à un court questionnaire de satisfaction (1–2 minutes)
+          pour nous aider à améliorer l'expérience proposée par <strong>${_businessName}</strong>.
+        </p>
+        <p style="margin:16px 0;">
+          <a href="${surveyUrl}"
+             style="display:inline-block;padding:10px 20px;border-radius:999px;
+                    background:#263b87;color:#ffffff;text-decoration:none;font-weight:600;
+                    box-shadow:0 10px 20px rgba(38,59,135,0.25);">
+            Répondre au questionnaire
+          </a>
+        </p>
+        <p style="font-size:12px;color:#6b7280;margin-top:16px;line-height:1.5;">
+          Ce lien est associé à une référence unique afin d'éviter de vous relancer inutilement.
+          Si ce message ne vous était pas destiné, vous pouvez simplement l'ignorer.
+        </p>
+        <p style="margin-top:16px;">
+          Merci beaucoup pour votre aide,<br/>
+          ${_fromName}
+        </p>
+
+        <p style="margin-top:20px;font-size:11px;color:#9ca3af;">
+          Propulsé par <a href="https://www.npsme.com" style="color:#263b87;text-decoration:underline;">NPS Me</a>.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return { invitationId, subject, plainText, html };
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -911,22 +992,39 @@ app.post("/api/send-invitation", async (req, res) => {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    // Build content + ID
-    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
-      email,
-      customerId,
-      customerName,
-      businessName,
-      stage,
-      surveyId,
-      fromName,
-      fromEmail,
-      replyToEmail,
-    });
+    // 1) Decide who the email appears to come from
+    const effectiveFromName =
+      fromName || process.env.ZOHO_FROM_NAME || "NPS Me";
+
+    const effectiveFromEmail =
+      fromEmail || process.env.ZOHO_FROM_EMAIL;
+
+    // Reply-To: explicitly provided, or fall back to from
+    const effectiveReplyTo =
+      replyToEmail || effectiveFromEmail;
+
+    if (!effectiveFromEmail) {
+      console.error("[npsme] No from email configured");
+      return res.status(500).json({ error: "Email configuration error" });
+    }
+
+    // 2) Build content + ID (still pass the raw values so the template can personalise signature etc.)
+    const { subject, plainText, html, invitationId } =
+      await sendInvitationEmail({
+        email,
+        customerId,
+        customerName,
+        businessName,
+        stage,
+        surveyId,
+        fromName: effectiveFromName,
+        fromEmail: effectiveFromEmail,
+        replyToEmail: effectiveReplyTo,
+      });
 
     const sentAt = new Date().toISOString();
 
-    // 1) Log to Dropbox
+    // 3) Log to Dropbox (including invitationId)
     await appendInvitationRow({
       invitationId,
       customerId,
@@ -942,7 +1040,7 @@ app.post("/api/send-invitation", async (req, res) => {
       responseId: "",
     });
 
-    // 2) Send email via Zoho (single send)
+    // 4) Send email via Zoho
     const info = await mailer.sendMail({
       from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
       to: email,
@@ -964,6 +1062,96 @@ app.post("/api/send-invitation", async (req, res) => {
   }
 });
 
+// NEW: send LIVE Envola invitation
+app.post("/api/send-live-invitation", async (req, res) => {
+  try {
+    const {
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName,
+      fromEmail,
+      replyToEmail,
+      typeOfDevice,
+      assistanteMaternelle, // frontend will POST this as free-text
+    } = req.body || {};
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    // 1) Decide who the email appears to come from
+    const effectiveFromName =
+      fromName || "Nicholas d'Envola"; // default with the H and Envola brand
+
+    const effectiveFromEmail =
+      fromEmail || process.env.ZOHO_FROM_EMAIL;
+
+    const effectiveReplyTo =
+      replyToEmail || effectiveFromEmail;
+
+    if (!effectiveFromEmail) {
+      console.error("[npsme] LIVE: No from email configured");
+      return res.status(500).json({ error: "Email configuration error" });
+    }
+
+    // 2) Build LIVE email content + ID
+    const { subject, plainText, html, invitationId } =
+      await sendLiveInvitationEmail({
+        email,
+        customerId,
+        customerName,
+        businessName,
+        stage,
+        surveyId,
+        fromName: effectiveFromName,
+        fromEmail: effectiveFromEmail,
+      });
+
+    const sentAt = new Date().toISOString();
+
+    // 3) Log to LIVE invitations CSV (includes typeOfDevice + assistanteMaternelle)
+    await appendLiveInvitationRow({
+      invitationId,
+      customerId,
+      customerName,
+      businessName,
+      email,
+      stage,
+      surveyId,
+      typeOfDevice: typeOfDevice || "",
+      assistanteMaternelle: assistanteMaternelle || "",
+      sentAt,
+      resentCount: 0,
+      lastSentAt: sentAt,
+      status: "sent",
+      responseId: "",
+    });
+
+    // 4) Send email via Zoho
+    const info = await mailer.sendMail({
+      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
+      to: email,
+      replyTo: effectiveReplyTo,
+      bcc: "hello@npsme.com",
+      subject,
+      text: plainText,
+      html,
+    });
+
+    res.json({
+      ok: true,
+      invitationId,
+      messageId: info.messageId,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/send-live-invitation", err);
+    res.status(500).json({ error: "Failed to send live invitation" });
+  }
+});
 
 // Validate a demo survey link
 app.get("/api/demo-survey/lookup", async (req, res) => {
@@ -1299,7 +1487,7 @@ async function appendLiveInvitationRow(row) {
   }
 
   const header =
-    "invitationId,customerId,customerName,businessName,email,stage,surveyId,typeOfDevice,assistanceMaternelle,sentAt,resentCount,lastSentAt,status,responseId";
+    "invitationId,customerId,customerName,businessName,email,stage,surveyId,typeOfDevice,assistanteMaternelle,sentAt,resentCount,lastSentAt,status,responseId";
 
   const fields = [
     row.invitationId,
@@ -1310,7 +1498,7 @@ async function appendLiveInvitationRow(row) {
     row.stage || "",
     row.surveyId || "",
     row.typeOfDevice || "",
-    row.assistanceMaternelle || "",
+    row.assistanteMaternelle || "",
     row.sentAt,
     row.resentCount ?? 0,
     row.lastSentAt || row.sentAt,
@@ -1490,7 +1678,7 @@ app.get("/api/live-survey/lookup", async (req, res) => {
         stage: invitation.stage || "",
         surveyId: invitation.surveyId || "",
         typeOfDevice: invitation.typeOfDevice || "",
-        assistanceMaternelle: invitation.assistanceMaternelle || "",
+        assistanteMaternelle: invitation.assistanteMaternelle || "",
       },
     });
   } catch (err) {

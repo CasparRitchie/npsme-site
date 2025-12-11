@@ -166,10 +166,10 @@ export default function LiveInvitationSurvey() {
           </p>
         )}
 
-        {invitation.assistanceMaternelle && (
+        {invitation.assistanteMaternelle && (
           <p style={{ marginTop: "0.25rem", fontSize: "0.9rem", opacity: 0.85 }}>
             Assistance maternelle :{" "}
-            <strong>{invitation.assistanceMaternelle}</strong>
+            <strong>{invitation.assistanteMaternelle}</strong>
           </p>
         )}
 

@@ -90,7 +90,7 @@ export default function LiveResultsPanel() {
   const overallNps = computeNps(scores);
 
   const byDevice = groupByKey(rows, "typeOfDevice");
-  const byAssist = groupByKey(rows, "assistanceMaternelle");
+  const byAssist = groupByKey(rows, "assistanteMaternelle");
 
   return (
     <div className="results-panel">

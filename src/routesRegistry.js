@@ -74,7 +74,7 @@ const COMPONENTS = {
 
   // Live survey components
   "/live-invitation-survey": LiveInvitationSurvey,
-  "/live-survey": LiveSurveyPage,
+  "/live-survey-page": LiveSurveyPage,
   "/live-thank-you": LiveThankYou,
   "/live-results": LiveResultsPanel,
 

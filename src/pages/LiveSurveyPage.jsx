@@ -110,7 +110,7 @@ export default function LiveSurveyPage() {
       }
 
       // Success: navigate to thank-you page, passing the score in the URL
-      navigate(`/live-thank-you?score=${encodeURIComponent(score)}`);
+    navigate(`/live-survey/thanks?score=${encodeURIComponent(score)}`);
     } catch (err) {
       console.error("[LiveSurveyPage] submit error", err);
       setError(

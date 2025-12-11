@@ -79,6 +79,12 @@ export default function LiveInvitationSurvey() {
             <span className="envola-badge">Questionnaire de satisfaction</span>
           </div>
           <p>Chargement du questionnaire…</p>
+          <p className="envola-powered">
+            Propulsé par{" "}
+            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+              NPS Me
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -95,6 +101,12 @@ export default function LiveInvitationSurvey() {
           </div>
           <h1>Oups…</h1>
           <p>{error}</p>
+          <p className="envola-powered">
+            Propulsé par{" "}
+            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+              NPS Me
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -112,6 +124,12 @@ export default function LiveInvitationSurvey() {
           <h1>Oups…</h1>
           <p>
             Une erreur inattendue s'est produite. Merci de réessayer plus tard.
+          </p>
+          <p className="envola-powered">
+            Propulsé par{" "}
+            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+              NPS Me
+            </a>
           </p>
         </div>
       </div>
@@ -182,6 +200,12 @@ export default function LiveInvitationSurvey() {
         >
           Votre réponse est confidentielle et ne sera utilisée que pour améliorer
           l'expérience proposée.
+        </p>
+        <p className="envola-powered">
+          Propulsé par{" "}
+          <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+            NPS Me
+          </a>
         </p>
       </div>
     </div>

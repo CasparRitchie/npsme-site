@@ -50,6 +50,12 @@ export default function LiveThankYou() {
           Si vous avez d'autres remarques, n'hésitez pas à les partager avec
           votre interlocuteur habituel.
         </p>
+        <p className="envola-powered">
+          Propulsé par{" "}
+          <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+            NPS Me
+          </a>
+        </p>
       </div>
     </div>
   );

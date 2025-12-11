@@ -146,6 +146,12 @@ export default function LiveSurveyPage() {
           </div>
           <h1>Oups…</h1>
           <p>{error}</p>
+          <p className="envola-powered">
+            Propulsé par{" "}
+            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+              NPS Me
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -277,6 +283,12 @@ export default function LiveSurveyPage() {
         >
           Ce questionnaire est géré par NPS Me. Votre réponse sera utilisée pour
           améliorer l'expérience proposée.
+        </p>
+        <p className="envola-powered">
+          Propulsé par{" "}
+          <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+            NPS Me
+          </a>
         </p>
       </div>
     </div>

@@ -895,7 +895,17 @@ app.post("/api/send-test-email", async (req, res) => {
 
 app.post("/api/send-invitation", async (req, res) => {
   try {
-    const { email, customerId, customerName, businessName, stage, surveyId } = req.body || {};
+    const {
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName,
+      fromEmail,
+      replyToEmail,
+    } = req.body || {};
 
     if (!email) {
       return res.status(400).json({ error: "Email is required" });
@@ -909,6 +919,9 @@ app.post("/api/send-invitation", async (req, res) => {
       businessName,
       stage,
       surveyId,
+      fromName,
+      fromEmail,
+      replyToEmail,
     });
 
     const sentAt = new Date().toISOString();
@@ -931,8 +944,9 @@ app.post("/api/send-invitation", async (req, res) => {
 
     // 2) Send email via Zoho (single send)
     const info = await mailer.sendMail({
-      from: '"NPS Me" <hello@npsme.com>',
+      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
       to: email,
+      replyTo: effectiveReplyTo,
       bcc: "hello@npsme.com",
       subject,
       text: plainText,

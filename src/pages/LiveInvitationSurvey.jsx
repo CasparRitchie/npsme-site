@@ -27,7 +27,7 @@ export default function LiveInvitationSurvey() {
     const fetchInvitation = async () => {
       try {
         const res = await fetch(
-          `/api/live-survey/lookup?inv=${encodeURIComponent(inv)}`
+          `/api/live-survey-page/lookup?inv=${encodeURIComponent(inv)}`
         );
 
         if (res.status === 404) {

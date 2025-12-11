@@ -75,7 +75,7 @@ const COMPONENTS = {
   // Live survey components
   "/live-invitation-survey": LiveInvitationSurvey,
   "/live-survey-page": LiveSurveyPage,
-  "/live-thank-you": LiveThankYou,
+  "/live-survey/thanks": LiveThankYou,
   "/live-results": LiveResultsPanel,
 
   // NPSme data

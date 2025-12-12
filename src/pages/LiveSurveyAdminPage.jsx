@@ -3,7 +3,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import Seo from "../components/Seo";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { t } from "../i18n/translations.js";
+import { t as translate} from "../i18n/translations.js";
 
 function normaliseStatus(s) {
   const v = (s || "").toLowerCase().trim();
@@ -135,7 +135,7 @@ function StatusPill({ status, label }) {
 export default function LiveSurveyAdminPage() {
   const { lang } = useLanguage();
   const location = useLocation();
-  const tr = (key, fallback) => t(lang, key, fallback);
+  const tr = (key, fallback) => translate(lang, key, fallback);
 
   const [invites, setInvites] = React.useState([]);
   const [responses, setResponses] = React.useState([]);

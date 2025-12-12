@@ -23,7 +23,7 @@ export default function SiteFooter() {
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           {footerLinks.map(({ path, label, labelKey }) => {
-            const text = tr(lang, labelKey, label);
+            const text = translations(lang, labelKey, label);
 
             if (isExternal(path)) {
               return (
@@ -48,7 +48,11 @@ export default function SiteFooter() {
             }
 
             return (
-              <Link key={path} to={localizePath(path, lang)} className="hover:text-slate-200">
+              <Link
+                key={path}
+                to={localizePath(path, lang)}
+                className="hover:text-slate-200"
+              >
                 {text}
               </Link>
             );

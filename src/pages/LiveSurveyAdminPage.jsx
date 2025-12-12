@@ -3,7 +3,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import Seo from "../components/Seo";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { tr } from "../i18n/translations.js";
+import { tr as t} from "../i18n/translations.js";
 
 function normaliseStatus(s) {
   const v = (s || "").toLowerCase().trim();

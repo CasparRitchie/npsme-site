@@ -36,8 +36,9 @@ export default function SiteFooter() {
               );
             }
             return (
-              <Link key={label} to={path} className="hover:text-slate-200">
-                {text}
+              <Link key={label} to={localizePath(path, lang)} className="hover:text-slate-200">
+                {/* {t(lang, labelKey, label)} */}
+                {label}
               </Link>
             );
           })}

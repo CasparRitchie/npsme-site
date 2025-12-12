@@ -1,52 +1,88 @@
-// src/i18n/LanguageContext.jsx
+// // src/i18n/LanguageContext.jsx
+// import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+// import { useLocation } from "react-router-dom";
+
+// const LanguageContext = createContext({
+//   lang: "en",
+//   setLang: () => {},
+// });
+
+// const SUPPORTED_LANGS = ["en", "fr"];
+// const STORAGE_KEY = "npsme.lang";
+
+// export function LanguageProvider({ children }) {
+//   const location = useLocation();
+//   const [lang, setLangState] = useState("en");
+
+//   // 1️⃣ Detect language from URL prefix (/fr/...)
+//   useEffect(() => {
+//     const match = location.pathname.match(/^\/(fr)(\/|$)/);
+//     if (match) {
+//       setLangState("fr");
+//       document.documentElement.lang = "fr";
+//       return;
+//     }
+
+//     // Default to English
+//     setLangState("en");
+//     document.documentElement.lang = "en";
+//   }, [location.pathname]);
+
+//   // 2️⃣ Allow manual override (navbar toggle)
+//   const setLang = (next) => {
+//     const normalised = SUPPORTED_LANGS.includes(next) ? next : "en";
+//     setLangState(normalised);
+//     document.documentElement.lang = normalised;
+//     try {
+//       localStorage.setItem(STORAGE_KEY, normalised);
+//     } catch {
+//       // ignore
+//     }
+//   };
+
+//   const value = useMemo(() => ({ lang, setLang }), [lang]);
+
+//   return (
+//     <LanguageContext.Provider value={value}>
+//       {children}
+//     </LanguageContext.Provider>
+//   );
+// }
+
+// export function useLanguage() {
+//   return useContext(LanguageContext);
+// }
+
+
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-const LanguageContext = createContext({
-  lang: "en",
-  setLang: () => {},
-});
+const LanguageContext = createContext({ lang: "en", setLang: () => {} });
 
-const SUPPORTED_LANGS = ["en", "fr"];
 const STORAGE_KEY = "npsme.lang";
 
 export function LanguageProvider({ children }) {
   const location = useLocation();
   const [lang, setLangState] = useState("en");
 
-  // 1️⃣ Detect language from URL prefix (/fr/...)
+  // keep lang in sync with URL prefix
   useEffect(() => {
-    const match = location.pathname.match(/^\/(fr)(\/|$)/);
-    if (match) {
-      setLangState("fr");
-      document.documentElement.lang = "fr";
-      return;
-    }
-
-    // Default to English
-    setLangState("en");
-    document.documentElement.lang = "en";
+    const isFr = location.pathname === "/fr" || location.pathname.startsWith("/fr/");
+    const next = isFr ? "fr" : "en";
+    setLangState(next);
+    try { localStorage.setItem(STORAGE_KEY, next); } catch {}
   }, [location.pathname]);
 
-  // 2️⃣ Allow manual override (navbar toggle)
+  // setLang should navigate (not just flip state) in /fr mode
   const setLang = (next) => {
-    const normalised = SUPPORTED_LANGS.includes(next) ? next : "en";
+    const normalised = next === "fr" ? "fr" : "en";
     setLangState(normalised);
-    document.documentElement.lang = normalised;
-    try {
-      localStorage.setItem(STORAGE_KEY, normalised);
-    } catch {
-      // ignore
-    }
+    try { localStorage.setItem(STORAGE_KEY, normalised); } catch {}
+    // navigation handled in Navbar toggle (next step)
   };
 
   const value = useMemo(() => ({ lang, setLang }), [lang]);
-
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {

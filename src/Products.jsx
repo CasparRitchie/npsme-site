@@ -1,26 +1,41 @@
-// src/Products.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
-
+import { useLanguage } from "./i18n/LanguageContext.jsx";
+import { t, TRANSLATIONS } from "./i18n/translations.js";
 
 export default function Products() {
+  const { lang } = useLanguage();
+
+  // Convenience accessor (so we can pull arrays like bullets cleanly)
+  const tr = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
+  const seoTitle = t(lang, "products.seoTitle", "Products | NPS Me");
+  const seoDescription = t(
+    lang,
+    "products.seoDescription",
+    "Pick a CX package to improve outcomes."
+  );
+
+  const pulseLeft = tr?.products?.pulseExplainer?.left || [];
+  const pulseRight = tr?.products?.pulseExplainer?.right || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <Seo
-        path="/products"
-        title="Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me"
-        description="Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports."
-      />
+      <Seo path="/products" title={seoTitle} description={seoDescription} />
 
       <PageHeader
-        iconLabel="Productized CX services"
-        tag="NPS Me / Services"
-        accent="Productized services"
-        title="that turn feedback into growth"
-        subtitle="Pick the package that fits your stage—from foundations, to enablement, to a weekly CX intelligence feed you can act on."
+        iconLabel={t(lang, "products.header.iconLabel", "Productized CX services")}
+        tag={t(lang, "products.header.tag", "NPS Me / Services")}
+        accent={t(lang, "products.header.accent", "Productized services")}
+        title={t(lang, "products.header.title", "that turn feedback into growth")}
+        subtitle={t(
+          lang,
+          "products.header.subtitle",
+          "Pick the package that fits your stage."
+        )}
       />
 
       {/* Product cards */}
@@ -28,82 +43,87 @@ export default function Products() {
         <div className="grid gap-6 md:grid-cols-3">
           <ProductCard
             icon={<Search className="h-5 w-5 text-white" />}
-            title="Feedback Foundations"
-            price="from £450"
-            bullets={[
-              "Review mining & journey audit",
-              "Baseline NPS®/CSAT/CES & quick wins",
-              "Prioritised roadmap (effort/impact)"
-            ]}
-            // ⬇ changed to /book
-            cta={{ label: "Request audit", href: "/book" }}
+            title={t(lang, "products.cards.foundations.title", "Feedback Foundations")}
+            price={t(lang, "products.cards.foundations.price", "from £450")}
+            bullets={tr?.products?.cards?.foundations?.bullets || []}
+            cta={{
+              label: t(lang, "products.cards.foundations.cta", "Request audit"),
+              href: "/book",
+            }}
           />
 
           <ProductCard
             icon={<LineChart className="h-5 w-5 text-white" />}
-            title="Momentum Program"
-            price="from £850/mo"
-            bullets={[
-              "Hands-on implementation & enablement",
-              "Monthly review cycles & dashboards",
-              "Measured lift on key outcomes"
-            ]}
-            // ⬇ changed to /book
-            cta={{ label: "Book discovery", href: "/book" }}
+            title={t(lang, "products.cards.momentum.title", "Momentum Program")}
+            price={t(lang, "products.cards.momentum.price", "from £850/mo")}
+            bullets={tr?.products?.cards?.momentum?.bullets || []}
+            cta={{
+              label: t(lang, "products.cards.momentum.cta", "Book discovery"),
+              href: "/book",
+            }}
           />
 
           <ProductCard
             featured
             icon={<Newspaper className="h-5 w-5 text-white" />}
-            title="CX Pulse Report (weekly)"
-            price="from £190/mo"
-            bullets={[
-              "Social listening across X/LinkedIn/Reddit/Reviews",
-              "Top themes, sentiment & competitor pulse",
-              "1-page actionable summary + next steps"
-            ]}
-            cta={{ label: "See sample report", href: "/cx-pulse-sample" }}
-            footnote="Starts manual, scales with automation. Cancel anytime."
+            title={t(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
+            price={t(lang, "products.cards.pulse.price", "from £190/mo")}
+            bullets={tr?.products?.cards?.pulse?.bullets || []}
+            cta={{
+              label: t(lang, "products.cards.pulse.cta", "See sample report"),
+              href: "/cx-pulse-sample",
+            }}
+            footnote={t(lang, "products.cards.pulse.footnote", "")}
           />
         </div>
 
         {/* Explainer for CX Pulse */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">What you get in the weekly CX Pulse</h2>
+          <h2 className="text-xl md:text-2xl font-semibold text-white">
+            {t(lang, "products.pulseExplainer.title", "What you get in the weekly CX Pulse")}
+          </h2>
+
           <div className="mt-4 grid md:grid-cols-2 gap-6 text-sm text-slate-300">
             <ul className="space-y-2 list-disc pl-5">
-              <li>Sentiment pulse (WoW change, drivers)</li>
-              <li>Emerging topics (3-5 themes with examples)</li>
-              <li>Competitor comparison (optional)</li>
+              {pulseLeft.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
             <ul className="space-y-2 list-disc pl-5">
-              <li>Plain-English insight summary (what to do next)</li>
-              <li>Lightweight dashboard (rolling trends)</li>
-              <li>Delivery on the same weekday, every week</li>
+              {pulseRight.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
           </div>
         </div>
 
         {/* CTA */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 text-center">
-          <h3 className="text-2xl font-semibold text-white">Ready for a sample?</h3>
+          <h3 className="text-2xl font-semibold text-white">
+            {t(lang, "products.cta.title", "Ready for a sample?")}
+          </h3>
           <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-            I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.
+            {t(
+              lang,
+              "products.cta.body",
+              "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days."
+            )}
           </p>
+
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:hello@npsme.com?subject=Sample%20CX%20Pulse%20request"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
             >
-              Email hello@npsme.com
+              {t(lang, "products.cta.email", "Email hello@npsme.com")}
               <ArrowRight className="h-4 w-4" />
             </a>
-            {/* ⬇ changed to internal Link -> /book */}
+
             <Link
               to="/book"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
-              Book discovery
+              {t(lang, "products.cta.book", "Book discovery")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -135,9 +155,11 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
         </div>
         <h3 className="font-semibold text-white">{title}</h3>
       </div>
+
       <div className="mt-2 text-sm text-slate-400">{price}</div>
+
       <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
-        {bullets.map((b) => (
+        {(bullets || []).map((b) => (
           <li key={b}>{b}</li>
         ))}
       </ul>
@@ -150,7 +172,7 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
         <ArrowRight className="h-4 w-4" />
       </CTA>
 
-      {footnote && <p className="mt-3 text-[11px] text-slate-500">{footnote}</p>}
+      {footnote ? <p className="mt-3 text-[11px] text-slate-500">{footnote}</p> : null}
     </div>
   );
 }

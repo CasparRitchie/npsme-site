@@ -18,6 +18,77 @@ export const TRANSLATIONS = {
       blog: "Blog",
       cxCockpit: "CX Cockpit",
     },
+    products: {
+      seoTitle:
+        "Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me",
+      seoDescription:
+        "Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports.",
+
+      header: {
+        iconLabel: "Productized CX services",
+        tag: "NPS Me / Services",
+        accent: "Productized services",
+        title: "that turn feedback into growth",
+        subtitle:
+          "Pick the package that fits your stage—from foundations, to enablement, to a weekly CX intelligence feed you can act on.",
+      },
+
+      cards: {
+        foundations: {
+          title: "Feedback Foundations",
+          price: "from £450",
+          bullets: [
+            "Review mining & journey audit",
+            "Baseline NPS®/CSAT/CES & quick wins",
+            "Prioritised roadmap (effort/impact)",
+          ],
+          cta: "Request audit",
+        },
+        momentum: {
+          title: "Momentum Program",
+          price: "from £850/mo",
+          bullets: [
+            "Hands-on implementation & enablement",
+            "Monthly review cycles & dashboards",
+            "Measured lift on key outcomes",
+          ],
+          cta: "Book discovery",
+        },
+        pulse: {
+          title: "CX Pulse Report (weekly)",
+          price: "from £190/mo",
+          bullets: [
+            "Social listening across X/LinkedIn/Reddit/Reviews",
+            "Top themes, sentiment & competitor pulse",
+            "1-page actionable summary + next steps",
+          ],
+          cta: "See sample report",
+          footnote: "Starts manual, scales with automation. Cancel anytime.",
+        },
+      },
+
+      pulseExplainer: {
+        title: "What you get in the weekly CX Pulse",
+        left: [
+          "Sentiment pulse (WoW change, drivers)",
+          "Emerging topics (3-5 themes with examples)",
+          "Competitor comparison (optional)",
+        ],
+        right: [
+          "Plain-English insight summary (what to do next)",
+          "Lightweight dashboard (rolling trends)",
+          "Delivery on the same weekday, every week",
+        ],
+      },
+
+      cta: {
+        title: "Ready for a sample?",
+        body:
+          "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.",
+        email: "Email hello@npsme.com",
+        book: "Book discovery",
+      },
+    },
     cxCockpit: {
       seoTitle: "CX Cockpit (Demo) | NPS Me",
       seoDescription:
@@ -64,6 +135,78 @@ export const TRANSLATIONS = {
       socialListening: "Social listening",
       blog: "Blog",
       cxCockpit: "Cockpit CX",
+    },
+    products: {
+      seoTitle:
+        "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",
+      seoDescription:
+        "Choisissez une offre CX pour améliorer le NPS®, réduire la charge support et augmenter la rétention : Feedback Foundations, Momentum Program et rapports CX Pulse hebdomadaires.",
+
+      header: {
+        iconLabel: "Offres CX packagées",
+        tag: "NPS Me / Services",
+        accent: "Offres packagées",
+        title: "qui transforment le feedback en croissance",
+        subtitle:
+          "Choisissez le pack adapté à votre étape : bases, accompagnement, ou un flux hebdomadaire d’insights CX actionnables.",
+      },
+
+      cards: {
+        foundations: {
+          title: "Feedback Foundations",
+          price: "à partir de 450 £",
+          bullets: [
+            "Analyse des avis & audit du parcours",
+            "NPS®/CSAT/CES de référence & quick wins",
+            "Roadmap priorisée (effort/impact)",
+          ],
+          cta: "Demander un audit",
+        },
+        momentum: {
+          title: "Momentum Program",
+          price: "à partir de 850 £/mois",
+          bullets: [
+            "Mise en œuvre & accompagnement",
+            "Cycles mensuels & dashboards",
+            "Amélioration mesurée des résultats",
+          ],
+          cta: "Prendre rendez-vous",
+        },
+        pulse: {
+          title: "Rapport CX Pulse (hebdo)",
+          price: "à partir de 190 £/mois",
+          bullets: [
+            "Social listening (X/LinkedIn/Reddit/Avis)",
+            "Thèmes clés, sentiment & pouls concurrentiel",
+            "Synthèse actionnable (1 page) + prochaines étapes",
+          ],
+          cta: "Voir un exemple",
+          footnote:
+            "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
+        },
+      },
+
+      pulseExplainer: {
+        title: "Ce que vous recevez dans le CX Pulse hebdomadaire",
+        left: [
+          "Baromètre de sentiment (évolution semaine/semaine, causes)",
+          "Sujets émergents (3–5 thèmes avec exemples)",
+          "Comparaison concurrentielle (option)",
+        ],
+        right: [
+          "Synthèse claire (quoi faire ensuite)",
+          "Dashboard léger (tendances)",
+          "Livraison le même jour chaque semaine",
+        ],
+      },
+
+      cta: {
+        title: "Prêt pour un exemple ?",
+        body:
+          "Je réalise un CX Pulse ponctuel sur votre marque et je vous envoie le PDF sous quelques jours.",
+        email: "Écrire à hello@npsme.com",
+        book: "Prendre rendez-vous",
+      },
     },
     cxCockpit: {
       seoTitle: "Cockpit CX (Démo) | NPS Me",

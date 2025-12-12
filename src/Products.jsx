@@ -4,13 +4,13 @@ import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
-import { translations } from "./i18n/translations.js";
+import { TRANSLATIONS, translations } from "./i18n/translations.js";
 import { localizePath } from "./i18n/pathHelpers.js";
 
 export default function Products() {
   const { lang } = useLanguage();
 
-  // Use "dict" for grabbing arrays/objects
+  // Use "dict" for grabbing arrays/objects (bullets etc.)
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const pulseLeft = dict?.products?.pulseExplainer?.left || [];
@@ -22,7 +22,11 @@ export default function Products() {
         path={localizePath("/products", lang)}
         lang={lang}
         title={translations(lang, "products.seoTitle", "Products | NPS Me")}
-        description={translations(lang, "products.seoDescription", "Pick a CX package to improve outcomes.")}
+        description={translations(
+          lang,
+          "products.seoDescription",
+          "Pick a CX package to improve outcomes."
+        )}
         alternates={[
           { lang: "en", href: "https://www.npsme.com/products" },
           { lang: "fr", href: "https://www.npsme.com/fr/products" },
@@ -99,7 +103,11 @@ export default function Products() {
             {translations(lang, "products.cta.title", "Ready for a sample?")}
           </h3>
           <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-            {translations(lang, "products.cta.body", "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.")}
+            {translations(
+              lang,
+              "products.cta.body",
+              "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days."
+            )}
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">

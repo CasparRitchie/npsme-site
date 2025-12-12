@@ -102,6 +102,11 @@ export const TRANSLATIONS = {
  * Example: t(lang, "navbar.bookDiscovery", "Book discovery")
  */
 export function t(lang, path, fallback) {
+  // ✅ Guard: never crash if a caller passes undefined/null/non-string
+  if (typeof path !== "string" || !path.trim()) {
+    return fallback !== undefined ? fallback : "";
+  }
+
   const parts = path.split(".");
   let current = TRANSLATIONS[lang] || TRANSLATIONS.en;
 

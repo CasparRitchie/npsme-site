@@ -10,7 +10,6 @@ function normaliseStatus(s) {
   return v || "pending";
 }
 
-// ✅ Keep ONE computeNps
 function computeNps(scores) {
   const clean = (scores || []).filter((n) => Number.isFinite(n));
   if (!clean.length) return null;
@@ -24,13 +23,10 @@ function toInt(v, fallback = 0) {
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
 }
 
-// ✅ Fix “Resends”: treat your stored count as “number of sends” (initial send counts as 1)
 function computeResendsFromRow(row) {
-  // If you later add a true "resends" field, we’ll honour it first:
   const explicitResends = row?.resends ?? row?.resendCount;
   if (Number.isFinite(Number(explicitResends))) return Math.max(0, toInt(explicitResends));
 
-  // Otherwise (current behaviour you described): "resentCount" is actually "sendCount"
   const sends = toInt(row?.sendCount ?? row?.sentCount ?? row?.resentCount ?? row?.sendsCount, 0);
   return Math.max(0, sends - 1);
 }
@@ -42,6 +38,10 @@ function formatMaybeIso(s) {
   return d.toISOString();
 }
 
+function interpolate(template, vars = {}) {
+  return String(template || "").replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? ""));
+}
+
 function ResponseDial({ value, label, valueLabel }) {
   const pct = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
   const style = {
@@ -49,11 +49,7 @@ function ResponseDial({ value, label, valueLabel }) {
   };
   return (
     <div className="flex items-center gap-3">
-      <div
-        className="h-12 w-12 rounded-full p-[3px]"
-        style={style}
-        aria-label={`${label} ${pct}%`}
-      >
+      <div className="h-12 w-12 rounded-full p-[3px]" style={style} aria-label={`${label} ${pct}%`}>
         <div className="h-full w-full rounded-full bg-slate-950/80 flex items-center justify-center">
           <span className="text-[11px] font-semibold text-slate-100">{pct}%</span>
         </div>
@@ -66,7 +62,6 @@ function ResponseDial({ value, label, valueLabel }) {
   );
 }
 
-// ✅ Little NPS dial (-100..+100)
 function NpsDial({ value, label }) {
   const size = 48;
   const stroke = 6;
@@ -135,7 +130,9 @@ function StatusPill({ status, label }) {
 export default function LiveSurveyAdminPage() {
   const { lang } = useLanguage();
   const location = useLocation();
-  const tr = (key, fallback) => t(lang, key, fallback);
+
+  // explicit helper (uses your new translations() function)
+  const tr = (key, fallback) => translations(lang, key, fallback);
 
   const [invites, setInvites] = React.useState([]);
   const [responses, setResponses] = React.useState([]);
@@ -164,15 +161,15 @@ export default function LiveSurveyAdminPage() {
       const invData = await invRes.json();
       const respData = await respRes.json();
 
-      if (!invRes.ok) throw new Error(invData.error || tr("liveAdmin.errors.loadInvites", "Failed to load invitations"));
-      if (!respRes.ok) throw new Error(respData.error || tr("liveAdmin.errors.loadResponses", "Failed to load responses"));
+      if (!invRes.ok) throw new Error(invData.error || tr("liveAdmin.errors.loadInvFail", "Failed to load invitations"));
+      if (!respRes.ok) throw new Error(respData.error || tr("liveAdmin.errors.loadRespFail", "Failed to load responses"));
 
       setInvites(invData.rows || []);
       setResponses(respData.rows || []);
       setSelectedIds(new Set());
     } catch (e) {
       console.error("loadAll error", e);
-      setError(e.message || tr("liveAdmin.errors.unableLoad", "Unable to load data."));
+      setError(e.message || tr("liveAdmin.errors.loadUnable", "Unable to load data."));
     } finally {
       setLoading(false);
     }
@@ -192,7 +189,6 @@ export default function LiveSurveyAdminPage() {
     });
   };
 
-  // Map latest response by invitationId (if duplicates exist, keep last by createdAt)
   const responseByInvitationId = React.useMemo(() => {
     const map = new Map();
     for (const r of responses || []) {
@@ -203,14 +199,11 @@ export default function LiveSurveyAdminPage() {
       const prev = map.get(id);
       const prevTime = prev?.createdAt ? new Date(prev.createdAt).getTime() : 0;
 
-      if (!prev || createdAt >= prevTime) {
-        map.set(id, r);
-      }
+      if (!prev || createdAt >= prevTime) map.set(id, r);
     }
     return map;
   }, [responses]);
 
-  // Buckets
   const pending = [];
   const sent = [];
   const started = [];
@@ -251,22 +244,23 @@ export default function LiveSurveyAdminPage() {
       });
 
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || tr("liveAdmin.errors.batchSendFailed", "Batch send failed"));
+      if (!res.ok || !data.ok) throw new Error(data.error || tr("liveAdmin.errors.sendFail", "Batch send failed"));
 
       const successes = (data.results || []).filter((r) => r.ok).length;
       const failures = (data.results || []).filter((r) => !r.ok).length;
 
-      setStatusMsg(
-        tr("liveAdmin.messages.sentPrefix", "Sent") +
-          ` ${successes} ` +
-          tr("liveAdmin.messages.invitationWord", successes === 1 ? "invitation" : "invitations") +
-          (failures ? `, ${failures} ${tr("liveAdmin.messages.failed", "failed")}.` : ".")
-      );
+      const plural = successes === 1 ? "" : "s";
+      const failSuffix = failures
+        ? interpolate(tr("liveAdmin.statusMsg.failSuffix", ", {failures} failed."), { failures })
+        : "";
+
+      const template = tr("liveAdmin.statusMsg.sent", "Sent {successes} invitation{plural}{failSuffix}");
+      setStatusMsg(interpolate(template, { successes, plural, failSuffix }));
 
       await loadAll();
     } catch (e) {
       console.error("send batch error", e);
-      setError(e.message || tr("liveAdmin.errors.couldNotSend", "We couldn’t send those invitations."));
+      setError(e.message || tr("liveAdmin.errors.sendUnable", "We couldn’t send those invitations."));
     } finally {
       setSending(false);
     }
@@ -285,19 +279,20 @@ export default function LiveSurveyAdminPage() {
       });
 
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || tr("liveAdmin.errors.resendFailed", "Resend failed"));
+      if (!res.ok || !data.ok) throw new Error(data.error || tr("liveAdmin.errors.resendFail", "Resend failed"));
 
-      setStatusMsg(tr("liveAdmin.messages.resent", "Resent invitation") + ` ${invitationId}.`);
+      const template = tr("liveAdmin.statusMsg.resent", "Resent invitation {invitationId}.");
+      setStatusMsg(interpolate(template, { invitationId }));
+
       await loadAll();
     } catch (e) {
       console.error("resend error", e);
-      setError(e.message || tr("liveAdmin.errors.couldNotResend", "We couldn’t resend that invitation."));
+      setError(e.message || tr("liveAdmin.errors.resendUnable", "We couldn’t resend that invitation."));
     } finally {
       setResendingId("");
     }
   }
 
-  // KPIs
   const total = invites.length;
   const sentOrMore = sent.length + started.length + completed.length;
   const responseRate = sentOrMore ? Math.round((completed.length / sentOrMore) * 100) : 0;
@@ -311,26 +306,26 @@ export default function LiveSurveyAdminPage() {
 
   const statusLabel = (rawStatus) => {
     const s = normaliseStatus(rawStatus);
+    // Optional: add liveAdmin.status.pending/sent/... later in TRANSLATIONS
     return tr(`liveAdmin.status.${s}`, s);
   };
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
-      {/* Use the actual current pathname so EN/FR get correct canonical */}
       <Seo path={location.pathname} title={title} description={description} />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 space-y-6">
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs tracking-widest text-slate-400 uppercase">
-              {tr("liveAdmin.kicker", "Live programme · Envola")}
+              {tr("liveAdmin.eyebrow", "Live programme · Envola")}
             </p>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-50">
-              {tr("liveAdmin.pageTitle", "Live survey admin")}
+              {tr("liveAdmin.title", "Live survey admin")}
             </h1>
             <p className="mt-1 text-sm text-slate-400 max-w-2xl">
               {tr(
-                "liveAdmin.pageSubtitle",
+                "liveAdmin.intro",
                 "Track invitations through the full lifecycle, resend when needed, and review completed scores."
               )}
             </p>
@@ -366,16 +361,15 @@ export default function LiveSurveyAdminPage() {
           </div>
         )}
 
-        {/* KPIs */}
         <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <KpiCard label={tr("liveAdmin.kpis.total", "Total")} value={total} sub={tr("liveAdmin.kpis.totalSub", "All invitations in file")} />
-          <KpiCard label={tr("liveAdmin.kpis.pending", "Pending")} value={pending.length} sub={tr("liveAdmin.kpis.pendingSub", "Not yet sent")} />
-          <KpiCard label={tr("liveAdmin.kpis.sent", "Sent")} value={sent.length} sub={tr("liveAdmin.kpis.sentSub", "Delivered or queued")} />
-          <KpiCard label={tr("liveAdmin.kpis.started", "Started")} value={started.length} sub={tr("liveAdmin.kpis.startedSub", "Opened survey link")} />
+          <KpiCard label={tr("liveAdmin.kpi.total", "Total")} value={total} sub={tr("liveAdmin.kpi.totalSub", "All invitations in file")} />
+          <KpiCard label={tr("liveAdmin.kpi.pending", "Pending")} value={pending.length} sub={tr("liveAdmin.kpi.pendingSub", "Not yet sent")} />
+          <KpiCard label={tr("liveAdmin.kpi.sent", "Sent")} value={sent.length} sub={tr("liveAdmin.kpi.sentSub", "Delivered or queued")} />
+          <KpiCard label={tr("liveAdmin.kpi.started", "Started")} value={started.length} sub={tr("liveAdmin.kpi.startedSub", "Opened survey link")} />
           <KpiCard
-            label={tr("liveAdmin.kpis.completed", "Completed")}
+            label={tr("liveAdmin.kpi.completed", "Completed")}
             value={completed.length}
-            sub={nps === null ? tr("liveAdmin.kpis.npsNa", "NPS: n/a") : `${tr("liveAdmin.kpis.nps", "NPS")}: ${nps}`}
+            sub={nps === null ? tr("liveAdmin.kpi.npsNA", "NPS: n/a") : `${tr("liveAdmin.nps", "NPS")}: ${nps}`}
           />
         </section>
 
@@ -394,7 +388,7 @@ export default function LiveSurveyAdminPage() {
                 disabled={loading || pending.length === 0}
                 className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
               >
-                {allSelected ? tr("liveAdmin.deselectAll", "Deselect all") : tr("liveAdmin.selectAll", "Select all")}
+                {allSelected ? tr("liveAdmin.actions.deselectAll", "Deselect all") : tr("liveAdmin.actions.selectAll", "Select all")}
               </button>
 
               <button
@@ -407,15 +401,15 @@ export default function LiveSurveyAdminPage() {
                     : "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
                 }`}
               >
-                {sending ? tr("liveAdmin.sending", "Sending…") : tr("liveAdmin.sendSelected", "Send selected")}
+                {sending ? tr("liveAdmin.actions.sending", "Sending…") : tr("liveAdmin.actions.sendSelected", "Send selected")}
               </button>
             </div>
           </div>
 
           {loading ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.loading", "Loading…")}</p>
+            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.loading", "Loading…")}</p>
           ) : pending.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.pending", "No pending invitations.")}</p>
+            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noPending", "No pending invitations.")}</p>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
               <table className="min-w-full text-xs">
@@ -439,11 +433,7 @@ export default function LiveSurveyAdminPage() {
                     return (
                       <tr key={row.invitationId} className={stripe}>
                         <td className="px-3 py-2">
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            onChange={() => toggleOne(row.invitationId)}
-                          />
+                          <input type="checkbox" checked={selected} onChange={() => toggleOne(row.invitationId)} />
                         </td>
                         <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
                         <td className="px-3 py-2">{row.customerName}</td>
@@ -470,7 +460,7 @@ export default function LiveSurveyAdminPage() {
           </div>
 
           {sent.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.sent", "No sent invitations.")}</p>
+            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noSent", "No sent invitations.")}</p>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
               <table className="min-w-full text-xs">
@@ -509,8 +499,8 @@ export default function LiveSurveyAdminPage() {
                             }`}
                           >
                             {resendingId === row.invitationId
-                              ? tr("liveAdmin.resending", "Resending…")
-                              : tr("liveAdmin.resend", "Resend")}
+                              ? tr("liveAdmin.actions.resending", "Resending…")
+                              : tr("liveAdmin.actions.resend", "Resend")}
                           </button>
                         </td>
                       </tr>
@@ -530,7 +520,7 @@ export default function LiveSurveyAdminPage() {
           </div>
 
           {started.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.started", "No started invitations.")}</p>
+            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noStarted", "No started invitations.")}</p>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
               <table className="min-w-full text-xs">
@@ -566,13 +556,11 @@ export default function LiveSurveyAdminPage() {
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-slate-50">{tr("liveAdmin.sections.completed", "Completed")}</h2>
-            <p className="text-xs text-slate-400">
-              {tr("liveAdmin.sections.completedHelp", "Scores are shown when a response exists in /npsme/live/responses.csv.")}
-            </p>
+            <p className="text-xs text-slate-400">{tr("liveAdmin.sections.completedHelp", "Scores are shown when a response exists in /npsme/live/responses.csv.")}</p>
           </div>
 
           {completed.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.completed", "No completed invitations.")}</p>
+            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noCompleted", "No completed invitations.")}</p>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
               <table className="min-w-full text-xs">

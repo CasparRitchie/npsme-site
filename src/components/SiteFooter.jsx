@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { t } from "../i18n/translations.js";
+import { t as translate} from "../i18n/translations.js";
 import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
 
 
@@ -23,7 +23,7 @@ export default function SiteFooter() {
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           {footerLinks.map(({ path, label, labelKey }) => {
-            const text = t(lang, labelKey, label);
+            const text = translate(lang, labelKey, label);
 
             if (isExternal(path)) {
               return (

@@ -1,17 +1,16 @@
-// src/components/Navbar.jsx
 import React from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { t } from "../i18n/translations.js";
-import { localizePath } from "../i18n/pathHelpers";
+import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
 
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
 
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { lang, setLang } = useLanguage();
   const headerLinks = ROUTES.filter((r) => r.enabled && r.inHeader);
@@ -31,11 +30,8 @@ export default function NavBar() {
     const next = lang === "en" ? "fr" : "en";
     setLang(next);
 
-    // Remove existing /fr prefix if present, then re-apply based on `next`
-    const rawPath = location.pathname.startsWith("/fr")
-      ? location.pathname.replace(/^\/fr/, "") || "/"
-      : location.pathname;
-
+    // keep same page, switch prefix
+    const rawPath = stripLangPrefix(location.pathname) || "/";
     navigate(localizePath(rawPath, next) + location.search + location.hash);
   };
 
@@ -58,7 +54,6 @@ export default function NavBar() {
             </NavItem>
           ))}
 
-          {/* Language toggle */}
           <button
             type="button"
             onClick={toggleLang}
@@ -102,7 +97,6 @@ export default function NavBar() {
               </NavItem>
             ))}
 
-            {/* Language toggle (mobile) */}
             <button
               type="button"
               onClick={toggleLang}

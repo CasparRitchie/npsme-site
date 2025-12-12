@@ -1,17 +1,20 @@
-export function localizePath(path, lang) {
-  if (!path) return path;
+// src/i18n/pathHelpers.js
 
-  // don't touch external urls
-  if (/^https?:\/\//i.test(path)) return path;
+export function stripLangPrefix(pathname = "") {
+  if (pathname.startsWith("/fr/")) return pathname.slice(3);
+  if (pathname === "/fr") return "/";
+  return pathname;
+}
 
-  // don't touch hashes
-  if (path.includes("#")) return path;
+export function localizePath(path = "/", lang = "en") {
+  const clean = stripLangPrefix(path || "/");
 
-  // already localized
-  if (path.startsWith("/fr")) return path;
+  if (lang === "fr") {
+    // ensure leading slash
+    const base = clean.startsWith("/") ? clean : `/${clean}`;
+    return base === "/" ? "/fr" : `/fr${base}`;
+  }
 
-  // root
-  if (path === "/") return lang === "fr" ? "/fr" : "/";
-
-  return lang === "fr" ? `/fr${path}` : path;
+  // en: no prefix
+  return clean.startsWith("/") ? clean : `/${clean}`;
 }

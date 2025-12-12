@@ -124,6 +124,7 @@ export default function LiveSurveyPage() {
     return (
       <div className="survey-page envola-theme">
         <div className="survey-card envola-card">
+          <div className="envola-brand-bar">
             <div className="envola-logo-wrap">
               <img
                 src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"

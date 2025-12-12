@@ -11,22 +11,23 @@ export default function NavBar() {
   const loc = useLocation();
   const { lang, setLang } = useLanguage();
 
-  const headerLinks = ROUTES.filter(r => r.enabled && r.inHeader);
+  const headerLinks = ROUTES.filter((r) => r.enabled && r.inHeader);
 
   React.useEffect(() => setOpen(false), [loc.pathname]);
   React.useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
-    const toggleLang = () => {
-    setLang(lang === "en" ? "fr" : "en");
-  };
+
+  const toggleLang = () => setLang(lang === "en" ? "fr" : "en");
+
   return (
     <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between">
-        {/* Brand */}
         <Link to="/" className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
           <span className="text-lg tracking-tight font-semibold">
@@ -34,29 +35,23 @@ export default function NavBar() {
           </span>
         </Link>
 
-        {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
           {headerLinks.map(({ path, label, labelKey }) => (
             <NavItem key={path} to={path}>
-              {labelKey ? t(lang, labelKey, label) : label}
+              {t(lang, labelKey, label)}
             </NavItem>
           ))}
 
-          {/* Language toggle */}
           <button
             type="button"
             onClick={toggleLang}
             className="inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
           >
-            <span
-              className={lang === "en" ? "font-semibold" : "opacity-60"}
-            >
+            <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
               {t(lang, "navbar.languageEn", "EN")}
             </span>
             <span className="mx-1 text-slate-500">/</span>
-            <span
-              className={lang === "fr" ? "font-semibold" : "opacity-60"}
-            >
+            <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
               {t(lang, "navbar.languageFr", "FR")}
             </span>
           </button>
@@ -69,42 +64,35 @@ export default function NavBar() {
           </Link>
         </nav>
 
-        {/* Mobile burger */}
         <button
           className="md:hidden inline-flex items-center justify-center p-2 rounded-lg hover:bg-white/10"
           aria-label="Toggle menu"
           aria-expanded={open ? "true" : "false"}
-          onClick={() => setOpen(s => !s)}
+          onClick={() => setOpen((s) => !s)}
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-            {/* Mobile panel */}
       {open && (
         <div className="md:hidden border-t border-white/10 bg-[#0B0F19]/95 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
-            {headerLinks.map(({ path, label }) => (
+            {headerLinks.map(({ path, label, labelKey }) => (
               <NavItem key={path} to={path} mobile>
-                {label}
+                {t(lang, labelKey, label)}
               </NavItem>
             ))}
 
-            {/* Language toggle (mobile) */}
             <button
               type="button"
               onClick={toggleLang}
               className="mt-1 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
             >
-              <span
-                className={lang === "en" ? "font-semibold" : "opacity-60"}
-              >
+              <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
                 {t(lang, "navbar.languageEn", "EN")}
               </span>
               <span className="mx-1 text-slate-500">/</span>
-              <span
-                className={lang === "fr" ? "font-semibold" : "opacity-60"}
-              >
+              <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
                 {t(lang, "navbar.languageFr", "FR")}
               </span>
             </button>
@@ -126,11 +114,13 @@ function NavItem({ to, children, mobile = false }) {
   return (
     <NavLink
       to={to}
-      className={({ isActive }) => [
-        "px-2 py-1 rounded-lg transition",
-        mobile ? "text-base" : "text-sm",
-        isActive ? "text-white" : "text-slate-300 hover:text-white",
-      ].join(" ")}
+      className={({ isActive }) =>
+        [
+          "px-2 py-1 rounded-lg transition",
+          mobile ? "text-base" : "text-sm",
+          isActive ? "text-white" : "text-slate-300 hover:text-white",
+        ].join(" ")
+      }
     >
       {children}
     </NavLink>

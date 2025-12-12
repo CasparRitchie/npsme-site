@@ -118,6 +118,98 @@ export const TRANSLATIONS = {
         "Here we’ll add an AI “co-pilot” that reads the charts and verbatim themes and gives you a short briefing: where NPS is drifting, which journey stages are hurting, and where to focus next.",
       copilotPlaceholder: "AI commentary placeholder",
     },
+    liveAdmin: {
+      seoTitle: "Live Survey Admin | NPS Me",
+      seoDescription: "Review and send live NPS invitations from your Envola customer list.",
+
+      eyebrow: "Live programme · Envola",
+      title: "Live survey admin",
+      intro:
+        "Track invitations through the full lifecycle, resend when needed, and review completed scores.",
+
+      refresh: "Refresh",
+      refreshing: "Refreshing…",
+
+      kpi: {
+        total: "Total",
+        totalSub: "All invitations in file",
+        pending: "Pending",
+        pendingSub: "Not yet sent",
+        sent: "Sent",
+        sentSub: "Delivered or queued",
+        started: "Started",
+        startedSub: "Opened survey link",
+        completed: "Completed",
+        npsNA: "NPS: n/a",
+        npsValue: "NPS: {nps}",
+      },
+
+      responseRate: "Response rate",
+
+      errors: {
+        loadUnable: "Unable to load data.",
+        selectAtLeastOne: "Please select at least one invitation to send.",
+        loadInvFail: "Failed to load invitations",
+        loadRespFail: "Failed to load responses",
+        sendFail: "Batch send failed",
+        resendFail: "Resend failed",
+        sendUnable: "We couldn’t send those invitations.",
+        resendUnable: "We couldn’t resend that invitation.",
+      },
+
+      statusMsg: {
+        sent: "Sent {successes} invitation{plural}{failSuffix}",
+        failSuffix: ", {failures} failed.",
+        resent: "Resent invitation {invitationId}.",
+      },
+
+      sections: {
+        pending: "Pending",
+        pendingHelp: "Select and send invitations.",
+        sent: "Sent",
+        sentHelp: "Resend if someone cannot find the email.",
+        started: "Started",
+        startedHelp: "These recipients opened the survey link.",
+        completed: "Completed",
+        completedHelp: "Scores are shown when a response exists in /npsme/live/responses.csv.",
+      },
+
+      actions: {
+        selectAll: "Select all",
+        deselectAll: "Deselect all",
+        sendSelected: "Send selected",
+        sending: "Sending…",
+        resend: "Resend",
+        resending: "Resending…",
+      },
+
+      empty: {
+        loading: "Loading…",
+        noPending: "No pending invitations.",
+        noSent: "No sent invitations.",
+        noStarted: "No started invitations.",
+        noCompleted: "No completed invitations.",
+      },
+
+      table: {
+        invitationId: "Invitation ID",
+        name: "Name",
+        email: "Email",
+        device: "Device",
+        am: "AM",
+        status: "Status",
+        lastSent: "Last sent",
+        resends: "Resends",
+        action: "Action",
+        score: "Score",
+        comment: "Comment",
+        created: "Created",
+      },
+
+      misc: {
+        dash: "-",
+      },
+    },
   },
   fr: {
     navbar: {
@@ -236,6 +328,100 @@ export const TRANSLATIONS = {
       copilotBody:
         "Ici, nous ajouterons un “co-pilote” IA qui lit les graphiques et les thèmes verbatim et vous donne un briefing : où le NPS dérive, quelles étapes du parcours posent problème, et où concentrer vos efforts.",
       copilotPlaceholder: "Emplacement du commentaire IA",
+    },
+     liveAdmin: {
+      seoTitle: "Admin enquête live | NPS Me",
+      seoDescription:
+        "Gérez et envoyez des invitations NPS en direct depuis votre liste clients Envola.",
+
+      eyebrow: "Programme live · Envola",
+      title: "Administration enquête live",
+      intro:
+        "Suivez les invitations de bout en bout, renvoyez si besoin, et consultez les scores terminés.",
+
+      refresh: "Rafraîchir",
+      refreshing: "Rafraîchissement…",
+
+      kpi: {
+        total: "Total",
+        totalSub: "Toutes les invitations du fichier",
+        pending: "En attente",
+        pendingSub: "Pas encore envoyées",
+        sent: "Envoyées",
+        sentSub: "Envoyées ou en file",
+        started: "Commencées",
+        startedSub: "Lien ouvert",
+        completed: "Terminées",
+        npsNA: "NPS : n/a",
+        npsValue: "NPS : {nps}",
+      },
+
+      responseRate: "Taux de réponse",
+
+      errors: {
+        loadUnable: "Impossible de charger les données.",
+        selectAtLeastOne: "Veuillez sélectionner au moins une invitation à envoyer.",
+        loadInvFail: "Échec du chargement des invitations",
+        loadRespFail: "Échec du chargement des réponses",
+        sendFail: "Échec de l’envoi groupé",
+        resendFail: "Échec du renvoi",
+        sendUnable: "Impossible d’envoyer ces invitations.",
+        resendUnable: "Impossible de renvoyer cette invitation.",
+      },
+
+      statusMsg: {
+        sent: "{successes} invitation{plural} envoyée{plural}{failSuffix}",
+        failSuffix: ", {failures} en échec.",
+        resent: "Invitation {invitationId} renvoyée.",
+      },
+
+      sections: {
+        pending: "En attente",
+        pendingHelp: "Sélectionnez puis envoyez des invitations.",
+        sent: "Envoyées",
+        sentHelp: "Renvoyez si la personne ne retrouve pas l’email.",
+        started: "Commencées",
+        startedHelp: "Ces destinataires ont ouvert le lien du questionnaire.",
+        completed: "Terminées",
+        completedHelp:
+          "Les scores s’affichent lorsqu’une réponse existe dans /npsme/live/responses.csv.",
+      },
+
+      actions: {
+        selectAll: "Tout sélectionner",
+        deselectAll: "Tout désélectionner",
+        sendSelected: "Envoyer la sélection",
+        sending: "Envoi…",
+        resend: "Renvoyer",
+        resending: "Renvoi…",
+      },
+
+      empty: {
+        loading: "Chargement…",
+        noPending: "Aucune invitation en attente.",
+        noSent: "Aucune invitation envoyée.",
+        noStarted: "Aucune invitation commencée.",
+        noCompleted: "Aucune invitation terminée.",
+      },
+
+      table: {
+        invitationId: "ID invitation",
+        name: "Nom",
+        email: "Email",
+        device: "Appareil",
+        am: "AM",
+        status: "Statut",
+        lastSent: "Dernier envoi",
+        resends: "Renvois",
+        action: "Action",
+        score: "Score",
+        comment: "Commentaire",
+        created: "Créé",
+      },
+
+      misc: {
+        dash: "-",
+      },
     },
   },
 };

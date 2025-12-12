@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { tr as translate} from "../i18n/translations.js";
+import { translations } from "../i18n/translations.js";
 import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
 
 export default function NavBar() {
@@ -13,9 +13,11 @@ export default function NavBar() {
   const location = useLocation();
 
   const { lang, setLang } = useLanguage();
+
   const headerLinks = ROUTES.filter(
     (r) => r.enabled && r.inHeader && (r.lang ? r.lang === lang : true)
   );
+
   React.useEffect(() => setOpen(false), [location.pathname]);
 
   React.useEffect(() => {
@@ -31,7 +33,6 @@ export default function NavBar() {
     const next = lang === "en" ? "fr" : "en";
     setLang(next);
 
-    // keep same page, switch prefix
     const rawPath = stripLangPrefix(location.pathname) || "/";
     navigate(localizePath(rawPath, next) + location.search + location.hash);
   };
@@ -51,7 +52,7 @@ export default function NavBar() {
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
           {headerLinks.map(({ path, label, labelKey }) => (
             <NavItem key={path} to={localizePath(path, lang)}>
-              {tr(lang, labelKey, label)}
+              {translations(lang, labelKey, label)}
             </NavItem>
           ))}
 
@@ -61,11 +62,11 @@ export default function NavBar() {
             className="inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
           >
             <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
-              {tr(lang, "navbar.languageEn", "EN")}
+              {translations(lang, "navbar.languageEn", "EN")}
             </span>
             <span className="mx-1 text-slate-500">/</span>
             <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
-              {tr(lang, "navbar.languageFr", "FR")}
+              {translations(lang, "navbar.languageFr", "FR")}
             </span>
           </button>
 
@@ -73,7 +74,7 @@ export default function NavBar() {
             to={localizePath("/book", lang)}
             className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition shadow-[0_0_0_0_rgba(124,58,237,0.5)] hover:shadow-[0_0_0_6px_rgba(124,58,237,0.15)]"
           >
-            {tr(lang, "navbar.bookDiscovery", "Book discovery")}
+            {translations(lang, "navbar.bookDiscovery", "Book discovery")}
           </Link>
         </nav>
 
@@ -94,7 +95,7 @@ export default function NavBar() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
             {headerLinks.map(({ path, label, labelKey }) => (
               <NavItem key={path} to={localizePath(path, lang)} mobile>
-                {tr(lang, labelKey, label)}
+                {translations(lang, labelKey, label)}
               </NavItem>
             ))}
 
@@ -104,11 +105,11 @@ export default function NavBar() {
               className="mt-1 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
             >
               <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
-                {tr(lang, "navbar.languageEn", "EN")}
+                {translations(lang, "navbar.languageEn", "EN")}
               </span>
               <span className="mx-1 text-slate-500">/</span>
               <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
-                {tr(lang, "navbar.languageFr", "FR")}
+                {translations(lang, "navbar.languageFr", "FR")}
               </span>
             </button>
 
@@ -116,7 +117,7 @@ export default function NavBar() {
               to={localizePath("/book", lang)}
               className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              {tr(lang, "navbar.bookDiscovery", "Book discovery")}
+              {translations(lang, "navbar.bookDiscovery", "Book discovery")}
             </Link>
           </div>
         </div>

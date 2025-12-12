@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { tr } from "../i18n/translations.js";
+import { translations } from "../i18n/translations.js";
 import { localizePath } from "../i18n/pathHelpers.js";
 
 export default function SiteFooter() {

@@ -3,13 +3,13 @@ import React from "react";
 import Seo from "../components/Seo";
 import DemoResultsPanel from "../components/DemoResultsPanel";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { tr } from "../i18n/translations.js";
+import { translations } from "../i18n/translations.js";
 
 export default function CxCockpit() {
   const { lang } = useLanguage();
 
-  const title = t(lang, "cxCockpit.seoTitle", "CX Cockpit (Demo) | NPS Me");
-  const description = t(
+  const title = translations(lang, "cxCockpit.seoTitle", "CX Cockpit (Demo) | NPS Me");
+  const description = translations(
     lang,
     "cxCockpit.seoDescription",
     "Explore your customer experience cockpit: NPS, journey stages, response funnels and verbatim themes in one place."
@@ -28,13 +28,13 @@ export default function CxCockpit() {
             </div>
             <div>
               <p className="text-xs tracking-[0.18em] text-slate-400 uppercase">
-                {tr(lang, "cxCockpit.badge", "CX cockpit · demo")}
+                {translations(lang, "cxCockpit.badge", "CX cockpit · demo")}
               </p>
               <h1 className="text-2xl sm:text-3xl font-semibold text-slate-50">
-                {tr(lang, "cxCockpit.headline", "Fly your customer experience spaceship")}
+                {translations(lang, "cxCockpit.headline", "Fly your customer experience spaceship")}
               </h1>
               <p className="mt-1 text-sm text-slate-400 max-w-xl">
-                {tr(
+                {translations(
                   lang,
                   "cxCockpit.intro",
                   "A single view of NPS scores, journey stages, response funnels and verbatim themes. This demo cockpit uses the live NPS Me sandbox data."
@@ -46,10 +46,10 @@ export default function CxCockpit() {
           <div className="mt-2 sm:mt-0 flex flex-col items-start sm:items-end gap-2 text-xs text-slate-400">
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1">
               <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{tr(lang, "cxCockpit.liveFeed", "Live demo data feed")}</span>
+              <span>{translations(lang, "cxCockpit.liveFeed", "Live demo data feed")}</span>
             </div>
             <p className="max-w-xs text-[11px] text-slate-500">
-              {tr(
+              {translations(
                 lang,
                 "cxCockpit.liveFeedNote",
                 "For a real client build, this cockpit would connect to your production survey and CRM events."
@@ -63,10 +63,10 @@ export default function CxCockpit() {
           {/* Left */}
           <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 sm:p-6 shadow-2xl shadow-black/40">
             <h2 className="text-sm font-semibold text-slate-100 mb-1">
-              {tr(lang, "cxCockpit.leftTitle", "NPS & journey instrumentation")}
+              {translations(lang, "cxCockpit.leftTitle", "NPS & journey instrumentation")}
             </h2>
             <p className="text-[11px] text-slate-500 mb-4">
-              {tr(
+              {translations(
                 lang,
                 "cxCockpit.leftSub",
                 "Filter by contact, company, result type and stage to see how your NPS is behaving across the customer journey."
@@ -80,31 +80,31 @@ export default function CxCockpit() {
           <div className="space-y-4">
             <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 sm:p-5">
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
-                {tr(lang, "cxCockpit.upcomingDial", "Upcoming dial")}
+                {translations(lang, "cxCockpit.upcomingDial", "Upcoming dial")}
               </p>
               <h3 className="text-sm font-semibold text-slate-100">
-                {tr(lang, "cxCockpit.raceTitle", "Race chart – NPS over time by segment")}
+                {translations(lang, "cxCockpit.raceTitle", "Race chart – NPS over time by segment")}
               </h3>
               <p className="mt-1 text-[11px] text-slate-500">
-                {tr(lang, "cxCockpit.raceBody", "")}
+                {translations(lang, "cxCockpit.raceBody", "")}
               </p>
               <div className="mt-3 h-32 rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center text-[11px] text-slate-600">
-                {tr(lang, "cxCockpit.racePlaceholder", "Race chart placeholder")}
+                {translations(lang, "cxCockpit.racePlaceholder", "Race chart placeholder")}
               </div>
             </div>
 
             <div className="rounded-3xl border border-slate-800 bg-slate-950/90 p-4 sm:p-5">
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">
-                {tr(lang, "cxCockpit.upcomingDial", "Upcoming dial")}
+                {translations(lang, "cxCockpit.upcomingDial", "Upcoming dial")}
               </p>
               <h3 className="text-sm font-semibold text-slate-100">
-                {tr(lang, "cxCockpit.copilotTitle", "CX co-pilot summary")}
+                {translations(lang, "cxCockpit.copilotTitle", "CX co-pilot summary")}
               </h3>
               <p className="mt-1 text-[11px] text-slate-500">
-                {tr(lang, "cxCockpit.copilotBody", "")}
+                {translations(lang, "cxCockpit.copilotBody", "")}
               </p>
               <div className="mt-3 h-24 rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/40 flex items-center justify-center text-[11px] text-slate-600 text-center px-4">
-                {tr(lang, "cxCockpit.copilotPlaceholder", "AI commentary placeholder")}
+                {translations(lang, "cxCockpit.copilotPlaceholder", "AI commentary placeholder")}
               </div>
             </div>
           </div>

@@ -430,7 +430,7 @@ export const TRANSLATIONS = {
  * Very small translation helper.
  * Example: t(lang, "navbar.bookDiscovery", "Book discovery")
  */
-export function tr(lang, path, fallback) {
+export function translations(lang, path, fallback) {
   // ✅ Guard: never crash if a caller passes undefined/null/non-string
   if (typeof path !== "string" || !path.trim()) {
     return fallback !== undefined ? fallback : "";

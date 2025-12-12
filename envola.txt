@@ -1,10 +1,10 @@
 Caspar to do
 1) French language for relevant pages
-4) Create live survey page and journey - instead of the demo journey as we'll have real customers on it soon.
 5) Link 1 and 4 in one shot
 
 Caspar Completed:
 3) Fix invitation and ability to respond - done
+4) Create live survey page and journey - instead of the demo journey as we'll have real customers on it soon.
 
 Caspar scheduled for next phase:
 2) Link to airtable for sending / timings - wait til next time and set up schedule for next year
@@ -22,4 +22,4 @@ Type of piou piou device that they have
 Assistante maternelle
 
 Caspar to develop in future:
-The AI funcionality for exampl eLast month's feedback and how to make sure the AI talks about recent issues
+The AI funcionality for example Last month's feedback and how to make sure the AI talks about recent issues

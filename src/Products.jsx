@@ -24,7 +24,18 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <Seo path="/products" title={seoTitle} description={seoDescription} />
+    const { lang } = useLanguage();
+
+    <Seo
+      path="/products"
+      lang={lang}
+      title={t(lang, "products.seoTitle")}
+      description={t(lang, "products.seoDescription")}
+      alternates={[
+        { hrefLang: "en", href: "https://www.npsme.com/products" },
+        { hrefLang: "fr", href: "https://www.npsme.com/products" }, // NOTE: this is only “real” when FR has its own URL
+      ]}
+    />
 
       <PageHeader
         iconLabel={t(lang, "products.header.iconLabel", "Productized CX services")}

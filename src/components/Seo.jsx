@@ -2,26 +2,33 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
-/**
- * <Seo /> – lightweight per-page meta helper.
- * - `path` should be the pathname (e.g., "/products")
- * - `title` is the full page <title>
- * - `description` is the meta description
- * - `image` optional: absolute OG/Twitter image URL
- */
 export default function Seo({
   path = "/",
-  title = "NPS Me",
-  description = "Customer experience (CX) consulting to improve NPS®, retention, and revenue.",
+  title,
+  description,
   image = "https://www.npsme.com/og-image.jpg?v=3",
+  lang = "en",
+  alternates = [],
 }) {
   const url = `https://www.npsme.com${path}`;
+
   return (
-    <Helmet>
+    <Helmet htmlAttributes={{ lang }}>
       <title>{title}</title>
       <link rel="canonical" href={url} />
 
       <meta name="description" content={description} />
+
+      {/* hreflang */}
+      {alternates.map((alt) => (
+        <link
+          key={alt.lang}
+          rel="alternate"
+          hrefLang={alt.lang}
+          href={alt.href}
+        />
+      ))}
+      <link rel="alternate" hrefLang="x-default" href="https://www.npsme.com/products" />
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />

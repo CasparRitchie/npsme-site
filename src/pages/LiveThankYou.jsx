@@ -34,11 +34,19 @@ export default function LiveThankYou() {
             </div>
             <span className="envola-badge">Questionnaire de satisfaction</span>
           </div>
-        <h1>{headline}</h1>
+                <h1>{headline}</h1>
+
         <p style={{ marginTop: "1rem" }}>
-          Votre avis nous aide à comprendre ce qui fonctionne bien et ce que
-          nous pouvons encore améliorer.
+          Merci beaucoup pour votre participation!
+          <br />
+          Connaître votre niveau de satisfaction va nous permettre de continuer
+          à faire évoluer Envola, de nous améliorer en restant toujours au plus
+          proche de votre réalité de terrain.
+          <br />
+          <br />
+          Nicholas &amp; Karin
         </p>
+
         {!Number.isNaN(score) && rawScore != null && (
           <p style={{ marginTop: "0.75rem", fontSize: "0.95rem" }}>
             Note donnée : <strong>{score} / 10</strong>

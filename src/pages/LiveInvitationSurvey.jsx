@@ -151,45 +151,54 @@ export default function LiveInvitationSurvey() {
     );
   }
 
-  const displayName =
+    const displayName =
     invitation.customerName || invitation.email || "cher client";
 
   const handleStart = () => {
-    navigate(`/live-survey-page?inv=${encodeURIComponent(invitation.invitationId)}`);
+    navigate(
+      `/live-survey-page?inv=${encodeURIComponent(invitation.invitationId)}`
+    );
   };
 
   return (
     <div className="survey-page envola-theme">
       <div className="survey-card envola-card">
         <div className="envola-brand-bar">
-            <div className="envola-logo-wrap">
-              <img
-                src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
-                alt="Envola"
-                className="envola-logo-img"
-              />
-            </div>
-            <span className="envola-badge">Questionnaire de satisfaction</span>
+          <div className="envola-logo-wrap">
+            <img
+              src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
+              alt="Envola"
+              className="envola-logo-img"
+            />
           </div>
-        <h1>Votre avis compte beaucoup pour nous</h1>
+          <span className="envola-badge">Questionnaire de satisfaction</span>
+        </div>
+
         <p style={{ marginTop: "1rem" }}>
           Bonjour {displayName},
           <br />
           <br />
-          Ce court questionnaire (1–2 minutes) nous permet de mieux comprendre
-          votre expérience et d'améliorer nos services.
+          Vous utilisez Envola depuis quelque temps maintenant, et votre retour
+          compte énormément pour nous. Pourriez-vous prendre 2 à 3 minutes pour
+          compléter notre enquête de satisfaction.
         </p>
 
+        <p style={{ marginTop: "0.75rem" }}>Vos réponses nous permettront :</p>
+        <ul style={{ marginTop: "0.5rem", paddingLeft: "1.25rem", lineHeight: 1.6 }}>
+          <li>d’identifier ce qui fonctionne bien,</li>
+          <li>de repérer ce qui peut encore être amélioré,</li>
+          <li>et d’ajuster Envola au plus près de vos besoins.</li>
+        </ul>
+
         {invitation.typeOfDevice && (
-          <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", opacity: 0.85 }}>
+          <p style={{ marginTop: "0.9rem", fontSize: "0.9rem", opacity: 0.85 }}>
             Type d'appareil : <strong>{invitation.typeOfDevice}</strong>
           </p>
         )}
 
         {invitation.assistanteMaternelle && (
           <p style={{ marginTop: "0.25rem", fontSize: "0.9rem", opacity: 0.85 }}>
-            Assistance maternelle :{" "}
-            <strong>{invitation.assistanteMaternelle}</strong>
+            Assistante maternelle : <strong>{invitation.assistanteMaternelle}</strong>
           </p>
         )}
 
@@ -207,20 +216,22 @@ export default function LiveInvitationSurvey() {
             cursor: "pointer",
           }}
         >
-          Commencer le questionnaire
+          👉 Accéder au questionnaire de satisfaction
         </button>
 
         <p
           style={{
             marginTop: "1rem",
-            fontSize: "0.8rem",
+            fontSize: "0.9rem",
             color: "#6b7280",
-            lineHeight: 1.4,
+            lineHeight: 1.5,
           }}
         >
-          Votre réponse est confidentielle et ne sera utilisée que pour améliorer
-          l'expérience proposée.
+          Nous vous souhaitons une belle journée,
+          <br />
+          Nicholas &amp; Karin
         </p>
+
         <p className="envola-powered">
           Propulsé par{" "}
           <a href="https://www.npsme.com" target="_blank" rel="noreferrer">

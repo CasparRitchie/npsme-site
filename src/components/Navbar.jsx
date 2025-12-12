@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { t } from "../i18n/translations.js";
-import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
+import { localizePath, stripLangPrefix } from "./i18n/pathHelpers.js";
 
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);

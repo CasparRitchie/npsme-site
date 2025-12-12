@@ -8,7 +8,9 @@ import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
 
 
 export default function SiteFooter() {
-  const footerLinks = ROUTES.filter((r) => r.enabled && r.inFooter);
+  const footerLinks = ROUTES.filter(
+    (r) => r.enabled && r.inFooter && r.lang === lang
+  );
   const { lang } = useLanguage();
 
   const isExternal = (to = "") => /^https?:\/\//i.test(to);
@@ -38,9 +40,8 @@ export default function SiteFooter() {
               );
             }
             return (
-              <Link key={label} to={localizePath(path, lang)} className="hover:text-slate-200">
-                {/* {t(lang, labelKey, label)} */}
-                {label}
+              <Link key={path} to={path} className="hover:text-slate-200">
+                {text}
               </Link>
             );
           })}

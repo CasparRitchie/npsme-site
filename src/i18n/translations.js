@@ -7,6 +7,17 @@ export const TRANSLATIONS = {
       languageEn: "EN",
       languageFr: "FR",
     },
+    routes: {
+      products: "Products",
+      whyNpsMe: "Why NPS Me",
+      milestoneNps: "Milestone NPS",
+      npsSurveyProgramme: "NPS Survey Programme",
+      whatIsNps: "What is NPS?",
+      dataAutomation: "Data & Automation",
+      socialListening: "Social Listening",
+      blog: "Blog",
+      cxCockpit: "CX Cockpit",
+    },
     cxCockpit: {
       seoTitle: "CX Cockpit (Demo) | NPS Me",
       seoDescription:
@@ -42,6 +53,17 @@ export const TRANSLATIONS = {
       bookDiscovery: "Prendre rendez-vous",
       languageEn: "EN",
       languageFr: "FR",
+    },
+    routes: {
+      products: "Produits",
+      whyNpsMe: "Pourquoi NPS Me",
+      milestoneNps: "Parcours NPS",
+      npsSurveyProgramme: "Programme d’enquête NPS",
+      whatIsNps: "Qu’est-ce que le NPS ?",
+      dataAutomation: "Données & automatisation",
+      socialListening: "Social listening",
+      blog: "Blog",
+      cxCockpit: "Cockpit CX",
     },
     cxCockpit: {
       seoTitle: "Cockpit CX (Démo) | NPS Me",

@@ -1,27 +1,28 @@
 // src/routesManifest.js
 export const ROUTES_MANIFEST = [
   { path: "/",                                 label: "Home",                             enabled: true,  inHeader: false,  inFooter: false },
-  { path: "/products",                         label: "Products",                         enabled: true,  inHeader: true,   inFooter: true  },
   { path: "/impact",                           label: "Impact",                           enabled: true,  inHeader: false,  inFooter: true  },
-  { path: "/why-nps-me",                       label: "Why NPS Me",                       enabled: true,  inHeader: true,   inFooter: true  },
-  { path: "/milestone-nps",                    label: "Milestone NPS",                    enabled: true,  inHeader: true,   inFooter: true  },
-  { path: "/nps-survey-programme",             label: "NPS Survey Programme",             enabled: true,  inHeader: true,   inFooter: true  },
   { path: "/book",                             label: "Book discovery",                   enabled: true,  inHeader: false,  inFooter: true },
-  { path: "/what-is-nps",                      label: "What is NPS?",                     enabled: true,  inHeader: true,   inFooter: true },
-  { path: "/data-automation",                  label: "Data & Automation",                enabled: true,  inHeader: true,   inFooter: true  },
+  { path: "/products",     label: "Products",    labelKey: "routes.products", enabled: true, inHeader: true, inFooter: true },
+  { path: "/why-nps-me",   label: "Why NPS Me",  labelKey: "routes.whyNpsMe", enabled: true, inHeader: true, inFooter: true },
+  { path: "/milestone-nps",label: "Milestone NPS",labelKey:"routes.milestoneNps", enabled:true, inHeader:true, inFooter:true },
+  { path: "/nps-survey-programme", label:"NPS Survey Programme", labelKey:"routes.npsSurveyProgramme", enabled:true, inHeader:true, inFooter:true },
+  { path: "/what-is-nps",  label: "What is NPS?", labelKey: "routes.whatIsNps", enabled: true, inHeader: true, inFooter: true },
+  { path: "/data-automation", label:"Data & Automation", labelKey:"routes.dataAutomation", enabled:true, inHeader:true, inFooter:true },
 
   // Social Listening Index + dynamic anonymised reports
-  { path: "/social-listening",                 label: "Social Listening",                 enabled: true,  inHeader: true,   inFooter: true  },
+  { path: "/social-listening", label:"Social Listening", labelKey:"routes.socialListening", enabled:true, inHeader:true, inFooter:true },
   { path: "/social-listening-index",           label: "Social Listening Index",           enabled: true,  inHeader: true,   inFooter: true  },
   { path: "/social-listening/:slug",           label: "Social Listening Report",          enabled: true,  inHeader: false,  inFooter: false },
 
   // NPSme data
   { path: "/cx-pulse-sample",                  label: "CX Pulse (sample)",                enabled: true,  inHeader: false,  inFooter: true  },
+
   // 🚀 CX Cockpit (demo / spaceship dashboard)
-  { path: "/cx-cockpit",                       label: "CX Cockpit",                       enabled: true,  inHeader: true,   inFooter: true },
+  { path: "/cx-cockpit",   label: "CX Cockpit",  labelKey: "routes.cxCockpit", enabled: true, inHeader: true, inFooter: true },
 
   // Blogs
-  { path: "/blog",                             label: "Blog",                             enabled: true,  inHeader: true,   inFooter: true  },
+  { path: "/blog",         label: "Blog",        labelKey: "routes.blog", enabled: true, inHeader: true, inFooter: true },
   { path: "/blog/ethical-surveys",             label: "Blog: Ethical Surveys",            enabled: true,  inHeader: false,  inFooter: false },
   { path: "/blog/ethics-of-contact-selection", label: "Blog: Contact Selection Ethics",   enabled: true,  inHeader: false,  inFooter: false },
   { path: "/blog/closing-the-loop",            label: "Blog: Closing the Loop",           enabled: true,  inHeader: false,  inFooter: false },

@@ -36,9 +36,9 @@ export default function NavBar() {
 
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-          {headerLinks.map(({ path, label }) => (
+          {headerLinks.map(({ path, label, labelKey }) => (
             <NavItem key={path} to={path}>
-              {label}
+              {labelKey ? t(lang, labelKey, label) : label}
             </NavItem>
           ))}
 

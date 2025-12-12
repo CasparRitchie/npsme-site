@@ -1730,15 +1730,21 @@ app.get("/api/live-survey/lookup", async (req, res) => {
   }
 });
 
-// Load ALL live invitations for the admin page
+// Load ALL live invitations for the admin page (optionally filter by status)
 app.get("/api/live-invitations", async (req, res) => {
   try {
     const rows = await loadLiveInvitations();
 
-    // Optional: filter out ones already sent/responded if you only want "to send"
+    const statusFilterRaw = (req.query.status || "").toString().trim().toLowerCase();
+    const includeAll = req.query.all === "1" || req.query.all === "true";
+
+    if (includeAll || !statusFilterRaw) {
+      return res.json({ rows });
+    }
+
     const filtered = rows.filter((row) => {
-      const status = (row.status || "").toLowerCase().trim();
-      return !status || status === "pending" || status === "started";
+      const s = (row.status || "").toLowerCase().trim() || "pending";
+      return s === statusFilterRaw;
     });
 
     res.json({ rows: filtered });
@@ -1828,6 +1834,63 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
   }
 });
 
+// Resend a LIVE invitation (allowed for status "sent" or "started", blocked if "responded")
+app.post("/api/live-invitations/resend", async (req, res) => {
+  try {
+    const { invitationId } = req.body || {};
+    const id = (invitationId || "").trim();
+
+    if (!id) {
+      return res.status(400).json({ error: "invitationId is required" });
+    }
+
+    const inv = await findLiveInvitationById(id);
+    if (!inv) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    const status = (inv.status || "").toLowerCase().trim() || "pending";
+    if (status === "responded") {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+    if (status === "pending") {
+      return res.status(409).json({ error: "Invitation not sent yet. Use Send from Pending." });
+    }
+
+    if (!process.env.ZOHO_FROM_EMAIL) {
+      return res.status(500).json({ error: "ZOHO_FROM_EMAIL not configured" });
+    }
+
+    const { subject, plainText, html } = await sendLiveInvitationEmail({
+      email: inv.email,
+      customerId: inv.customerId || "",
+      customerName: inv.customerName || "",
+      businessName: inv.businessName || "",
+      stage: inv.stage || "",
+      surveyId: inv.surveyId || "",
+      fromName: "Nicholas d'Envola",
+      fromEmail: process.env.ZOHO_FROM_EMAIL,
+      invitationId: id,
+    });
+
+    await mailer.sendMail({
+      from: `"Nicholas d'Envola" <${process.env.ZOHO_FROM_EMAIL}>`,
+      to: inv.email,
+      replyTo: process.env.ZOHO_FROM_EMAIL,
+      bcc: "hello@npsme.com",
+      subject,
+      text: plainText,
+      html,
+    });
+
+    await markLiveInvitationSent(id);
+
+    res.json({ ok: true, invitationId: id });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-invitations/resend", err);
+    res.status(500).json({ error: "Failed to resend invitation" });
+  }
+});
 
 app.post("/api/live-survey/submit", async (req, res) => {
   try {

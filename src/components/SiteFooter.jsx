@@ -3,15 +3,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { t as translate} from "../i18n/translations.js";
-import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
-
+import { tr } from "../i18n/translations.js";
+import { localizePath } from "../i18n/pathHelpers.js";
 
 export default function SiteFooter() {
-  const footerLinks = ROUTES.filter(
-    (r) => r.enabled && r.inFooter && r.lang === lang
-  );
   const { lang } = useLanguage();
+
+  const footerLinks = ROUTES.filter(
+    (r) => r.enabled && r.inFooter && (r.lang ? r.lang === lang : true)
+  );
 
   const isExternal = (to = "") => /^https?:\/\//i.test(to);
   const isHash = (to = "") => to.includes("#");
@@ -23,24 +23,32 @@ export default function SiteFooter() {
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           {footerLinks.map(({ path, label, labelKey }) => {
-            const text = translate(lang, labelKey, label);
+            const text = tr(lang, labelKey, label);
 
             if (isExternal(path)) {
               return (
-                <a key={label} href={path} className="hover:text-slate-200" target="_blank" rel="noreferrer">
+                <a
+                  key={path}
+                  href={path}
+                  className="hover:text-slate-200"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {text}
                 </a>
               );
             }
+
             if (isHash(path)) {
               return (
-                <a key={label} href={path} className="hover:text-slate-200">
+                <a key={path} href={path} className="hover:text-slate-200">
                   {text}
                 </a>
               );
             }
+
             return (
-              <Link key={path} to={path} className="hover:text-slate-200">
+              <Link key={path} to={localizePath(path, lang)} className="hover:text-slate-200">
                 {text}
               </Link>
             );

@@ -4,60 +4,49 @@ import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
-import { t, TRANSLATIONS } from "./i18n/translations.js";
+import { tr as t, TRANSLATIONS } from "./i18n/translations.js";
+import { localizePath } from "./i18n/pathHelpers.js";
 
 export default function Products() {
   const { lang } = useLanguage();
 
-  // Convenience accessor (so we can pull arrays like bullets cleanly)
-  const tr = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  // Use "dict" for grabbing arrays/objects
+  const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-  const seoTitle = t(lang, "products.seoTitle", "Products | NPS Me");
-  const seoDescription = t(
-    lang,
-    "products.seoDescription",
-    "Pick a CX package to improve outcomes."
-  );
-
-  const pulseLeft = tr?.products?.pulseExplainer?.left || [];
-  const pulseRight = tr?.products?.pulseExplainer?.right || [];
+  const pulseLeft = dict?.products?.pulseExplainer?.left || [];
+  const pulseRight = dict?.products?.pulseExplainer?.right || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-    <Seo
-      path="/products"
-      lang={lang}
-      title={t(lang, "products.seoTitle")}
-      description={t(lang, "products.seoDescription")}
-      alternates={[
-        { hrefLang: "en", href: "https://www.npsme.com/products" },
-        { hrefLang: "fr", href: "https://www.npsme.com/products" }, // NOTE: this is only “real” when FR has its own URL
-      ]}
-    />
+      <Seo
+        path={localizePath("/products", lang)}
+        lang={lang}
+        title={t(lang, "products.seoTitle", "Products | NPS Me")}
+        description={t(lang, "products.seoDescription", "Pick a CX package to improve outcomes.")}
+        alternates={[
+          { lang: "en", href: "https://www.npsme.com/products" },
+          { lang: "fr", href: "https://www.npsme.com/fr/products" },
+        ]}
+      />
 
       <PageHeader
         iconLabel={t(lang, "products.header.iconLabel", "Productized CX services")}
         tag={t(lang, "products.header.tag", "NPS Me / Services")}
         accent={t(lang, "products.header.accent", "Productized services")}
         title={t(lang, "products.header.title", "that turn feedback into growth")}
-        subtitle={t(
-          lang,
-          "products.header.subtitle",
-          "Pick the package that fits your stage."
-        )}
+        subtitle={t(lang, "products.header.subtitle", "Pick the package that fits your stage.")}
       />
 
-      {/* Product cards */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="grid gap-6 md:grid-cols-3">
           <ProductCard
             icon={<Search className="h-5 w-5 text-white" />}
             title={t(lang, "products.cards.foundations.title", "Feedback Foundations")}
             price={t(lang, "products.cards.foundations.price", "from £450")}
-            bullets={tr?.products?.cards?.foundations?.bullets || []}
+            bullets={dict?.products?.cards?.foundations?.bullets || []}
             cta={{
               label: t(lang, "products.cards.foundations.cta", "Request audit"),
-              href: "/book",
+              href: localizePath("/book", lang),
             }}
           />
 
@@ -65,10 +54,10 @@ export default function Products() {
             icon={<LineChart className="h-5 w-5 text-white" />}
             title={t(lang, "products.cards.momentum.title", "Momentum Program")}
             price={t(lang, "products.cards.momentum.price", "from £850/mo")}
-            bullets={tr?.products?.cards?.momentum?.bullets || []}
+            bullets={dict?.products?.cards?.momentum?.bullets || []}
             cta={{
               label: t(lang, "products.cards.momentum.cta", "Book discovery"),
-              href: "/book",
+              href: localizePath("/book", lang),
             }}
           />
 
@@ -77,16 +66,15 @@ export default function Products() {
             icon={<Newspaper className="h-5 w-5 text-white" />}
             title={t(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
             price={t(lang, "products.cards.pulse.price", "from £190/mo")}
-            bullets={tr?.products?.cards?.pulse?.bullets || []}
+            bullets={dict?.products?.cards?.pulse?.bullets || []}
             cta={{
               label: t(lang, "products.cards.pulse.cta", "See sample report"),
-              href: "/cx-pulse-sample",
+              href: localizePath("/cx-pulse-sample", lang),
             }}
             footnote={t(lang, "products.cards.pulse.footnote", "")}
           />
         </div>
 
-        {/* Explainer for CX Pulse */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
           <h2 className="text-xl md:text-2xl font-semibold text-white">
             {t(lang, "products.pulseExplainer.title", "What you get in the weekly CX Pulse")}
@@ -106,17 +94,12 @@ export default function Products() {
           </div>
         </div>
 
-        {/* CTA */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 text-center">
           <h3 className="text-2xl font-semibold text-white">
             {t(lang, "products.cta.title", "Ready for a sample?")}
           </h3>
           <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-            {t(
-              lang,
-              "products.cta.body",
-              "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days."
-            )}
+            {t(lang, "products.cta.body", "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.")}
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
@@ -129,7 +112,7 @@ export default function Products() {
             </a>
 
             <Link
-              to="/book"
+              to={localizePath("/book", lang)}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
               {t(lang, "products.cta.book", "Book discovery")}

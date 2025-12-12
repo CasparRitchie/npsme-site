@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { t } from "../i18n/translations.js";
+import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
+
 
 export default function SiteFooter() {
   const footerLinks = ROUTES.filter((r) => r.enabled && r.inFooter);

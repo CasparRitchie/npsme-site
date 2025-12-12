@@ -13,8 +13,9 @@ export default function NavBar() {
   const location = useLocation();
 
   const { lang, setLang } = useLanguage();
-  const headerLinks = ROUTES.filter((r) => r.enabled && r.inHeader);
-
+  const headerLinks = ROUTES.filter(
+    (r) => r.enabled && r.inHeader && (r.lang ? r.lang === lang : true)
+  );
   React.useEffect(() => setOpen(false), [location.pathname]);
 
   React.useEffect(() => {

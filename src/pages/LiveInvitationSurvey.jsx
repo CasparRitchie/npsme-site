@@ -74,8 +74,13 @@ export default function LiveInvitationSurvey() {
       <div className="survey-page envola-theme">
         <div className="survey-card envola-card">
           <div className="envola-brand-bar">
-            {/* replace this with a real logo img later if you like */}
-            <span className="envola-logo-text">Envola</span>
+            <div className="envola-logo-wrap">
+              <img
+                src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
+                alt="Envola"
+                className="envola-logo-img"
+              />
+            </div>
             <span className="envola-badge">Questionnaire de satisfaction</span>
           </div>
           <p>Chargement du questionnaire…</p>

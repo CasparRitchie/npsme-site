@@ -9,6 +9,7 @@ import ImpactPage from "./ImpactPage";
 import WhyNpsMe from "./pages/WhyNpsMe";
 import MilestoneNps from "./MilestoneNps";
 import NpsSurveyProgramme from "./NpsSurveyProgramme";
+import NpsIntelligenceLayer from "./pages/NpsIntelligenceLayer";
 import Book from "./Book";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
@@ -62,6 +63,9 @@ const COMPONENTS = {
 
   "/nps-survey-programme": NpsSurveyProgramme,
   "/fr/nps-survey-programme": NpsSurveyProgramme,
+
+  "/nps-intelligence-layer": NpsIntelligenceLayer,
+  "/fr/nps-intelligence-layer": NpsIntelligenceLayer,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

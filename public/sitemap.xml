@@ -85,6 +85,18 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.npsme.com/nps-intelligence-layer</loc>
+    <lastmod>2025-12-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.npsme.com/fr/nps-intelligence-layer</loc>
+    <lastmod>2025-12-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.npsme.com/data-automation</loc>
     <lastmod>2025-12-13</lastmod>
     <changefreq>monthly</changefreq>

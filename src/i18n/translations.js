@@ -13,6 +13,7 @@ export const TRANSLATIONS = {
       milestoneNps: "Milestone NPS",
       npsSurveyProgramme: "NPS Survey Programme",
       whatIsNps: "What is NPS?",
+      npsIntelligenceLayer: "NPS Intelligence Layer",
       dataAutomation: "Data & Automation",
       socialListening: "Social Listening",
       blog: "Blog",
@@ -1737,6 +1738,113 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    npsIntelligenceLayer: {
+      seoTitle: "The NPS Intelligence Layer for Intercom, Medallia & CX Tools | NPS Me",
+      seoDescription:
+        "Already using Intercom or Medallia? NPS Me adds a strategic CX intelligence layer that turns NPS and feedback data into clear priorities and action.",
+
+      header: {
+        iconLabel: "NPS Me / CX Intelligence",
+        tag: "NPS Me / Strategy",
+        accent: "Intelligence layer",
+        title: "your CX tools don’t provide",
+        subtitle: "Your tools collect signals. We turn them into decisions, priorities, and action.",
+      },
+
+      hero: {
+        title: "The CX intelligence layer your tools don’t provide",
+        body1:
+          "If you already use Intercom, Medallia, NPS surveys or social listening tools but still struggle to prioritise actions, explain results, or drive change, you are not alone.",
+        body2: "Most organisations do not have a data problem. They have an interpretation and direction problem.",
+        ctaPrimary: "Book a CX review",
+        ctaSecondary: "See a sample CX Pulse",
+      },
+
+      sections: {
+        pain: {
+          title: "Why teams still feel stuck with Intercom or Medallia",
+          body: "These platforms are strong at collecting signals. The gap is turning those signals into clear priorities and decisions.",
+          bullets: [
+            "Plenty of dashboards, but little clarity",
+            "NPS scores without meaningful context",
+            "Transactional feedback drowning out strategic insight",
+            "Reports that do not lead to action",
+            "Leadership asking: what should we do next?",
+          ],
+          footer: "The result is too much reporting and not enough improvement.",
+        },
+
+        layer: {
+          title: "Introducing the NPS Me Intelligence Layer",
+          body:
+            "We sit on top of your existing tools. We do not replace Intercom, Medallia, or your survey platform. We connect, interpret, and elevate what they already capture.",
+          bullets: [
+            "Interpret signals across tools",
+            "Add behavioural and strategic context",
+            "Prioritise what matters",
+            "Produce action-focused insight",
+          ],
+        },
+
+        intercom: {
+          title: "Example: Intercom + NPS Me",
+          body:
+            "Intercom can tell you who responded, what score they gave, and what they wrote. NPS Me adds the strategic layer that turns that into priorities.",
+          boxLeftTitle: "Intercom gives you",
+          left: ["Who responded", "Score and comment", "Basic filtering and views"],
+          boxRightTitle: "NPS Me adds",
+          right: [
+            "What matters now and why",
+            "Signals linked to churn and retention",
+            "Noise vs priority issues",
+            "What to fix first and what can wait",
+            "A weekly CX Pulse leaders actually read",
+          ],
+          footer: "Instead of another dashboard, teams get clarity, narrative, and priorities.",
+        },
+
+        medallia: {
+          title: "A note on Medallia",
+          body1:
+            "Medallia is powerful. In large organisations it can also become over-configured and under-interpreted.",
+          body2:
+            "Having access to everything does not guarantee clarity. NPS Me is built to make decisions easier, without adding complexity.",
+        },
+
+        deliver: {
+          title: "What the intelligence layer delivers",
+          bullets: [
+            "CX strategy overlay for existing tools",
+            "Transactional vs relational NPS clarity",
+            "Weekly or monthly CX Pulse reporting",
+            "Cross-channel insight (surveys, listening, ops data)",
+            "Executive-ready summaries and narratives",
+            "Clear, prioritised CX actions",
+          ],
+          footer: "Always grounded in your data. Always focused on what to do next.",
+        },
+
+        fit: {
+          title: "Who this is for",
+          bullets: [
+            "CX leaders using Intercom or Medallia",
+            "Teams overwhelmed by dashboards",
+            "Organisations with good data but limited direction",
+            "Leaders who want fewer charts and better decisions",
+          ],
+        },
+      },
+
+      cta: {
+        title: "Ready to add clarity on top of your tools?",
+        body:
+          "We start with your current setup, the questions you struggle to answer, and the decisions you need to make. Then we build a simple, action-focused layer on top.",
+        primary: "Book a CX review",
+        secondary: "See a sample CX Pulse",
+        note: "No platform switch required. No survey rebuild required.",
+      },
+    },
+
     socialListeningIndex: {
       seoTitle: "Social Listening Reports (Anonymised) | NPS Me",
       seoDescription:
@@ -2058,6 +2166,7 @@ export const TRANSLATIONS = {
       milestoneNps: "Parcours NPS",
       npsSurveyProgramme: "Programme d’enquête NPS",
       whatIsNps: "Qu’est-ce que le NPS ?",
+      npsIntelligenceLayer: "Couche d’intelligence NPS",
       dataAutomation: "Données & automatisation",
       socialListening: "Social listening",
       blog: "Blog",
@@ -3820,6 +3929,115 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    npsIntelligenceLayer: {
+      seoTitle: "La couche d’intelligence NPS pour Intercom, Medallia et vos outils CX | NPS Me",
+      seoDescription:
+        "Vous utilisez déjà Intercom ou Medallia ? NPS Me ajoute une couche d’intelligence CX qui transforme vos données NPS et feedback en priorités claires et actions.",
+
+      header: {
+        iconLabel: "NPS Me / Intelligence CX",
+        tag: "NPS Me / Stratégie",
+        accent: "Couche d’intelligence",
+        title: "que vos outils CX ne fournissent pas",
+        subtitle: "Vos outils collectent des signaux. Nous les transformons en décisions, priorités et actions.",
+      },
+
+      hero: {
+        title: "La couche d’intelligence CX que vos outils ne fournissent pas",
+        body1:
+          "Si vous utilisez déjà Intercom, Medallia, des enquêtes NPS ou des outils de social listening, mais que vous avez encore du mal à prioriser, expliquer les résultats ou déclencher le changement, vous n’êtes pas seul.",
+        body2:
+          "La plupart des organisations n’ont pas un problème de données. Elles ont un problème d’interprétation et de direction.",
+        ctaPrimary: "Réserver une revue CX",
+        ctaSecondary: "Voir un exemple de CX Pulse",
+      },
+
+      sections: {
+        pain: {
+          title: "Pourquoi les équipes restent bloquées avec Intercom ou Medallia",
+          body:
+            "Ces plateformes sont fortes pour collecter des signaux. Le manque se situe dans la transformation de ces signaux en priorités et décisions claires.",
+          bullets: [
+            "Beaucoup de dashboards, peu de clarté",
+            "Des scores NPS sans contexte utile",
+            "Le feedback transactionnel masque l’insight stratégique",
+            "Des rapports qui ne mènent pas à l’action",
+            "La direction demande : que fait-on maintenant ?",
+          ],
+          footer: "Résultat : trop de reporting, pas assez d’amélioration.",
+        },
+
+        layer: {
+          title: "La couche d’intelligence NPS Me",
+          body:
+            "Nous nous plaçons au-dessus de vos outils existants. Nous ne remplaçons pas Intercom, Medallia ou vos enquêtes. Nous connectons, interprétons et valorisons ce que vos outils captent déjà.",
+          bullets: [
+            "Interpréter les signaux entre plusieurs outils",
+            "Ajouter du contexte comportemental et stratégique",
+            "Prioriser ce qui compte vraiment",
+            "Produire un insight orienté action",
+          ],
+        },
+
+        intercom: {
+          title: "Exemple : Intercom + NPS Me",
+          body:
+            "Intercom peut vous dire qui a répondu, quel score a été donné, et ce qui a été écrit. NPS Me ajoute la couche stratégique qui transforme cela en priorités.",
+          boxLeftTitle: "Intercom vous donne",
+          left: ["Qui a répondu", "Score et commentaire", "Filtres et vues de base"],
+          boxRightTitle: "NPS Me ajoute",
+          right: [
+            "Ce qui compte maintenant et pourquoi",
+            "Des signaux liés au churn et à la rétention",
+            "Bruit vs vrais sujets prioritaires",
+            "Quoi corriger d’abord, quoi attendre",
+            "Un CX Pulse hebdo lisible par la direction",
+          ],
+          footer: "Au lieu d’un dashboard de plus, vous obtenez clarté, récit et priorités.",
+        },
+
+        medallia: {
+          title: "À propos de Medallia",
+          body1:
+            "Medallia est puissant. Dans les grandes organisations, cela peut aussi devenir très configuré et peu interprété.",
+          body2:
+            "Avoir accès à tout ne garantit pas la clarté. NPS Me est conçu pour faciliter la décision, sans ajouter de complexité.",
+        },
+
+        deliver: {
+          title: "Ce que délivre la couche d’intelligence",
+          bullets: [
+            "Une surcouche stratégique sur vos outils existants",
+            "Clarté entre NPS transactionnel et relationnel",
+            "CX Pulse hebdo ou mensuel",
+            "Insight multi-sources (enquêtes, listening, données ops)",
+            "Synthèses et récits prêts pour l’exécutif",
+            "Actions CX claires et priorisées",
+          ],
+          footer: "Toujours basé sur vos données. Toujours orienté vers la prochaine action.",
+        },
+
+        fit: {
+          title: "Pour qui c’est fait",
+          bullets: [
+            "Responsables CX utilisant Intercom ou Medallia",
+            "Équipes noyées sous les dashboards",
+            "Organisations avec de bonnes données mais peu de direction",
+            "Décideurs qui veulent moins de charts et de meilleures décisions",
+          ],
+        },
+      },
+
+      cta: {
+        title: "Envie d’ajouter de la clarté au-dessus de vos outils ?",
+        body:
+          "On commence par votre setup actuel, les questions qui restent sans réponse, et les décisions que vous devez prendre. Ensuite, on construit une couche simple et orientée action au-dessus.",
+        primary: "Réserver une revue CX",
+        secondary: "Voir un exemple de CX Pulse",
+        note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
+      },
+    },
+
     socialListeningIndex: {
       seoTitle: "Rapports Social Listening (anonymisés) | NPS Me",
       seoDescription:

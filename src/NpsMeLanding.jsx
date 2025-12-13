@@ -242,8 +242,10 @@ export default function NpsMeLanding() {
               transition={{ duration: 0.7, delay: 0.05 }}
               className="mt-5 text-slate-300 max-w-xl"
             >
-              NPS Me is a specialist CX consulting firm. We diagnose friction across your journey,
-              prioritise the highest-impact fixes, and implement changes that measurably lift NPS®, reduce churn, and increase repeat purchase.
+                NPS Me helps teams run NPS and milestone feedback through their existing stack
+                (Intercom, HubSpot, helpdesks, product tools, or CSV). We add the missing layer:
+                survey governance, unbiased sampling, and decision-grade insight so feedback turns
+                into measurable retention and revenue.
             </motion.p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -267,6 +269,21 @@ export default function NpsMeLanding() {
               <div className="flex items-center gap-2"><Wrench className="h-4 w-4" /> Hands-on enablement</div>
               <div className="flex items-center gap-2"><LineChart className="h-4 w-4" /> Measurable lift</div>
             </div>
+            {/* Works with your tools */}
+            <div className="mt-6 flex flex-wrap gap-2 text-xs">
+              {["Intercom", "HubSpot", "Zendesk", "Product events", "CSV upload"].map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-slate-500 max-w-xl">
+              Use NPS Me alongside your existing tools. We focus on governance, analysis and action,
+              not replacing your CS platform.
+            </p>
           </div>
         </div>
       </PageHeader>
@@ -318,8 +335,10 @@ export default function NpsMeLanding() {
               Try the NPS®-style demo (close-the-loop ready)
             </h3>
             <p className="mt-2 text-slate-300 max-w-xl">
-              The demo shows how invitations, survey responses, and NPS metrics link together.
-              These numbers are live from the demo environment.
+                The demo shows how invitations, survey responses, and NPS metrics link together.
+                In real deployments, targeting and sending often stay in your CS platform and NPS Me
+                ingests the responses to drive analysis and action.
+                These numbers are live from the demo environment.
             </p>
             <div className="mt-4">
               <DemoSummaryStrip />
@@ -341,7 +360,39 @@ export default function NpsMeLanding() {
           </div>
         </div>
       </section>
+      <section id="platform" className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            Not another survey tool
+          </h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            Most teams already have ways to send surveys. NPS Me helps you run a fair, consistent,
+            decision-grade programme across whatever tools you use.
+          </p>
 
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                title: "Governance",
+                desc: "Sampling, cadence, anti-gaming, and comparability over time so the score means something.",
+              },
+              {
+                title: "Interpretation",
+                desc: "Theme and driver analysis, confidence checks, and clear prioritisation so action is obvious.",
+              },
+              {
+                title: "Close the loop",
+                desc: "Follow-up workflows and outcome tracking so responses lead to measurable changes.",
+              },
+            ].map((card) => (
+              <div key={card.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+                <div className="text-white font-semibold">{card.title}</div>
+                <div className="mt-2 text-sm text-slate-300">{card.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <NpsExplainer />
       <MilestoneNpsSection />
 

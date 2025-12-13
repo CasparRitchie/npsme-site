@@ -99,7 +99,6 @@ export const TRANSLATIONS = {
         ],
       },
     },
-
     landing: {
       seo: {
         title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
@@ -201,6 +200,102 @@ export const TRANSLATIONS = {
           "Book a free 30-minute discovery session. We’ll review your current scores and identify quick wins.",
         emailCta: "Email hello@npsme.com",
         bookCta: "Request a discovery call",
+      },
+    },
+    surveyProgramme: {
+      seoTitle: "Your personalised NPS Survey Programme | NPS Me",
+      seoDescription:
+        "Upload your customer list and we'll run a structured NPS survey programme for you - invitations, reminders, dashboards and insight-ready exports.",
+
+      header: {
+        iconLabel: "NPS survey programme",
+        tag: "NPS Me / Survey Programme",
+        accent: "Your personalised NPS Survey Programme",
+        subtitle:
+          "Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you — invitations, reminders, dashboards and export-ready data — so you can focus on acting on the insight, not wrestling with tools.",
+      },
+
+      howItWorks: {
+        title: "How it works",
+        stepLabel: "Step {n}",
+        steps: [
+          {
+            step: "1",
+            title: "Upload your list",
+            text:
+              "You send us a CSV/Excel with customer name, email, company and any groupings you care about (sector, segment, persona, CSM, etc.).",
+          },
+          {
+            step: "2",
+            title: "We set up the survey",
+            text:
+              "We configure your NPS survey, branding and timing - including who to ask, when, and how often to follow up.",
+          },
+          {
+            step: "3",
+            title: "Invitations & reminders",
+            text:
+              "Invitations go out via email, with optional targeted reminders to non-responders. Every response is tracked and stored for analysis.",
+          },
+          {
+            step: "4",
+            title: "Live CX dashboard",
+            text:
+              "You get a secure portal with live NPS, response rates and verbatim comments, plus CSV exports you can drop straight into PowerPoint, Excel or your BI tool.",
+          },
+        ],
+      },
+
+      pulseBox: {
+        title: "Perfect for a rapid, easy to set up, customer pulse",
+        body:
+          "If you have a list of customers you want to hear from quickly, we can spin up a focused NPS survey in days - not months. You send the list, we handle the invites and tracking, and you log in to see live NPS, completion and comments as they come in.",
+        bullets: [
+          "Single CSV upload - no complex tooling for your team.",
+          "Branded NPS survey, tuned to your tone of voice.",
+          "Live NPS and completion rates throughout the survey window.",
+          "Comment feed you can filter by segment, persona or CSM.",
+        ],
+      },
+
+      twoCol: {
+        left: {
+          title: "Client dashboard",
+          intro:
+            "Each client gets their own secure view of their survey programme - no heavy tooling or admin. They can see:",
+          bullets: [
+            "Current NPS and response rate.",
+            "Breakdowns by segment, sector or persona.",
+            "Verbatim comments, ready to tag and share.",
+            "CSV export of the latest status at any time.",
+          ],
+        },
+        right: {
+          title: "Under the hood",
+          intro:
+            "Behind the scenes, NPS Me handles secure storage, deduplicated invitations, tracking and reminders - so you don't need to build or buy a heavy CX platform just to run one survey programme.",
+          bullets: [
+            "Contact file stored securely and versioned.",
+            "Unique links per customer to avoid duplicate responses.",
+            "Optional notifications when new responses arrive.",
+            "Clear audit trail of what was sent and when.",
+          ],
+        },
+      },
+
+      cta: {
+        title: "Want to run an NPS survey with your customers?",
+        body:
+          "Share your customer list and a target go-live date and we'll propose a simple, end-to-end survey plan - including email copy, timings and how we'll report back.",
+        button: "Talk with us to set up your survey programme →",
+      },
+
+      demo: {
+        title: "Try the NPS survey demo",
+        body:
+          "See how invitations, reminders, scoring, and dashboards all work — exactly as your customers would experience them. Quick, safe, and designed to show how NPSme runs full programmes.",
+        button: "Open the NPS demo",
+        note: "Sends a real invite and logs your demo response into the metrics.",
       },
     },
     products: {
@@ -580,7 +675,6 @@ export const TRANSLATIONS = {
         ],
       },
     },
-
     landing: {
       seo: {
         title: "Conseil CX & amélioration du NPS® | NPS Me",
@@ -684,6 +778,103 @@ export const TRANSLATIONS = {
         bookCta: "Demander un rendez-vous",
       },
     },
+    surveyProgramme: {
+      seoTitle: "Votre programme d’enquête NPS personnalisé | NPS Me",
+      seoDescription:
+        "Transmettez votre liste clients et nous déployons un programme NPS structuré : invitations, relances, dashboards et exports prêts pour l’analyse.",
+
+      header: {
+        iconLabel: "Programme d’enquête NPS",
+        tag: "NPS Me / Programme d’enquête",
+        accent: "Votre programme d’enquête NPS personnalisé",
+        subtitle:
+          "Fournissez un fichier de contacts clients et nous déployons pour vous un programme NPS structuré — invitations, relances, dashboards et données prêtes à exporter — pour que vous puissiez vous concentrer sur l’action, pas sur les outils.",
+      },
+
+      howItWorks: {
+        title: "Comment ça marche",
+        stepLabel: "Étape {n}",
+        steps: [
+          {
+            step: "1",
+            title: "Déposez votre liste",
+            text:
+              "Vous nous envoyez un CSV/Excel avec le nom, l’email, l’entreprise et les regroupements utiles (secteur, segment, persona, CSM, etc.).",
+          },
+          {
+            step: "2",
+            title: "Nous paramétrons l’enquête",
+            text:
+              "Nous configurons l’enquête NPS, le branding et le calendrier — y compris qui interroger, quand, et la fréquence des relances.",
+          },
+          {
+            step: "3",
+            title: "Invitations & relances",
+            text:
+              "Les invitations partent par email, avec relances ciblées possibles pour les non-répondants. Chaque réponse est tracée et stockée pour l’analyse.",
+          },
+          {
+            step: "4",
+            title: "Dashboard CX en direct",
+            text:
+              "Vous disposez d’un portail sécurisé avec NPS en temps réel, taux de réponse et verbatims, plus des exports CSV prêts pour PowerPoint, Excel ou votre outil BI.",
+          },
+        ],
+      },
+
+      pulseBox: {
+        title: "Idéal pour un baromètre client rapide et simple à lancer",
+        body:
+          "Si vous avez une liste de clients à interroger rapidement, nous pouvons lancer une enquête NPS focalisée en quelques jours — pas en quelques mois. Vous envoyez la liste, nous gérons les invitations et le suivi, et vous vous connectez pour voir le NPS, l’avancement et les commentaires en temps réel.",
+        bullets: [
+          "Un seul upload CSV — pas d’outil complexe pour vos équipes.",
+          "Enquête NPS brandée, adaptée à votre ton de voix.",
+          "NPS et taux de complétion en direct pendant la fenêtre d’enquête.",
+          "Filtre des commentaires par segment, persona ou CSM.",
+        ],
+      },
+
+      twoCol: {
+        left: {
+          title: "Dashboard client",
+          intro:
+            "Chaque client dispose d’une vue sécurisée de son programme — sans lourdeur d’admin ni outil complexe. Ils peuvent voir :",
+          bullets: [
+            "NPS actuel et taux de réponse.",
+            "Découpes par segment, secteur ou persona.",
+            "Verbatims prêts à taguer et partager.",
+            "Export CSV du statut à tout moment.",
+          ],
+        },
+        right: {
+          title: "Sous le capot",
+          intro:
+            "En coulisses, NPS Me gère le stockage sécurisé, la déduplication des invitations, le suivi et les relances — sans que vous ayez à construire (ou acheter) une plateforme CX lourde juste pour un programme d’enquête.",
+          bullets: [
+            "Fichier contacts stocké de façon sécurisée et versionné.",
+            "Liens uniques par client pour éviter les doublons de réponse.",
+            "Notifications optionnelles à l’arrivée de nouvelles réponses.",
+            "Traçabilité claire de ce qui a été envoyé, et quand.",
+          ],
+        },
+      },
+
+      cta: {
+        title: "Vous voulez lancer une enquête NPS auprès de vos clients ?",
+        body:
+          "Partagez votre liste clients et une date cible de lancement : nous vous proposerons un plan simple de bout en bout — incluant le contenu email, le timing et le reporting.",
+        button: "Parlons-en pour mettre en place votre programme →",
+      },
+
+      demo: {
+        title: "Tester la démo d’enquête NPS",
+        body:
+          "Découvrez le fonctionnement des invitations, relances, scoring et dashboards — exactement comme vos clients le vivraient. Rapide, sans risque, et conçu pour montrer comment NPS Me exécute des programmes complets.",
+        button: "Ouvrir la démo NPS",
+        note: "Envoie une vraie invitation et enregistre votre réponse démo dans les métriques.",
+      },
+    },
+
     products: {
       seoTitle:
         "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",

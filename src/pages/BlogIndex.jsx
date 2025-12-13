@@ -67,6 +67,7 @@ const POSTS = [
 
 export default function BlogIndex() {
   const { lang } = useLanguage();
+  const prefix = lang === "fr" ? "/fr" : ""; // ✅ add
 
   const posts = [...POSTS].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -107,7 +108,7 @@ export default function BlogIndex() {
               </div>
 
               <h2 className="mt-2 text-xl font-semibold text-white">
-                <Link to={`/blog/${p.slug}`} className="hover:underline">
+                <Link to={`${prefix}/blog/${p.slug}`} className="hover:underline">
                   {translations(lang, p.titleKey)}
                 </Link>
               </h2>
@@ -129,7 +130,7 @@ export default function BlogIndex() {
 
               <div className="mt-4">
                 <Link
-                  to={`/blog/${p.slug}`}
+                  to={`${prefix}/blog/${p.slug}`}
                   className="inline-flex items-center gap-2 text-sm text-[#22C55E] hover:text-[#16A34A]"
                 >
                   {translations(lang, "blog.readPost")} →

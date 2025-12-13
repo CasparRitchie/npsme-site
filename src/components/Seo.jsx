@@ -2,46 +2,93 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
+const BASE_URL = "https://www.npsme.com";
+
+function normalisePath(path) {
+  if (!path) return "/";
+  if (path === "/") return "/";
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
+// For a given current path + lang, compute the EN and FR equivalents
+function computeLangUrls(path, lang) {
+  const p = normalisePath(path);
+
+  // If this is a French route like /fr or /fr/xyz, derive the English path
+  if (lang === "fr") {
+    const enPath = p === "/fr" ? "/" : p.replace(/^\/fr/, "") || "/";
+    const frPath = p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
+    return {
+      enUrl: `${BASE_URL}${enPath}`,
+      frUrl: `${BASE_URL}${frPath}`,
+      xDefaultUrl: `${BASE_URL}${enPath}`,
+      canonicalUrl: `${BASE_URL}${frPath}`, // current page is French
+    };
+  }
+
+  // English page
+  const frPath = p === "/" ? "/fr" : `/fr${p}`;
+  return {
+    enUrl: `${BASE_URL}${p}`,
+    frUrl: `${BASE_URL}${frPath}`,
+    xDefaultUrl: `${BASE_URL}${p}`,
+    canonicalUrl: `${BASE_URL}${p}`, // current page is English
+  };
+}
+
 export default function Seo({
   path = "/",
   title,
   description,
-  image = "https://www.npsme.com/og-image.jpg?v=3",
+  image = `${BASE_URL}/og-image.jpg?v=3`,
   lang = "en",
-  alternates = [],
+  // keep alternates optional: if provided we’ll use it, otherwise auto
+  alternates = null,
+  noindex = false,
 }) {
-  const url = `https://www.npsme.com${path}`;
+  const { enUrl, frUrl, xDefaultUrl, canonicalUrl } = computeLangUrls(path, lang);
+
+  // If caller passes alternates explicitly, use them; otherwise auto-generate EN/FR.
+  const finalAlternates =
+    Array.isArray(alternates) && alternates.length > 0
+      ? alternates
+      : [
+          { lang: "en", href: enUrl },
+          { lang: "fr", href: frUrl },
+          { lang: "x-default", href: xDefaultUrl },
+        ];
 
   return (
     <Helmet htmlAttributes={{ lang }}>
-      <title>{title}</title>
-      <link rel="canonical" href={url} />
+      {title ? <title>{title}</title> : null}
+      <link rel="canonical" href={canonicalUrl} />
 
-      <meta name="description" content={description} />
+      {description ? <meta name="description" content={description} /> : null}
 
       {/* hreflang */}
-      {alternates.map((alt) => (
+      {finalAlternates.map((alt) => (
         <link
-          key={alt.lang}
+          key={`${alt.lang}-${alt.href}`}
           rel="alternate"
           hrefLang={alt.lang}
           href={alt.href}
         />
       ))}
-      <link rel="alternate" hrefLang="x-default" href="https://www.npsme.com/products" />
+
+      {noindex ? <meta name="robots" content="noindex, nofollow" /> : null}
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content={url} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonicalUrl} />
+      {title ? <meta property="og:title" content={title} /> : null}
+      {description ? <meta property="og:description" content={description} /> : null}
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content="NPS Me" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
+      {title ? <meta name="twitter:title" content={title} /> : null}
+      {description ? <meta name="twitter:description" content={description} /> : null}
       <meta name="twitter:image" content={image} />
     </Helmet>
   );

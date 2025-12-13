@@ -833,6 +833,306 @@ export const TRANSLATIONS = {
         btnBook: "Book a free discovery call",
       },
     },
+    blogWhatToDoWithNpsScores: {
+      seo: {
+        title: "What To Do With Your NPS Scores: Present, Interpret, Act | NPS Me",
+        description:
+          "How to present NPS the right way, avoid small-sample traps, handle repeat responders, and target changes that actually lift the score and the business.",
+      },
+      header: {
+        iconLabel: "Interpreting NPS",
+        tag: "CX & NPS / Blog",
+        accent: "What To Do With Your NPS Scores. ",
+        title: "Practical ways to present, interpret, and act on NPS...",
+        subtitle: "...so it changes customer outcomes, not just dashboards.",
+      },
+      intro:
+        "A single number on its own rarely helps a leadership team make better decisions. NPS can be powerful, but only when it is presented clearly, read in context, and tied to action. Below is a simple approach you can apply next week with almost any programme.",
+
+      sections: {
+        1: {
+          title: "Present the score in three views",
+          bullets: {
+            1: {
+              strong: "Spot month",
+              text:
+                "for recency. Useful for operational reviews and short feedback loops. Always show the response count next to the score so people see the confidence level.",
+            },
+            2: {
+              strong: "Quarter to date",
+              text:
+                "for directional movement. Reduces noise while keeping changes visible for stakeholders who live by quarters.",
+            },
+            3: {
+              strong: "12-month rolling",
+              text:
+                "for the strategic view. Smooths seasonality and shows whether your programme is truly improving. Use this for long-term trend calls with the exec team.",
+            },
+          },
+          tip:
+            "Tip: plot all three on a single compact chart. The room sees momentum without losing sight of today.",
+        },
+
+        2: {
+          title: "Respect sample size and stability",
+          p1:
+            "NPS becomes volatile when volumes are low. Publish a simple rule of thumb alongside each chart. For example: “Spot month is treated as directional below 200 responses.” You don’t need to show confidence intervals to everyone, but you should design where you get stability:",
+          bullets: {
+            1: "Pool small segments into a parent cohort for reporting, then deep-dive with comments.",
+            2: "Use rolling windows for teams with low monthly volumes.",
+            3: "Guard against sudden shifts caused by one large outreach or one major incident.",
+          },
+        },
+
+        3: {
+          title: "Look beyond the score",
+          p1:
+            "Two people can feel the same way about your brand and still give different numbers. Culture and context matter. In the UK, a pass at 40% is normal at university; in other places 70% is the threshold. Some markets avoid 10 out of 10 unless everything is perfect, others are comfortable rating highly when the experience simply meets expectations.",
+          p2:
+            "The comment is where the truth lives. Make written feedback first-class and the number second.",
+        },
+
+        4: {
+          title: "Handle repeat responders with intent",
+          p1:
+            "Repeat responders are valuable because they reveal change over time, but they can bias the score if they dominate the sample. Use light controls:",
+          bullets: {
+            1: "Cap contact frequency per person so you don’t over-survey the same voices.",
+            2: "Track first-time vs repeat separately and report both when volumes allow.",
+            3:
+              "Use longitudinal slices to see if fixes actually shift the same customer’s view after an intervention.",
+          },
+        },
+
+        5: {
+          title: "Where to focus for the biggest lift",
+          p1a:
+            "It’s tempting to chase the loudest 0 or 1. Sometimes you must, especially if it points to a critical failure. But if the goal is to lift the overall score, moving ",
+          p1strong: "7s and 8s to 9s and 10s",
+          p1b: " often has more impact, because you’re nudging people who already see value.",
+          bullets: {
+            1: { strong: "Stabilise detractors", text: "by fixing systemic blockers that create repeats of the same pain." },
+            2: { strong: "Activate passives", text: "with small experience upgrades that remove friction and make advocacy easy." },
+            3: { strong: "Protect promoters", text: "with consistent basics and simple referral prompts." },
+          },
+        },
+
+        6: {
+          title: "Cut the data where teams can act",
+          bullets: {
+            1: { strong: "Journey step", text: "like sign-up, first delivery, renewal, refund." },
+            2: { strong: "Product or service line", text: "where ownership is clear." },
+            3: { strong: "Channel", text: "such as app, web, store, or partner." },
+            4: { strong: "Customer cohort", text: "for new vs repeat, high vs low value, or region." },
+          },
+          tip:
+            "Each slice should lead to a named owner, a clear fix, and a measurable “before and after”.",
+        },
+
+        7: {
+          title: "Close the loop and show the change",
+          p1:
+            "Turning comments into fixes is the whole point. Use a simple rhythm: collect, cluster, choose, ship, share. Publish a “you said, we did” update at a cadence your customers can feel. Then watch the same cohorts in the next cycle to see if the needle moves.",
+        },
+
+        8: {
+          title: "Bottom line",
+          p1:
+            "Present NPS in a way that sets the right expectations, control for sample stability, read the comments first, and aim your effort where it converts sentiment into advocacy. That’s how the score becomes a by-product of better experience, rather than a target in itself.",
+        },
+      },
+
+      cta: {
+        title:
+          "Want help turning feedback into growth with clear dashboards and shipped fixes?",
+        subtitle:
+          "NPS Me can help you design reporting lenses, stabilise noisy scores, and link NPS directly to actionable change in your customer journey.",
+        primary: "Explore NPS Me services",
+        secondary: "Book a discovery call",
+      },
+    },
+    blogWhyNpsIsntImproving: {
+      seo: {
+        title: "Why Your NPS Isn't Improving - Even When Your CX Looks Better | NPS Me",
+        description:
+          "A practical guide to understanding flat NPS, invisible friction, sampling drift, and what to fix first when scores won't move.",
+      },
+      header: {
+        iconLabel: "Understanding NPS and CX",
+        tag: "CX & NPS / Blog",
+        title: "Why your NPS isn't improving - even when your CX looks better",
+        subtitle:
+          "A practical guide to understanding flat NPS, invisible friction, sampling drift, and what to fix first when scores won't move.",
+      },
+
+      p: {
+        1: {
+          a:
+            "In every company there comes a moment where the team genuinely feels things have improved - fewer complaints, better onboarding, cleaner support flow - and yet the",
+          bStrong: "NPS score refuses to move.",
+        },
+        2:
+          "It's frustrating. Demoralising. And it usually sparks a round of “Maybe NPS is just broken” conversations internally.",
+        3: { a: "But it's not. Flat NPS is almost always a", bEm: "signal", c: "- just not the one you think." },
+        4: "Here's why.",
+      },
+
+      s: {
+        1: {
+          title: "1. Improvements happened… but only for some customers",
+          p1: "Most teams fix friction where it's loudest:",
+          bullets: {
+            1: "a support backlog",
+            2: "complaints about delivery",
+            3: "onboarding confusion",
+            4: "a clunky checkout step",
+          },
+          p2:
+            "These fixes help a subset of customers, often the ones already leaning towards “Passive”.",
+          p3: {
+            a: "But if the customers who are giving the",
+            bStrong: "0–6 scores",
+            c:
+              "aren't experiencing that improvement - or worse, they're still stuck in slow, high-friction processes - NPS barely moves.",
+          },
+          p4: {
+            strong: "NPS is weighted by your worst experience, not your best.",
+            rest: "Detractors pull harder than Promoters lift.",
+          },
+        },
+
+        2: {
+          title: "2. You improved processes - but didn't improve expectations",
+          p1: "One of the biggest hidden blockers:",
+          quote: {
+            a: "Customers judge you based on what they",
+            bNotItalic: "think",
+            c: "should happen, not what actually happened.",
+          },
+          p2:
+            "Improving the operations without improving the promise often creates flat NPS because expectations drag sentiment down even when delivery is solid.",
+          p3: "Classic pattern:",
+          bullets: {
+            1: "Onboarding got faster → great",
+            2: "Communication didn't change → customer still feels lost",
+            3: "NPS: unchanged",
+          },
+          p4: "If expectations stay vague, NPS stays flat.",
+        },
+
+        3: {
+          title: "3. You reduced friction - but didn't close the loop",
+          p1: "Customers don't magically know you fixed the thing they complained about.",
+          p2: "Teams often launch improvements quietly, thinking “customers will notice”.",
+          p3: "They don't.",
+          p4: { strong: "Closing the loop creates perceived improvement", rest: ", which is what moves NPS:" },
+          bullets: {
+            1: "“We heard you.”",
+            2: "“We've changed X.”",
+            3: "“It now works like this.”",
+          },
+          p5: "A 30-second email can do more for NPS than a 3-month engineering project.",
+        },
+
+        4: {
+          title: "4. Sample drift is disguising real improvement",
+          p1: "This is the most common hidden reason.",
+          p2:
+            "If the mix of people you're surveying changes - even slightly - your NPS will behave strangely.",
+          p3: "Examples:",
+          bullets: {
+            1: "Your most frustrated segment now makes up more of the sample.",
+            2: "New customers respond more than long-term ones.",
+            3: "Support-triggered surveys skew the mix.",
+            4: "A change in CRM logic suddenly excludes “happy” segments.",
+            5: "The underlying experience has improved, but the surveyed set has shifted in the opposite direction.",
+          },
+          p5:
+            "If sampling isn't stable and representative, NPS becomes a weather report, not a trend.",
+          p6: {
+            strong:
+              "If sampling isn't stable and representative, NPS becomes a weather report, not a trend.",
+          },
+        },
+
+        5: {
+          title: "5. Promoters don't score higher - they just complain less",
+          p1: "This one surprises people.",
+          p2: "Often you fix friction → customers feel happier → they stop complaining.",
+          p3: "But they also don't suddenly become raving fans.",
+          p4:
+            "Moving someone from 6 → 7 does lift NPS (it removes a Detractor), but in larger samples the impact per customer is small — meaningful score movement usually comes from shifting groups, not single responses.",
+          p5: "This creates “silent success”:",
+          bullets: {
+            1: "fewer refunds",
+            2: "fewer escalations",
+            3: "better sentiment",
+            4: "NPS unchanged",
+          },
+          p7:
+            "The business improves - but NPS doesn't reflect it until you cross a threshold.",
+        },
+
+        6: {
+          title: "6. You fixed the symptom, not the cause",
+          p1: "Teams often fix visible problems:",
+          bulletsA: { 1: "slow replies", 2: "confusing emails", 3: "high contact rates" },
+          p2: "But the root cause lives deeper:",
+          bulletsB: {
+            1: "unclear SLAs",
+            2: "broken internal tools",
+            3: "mismatched pricing vs value",
+            4: "internal KPIs incentivising speed, not clarity",
+          },
+          p3:
+            "Unless you fix the origin, you get short-term uplift… and then everything plateaus again.",
+          p4: { strong: "NPS is a system score - not a quick-win score." },
+        },
+
+        7: {
+          title: "7. Customers' expectations rose faster than your improvements",
+          p1: "This is the paradox of CX:",
+          quote: "When you improve something, customers expect even more.",
+          p2: "It's why Amazon improves delivery speed and still gets complaints.",
+          p3: "Your “big wins” quickly become “base expectations”.",
+          p4: "So the NPS line stays flat while the bar keeps rising.",
+          p5:
+            "Flat NPS doesn't always mean “no progress”. Sometimes it means progress was absorbed into baseline.",
+          p6: "Flat NPS doesn't always mean “no progress”. Sometimes it means",
+          p7: { a: "progress was absorbed into baseline.", bStrong: "progress was absorbed into baseline." },
+        },
+      },
+
+      moves: {
+        title: "So what actually moves NPS?",
+        bullets: {
+          1: "Fixing friction at the root, not just the symptom.",
+          2: "Clear, proactive expectation setting.",
+          3: "Representative, stable sampling.",
+          4: "Real close-the-loop routines, not boilerplate.",
+          5: "Improvements that reach Detractors, not just Passives.",
+          6: "Cross-functional fixes across Product, CX, Ops and Support.",
+          7: "Repeated communication so people can feel the change.",
+        },
+      },
+
+      test: {
+        title: "A simple test: did we reduce annoyances, or improve the journey?",
+        p1: { a: "Reducing annoyances", bItalic: "stabilises", c: "NPS." },
+        p2: { a: "Improving the journey", bItalic: "lifts", c: "NPS." },
+        p3: "Most teams spend 90% of their time on the first.",
+        p4: "Your NPS is telling you which you've done.",
+        p5: "",
+        p6: "",
+      },
+
+      cta: {
+        lead:
+          "If your NPS feels stuck even though your teams are working hard, we can help you diagnose what's really going on.",
+        primary: "Explore NPS Me services",
+        secondary: "Book a discovery call",
+      },
+    },
 
     dataAutomation: {
       seoTitle: "Data, Automation & Insight — Transform Your Reporting | NPS Me",
@@ -2577,6 +2877,312 @@ export const TRANSLATIONS = {
           "Si vous voulez de l’aide pour la mettre en place - ou tester la démo - commencez ici :",
         btnDemo: "Tester l’expérience démo NPS",
         btnBook: "Réserver un appel découverte gratuit",
+      },
+    },
+    blogWhatToDoWithNpsScores: {
+      seo: {
+        title: "Que faire de vos scores NPS : présenter, interpréter, agir | NPS Me",
+        description:
+          "Comment présenter le NPS correctement, éviter les pièges des petits échantillons, gérer les répondants récurrents et cibler des actions qui font réellement progresser le score et le business.",
+      },
+      header: {
+        iconLabel: "Interpréter le NPS",
+        tag: "CX & NPS / Blog",
+        accent: "Que faire de vos scores NPS. ",
+        title: "Des méthodes concrètes pour présenter, interpréter et agir avec le NPS...",
+        subtitle: "...pour améliorer l’expérience réelle, pas seulement les dashboards.",
+      },
+      intro:
+        "Un seul chiffre, pris isolément, aide rarement une équipe dirigeante à prendre de meilleures décisions. Le NPS peut être puissant, mais seulement s’il est présenté clairement, lu avec du contexte, et relié à l’action. Voici une approche simple que vous pouvez appliquer dès la semaine prochaine dans presque n’importe quel programme.",
+
+      sections: {
+        1: {
+          title: "Présentez le score sous trois angles",
+          bullets: {
+            1: {
+              strong: "Mois ponctuel",
+              text:
+                "pour la fraîcheur. Utile pour les revues opérationnelles et les boucles de feedback courtes. Affichez toujours le nombre de réponses à côté du score pour rendre le niveau de confiance visible.",
+            },
+            2: {
+              strong: "Trimestre à date",
+              text:
+                "pour la tendance. Réduit le bruit tout en gardant les changements visibles pour les parties prenantes qui pilotent au trimestre.",
+            },
+            3: {
+              strong: "Glissant 12 mois",
+              text:
+                "pour la vue stratégique. Lisse la saisonnalité et montre si le programme s’améliore réellement. À utiliser pour les discussions de tendance long terme avec le COMEX.",
+            },
+          },
+          tip:
+            "Astuce : tracez les trois sur un seul graphique compact. Tout le monde voit la dynamique sans perdre de vue l’actualité.",
+        },
+
+        2: {
+          title: "Respectez la taille d’échantillon et la stabilité",
+          p1:
+            "Le NPS devient volatile quand les volumes sont faibles. Publiez une règle simple à côté de chaque graphique. Par exemple : « Le mois ponctuel est considéré comme directionnel en dessous de 200 réponses. » Vous n’avez pas besoin de montrer des intervalles de confiance à tout le monde, mais vous devez concevoir la stabilité :",
+          bullets: {
+            1: "Regroupez les petits segments dans une cohorte “parent” pour le reporting, puis creusez via les verbatims.",
+            2: "Utilisez des fenêtres glissantes pour les équipes avec de faibles volumes mensuels.",
+            3: "Protégez-vous des variations dues à une campagne massive ou à un incident majeur isolé.",
+          },
+        },
+
+        3: {
+          title: "Regardez au-delà du score",
+          p1:
+            "Deux personnes peuvent ressentir la même chose vis-à-vis de votre marque et pourtant donner des notes différentes. La culture et le contexte comptent. Au Royaume-Uni, 40% peut être une note “passable” à l’université ; ailleurs, 70% est le seuil. Certains marchés évitent le 10/10 sauf perfection ; d’autres notent volontiers haut quand l’expérience répond simplement aux attentes.",
+          p2:
+            "Le verbatim, c’est là que vit la vérité. Faites du feedback écrit un citoyen de première classe, et du chiffre un second.",
+        },
+
+        4: {
+          title: "Gérez les répondants récurrents avec intention",
+          p1:
+            "Les répondants récurrents sont précieux car ils montrent l’évolution dans le temps, mais ils peuvent biaiser le score s’ils dominent l’échantillon. Utilisez des garde-fous légers :",
+          bullets: {
+            1: "Limitez la fréquence de sollicitation par personne pour ne pas sur-solliciter les mêmes voix.",
+            2: "Distinguez primo-répondants vs récurrents, et reportez les deux quand les volumes le permettent.",
+            3:
+              "Utilisez des vues longitudinales pour voir si les actions changent réellement l’avis d’un même client après intervention.",
+          },
+        },
+
+        5: {
+          title: "Où se concentrer pour le plus gros levier",
+          p1a:
+            "On est tenté de courir après le 0 ou le 1 le plus bruyant. Parfois c’est nécessaire, surtout si cela pointe une défaillance critique. Mais si l’objectif est de faire progresser le score global, faire passer ",
+          p1strong: "les 7 et 8 vers 9 et 10",
+          p1b:
+            " a souvent plus d’impact, car vous faites évoluer des clients qui voient déjà de la valeur.",
+          bullets: {
+            1: { strong: "Stabilisez les détracteurs", text: "en corrigeant les blocages systémiques qui recréent les mêmes irritants." },
+            2: { strong: "Activez les passifs", text: "avec de petites améliorations qui enlèvent la friction et rendent la recommandation naturelle." },
+            3: { strong: "Protégez les promoteurs", text: "en assurant les fondamentaux et des demandes de recommandation simples." },
+          },
+        },
+
+        6: {
+          title: "Découpez la donnée là où les équipes peuvent agir",
+          bullets: {
+            1: { strong: "Étape de parcours", text: "comme inscription, première livraison, renouvellement, remboursement." },
+            2: { strong: "Produit ou ligne de service", text: "où la responsabilité est claire." },
+            3: { strong: "Canal", text: "comme app, web, magasin, ou partenaire." },
+            4: { strong: "Cohorte client", text: "nouveaux vs récurrents, forte vs faible valeur, ou région." },
+          },
+          tip:
+            "Chaque découpe doit mener à un owner nommé, un correctif clair, et un “avant / après” mesurable.",
+        },
+
+        7: {
+          title: "Fermez la boucle et montrez le changement",
+          p1:
+            "Transformer les commentaires en actions, c’est tout l’enjeu. Utilisez un rythme simple : collecter, regrouper, choisir, livrer, partager. Publiez un « vous avez dit, nous avons fait » à une cadence perceptible par les clients. Puis suivez les mêmes cohortes au cycle suivant pour voir si ça bouge.",
+        },
+
+        8: {
+          title: "En bref",
+          p1:
+            "Présentez le NPS de façon à cadrer les attentes, contrôlez la stabilité de l’échantillon, lisez d’abord les verbatims, et concentrez l’effort là où il transforme le sentiment en recommandation. C’est ainsi que le score devient une conséquence d’une meilleure expérience, plutôt qu’un objectif en soi.",
+        },
+      },
+
+      cta: {
+        title:
+          "Envie de transformer le feedback en croissance, avec des dashboards clairs et des actions livrées ?",
+        subtitle:
+          "NPS Me peut vous aider à concevoir de bons angles de reporting, stabiliser des scores bruités, et relier le NPS à des changements concrets dans le parcours client.",
+        primary: "Découvrir les services NPS Me",
+        secondary: "Réserver un appel découverte",
+      },
+    },
+    blogWhyNpsIsntImproving: {
+      seo: {
+        title: "Pourquoi votre NPS ne progresse pas — même si votre CX s’améliore | NPS Me",
+        description:
+          "Un guide pratique pour comprendre un NPS qui stagne : frictions invisibles, dérive d’échantillon, et quoi corriger en priorité lorsque les scores ne bougent plus.",
+      },
+      header: {
+        iconLabel: "Comprendre le NPS et la CX",
+        tag: "CX & NPS / Blog",
+        title: "Pourquoi votre NPS ne progresse pas — même si votre CX s’améliore",
+        subtitle:
+          "Un guide pratique pour comprendre un NPS qui stagne : frictions invisibles, dérive d’échantillon, et quoi corriger en priorité lorsque les scores ne bougent plus.",
+      },
+
+      p: {
+        1: {
+          a:
+            "Dans chaque entreprise, il arrive un moment où l’équipe a le sentiment sincère que les choses se sont améliorées — moins de réclamations, un onboarding plus fluide, un support mieux organisé — et pourtant",
+          bStrong: "le score NPS refuse de bouger.",
+        },
+        2:
+          "C’est frustrant. Démoralisant. Et cela déclenche souvent en interne des discussions du type : « Peut-être que le NPS est cassé ».",
+        3: { a: "Mais non. Un NPS plat est presque toujours un", bEm: "signal", c: "— simplement pas celui auquel vous pensez." },
+        4: "Voici pourquoi.",
+      },
+
+      s: {
+        1: {
+          title: "1. Des améliorations ont eu lieu… mais seulement pour certains clients",
+          p1: "La plupart des équipes corrigent les frictions là où elles sont les plus bruyantes :",
+          bullets: {
+            1: "un retard de support",
+            2: "des plaintes sur la livraison",
+            3: "de la confusion pendant l’onboarding",
+            4: "une étape de paiement trop lourde",
+          },
+          p2:
+            "Ces correctifs aident une partie des clients — souvent ceux qui étaient déjà proches du statut « Passif ».",
+          p3: {
+            a: "Mais si les clients qui donnent des",
+            bStrong: "notes 0–6",
+            c:
+              "ne ressentent pas cette amélioration — ou pire, s’ils restent bloqués dans des processus lents et très frictionnels — le NPS bouge à peine.",
+          },
+          p4: {
+            strong: "Le NPS est pondéré par votre pire expérience, pas par la meilleure.",
+            rest: "Les Détracteurs tirent plus fort vers le bas que les Promoteurs ne tirent vers le haut.",
+          },
+        },
+
+        2: {
+          title: "2. Vous avez amélioré les processus — mais pas les attentes",
+          p1: "L’un des freins cachés les plus fréquents :",
+          quote: {
+            a: "Les clients vous jugent selon ce qu’ils",
+            bNotItalic: "pensent",
+            c: "qu’il devrait se passer, pas selon ce qui s’est réellement passé.",
+          },
+          p2:
+            "Améliorer l’opérationnel sans améliorer la promesse crée souvent un NPS qui stagne : les attentes tirent le ressenti vers le bas même lorsque l’exécution est correcte.",
+          p3: "Schéma classique :",
+          bullets: {
+            1: "L’onboarding est plus rapide → très bien",
+            2: "La communication ne change pas → le client se sent toujours perdu",
+            3: "NPS : inchangé",
+          },
+          p4: "Si les attentes restent floues, le NPS reste plat.",
+        },
+
+        3: {
+          title: "3. Vous avez réduit les frictions — mais vous n’avez pas « fermé la boucle »",
+          p1: "Les clients ne devinent pas automatiquement que vous avez corrigé ce dont ils se plaignaient.",
+          p2:
+            "Les équipes lancent souvent des améliorations discrètement, en se disant : « les clients vont le remarquer ».",
+          p3: "Ils ne le remarquent pas.",
+          p4: { strong: "Fermer la boucle crée une amélioration perçue", rest: ", et c’est cela qui fait bouger le NPS :" },
+          bullets: {
+            1: "« On vous a écouté. »",
+            2: "« On a changé X. »",
+            3: "« Désormais, ça fonctionne comme ça. »",
+          },
+          p5:
+            "Un e-mail de 30 secondes peut faire plus pour le NPS qu’un projet d’ingénierie de 3 mois.",
+        },
+
+        4: {
+          title: "4. La dérive de l’échantillon masque la vraie amélioration",
+          p1: "C’est la raison cachée la plus fréquente.",
+          p2:
+            "Si le profil des personnes interrogées change — même légèrement — votre NPS peut se comporter de façon étrange.",
+          p3: "Exemples :",
+          bullets: {
+            1: "Votre segment le plus frustré représente désormais une plus grande part de l’échantillon.",
+            2: "Les nouveaux clients répondent plus que les anciens.",
+            3: "Les enquêtes déclenchées par le support biaisent le mix.",
+            4: "Un changement de logique CRM exclut soudain certains segments « satisfaits ».",
+            5:
+              "L’expérience sous-jacente s’est améliorée, mais l’ensemble des répondants a dérivé dans la direction opposée.",
+          },
+          p5:
+            "Si l’échantillonnage n’est pas stable et représentatif, le NPS devient une météo, pas une tendance.",
+          p6: {
+            strong:
+              "Si l’échantillonnage n’est pas stable et représentatif, le NPS devient une météo, pas une tendance.",
+          },
+        },
+
+        5: {
+          title: "5. Les Promoteurs ne notent pas plus haut — ils se plaignent juste moins",
+          p1: "Ça surprend souvent.",
+          p2:
+            "Souvent, vous corrigez des frictions → les clients se sentent mieux → ils arrêtent de se plaindre.",
+          p3: "Mais ils ne deviennent pas pour autant des fans inconditionnels.",
+          p4:
+            "Faire passer un client de 6 à 7 améliore bien le NPS (on supprime un Détracteur), mais dans des volumes importants l’effet reste marginal. Les vraies hausses de NPS viennent de changements à l’échelle, pas de cas isolés.",
+          p5: "Cela crée un « succès silencieux » :",
+          bullets: {
+            1: "moins de remboursements",
+            2: "moins d’escalades",
+            3: "un ressenti global meilleur",
+            4: "NPS inchangé",
+          },
+          p7:
+            "L’entreprise s’améliore — mais le NPS ne le reflète pas tant que vous ne franchissez pas un seuil.",
+        },
+
+        6: {
+          title: "6. Vous avez corrigé le symptôme, pas la cause",
+          p1: "Les équipes corrigent souvent des problèmes visibles :",
+          bulletsA: { 1: "des réponses lentes", 2: "des e-mails confus", 3: "un volume de contacts élevé" },
+          p2: "Mais la cause racine est plus profonde :",
+          bulletsB: {
+            1: "des SLA peu clairs",
+            2: "des outils internes défaillants",
+            3: "un rapport prix / valeur désaligné",
+            4: "des KPI internes qui valorisent la vitesse plutôt que la clarté",
+          },
+          p3:
+            "Tant que l’origine n’est pas traitée, vous obtenez un léger gain… puis tout repart en plateau.",
+          p4: { strong: "Le NPS est un score de système — pas un score de quick wins." },
+        },
+
+        7: {
+          title: "7. Les attentes des clients ont augmenté plus vite que vos améliorations",
+          p1: "C’est le paradoxe de la CX :",
+          quote: "Quand vous améliorez quelque chose, les clients en attendent encore plus.",
+          p2:
+            "C’est pour cela qu’Amazon améliore la vitesse de livraison… et reçoit quand même des plaintes.",
+          p3: "Vos « grandes victoires » deviennent très vite des « attentes de base ».",
+          p4: "Donc la courbe NPS reste plate, pendant que la barre des attentes monte.",
+          p5:
+            "Un NPS plat ne signifie pas toujours « aucun progrès ». Parfois, cela signifie que le progrès a été absorbé dans le baseline.",
+          p6: "Un NPS plat ne signifie pas toujours « aucun progrès ». Parfois, cela signifie que",
+          p7: { a: "le progrès a été absorbé dans le baseline.", bStrong: "le progrès a été absorbé dans le baseline." },
+        },
+      },
+
+      moves: {
+        title: "Alors, qu’est-ce qui fait vraiment bouger le NPS ?",
+        bullets: {
+          1: "Corriger la friction à la racine, pas seulement le symptôme.",
+          2: "Clarifier les attentes de manière proactive.",
+          3: "Un échantillonnage représentatif et stable.",
+          4: "De vraies routines de « close the loop », pas du texte standard.",
+          5: "Des améliorations qui atteignent les Détracteurs, pas seulement les Passifs.",
+          6: "Des corrections transverses (Produit, CX, Ops, Support).",
+          7: "Une communication répétée, pour que les clients ressentent le changement.",
+        },
+      },
+
+      test: {
+        title: "Un test simple : avons-nous réduit des irritants, ou amélioré le parcours ?",
+        p1: { a: "Réduire les irritants", bItalic: "stabilise", c: "le NPS." },
+        p2: { a: "Améliorer le parcours", bItalic: "fait monter", c: "le NPS." },
+        p3: "La plupart des équipes passent 90% de leur temps sur le premier point.",
+        p4: "Votre NPS vous dit lequel vous avez fait.",
+        p5: "",
+        p6: "",
+      },
+
+      cta: {
+        lead:
+          "Si votre NPS semble bloqué alors que vos équipes travaillent dur, nous pouvons vous aider à diagnostiquer ce qui se passe réellement.",
+        primary: "Découvrir les services NPS Me",
+        secondary: "Réserver un appel découverte",
       },
     },
     cxCockpit: {

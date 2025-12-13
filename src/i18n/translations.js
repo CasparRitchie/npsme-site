@@ -490,6 +490,146 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    whatIsNps: {
+      seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
+      seoDescription:
+        "Plain English guide to Net Promoter Score (NPS): how it works, how to calculate it, where it helps, where it misleads, and how to act on feedback.",
+
+      header: {
+        iconLabel: "What is NPS?",
+        tag: "Guide / Customer Experience",
+        title: "What is Net Promoter Score (NPS)?",
+        subtitle:
+          "A practical explanation of how NPS works, where it is useful, where it can go wrong, and how to use it as a starting point for real customer improvement rather than just a number on a dashboard.",
+      },
+
+      core: {
+        title: "The core NPS question",
+        intro: "Net Promoter Score is built around one simple question:",
+        question:
+          "“How likely are you to recommend [company] to a friend or colleague?”",
+        body1:
+          "Respondents answer on a 0 to 10 scale, where 0 means “not at all likely” and 10 means “extremely likely”. What matters is not the average, but how people are grouped.",
+        groupsTitle: "Three groups",
+        groups: {
+          detractors: {
+            label: "Detractors (0-6)",
+            text:
+              "At risk, unhappy, or blocked. More likely to churn, complain, or warn others.",
+          },
+          passives: {
+            label: "Passives (7-8)",
+            text:
+              "Reasonably satisfied but not enthusiastic. Could be tempted by a competitor.",
+          },
+          promoters: {
+            label: "Promoters (9-10)",
+            text:
+              "Loyal advocates who are more likely to stay, expand, and recommend you.",
+          },
+        },
+      },
+
+      calc: {
+        title: "How Net Promoter Score is calculated",
+        intro:
+          "The NPS formula is intentionally simple. For a given sample of responses:",
+        steps: [
+          "Work out the percentage of Promoters (9-10).",
+          "Work out the percentage of Detractors (0-6).",
+          "Subtract Detractors from Promoters.",
+        ],
+        example:
+          "For example, if 60 percent of respondents are Promoters and 20 percent are Detractors, your NPS is {value}.",
+        scaleLabel: "NPS scale illustration",
+        bar: {
+          detractors: "Detractors",
+          passives: "Passives",
+          promoters: "Promoters",
+        },
+      },
+
+      types: {
+        title: "Relationship NPS and transactional NPS",
+        intro:
+          "NPS is not a single thing. The same question behaves differently depending on when you ask it and what just happened to the customer.",
+        relationship: {
+          title: "Relationship NPS",
+          body:
+            "Sent periodically to a sample of customers to understand overall brand sentiment. This is the number that often appears on executive dashboards.",
+          bullets: [
+            "Good for tracking overall direction over time.",
+            "Not great at highlighting exactly what is broken.",
+          ],
+        },
+        transactional: {
+          title: "Transactional or milestone NPS",
+          body:
+            "Sent after key journey moments, such as onboarding, first delivery, renewal, or support closure.",
+          bullets: [
+            "Pinpoints where the experience creates friction.",
+            "Much more useful for guiding concrete improvements.",
+          ],
+        },
+      },
+
+      beyond: {
+        title: "Beyond the score: why comments matter more than the number",
+        p1:
+          "A common criticism of NPS is that one number cannot capture the quality of a business. That is true. A single score on its own is a very crude signal. It is also shaped by culture and context.",
+        p2:
+          "Someone in one country may see a 7 out of 10 as a good mark. In another market, anything below a 9 looks mediocre. In some cultures people avoid giving 10 unless everything really is perfect. In others, giving a 10 is simply a polite way to say that things were fine.",
+        p3:
+          "This is why the open comment that sits next to the NPS question is so important. The comment tells you what is driving the score. It points to specific friction, specific delights, and real language that you can share internally.",
+        bullets: [
+          "Use NPS as a routing tool to the comments, not as the whole story.",
+          "Read what Detractors are saying first, then look at Promoters.",
+          "Look for patterns in language, not just changes of two or three points.",
+        ],
+      },
+
+      pitfalls: {
+        title: "Common pitfalls and how to avoid them",
+        pitfallsTitle: "Pitfalls",
+        pitfallsList: [
+          "Focusing only on the headline score and ignoring underlying comments.",
+          "Letting teams control who is invited to respond, which introduces bias.",
+          "Over-surveying the same contacts and creating fatigue.",
+          "Coaching customers to “give us a 9 or 10” instead of asking for honest feedback.",
+        ],
+        betterTitle: "Better practice",
+        betterList: [
+          "Use transparent, representative sampling rules.",
+          "Track NPS alongside retention, repeat purchase, and support volume.",
+          "Publish regular internal summaries that explain what customers are saying.",
+          "Reward teams for fixing root causes, not for pushing the score up at all costs.",
+        ],
+      },
+
+      closeLoop: {
+        title: "Making NPS useful: close the loop and show progress",
+        intro:
+          "The value of NPS comes from what you do with it. The companies that see the most impact treat surveys as the start of a conversation, not the end.",
+        bullets: [
+          "Follow up with customers who raise issues, especially high value accounts.",
+          "Group comments into themes that map to real processes and owners.",
+          "Agree a small number of fixes, ship them, and track the effect on both NPS and hard outcomes.",
+          "Share simple “you said, we did” updates so customers can see that speaking up is worth it.",
+        ],
+        outro:
+          "Over time this builds trust. Customers see that feedback leads to change, teams see that insight leads to better results, and the NPS score becomes one useful signal in a wider customer health picture.",
+      },
+
+      cta: {
+        title: "Want help designing an NPS program that actually drives change?",
+        body:
+          "NPS Me works with teams to design fair surveys, realistic sampling, and practical follow-up so that every point of feedback has somewhere to go.",
+        explore: "Explore services",
+        book: "Book a discovery call",
+        disclaimer:
+          "NPS and Net Promoter Score are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References on this page are descriptive only. NPS Me is independent and not affiliated with or endorsed by those parties.",
+      },
+    },
     whyNpsMe: {
       seoTitle: "Why NPS Me: Pragmatic CX consulting for real business impact",
       seoDescription:
@@ -1068,6 +1208,146 @@ export const TRANSLATIONS = {
 
       misc: {
         dash: "-",
+      },
+    },
+    whatIsNps: {
+      seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
+      seoDescription:
+        "Guide en français sur le Net Promoter Score (NPS) : fonctionnement, calcul, cas d’usage, pièges courants et comment agir sur les verbatims.",
+
+      header: {
+        iconLabel: "Qu’est-ce que le NPS ?",
+        tag: "Guide / Expérience client",
+        title: "Qu’est-ce que le Net Promoter Score (NPS) ?",
+        subtitle:
+          "Une explication pratique : comment le NPS fonctionne, quand il est utile, où il peut induire en erreur, et comment l’utiliser comme point de départ pour des améliorations concrètes — pas seulement comme un chiffre dans un dashboard.",
+      },
+
+      core: {
+        title: "La question NPS de base",
+        intro: "Le Net Promoter Score s’appuie sur une question simple :",
+        question:
+          "« Dans quelle mesure recommanderiez-vous [entreprise] à un ami ou un collègue ? »",
+        body1:
+          "Les répondants notent de 0 à 10, où 0 signifie « pas du tout probable » et 10 « extrêmement probable ». Ce qui compte n’est pas la moyenne, mais la répartition par groupes.",
+        groupsTitle: "Trois groupes",
+        groups: {
+          detractors: {
+            label: "Détracteurs (0–6)",
+            text:
+              "Insatisfaits, bloqués ou à risque. Plus susceptibles de churn, de se plaindre ou de décourager d’autres personnes.",
+          },
+          passives: {
+            label: "Passifs (7–8)",
+            text:
+              "Plutôt satisfaits, mais pas enthousiastes. Peuvent basculer chez un concurrent.",
+          },
+          promoters: {
+            label: "Promoteurs (9–10)",
+            text:
+              "Ambassadeurs fidèles, plus susceptibles de rester, d’étendre l’usage et de recommander.",
+          },
+        },
+      },
+
+      calc: {
+        title: "Comment le Net Promoter Score est calculé",
+        intro:
+          "La formule du NPS est volontairement simple. Pour un échantillon de réponses :",
+        steps: [
+          "Calculez le pourcentage de Promoteurs (9–10).",
+          "Calculez le pourcentage de Détracteurs (0–6).",
+          "Soustrayez les Détracteurs aux Promoteurs.",
+        ],
+        example:
+          "Par exemple, si 60 % des répondants sont Promoteurs et 20 % sont Détracteurs, votre NPS est {value}.",
+        scaleLabel: "Illustration de l’échelle NPS",
+        bar: {
+          detractors: "Détracteurs",
+          passives: "Passifs",
+          promoters: "Promoteurs",
+        },
+      },
+
+      types: {
+        title: "NPS relationnel et NPS transactionnel",
+        intro:
+          "Le NPS n’est pas une chose unique. La même question se comporte différemment selon le moment où vous la posez et ce que le client vient de vivre.",
+        relationship: {
+          title: "NPS relationnel",
+          body:
+            "Envoyé périodiquement à un échantillon de clients pour mesurer le sentiment global envers la marque. C’est souvent le chiffre présenté dans les dashboards exécutifs.",
+          bullets: [
+            "Utile pour suivre la tendance globale dans le temps.",
+            "Moins utile pour identifier précisément ce qui dysfonctionne.",
+          ],
+        },
+        transactional: {
+          title: "NPS transactionnel (ou “milestone”)",
+          body:
+            "Envoyé après un moment clé du parcours : onboarding, première livraison, renouvellement, clôture d’un ticket support, etc.",
+          bullets: [
+            "Permet de localiser les frictions dans le parcours.",
+            "Beaucoup plus actionnable pour prioriser des améliorations concrètes.",
+          ],
+        },
+      },
+
+      beyond: {
+        title: "Au-delà du score : pourquoi les commentaires comptent plus que le chiffre",
+        p1:
+          "Une critique fréquente du NPS : un seul nombre ne peut pas résumer la qualité d’une entreprise. C’est vrai. Pris isolément, le score est un signal très grossier, et il varie selon la culture et le contexte.",
+        p2:
+          "Dans certains pays, un 7/10 peut être perçu comme une bonne note. Dans d’autres marchés, tout ce qui est en dessous de 9 paraît moyen. Certaines cultures évitent de mettre 10 sauf perfection absolue. D’autres utilisent 10 comme une forme de politesse pour dire que “c’était correct”.",
+        p3:
+          "C’est pour cela que le commentaire ouvert associé à la question NPS est essentiel. Il explique ce qui motive la note : frictions concrètes, points forts, et formulation réelle que vous pouvez partager en interne.",
+        bullets: [
+          "Utilisez le NPS comme un routeur vers les verbatims, pas comme l’histoire complète.",
+          "Lisez d’abord les Détracteurs, puis regardez les Promoteurs.",
+          "Cherchez des patterns de langage, pas seulement des variations de 2 ou 3 points.",
+        ],
+      },
+
+      pitfalls: {
+        title: "Pièges courants et comment les éviter",
+        pitfallsTitle: "Pièges",
+        pitfallsList: [
+          "Se focaliser uniquement sur le score et ignorer les verbatims.",
+          "Laisser les équipes décider qui reçoit l’enquête, ce qui introduit un biais.",
+          "Sur-solliciter les mêmes contacts et créer de la fatigue.",
+          "Inciter les clients à “mettre 9 ou 10” au lieu de demander un retour honnête.",
+        ],
+        betterTitle: "Meilleures pratiques",
+        betterList: [
+          "Mettre en place des règles d’échantillonnage transparentes et représentatives.",
+          "Suivre le NPS avec la rétention, le repeat purchase et la charge support.",
+          "Publier des synthèses internes régulières sur ce que disent les clients.",
+          "Récompenser la résolution des causes racines, pas la “poussée” du score à tout prix.",
+        ],
+      },
+
+      closeLoop: {
+        title: "Rendre le NPS utile : “close the loop” et démontrer les progrès",
+        intro:
+          "La valeur du NPS vient de ce que vous en faites. Les entreprises qui obtiennent le plus d’impact traitent l’enquête comme le début d’une conversation, pas comme la fin.",
+        bullets: [
+          "Recontacter les clients qui remontent des problèmes, surtout sur les comptes à forte valeur.",
+          "Regrouper les verbatims en thèmes reliés à des processus réels et des owners.",
+          "Choisir quelques actions, les livrer, puis mesurer l’effet sur le NPS et sur les résultats business.",
+          "Partager des retours simples du type « vous avez dit / nous avons fait » pour montrer que ça sert à quelque chose.",
+        ],
+        outro:
+          "Avec le temps, cela crée de la confiance. Les clients voient que leur feedback déclenche des changements, les équipes voient que l’insight améliore les résultats, et le NPS devient un signal utile parmi d’autres dans la santé client.",
+      },
+
+      cta: {
+        title: "Besoin d’aide pour concevoir un programme NPS qui génère de vrais changements ?",
+        body:
+          "NPS Me accompagne les équipes pour concevoir des enquêtes justes, un échantillonnage réaliste, et des boucles de suivi pratiques — afin que chaque feedback mène quelque part.",
+        explore: "Découvrir les offres",
+        book: "Prendre rendez-vous",
+        disclaimer:
+          "NPS et Net Promoter Score sont des marques de service déposées de Bain & Company, Inc., Fred Reichheld, et Satmetrix Systems, Inc. Les références sur cette page sont purement descriptives. NPS Me est indépendant et n’est ni affilié ni sponsorisé par ces parties.",
       },
     },
     whyNpsMe: {

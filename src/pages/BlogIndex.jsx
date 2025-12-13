@@ -67,7 +67,7 @@ const POSTS = [
 
 export default function BlogIndex() {
   const { lang } = useLanguage();
-  const prefix = lang === "fr" ? "/fr" : ""; // ✅ add
+  const prefix = lang === "fr" ? "/fr" : "";
 
   const posts = [...POSTS].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -76,7 +76,7 @@ export default function BlogIndex() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/blog"
+        path={`${prefix}/blog`}
         title={translations(lang, "blog.seo.title")}
         description={translations(lang, "blog.seo.description")}
       />

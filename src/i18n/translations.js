@@ -650,6 +650,88 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    socialListeningIndex: {
+      seoTitle: "Social Listening Reports (Anonymised) | NPS Me",
+      seoDescription:
+        "Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions — how we turn feedback into growth.",
+
+      header: {
+        iconLabel: "Social listening gallery",
+        tag: "CX Pulse / Social listening",
+        title: "Social Listening Reports (Anonymised)",
+        subtitle:
+          "Examples of our weekly CX Pulse format using anonymised client data. Each shows top themes, quote snippets, actions, and impact.",
+      },
+
+      card: {
+        viewReport: "View report →",
+      },
+
+      summarize: {
+        sentimentLine: "Sentiment {arrow} {signedDelta} pts (now {last}).",
+        npsLine: "NPS-style index {arrow} {signedDelta} over 8 weeks.",
+        themeLine: "{name}: {change} ({status}).",
+        themeStatus: {
+          bad: "needs attention",
+          mid: "steady",
+          good: "improving",
+        },
+        ticketsLine: "Tickets per 1k orders {pct} lower.",
+      },
+    },
+    socialListeningReport: {
+      notFound: {
+        title: "Report not found",
+        body: "The report you’re looking for doesn’t exist.",
+        link: "View all reports",
+      },
+
+      seo: {
+        title: "{industry} Social Listening Insights (Anonymised) | NPS Me",
+        description:
+          "An anonymised {industry} CX Pulse report: themes, quotes, actions, and KPI impact across {period}.",
+      },
+
+      header: {
+        badge: "Anonymised report",
+        title: "{clientName} - CX Pulse",
+        sources: "{period}. Sources: {sources}.",
+        trendNote: "Trends and indexes; privacy-preserving quotes and volumes.",
+      },
+
+      highlights: {
+        sentimentLabel: "Headline sentiment",
+        sentimentNote: "Composite positivity (0-100)",
+        npsLabel: "NPS-style index",
+        npsNote: "Detractors vs Promoters balance (scaled)",
+        supportLabel: "Support load proxy",
+        supportValue: "−{pct}% tickets",
+        supportNote: "Tickets per 1k orders (relative)",
+      },
+
+      sections: {
+        quotesTitle: "What customers are saying",
+        anonymised: "anonymised",
+        themesTitle: "Top themes & movement",
+        movementNote: "Movement is week-on-week; volumes are normalised to protect privacy.",
+        actionsTitle: "Actions shipped & impact",
+      },
+
+      impact: {
+        repeatLabel: "Repeat purchase lift",
+        repeatNote: "Cohort repeat rate",
+        churnLabel: "Churn/refunds reduction",
+        churnNote: "Refunds per 1k orders",
+        ticketsLabel: "Tickets per 1k orders",
+        ticketsNote: "After comms & SLA revamp",
+      },
+
+      ctas: {
+        products: "Explore productized services",
+        book: "Book discovery",
+      },
+    },
+
     whatIsNps: {
       seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
       seoDescription:
@@ -1529,6 +1611,88 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    socialListeningIndex: {
+      seoTitle: "Rapports Social Listening (anonymisés) | NPS Me",
+      seoDescription:
+        "Exemples anonymisés de CX Pulse hebdomadaires : tendances de sentiment, thèmes et actions — comment on transforme le feedback en croissance.",
+
+      header: {
+        iconLabel: "Galerie social listening",
+        tag: "CX Pulse / Social listening",
+        title: "Rapports Social Listening (anonymisés)",
+        subtitle:
+          "Exemples de notre format CX Pulse hebdomadaire à partir de données clients anonymisées. Chaque rapport montre les thèmes clés, des extraits de verbatims, des actions, et l’impact.",
+      },
+
+      card: {
+        viewReport: "Voir le rapport →",
+      },
+
+      summarize: {
+        sentimentLine: "Sentiment {arrow} {signedDelta} pts (actuel : {last}).",
+        npsLine: "Indice type NPS {arrow} {signedDelta} sur 8 semaines.",
+        themeLine: "{name} : {change} ({status}).",
+        themeStatus: {
+          bad: "à traiter",
+          mid: "stable",
+          good: "en amélioration",
+        },
+        ticketsLine: "Tickets pour 1 000 commandes : {pct} de moins.",
+      },
+    },
+    socialListeningReport: {
+      notFound: {
+        title: "Rapport introuvable",
+        body: "Le rapport que vous cherchez n’existe pas.",
+        link: "Voir tous les rapports",
+      },
+
+      seo: {
+        title: "Insights social listening {industry} (anonymisés) | NPS Me",
+        description:
+          "Rapport CX Pulse {industry} anonymisé : thèmes, verbatims, actions et impact KPI sur {period}.",
+      },
+
+      header: {
+        badge: "Rapport anonymisé",
+        title: "{clientName} - CX Pulse",
+        sources: "{period}. Sources : {sources}.",
+        trendNote: "Tendances et indices ; verbatims et volumes anonymisés.",
+      },
+
+      highlights: {
+        sentimentLabel: "Sentiment (headline)",
+        sentimentNote: "Positivité composite (0–100)",
+        npsLabel: "Indice type NPS",
+        npsNote: "Équilibre Détracteurs vs Promoteurs (échelle)",
+        supportLabel: "Proxy charge support",
+        supportValue: "−{pct} % de tickets",
+        supportNote: "Tickets pour 1 000 commandes (relatif)",
+      },
+
+      sections: {
+        quotesTitle: "Ce que disent les clients",
+        anonymised: "anonymisé",
+        themesTitle: "Thèmes clés & évolution",
+        movementNote: "L’évolution est semaine/semaine ; les volumes sont normalisés pour protéger la confidentialité.",
+        actionsTitle: "Actions livrées & impact",
+      },
+
+      impact: {
+        repeatLabel: "Hausse du repeat purchase",
+        repeatNote: "Taux de réachat (cohorte)",
+        churnLabel: "Baisse churn/remboursements",
+        churnNote: "Remboursements pour 1 000 commandes",
+        ticketsLabel: "Tickets pour 1 000 commandes",
+        ticketsNote: "Après refonte coms & SLA",
+      },
+
+      ctas: {
+        products: "Découvrir les offres packagées",
+        book: "Prendre rendez-vous",
+      },
+    },
+
     whatIsNps: {
       seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
       seoDescription:

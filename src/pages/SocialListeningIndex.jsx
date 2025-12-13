@@ -1,24 +1,31 @@
-// src/pages/SocialListeningIndex.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { REPORTS } from "../data/socialReports";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations as t } from "../i18n/translations";
 
 // ---------- helpers (outside the component) ----------
 const fmtPct = (n) => `${Math.round(n * 100)}%`;
 const arrow = (d) => (d > 0 ? "↑" : d < 0 ? "↓" : "→");
+const signed = (n) => `${n >= 0 ? "+" : ""}${n}`;
 
-function summarizeReport(r) {
+function interpolate(template, vars) {
+  if (typeof template !== "string") return "";
+  return template.replace(/\{(\w+)\}/g, (_, k) => (vars?.[k] ?? ""));
+}
+
+function summarizeReport(r, lang) {
   // deltas
   const sFirst = r.sentimentSeries?.[0] ?? 0;
   const sLast = r.sentimentSeries?.[r.sentimentSeries.length - 1] ?? 0;
   const nFirst = r.npsStyleSeries?.[0] ?? 0;
   const nLast = r.npsStyleSeries?.[r.npsStyleSeries.length - 1] ?? 0;
 
-  const sentimentDelta = sLast - sFirst;       // points
-  const npsDelta = nLast - nFirst;             // points
+  const sentimentDelta = sLast - sFirst; // points
+  const npsDelta = nLast - nFirst; // points
   const ticketsDownPct = r?.kpis?.ticketsDown ?? 0;
 
   // biggest-moving theme
@@ -30,18 +37,43 @@ function summarizeReport(r) {
   const q = (r.quotes || [])[0]?.txt || "";
   const shortQuote = q.length > 90 ? `${q.slice(0, 87)}…` : q;
 
+  // templates
+  const sentimentLineTpl = t(lang, "socialListeningIndex.summarize.sentimentLine");
+  const npsLineTpl = t(lang, "socialListeningIndex.summarize.npsLine");
+  const themeLineTpl = t(lang, "socialListeningIndex.summarize.themeLine");
+  const ticketsLineTpl = t(lang, "socialListeningIndex.summarize.ticketsLine");
+
+  const themeStatus =
+    topTheme?.sev
+      ? t(lang, `socialListeningIndex.summarize.themeStatus.${topTheme.sev}`)
+      : "";
+
   const bullets = [
-    `Sentiment ${arrow(sentimentDelta)} ${sentimentDelta >= 0 ? "+" : ""}${sentimentDelta} pts (now ${sLast}).`,
+    interpolate(sentimentLineTpl, {
+      arrow: arrow(sentimentDelta),
+      signedDelta: signed(sentimentDelta),
+      last: sLast,
+    }),
     Math.abs(npsDelta) >= (topTheme ? Math.abs(parseFloat(topTheme.change)) : 0)
-      ? `NPS-style index ${arrow(npsDelta)} ${npsDelta >= 0 ? "+" : ""}${npsDelta} over 8 weeks.`
+      ? interpolate(npsLineTpl, {
+          arrow: arrow(npsDelta),
+          signedDelta: signed(npsDelta),
+        })
       : topTheme
-      ? `${topTheme.name}: ${topTheme.change} (${topTheme.sev === "bad" ? "needs attention" : topTheme.sev === "mid" ? "steady" : "improving"}).`
-      : `NPS-style index ${arrow(npsDelta)} ${npsDelta >= 0 ? "+" : ""}${npsDelta} over 8 weeks.`,
+      ? interpolate(themeLineTpl, {
+          name: topTheme.name,
+          change: topTheme.change,
+          status: themeStatus,
+        })
+      : interpolate(npsLineTpl, {
+          arrow: arrow(npsDelta),
+          signedDelta: signed(npsDelta),
+        }),
     ticketsDownPct > 0.005
-      ? `Tickets per 1k orders ${fmtPct(ticketsDownPct)} lower.`
+      ? interpolate(ticketsLineTpl, { pct: fmtPct(ticketsDownPct) })
       : shortQuote
       ? `“${shortQuote}”`
-      : `Tickets per 1k orders ${fmtPct(ticketsDownPct)} lower.`,
+      : interpolate(ticketsLineTpl, { pct: fmtPct(ticketsDownPct) }),
   ];
 
   return { bullets };
@@ -49,24 +81,27 @@ function summarizeReport(r) {
 // -----------------------------------------------------
 
 export default function SocialListeningIndex() {
+  const { lang } = useLanguage();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/social-listening"
-        title="Social Listening Reports (Anonymised) | NPS Me"
-        description="Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions — how we turn feedback into growth."
+        title={t(lang, "socialListeningIndex.seoTitle")}
+        description={t(lang, "socialListeningIndex.seoDescription")}
       />
 
       <PageHeader
-        iconLabel="Social listening gallery"
-        tag="CX Pulse / Social listening"
-        title="Social Listening Reports (Anonymised)"
-        subtitle="Examples of our weekly CX Pulse format using anonymised client data. Each shows top themes, quote snippets, actions, and impact."
+        iconLabel={t(lang, "socialListeningIndex.header.iconLabel")}
+        tag={t(lang, "socialListeningIndex.header.tag")}
+        title={t(lang, "socialListeningIndex.header.title")}
+        subtitle={t(lang, "socialListeningIndex.header.subtitle")}
       />
 
       <section className="mx-auto max-w-7xl px-6 py-10 grid gap-6 md:grid-cols-3">
         {REPORTS.map((r) => {
-          const { bullets } = summarizeReport(r);
+          const { bullets } = summarizeReport(r, lang);
+
           return (
             <Link
               key={r.slug}
@@ -89,7 +124,9 @@ export default function SocialListeningIndex() {
                 ))}
               </div>
 
-              <div className="mt-4 text-xs text-slate-400">View report →</div>
+              <div className="mt-4 text-xs text-slate-400">
+                {t(lang, "socialListeningIndex.card.viewReport")}
+              </div>
             </Link>
           );
         })}

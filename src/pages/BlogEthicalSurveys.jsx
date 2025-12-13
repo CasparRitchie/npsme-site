@@ -3,32 +3,36 @@ import React from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
 
 export default function BlogEthicalSurveys() {
+  const { lang } = useLanguage();
+
+  const seoTitle = translations(lang, "blogEthicalSurveys.seo.title");
+  const seoDescription = translations(lang, "blogEthicalSurveys.seo.description");
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <Seo
-        path="/blog/ethical-surveys"
-        title="When Feedback Fatigue Sets In: The Ethics of customer experience surveys | NPS Me"
-        description="A reflection by a former Telco Head of Customer Experience (Europe) on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems."
-      />
+      <Seo path="/blog/ethical-surveys" title={seoTitle} description={seoDescription} />
+
       {/* Meta header */}
       <PageHeader
-        iconLabel="Ethical NPS"
-        tag="CX & NPS / Blog"
-        accent="When Feedback Fatigue Sets In:"
-        title="The ethics of customer experience and surveys"
-        subtitle="How to build trustworthy, bias-resistant NPS programmes."
+        iconLabel={translations(lang, "blogEthicalSurveys.header.iconLabel")}
+        tag={translations(lang, "blogEthicalSurveys.header.tag")}
+        accent={translations(lang, "blogEthicalSurveys.header.accent")}
+        title={translations(lang, "blogEthicalSurveys.header.title")}
+        subtitle={translations(lang, "blogEthicalSurveys.header.subtitle")}
       />
-      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
 
+      <main className="mx-auto max-w-4xl px-6 py-10 md:py-14 space-y-10 md:space-y-12">
         {/* Intro */}
         <section className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">
           <p className="text-sm md:text-base text-slate-200 leading-relaxed">
-            Every company wants to be customer-centric, but few stop to ask whether
-            their feedback processes are <em>ethically customer-centric</em>.
-            It's one thing to measure Net Promoter Score (NPS) — it's another to ensure
-            that the way you collect that feedback actually reflects reality.
+            {translations(lang, "blogEthicalSurveys.intro.p1a")}{" "}
+            <em>{translations(lang, "blogEthicalSurveys.intro.p1b")}</em>.
+            {translations(lang, "blogEthicalSurveys.intro.p1c")}{" "}
+            {translations(lang, "blogEthicalSurveys.intro.p1d")}
           </p>
         </section>
 
@@ -38,25 +42,19 @@ export default function BlogEthicalSurveys() {
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
               1
             </span>
-            <span>Contact selection: the invisible bias</span>
+            <span>{translations(lang, "blogEthicalSurveys.sections.1.title")}</span>
           </h2>
 
           <div className="mt-3 space-y-3 text-sm md:text-base text-slate-200 leading-relaxed">
             <p>
-              At my former company, we used Salesforce to manage “contact selection”
-              for our B2B NPS programme. Each Account Manager could flag a contact as
-              <strong> “Available for Survey”</strong> or
-              <strong> “Not Suitable for Survey.”</strong>
+              {translations(lang, "blogEthicalSurveys.sections.1.p1a")}{" "}
+              <strong>{translations(lang, "blogEthicalSurveys.sections.1.p1b")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.1.p1c")}{" "}
+              <strong>{translations(lang, "blogEthicalSurveys.sections.1.p1d")}</strong>
+              {translations(lang, "blogEthicalSurveys.sections.1.p1e")}
             </p>
-            <p>
-              On paper, it looked fair. In practice, unhappy contacts could be quietly
-              excluded — or whole accounts marked as DNS (Do Not Survey) with no oversight.
-            </p>
-            <p>
-              We later introduced VP-level approval for DNS flags, but the problem remained:
-              when the people being measured can choose who speaks, NPS stops measuring
-              customer advocacy — and starts measuring survey ethics.
-            </p>
+            <p>{translations(lang, "blogEthicalSurveys.sections.1.p2")}</p>
+            <p>{translations(lang, "blogEthicalSurveys.sections.1.p3")}</p>
           </div>
         </section>
 
@@ -66,24 +64,18 @@ export default function BlogEthicalSurveys() {
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
               2
             </span>
-            <span>Response rates vs authenticity</span>
+            <span>{translations(lang, "blogEthicalSurveys.sections.2.title")}</span>
           </h2>
 
           <div className="mt-3 space-y-3 text-sm md:text-base text-slate-200 leading-relaxed">
-            <p>
-              Once the survey window opened, Account Managers were encouraged to
-              “nudge” customers — often too hard.
-            </p>
+            <p>{translations(lang, "blogEthicalSurveys.sections.2.p1")}</p>
 
             <blockquote className="border-l-4 border-[#22C55E] pl-4 italic text-slate-400">
-              “Please give us a 9 or 10, otherwise it's seen as bad.”
-              <br />A real poster once found in a Mercure hotel lift.
+              {translations(lang, "blogEthicalSurveys.sections.2.quote")} <br />
+              {translations(lang, "blogEthicalSurveys.sections.2.quoteNote")}
             </blockquote>
 
-            <p>
-              Coaching or pressuring customers damages data integrity.
-              The programme becomes performance theatre — chasing numbers instead of truth.
-            </p>
+            <p>{translations(lang, "blogEthicalSurveys.sections.2.p2")}</p>
           </div>
         </section>
 
@@ -93,29 +85,29 @@ export default function BlogEthicalSurveys() {
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#22C55E] text-[11px] font-bold">
               3
             </span>
-            <span>How to rebuild trust in feedback</span>
+            <span>{translations(lang, "blogEthicalSurveys.sections.3.title")}</span>
           </h2>
 
           <ul className="mt-4 list-disc list-inside space-y-2 text-sm md:text-base text-slate-200">
             <li>
-              <strong>Decouple incentives from scores.</strong>
-              Reward behaviours that improve outcomes, not manipulated metrics.
+              <strong>{translations(lang, "blogEthicalSurveys.sections.3.bullets.1.bold")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.3.bullets.1.text")}
             </li>
             <li>
-              <strong>Audit "Do Not Survey" logic.</strong>
-              DNS flags should require justification and VP oversight.
+              <strong>{translations(lang, "blogEthicalSurveys.sections.3.bullets.2.bold")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.3.bullets.2.text")}
             </li>
             <li>
-              <strong>Control pre-survey communication.</strong>
-              Messaging should come from the company, not individual AMs.
+              <strong>{translations(lang, "blogEthicalSurveys.sections.3.bullets.3.bold")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.3.bullets.3.text")}
             </li>
             <li>
-              <strong>Rotate samples.</strong>
-              Re-surveying the same contacts creates fatigue and bias.
+              <strong>{translations(lang, "blogEthicalSurveys.sections.3.bullets.4.bold")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.3.bullets.4.text")}
             </li>
             <li>
-              <strong>Close the loop transparently.</strong>
-              Share themes and improvements with customers to rebuild trust.
+              <strong>{translations(lang, "blogEthicalSurveys.sections.3.bullets.5.bold")}</strong>{" "}
+              {translations(lang, "blogEthicalSurveys.sections.3.bullets.5.text")}
             </li>
           </ul>
         </section>
@@ -126,18 +118,14 @@ export default function BlogEthicalSurveys() {
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#22C55E] to-[#7C3AED] text-[11px] font-bold">
               4
             </span>
-            <span>Final thoughts</span>
+            <span>{translations(lang, "blogEthicalSurveys.sections.4.title")}</span>
           </h2>
 
           <div className="mt-3 space-y-3 text-sm md:text-base text-slate-200 leading-relaxed">
+            <p>{translations(lang, "blogEthicalSurveys.sections.4.p1")}</p>
             <p>
-              Ethical feedback systems aren't about dodging criticism — they're about
-              earning credibility. A healthy CX programme measures itself not just by the
-              height of the NPS bar, but by the integrity behind it.
-            </p>
-            <p>
-              True improvement comes from facing uncomfortable truths…
-              and creating a space where customers feel safe enough to voice them.
+              {translations(lang, "blogEthicalSurveys.sections.4.p2a")}
+              {translations(lang, "blogEthicalSurveys.sections.4.p2b")}
             </p>
           </div>
         </section>
@@ -146,11 +134,10 @@ export default function BlogEthicalSurveys() {
         <footer className="mt-12">
           <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] via-[#0B1120] to-[#0B0F19] p-6 md:p-8 text-center">
             <p className="text-sm md:text-base text-slate-200">
-              Want help building an ethical, trustworthy NPS programme?
+              {translations(lang, "blogEthicalSurveys.cta.p1")}
             </p>
             <p className="mt-2 text-xs md:text-sm text-slate-400 max-w-2xl mx-auto">
-              NPS Me helps you design fair sampling, remove bias, and create feedback loops
-              customers can believe in.
+              {translations(lang, "blogEthicalSurveys.cta.p2")}
             </p>
 
             <div className="mt-5 flex flex-col sm:flex-row justify-center gap-3">
@@ -158,14 +145,14 @@ export default function BlogEthicalSurveys() {
                 to="/products"
                 className="rounded-2xl px-6 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
               >
-                Explore NPS Me services
+                {translations(lang, "blogEthicalSurveys.cta.btnServices")}
               </Link>
 
               <Link
                 to="/book"
                 className="rounded-2xl px-6 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#020617] hover:bg-[#16A34A] transition"
               >
-                Book a discovery call
+                {translations(lang, "blogEthicalSurveys.cta.btnBook")}
               </Link>
             </div>
           </div>

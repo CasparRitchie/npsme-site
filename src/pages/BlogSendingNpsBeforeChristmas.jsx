@@ -3,23 +3,33 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
 
 export default function BlogSendingNpsBeforeChristmas() {
+  const { lang } = useLanguage();
+
+  const seoTitle = translations(lang, "blogSendingNpsBeforeChristmas.seo.title");
+  const seoDescription = translations(
+    lang,
+    "blogSendingNpsBeforeChristmas.seo.description"
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/blog/sending-nps-before-christmas"
-        title="Sending an NPS survey before Christmas (without annoying your customers)"
-        description="How to run a respectful, effective pre-Christmas NPS pulse - and what to do with the insights."
+        title={seoTitle}
+        description={seoDescription}
       />
 
       {/* Header */}
       <PageHeader
-        iconLabel="NPS Survey"
-        tag="CX & NPS / Blog"
-        accent="How to Send an NPS Survey Before Christmas"
-        title="Even If You’ve Never Done One Before"
-        subtitle="A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse before the holidays."
+        iconLabel={translations(lang, "blogSendingNpsBeforeChristmas.header.iconLabel")}
+        tag={translations(lang, "blogSendingNpsBeforeChristmas.header.tag")}
+        accent={translations(lang, "blogSendingNpsBeforeChristmas.header.accent")}
+        title={translations(lang, "blogSendingNpsBeforeChristmas.header.title")}
+        subtitle={translations(lang, "blogSendingNpsBeforeChristmas.header.subtitle")}
       />
 
       {/* Content */}
@@ -27,229 +37,249 @@ export default function BlogSendingNpsBeforeChristmas() {
         {/* Intro */}
         <section className="space-y-4 text-sm sm:text-base leading-relaxed">
           <p>
-            As the year winds down, many companies enter{" "}
-            <span className="text-[#22C55E] font-medium">“reflection mode.”</span> Customers are taking
-            stock of the brands they rely on, inboxes quieten slightly, and people find themselves
-            with just enough mental space to offer thoughtful feedback.
+            {translations(lang, "blogSendingNpsBeforeChristmas.intro.p1a")}{" "}
+            <span className="text-[#22C55E] font-medium">
+              {translations(lang, "blogSendingNpsBeforeChristmas.intro.p1b")}
+            </span>{" "}
+            {translations(lang, "blogSendingNpsBeforeChristmas.intro.p1c")}
           </p>
-          <p>
-            That’s why the period between late November and mid-December is one of the most effective
-            windows of the year to send an NPS survey - especially if you’ve never run one before.
-          </p>
-          <p>
-            Better yet: with the right approach, you can launch a clean, branded, high-response NPS
-            survey in under 48 hours, even if you’re starting from scratch.
-          </p>
+
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.intro.p2")}</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.intro.p3")}</p>
+
           <p className="font-medium text-slate-100">
-            In this guide, you’ll learn exactly how to do it.
+            {translations(lang, "blogSendingNpsBeforeChristmas.intro.p4")}
           </p>
         </section>
 
-        {/* Section helper */}
         <ArticleSection
           number="1"
-          title="Why Sending an NPS Survey Before Christmas Works So Well"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.1.title")}
         >
-          <p>
-            It sounds counter-intuitive - December is “busy”, right?
-          </p>
-          <p>
-            Yes and no. Emails about discounts or logistics get ignored. But feedback requests hit
-            differently in December:
-          </p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p1")}</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p2")}</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p3")}</p>
+
           <ul className="mt-3 space-y-1.5 text-sm sm:text-base">
-            <li>• People are reflective and open to giving input</li>
-            <li>• Customers appreciate being asked before the new year starts</li>
-            <li>• You get richer qualitative comments - not rushed mid-year replies</li>
-            <li>• January inboxes become chaos, so December has higher engagement</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.bullets.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.1.bullets.4")}</li>
           </ul>
+
           <p className="mt-4">
-            For small and mid-size businesses - especially those with relationship-based customer
-            models - this window is{" "}
-            <span className="text-[#7C3AED] font-medium">a golden opportunity.</span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p4a")}{" "}
+            <span className="text-[#7C3AED] font-medium">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p4b")}
+            </span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.1.p4c")}
           </p>
         </ArticleSection>
 
         <ArticleSection
           number="2"
-          title="What You Need to Send an NPS Survey (It’s Less Than You Think)"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.2.title")}
         >
-          <p>Here’s everything you need to run an NPS survey:</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.p1")}</p>
 
-          <KeyLabel>✔ A list of customers</KeyLabel>
-          <p>A simple Excel/CSV with:</p>
+          <KeyLabel>✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.label")}</KeyLabel>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.p1")}</p>
           <ul className="mt-2 space-y-1.5">
-            <li>• First name</li>
-            <li>• Last name</li>
-            <li>• Company name (optional)</li>
-            <li>• Email</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.bullets.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k1.bullets.4")}</li>
           </ul>
 
-          <KeyLabel className="mt-4">✔ Your logo + colours</KeyLabel>
-          <p>To make the email feel branded and trustworthy.</p>
+          <KeyLabel className="mt-4">✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k2.label")}</KeyLabel>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k2.p1")}</p>
 
-          <KeyLabel className="mt-4">✔ One question</KeyLabel>
+          <KeyLabel className="mt-4">✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k3.label")}</KeyLabel>
           <p>
-            The NPS standard:
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k3.p1")}
             <br />
             <span className="italic text-slate-100">
-              “How likely are you to recommend us to a friend or colleague?”
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k3.q")}
             </span>
             <br />
-            Scale: <span className="font-medium text-[#22C55E]">0-10</span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k3.scale")}{" "}
+            <span className="font-medium text-[#22C55E]">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k3.range")}
+            </span>
           </p>
 
-          <KeyLabel className="mt-4">✔ One optional open-text question</KeyLabel>
+          <KeyLabel className="mt-4">✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k4.label")}</KeyLabel>
           <p>
-            <span className="italic text-slate-100">“What’s the main reason for your score?”</span>
+            <span className="italic text-slate-100">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k4.q")}
+            </span>
           </p>
 
-          <KeyLabel className="mt-4">✔ A way to send the surveys</KeyLabel>
+          <KeyLabel className="mt-4">✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k5.label")}</KeyLabel>
           <p>
-            You can use your ESP (Brevo, Mailjet, HubSpot…), or{" "}
-            <span className="text-[#22C55E] font-medium">NPSme can handle everything for you.</span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k5.p1")}{" "}
+            <span className="text-[#22C55E] font-medium">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k5.p2")}
+            </span>
           </p>
 
-          <KeyLabel className="mt-4">✔ A way to track results</KeyLabel>
-          <p>You need:</p>
+          <KeyLabel className="mt-4">✔ {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.label")}</KeyLabel>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.p1")}</p>
           <ul className="mt-2 space-y-1.5">
-            <li>• Overall NPS</li>
-            <li>• Response rate</li>
-            <li>• Score distribution (promoters/passives/detractors)</li>
-            <li>• Themes from comments</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.bullets.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.bullets.4")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.2.k6.bullets.5")}</li>
           </ul>
 
           <p className="mt-4">
-            You do not need a CRM or complex automation.{" "}
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.p2a")}{" "}
             <span className="font-medium text-slate-100">
-              A clean, simple setup works perfectly.
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.2.p2b")}
             </span>
           </p>
         </ArticleSection>
 
-        <ArticleSection number="3" title="When Exactly Should You Send It?">
-          <p>Here’s the surprisingly simple rule:</p>
+        <ArticleSection
+          number="3"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.3.title")}
+        >
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p1")}</p>
           <p className="mt-2 font-medium text-slate-100">
-            The earlier in December, the better.
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p2")}
           </p>
-          <p className="mt-2">
-            But even mid-December works if you time it well.
-          </p>
+          <p className="mt-2">{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p3")}</p>
 
-          <KeyLabel className="mt-4">Best windows:</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bestWindows")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• <span className="font-medium text-[#22C55E]">1-14 December</span> → Highest quality responses</li>
-            <li>• <span className="font-medium">15-20 December</span> → Still safe, especially if your product is digital or operational</li>
-            <li>• Avoid <span className="font-medium">21-25 December</span> (unless B2C retail or hospitality)</li>
+            <li>
+              •{" "}
+              <span className="font-medium text-[#22C55E]">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bullets.1.range")}
+              </span>{" "}
+              → {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bullets.1.note")}
+            </li>
+            <li>
+              •{" "}
+              <span className="font-medium">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bullets.2.range")}
+              </span>{" "}
+              → {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bullets.2.note")}
+            </li>
+            <li>
+              • {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.bullets.3")}
+            </li>
           </ul>
 
-          <p className="mt-4">Within those windows:</p>
+          <p className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p4")}</p>
           <ul className="mt-2 space-y-1.5">
-            <li>• Send on Mon-Wed mornings</li>
-            <li>• Around 9:00-11:00am local time</li>
-            <li>• Avoid Friday afternoons</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.rules.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.rules.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.3.rules.3")}</li>
           </ul>
 
           <p className="mt-4">
-            Responses typically land within <span className="font-medium text-[#7C3AED]">24-48 hours.</span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p5a")}{" "}
+            <span className="font-medium text-[#7C3AED]">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p5b")}
+            </span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.3.p5c")}
           </p>
         </ArticleSection>
 
-        <ArticleSection number="4" title="How to Craft the Email for Maximum Response">
-          <p>
-            The email is everything. If the email feels long or corporate, response rate collapses.
-          </p>
+        <ArticleSection
+          number="4"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.4.title")}
+        >
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.p1")}</p>
 
-          <p className="mt-3 font-medium text-slate-100">Principles:</p>
+          <p className="mt-3 font-medium text-slate-100">
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principlesTitle")}
+          </p>
           <ul className="mt-2 space-y-1.5">
-            <li>• Write like a human</li>
-            <li>• Keep it short</li>
-            <li>• Make it founder-led if possible</li>
-            <li>• Reassure: 10-20 seconds max</li>
-            <li>• Avoid marketing language</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principles.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principles.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principles.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principles.4")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.4.principles.5")}</li>
           </ul>
 
-          {/* English template */}
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#22C55E] mb-2">
-              Example template (English)
-            </p>
-            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
-              Subject: Quick question before the holidays?
+          {lang === "fr" ? (
+  <div className="mt-5 rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5">
+    <p className="text-xs uppercase tracking-[0.2em] text-[#7C3AED] mb-2">
+      {translations(lang, "blogSendingNpsBeforeChristmas.sections.4.templateFr.label")}
+    </p>
+    <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
+      {translations(lang, "blogSendingNpsBeforeChristmas.sections.4.templateFr.body")}
+    </pre>
+  </div>
+) : (
+  <div className="mt-5 rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5">
+    <p className="text-xs uppercase tracking-[0.2em] text-[#22C55E] mb-2">
+      {translations(lang, "blogSendingNpsBeforeChristmas.sections.4.templateEn.label")}
+    </p>
+    <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
+      {translations(lang, "blogSendingNpsBeforeChristmas.sections.4.templateEn.body")}
+    </pre>
+  </div>
+)}
 
-              Hi &#123;&#123;name&#125;&#125;,
-              As we wrap up the year, we’re reflecting on how we’re doing. Would you mind answering one quick question?
-
-              It takes 10 seconds, and your feedback genuinely helps shape our priorities for next year.
-
-              👉 &#123;&#123;survey_link&#125;&#125;
-
-              Thank you - it means a lot.
-              &#123;&#123;Founder name&#125;&#125;
-            </pre>
-          </div>
-
-          {/* French template */}
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#7C3AED] mb-2">
-              Exemple de template (Français)
-            </p>
-            <pre className="text-xs sm:text-sm bg-slate-900/60 border border-slate-700/70 rounded-2xl px-4 py-3 text-slate-100 whitespace-pre-wrap break-words">
-              Objet : Une petite question avant les fêtes ?
-
-              Bonjour &#123;&#123;name&#125;&#125;,
-              En cette fin d’année, nous prenons un moment pour réfléchir à ce que nous pouvons améliorer.
-              Pourriez-vous répondre à une seule question ?
-
-              Cela prend moins de 20 secondes, et votre avis compte vraiment pour nous.
-
-              👉 &#123;&#123;survey_link&#125;&#125;
-
-              Merci beaucoup,
-              &#123;&#123;Nom du fondateur&#125;&#125;
-            </pre>
-          </div>
         </ArticleSection>
 
         <ArticleSection
           number="5"
-          title="Avoid These Common Mistakes (Beginner Mistakes That Hurt Results)"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.5.title")}
         >
-          <p>These are the pitfalls that even big brands fall into:</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.5.p1")}</p>
           <ul className="mt-3 space-y-1.5">
             <li>
-              <span className="text-rose-400 font-semibold">❌ Sending from a “no-reply” address</span>
+              <span className="text-rose-400 font-semibold">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.1.title")}
+              </span>
               <br />
               <span className="text-sm text-slate-300">
-                Kills trust. Always send from a person.
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.1.note")}
               </span>
             </li>
+
             <li>
-              <span className="text-rose-400 font-semibold">❌ Asking too many questions</span>
+              <span className="text-rose-400 font-semibold">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.2.title")}
+              </span>
               <br />
               <span className="text-sm text-slate-300">
-                NPS works because it’s fast. Stick to 1-2 questions max.
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.2.note")}
               </span>
             </li>
+
             <li>
-              <span className="text-rose-400 font-semibold">❌ Mixing transactional and overall NPS</span>
+              <span className="text-rose-400 font-semibold">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.3.title")}
+              </span>
               <br />
               <span className="text-sm text-slate-300">
-                Keep milestone feedback separate from relationship feedback.
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.3.note")}
               </span>
             </li>
+
             <li>
-              <span className="text-rose-400 font-semibold">❌ Not closing the loop</span>
+              <span className="text-rose-400 font-semibold">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.4.title")}
+              </span>
               <br />
               <span className="text-sm text-slate-300">
-                A short callback to detractors in January can transform your reputation.
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.4.note")}
               </span>
             </li>
+
             <li>
-              <span className="text-rose-400 font-semibold">❌ Incentivising answers</span>
+              <span className="text-rose-400 font-semibold">
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.5.title")}
+              </span>
               <br />
               <span className="text-sm text-slate-300">
-                It introduces bias and skews your NPS.
+                {translations(lang, "blogSendingNpsBeforeChristmas.sections.5.items.5.note")}
               </span>
             </li>
           </ul>
@@ -257,133 +287,130 @@ export default function BlogSendingNpsBeforeChristmas() {
 
         <ArticleSection
           number="6"
-          title="What to Do With the Results (A Simple, Actionable Framework)"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.6.title")}
         >
-          <p>
-            Once the responses come in, here’s how to use them:
-          </p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.p1")}</p>
 
-          <KeyLabel className="mt-4">Promoters (9-10)</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.promoters.label")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• Ask for permission to use comments as testimonials</li>
-            <li>• Encourage them to leave a Trustpilot/Google review</li>
-            <li>• Identify what delighted them</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.promoters.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.promoters.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.promoters.bullets.3")}</li>
           </ul>
 
-          <KeyLabel className="mt-4">Passives (7-8)</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.passives.label")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• Ask what almost made it a 9</li>
-            <li>• Often low-effort fixes exist here (small UX or process issues)</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.passives.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.passives.bullets.2")}</li>
           </ul>
 
-          <KeyLabel className="mt-4">Detractors (0-6)</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.detractors.label")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• Prioritise these for callbacks</li>
-            <li>• Categorise their feedback: speed, clarity, service, price, etc.</li>
-            <li>• Fix recurring problems early in Q1 to lift NPS fast</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.detractors.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.detractors.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.6.detractors.bullets.3")}</li>
           </ul>
 
           <p className="mt-4">
-            A good January debrief turns feedback into{" "}
-            <span className="font-medium text-[#22C55E]">an actionable roadmap.</span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.6.p2a")}{" "}
+            <span className="font-medium text-[#22C55E]">
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.6.p2b")}
+            </span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.6.p2c")}
           </p>
         </ArticleSection>
 
         <ArticleSection
           number="7"
-          title="Tools to Run Your Survey (From Free to Turnkey)"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.7.title")}
         >
-          <p>You don’t need enterprise software.</p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.p1")}</p>
 
-          <KeyLabel className="mt-4">Beginner option (free):</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.beginner.label")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• Google Forms + manual NPS calculation</li>
-            <li>• Good for very small batches</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.beginner.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.beginner.bullets.2")}</li>
           </ul>
 
-          <KeyLabel className="mt-4">Mid-range option:</KeyLabel>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.mid.label")}</KeyLabel>
           <ul className="mt-2 space-y-1.5">
-            <li>• Your email tool + a lightweight survey link</li>
-            <li>• Manual spreadsheets for results</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.mid.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.mid.bullets.2")}</li>
           </ul>
 
-          <KeyLabel className="mt-4">Turnkey option (NPSme):</KeyLabel>
-          <p className="mt-2">
-            What we can provide:
-          </p>
+          <KeyLabel className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.label")}</KeyLabel>
+          <p className="mt-2">{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.p1")}</p>
           <ul className="mt-2 space-y-1.5">
-            <li>• Branded emails (your logo, your colours)</li>
-            <li>• Survey in English or French</li>
-            <li>• Personalised messaging</li>
-            <li>• Automatic link generation</li>
-            <li>• One-time invites or milestone-triggered</li>
-            <li>• Response rate dashboard</li>
-            <li>• NPS score + promoter/passive/detractor split</li>
-            <li>• Text analytics (themes, sentiment, keyword extraction)</li>
-            <li>• Support with closing the loop</li>
-            <li>• Exportable Excel / PDF packs for board reporting</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.4")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.5")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.6")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.7")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.8")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.9")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.10")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.7.turnkey.bullets.11")}</li>
           </ul>
 
           <p className="mt-4">
-            Setup time:{" "}
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.7.p2a")}{" "}
             <span className="font-medium text-[#7C3AED]">
-              24-48 hours after receiving your customer file.
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.7.p2b")}
             </span>
+            {translations(lang, "blogSendingNpsBeforeChristmas.sections.7.p2c")}
           </p>
         </ArticleSection>
 
         <ArticleSection
           number="8"
-          title="How NPSme Can Run Your Pre-Christmas Survey for You"
+          title={translations(lang, "blogSendingNpsBeforeChristmas.sections.8.title")}
         >
-          <p>
-            If you want this handled for you before Christmas, here’s the process:
-          </p>
+          <p>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.p1")}</p>
           <ol className="mt-3 space-y-1.5 list-decimal pl-5 text-sm sm:text-base">
-            <li>Send us your customer file (CSV or Excel)</li>
-            <li>We build your email invite (English, French, or both)</li>
-            <li>We apply your branding (logo, colours, tone)</li>
-            <li>We send your survey - either through your email tool or our own</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.3")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.4")}</li>
             <li>
-              You get a real-time dashboard showing:
+              {translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5a")}
               <ul className="mt-1.5 space-y-1.5 list-disc pl-4 text-[13px] sm:text-sm text-slate-300">
-                <li>response rate</li>
-                <li>NPS</li>
-                <li>score distribution</li>
-                <li>milestone scores (optional)</li>
-                <li>key themes from comments</li>
+                <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5bullets.1")}</li>
+                <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5bullets.2")}</li>
+                <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5bullets.3")}</li>
+                <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5bullets.4")}</li>
+                <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.5bullets.5")}</li>
               </ul>
             </li>
-            <li>
-              In January, we provide a short CX insights deck and recommendations
-            </li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.steps.6")}</li>
           </ol>
 
-          <p className="mt-4">
-            This gives you clarity for Q1 planning - and it requires almost no setup from your side.
-          </p>
+          <p className="mt-4">{translations(lang, "blogSendingNpsBeforeChristmas.sections.8.p2")}</p>
         </ArticleSection>
 
         {/* Conclusion + CTA */}
         <section className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 md:p-7 space-y-4">
           <h2 className="text-lg sm:text-xl font-semibold text-white">
-            Conclusion
+            {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.title")}
           </h2>
+
           <p className="text-sm sm:text-base">
-            Sending an NPS survey before Christmas is one of the simplest, highest-ROI actions a business
-            can take. Whether you have 20 customers or 2,000, a well-timed NPS survey gives you:
+            {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.p1")}
           </p>
+
           <ul className="mt-2 space-y-1.5 text-sm sm:text-base">
-            <li>• immediate visibility into customer sentiment</li>
-            <li>• actionable feedback to fix issues early in the new year</li>
-            <li>• a structured way to prioritise CX improvements in Q1</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.conclusion.bullets.1")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.conclusion.bullets.2")}</li>
+            <li>{translations(lang, "blogSendingNpsBeforeChristmas.conclusion.bullets.3")}</li>
           </ul>
+
           <p className="mt-3 text-sm sm:text-base">
-            And you can launch a professional, branded version in under 48 hours.
+            {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.p2")}
           </p>
 
           <p className="mt-4 text-sm sm:text-base">
-            If you’d like help setting it up - or want to try the demo - you can start here:
+            {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.p3")}
           </p>
 
           <div className="mt-4 flex flex-col sm:flex-row gap-3">
@@ -391,13 +418,14 @@ export default function BlogSendingNpsBeforeChristmas() {
               to="/demo-survey-page"
               className="inline-flex items-center justify-center rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white"
             >
-              Try the NPS demo experience
+              {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.btnDemo")}
             </Link>
+
             <Link
               to="/book"
               className="inline-flex items-center justify-center rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A]"
             >
-              Book a free discovery call
+              {translations(lang, "blogSendingNpsBeforeChristmas.conclusion.btnBook")}
             </Link>
           </div>
         </section>

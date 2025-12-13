@@ -47,6 +47,793 @@ export const TRANSLATIONS = {
         "Here we’ll add an AI “co-pilot” that reads the charts and verbatim themes and gives you a short briefing: where NPS is drifting, which journey stages are hurting, and where to focus next.",
       copilotPlaceholder: "AI commentary placeholder",
     },
+    blog: {
+      seo: {
+        title: "Blog | NPS Me – Practical CX & NPS Insights",
+        description:
+          "Opinionated, practitioner-grade guidance on improving customer experience (CX) and Net Promoter Score (NPS) ethically.",
+      },
+      header: {
+        iconLabel: "Insights",
+        tag: "CX & NPS / Blog",
+        accent: "Pragmatic lessons",
+        title: " from real programmes.",
+        subtitle: "Fewer buzzwords, more outcomes.",
+      },
+      readPost: "Read post",
+
+      posts: {
+        ethicsOfContactSelection: {
+          title: "Are We Asking the Right People? Ethical Contact Selection in B2B NPS",
+          excerpt:
+            "When account teams choose who gets surveyed, the data can drift. A practical guide to fair sampling, DNS governance, and response coaching.",
+        },
+        ethicalSurveys: {
+          title: "When Feedback Fatigue Sets In: The ethics of customer experience surveys",
+          excerpt:
+            "How contact selection, DNS flags, and response-pressure can quietly distort NPS — and what to do instead.",
+        },
+        closingTheLoop: {
+          title: "Beyond the Score: Why Closing the Loop Builds Trust",
+          excerpt:
+            "NPS is more than a number. Learn why closing the loop with customers builds credibility and drives lasting improvement.",
+        },
+        whatToDoWithNps: {
+          title: "What To Do With Your NPS Scores",
+          excerpt:
+            "Present NPS the right way, avoid small-sample traps, handle repeat responders, and target changes that actually lift the score and the business.",
+        },
+        sendingBeforeChristmas: {
+          title: "Sending an NPS survey before Christmas (without annoying your customers)",
+          excerpt:
+            "How to run a respectful, effective pre-Christmas NPS pulse — and what to do with the insights.",
+        },
+        whyNpsIsntImproving: {
+          title: "Why your NPS isn't improving — even when your CX looks better",
+          excerpt:
+            "When your CX feels better but your NPS refuses to move, it's usually not the score that's broken. It's sampling, expectations, or where the fixes are landing.",
+        },
+        dataVisualisationCx: {
+          title: "How to Use Data Visualisation to Unlock Hidden CX Insights",
+          excerpt:
+            "Move beyond pretty dashboards into visuals that reveal patterns, friction points, and expectation gaps your teams can act on.",
+        },
+      },
+    },
+    blogClosingLoop: {
+      seo: {
+        title: "Beyond the Score: Why Closing the Loop Builds Trust | NPS Me",
+        description:
+          "Customer feedback isn't valuable until you act on it. Learn why closing the loop builds trust beyond the NPS score.",
+      },
+      header: {
+        iconLabel: "Closing the Loop",
+        tag: "CX & NPS / Blog",
+        accent: "Beyond the Score:",
+        title: "Why Closing the Loop Builds Trust",
+        subtitle: "Why acting on feedback matters more than measuring it.",
+      },
+      intro: {
+        p1: "Most organisations measure feedback. Fewer act on it. And even fewer tell customers what they changed as a result.",
+        p2: "I’ve seen countless teams track Net Promoter Scores with impressive dashboards, yet the most important work starts after the results are in.",
+      },
+      sections: {
+        1: {
+          title: "When the survey ends, the story begins",
+          p1: "An NPS report can feel like closure, but feedback is only useful if someone acts on it.",
+          p2: "The best teams focus on fixing root causes and letting customers see improvement, not chasing scores.",
+        },
+        2: {
+          title: "The silence that damages trust",
+          p1: "A survey without follow-up feels like a conversation that ends halfway through.",
+          p2: "Transparency, even imperfect, rebuilds credibility over time.",
+        },
+        3: {
+          title: "Cultural differences: when a seven means something else",
+          p1: "Cultural norms heavily influence NPS scores across countries and industries.",
+          p2: "Context and comments matter more than the absolute number.",
+        },
+        4: {
+          title: "Looking beyond the number",
+          p1: "NPS is a compass, not a competition.",
+          p2: "When teams focus on patterns, scores tend to move naturally.",
+        },
+        5: {
+          title: "Closing the loop without showing your playbook",
+          p1: "Every organisation needs its own rhythm for closing the loop.",
+          p2: "There is no single formula, only consistent, meaningful action.",
+        },
+        6: {
+          title: "The outcome that matters most",
+          p1: "Customers remember how they were treated after they spoke up.",
+          p2: "Credibility, not perfection, is what earns loyalty.",
+        },
+      },
+      cta: {
+        lead: "Ready to turn feedback into actions your customers actually feel?",
+        sub:
+          "NPS Me helps you design fair surveys, close the loop consistently, and present results that drive decisions.",
+        services: "Explore NPS Me services",
+        book: "Book a discovery call",
+      },
+    },
+    blogCxDataViz: {
+      seo: {
+        baseTitle:
+          "How to Use Data Visualisation to Drill Into CX Data and Uncover Insights That Teams Can Act On",
+        description:
+          "Most companies have more CX dashboards than time. Learn how to use data visualisation to spot patterns, find friction, and turn NPS data into clear next actions.",
+      },
+      header: {
+        iconLabel: "Data",
+        tag: "CX & NPS / Blog",
+        accent: "How to Use Data Visualisation",
+        title: "to Unlock Hidden CX Insights",
+        subtitle:
+          "Go beyond pretty dashboards. Design visuals that make the next action obvious.",
+      },
+      intro: {
+        p1:
+          "Most companies have more dashboards than time. Yet despite all the reports, customer friction still goes unseen, decisions stall, and leaders feel like the story is missing.",
+        p2:
+          "The problem usually isn't the lack of visuals. It's that most charts don't actually explain anything.",
+        p3:
+          "Used well, data visualisation turns raw CX signals into something teams can immediately interpret and act on. Used poorly, it just becomes another place to scroll.",
+        p4:
+          "In this post we'll look at how to use visualisation properly, with examples from CX work, so your teams see what matters and move faster.",
+      },
+      sections: {
+        1: {
+          title: "Dashboards Aren't the Destination – They're the Lens",
+          p1:
+            "A dashboard is not the insight. It's the tool that helps you find the insight. In many CX teams we see:",
+          bullets: {
+            1: "• Dozens of dashboards but no single source of truth",
+            2: "• Charts that look impressive but don't answer questions",
+            3: "• Reports that explain what is happening, but not why",
+            4: "• Visuals built for the presenter, not the reader",
+          },
+          p2a: "A great CX visualisation has one job:",
+          p2b: "make the next action obvious.",
+        },
+        2: {
+          title: "The Three Layers of Visual Insight in Customer Experience",
+          layer1: {
+            label: "Layer 1 – Pattern spotting (macro trends)",
+            p1:
+              "These visuals tell you whether something is drifting, flattening, or breaking. You are scanning for shape, not precision:",
+            bullets: {
+              1: "• Sentiment or NPS over time",
+              2: "• Ticket volume per 1,000 customers",
+              3: "• Refund rate trends",
+              4: "• First-contact resolution by month",
+            },
+            p2a: "At this layer you're asking:",
+            p2b: "“Is something interesting happening?”",
+            p2c: "– not yet",
+            p2d: "“Why?”",
+          },
+          layer2: {
+            label: "Layer 2 – Friction hunting (the where and why)",
+            p1:
+              "Once a pattern shows something worth investigating, visualisations help pinpoint the specifics:",
+            bullets: {
+              1: "• Heatmaps showing satisfaction by channel or product line",
+              2: "• Drop-off charts showing where onboarding fails",
+              3: "• Journey maps where wait times spike",
+              4: "• Theme frequency charts linked to customer value",
+            },
+            p2a: "Here the question becomes:",
+            p2b: "“Where exactly is the experience breaking down?”",
+          },
+          layer3: {
+            label:
+              "Layer 3 – Expectation gaps (where your reality and the customer's differ)",
+            p1:
+              "Some of the strongest insights come from comparing operational metrics to customer sentiment:",
+            bullets: {
+              1: "• Fast delivery time + poor sentiment → expectations mismatch",
+              2: "• High CSAT + high churn → product–market mismatch",
+              3: "• Low NPS + strong operational KPIs → communications gap",
+            },
+            p2:
+              "These visuals reveal the disconnects that text alone hides, where customers feel one thing and your dashboards insist everything is fine.",
+          },
+        },
+        3: {
+          title: "Visuals That Consistently Deliver Insight in CX Programmes",
+          items: {
+            1: {
+              title: "1) Theme-by-value heatmap",
+              p1:
+                "Show which customer themes link most strongly to revenue, churn, or support cost. Rows are themes, columns are value segments or products. The darker the cell, the more it matters commercially.",
+              p2:
+                "This instantly surfaces “small but noisy” issues versus the themes that quietly drain loyalty from your most valuable customers.",
+            },
+            2: {
+              title: "2) Verbatim clustering (simple, not AI hype)",
+              p1:
+                "Group comments into 8–12 human-labelled categories and visualise their size and sentiment over time. No need for a complex model, start with simple rules and tags.",
+              p2:
+                "You'll quickly see which issues generate the most pain and which positive themes you should double down on.",
+            },
+            3: {
+              title: "3) Sankey flow of the customer journey",
+              p1:
+                "A Sankey diagram shows volume moving through steps in a journey, where people drop out, retry, escalate to support, or convert.",
+              p2:
+                "It's especially powerful for onboarding, installation, and cancellation journeys where lots of things can happen in a short window.",
+            },
+            4: {
+              title: "4) NPS vs retention scatterplot",
+              p1:
+                "Plot customers by their NPS score on one axis and retention or tenure on the other. If Promoters churn, you have an expectation gap. If Detractors stay, you may have a price–value balance issue.",
+              p2:
+                "This view stops you obsessing about scores from low-value segments and helps you focus on the customers who shape your future revenue.",
+            },
+            5: {
+              title: "5) Ticket topic trend lines",
+              p1:
+                "Simple line charts of ticket topics over time often predict churn or revenue risk before any score moves. A small rise in one issue from a key segment is often your earliest warning signal.",
+            },
+          },
+        },
+        4: {
+          title: "Common Mistakes That Kill Insight",
+          bullets: {
+            1: "• Over-aggregating (“Overall NPS” hides almost everything useful)",
+            2: "• Using averages instead of distributions or segments",
+            3: "• Putting design and colour over clarity and labelling",
+            4: "• Visualising dirty or mismatched data",
+            5: "• Assuming the chart is the answer when it should start a conversation",
+          },
+          p1:
+            "One honest, slightly ugly chart beats a beautiful dashboard of noise. If a visual makes people argue about the formatting instead of the decision, change it.",
+        },
+        5: {
+          title: "A Simple Workflow for Turning Visuals Into Action",
+          steps: {
+            1: {
+              title: "Step 1 – Start with a question",
+              p1: "Examples:",
+              bullets: {
+                1: "• Why is onboarding satisfaction flat even after we simplified the process?",
+                2: "• Which themes cost us the most revenue or support time?",
+              },
+            },
+            2: {
+              title: "Step 2 – Build the smallest visual that answers it",
+              p1:
+                "One chart. One insight. No clutter. If you need three filters, try again. The best CX visuals are boringly clear.",
+            },
+            3: {
+              title: "Step 3 – Interpret it in a single sentence",
+              p1:
+                "If the chart needs a paragraph to explain what it says, it's the wrong chart. Stakeholders should be able to glance and say: “Right, so we're losing high-value customers at installation.”",
+            },
+            4: {
+              title: "Step 4 – Assign ownership",
+              p1a: "Every useful visual should end with:",
+              p1b: "“So who owns this, and what happens next?”",
+              p2:
+                "A beautiful heatmap with no owner is just decoration. Insight only matters once someone is accountable for changing it.",
+            },
+          },
+        },
+        6: {
+          title: "Quick Wins You Can Implement This Week",
+          bullets: {
+            1: "• A retention curve segmented by Promoter / Passive / Detractor for one core product",
+            2: "• A heatmap of complaint themes by customer value band (high / medium / low, to start)",
+            3: "• A journey timeline visual showing where customers wait the longest",
+            4: "• A simple “you said, we did” tracker next to each dashboard, so people see action as well as scores",
+          },
+          p1:
+            "None of these require complex AI. They require clean data, clear questions, and visuals that respect your stakeholders' time.",
+        },
+      },
+      closing: {
+        title: "Turning Visuals Into Decisions",
+        p1a: "If you'd like help visualising CX data so the next action becomes obvious,",
+        p1b: "can:",
+        bullets: {
+          1: "• Link data across survey, ticketing, and CRM tools",
+          2: "• Build lightweight dashboards your teams actually read",
+          3: "• Design a small set of visuals that move you from “interesting charts” to repeatable decisions",
+        },
+        ctaBtn: "Book a short discovery call",
+        p2:
+          "and we'll look at where visualisation could make the biggest difference in your programme.",
+      },
+    },
+    blogEthicalSurveys: {
+      seo: {
+        title:
+          "When Feedback Fatigue Sets In: The Ethics of customer experience surveys | NPS Me",
+        description:
+          "A reflection by a former Telco Head of Customer Experience (Europe) on survey ethics, contact selection, and how to build genuinely trustworthy feedback systems.",
+      },
+      header: {
+        iconLabel: "Ethical NPS",
+        tag: "CX & NPS / Blog",
+        accent: "When Feedback Fatigue Sets In:",
+        title: "The ethics of customer experience and surveys",
+        subtitle: "How to build trustworthy, bias-resistant NPS programmes.",
+      },
+      intro: {
+        p1a:
+          "Every company wants to be customer-centric, but few stop to ask whether their feedback processes are",
+        p1b: "ethically customer-centric",
+        p1c:
+          ". It's one thing to measure Net Promoter Score (NPS) — it's another to ensure that the way you collect that feedback actually reflects reality.",
+        p1d:
+          "",
+      },
+      sections: {
+        1: {
+          title: "Contact selection: the invisible bias",
+          p1a:
+            "At my former company, we used Salesforce to manage “contact selection” for our B2B NPS programme. Each Account Manager could flag a contact as",
+          p1b: "“Available for Survey”",
+          p1c: "or",
+          p1d: "“Not Suitable for Survey.”",
+          p1e: "",
+          p2:
+            "On paper, it looked fair. In practice, unhappy contacts could be quietly excluded — or whole accounts marked as DNS (Do Not Survey) with no oversight.",
+          p3:
+            "We later introduced VP-level approval for DNS flags, but the problem remained: when the people being measured can choose who speaks, NPS stops measuring customer advocacy — and starts measuring survey ethics.",
+        },
+        2: {
+          title: "Response rates vs authenticity",
+          p1:
+            "Once the survey window opened, Account Managers were encouraged to “nudge” customers — often too hard.",
+          quote: "“Please give us a 9 or 10, otherwise it's seen as bad.”",
+          quoteNote: "A real poster once found in a Mercure hotel lift.",
+          p2:
+            "Coaching or pressuring customers damages data integrity. The programme becomes performance theatre — chasing numbers instead of truth.",
+        },
+        3: {
+          title: "How to rebuild trust in feedback",
+          bullets: {
+            1: {
+              bold: "Decouple incentives from scores.",
+              text: "Reward behaviours that improve outcomes, not manipulated metrics.",
+            },
+            2: {
+              bold: 'Audit "Do Not Survey" logic.',
+              text: "DNS flags should require justification and VP oversight.",
+            },
+            3: {
+              bold: "Control pre-survey communication.",
+              text: "Messaging should come from the company, not individual AMs.",
+            },
+            4: {
+              bold: "Rotate samples.",
+              text: "Re-surveying the same contacts creates fatigue and bias.",
+            },
+            5: {
+              bold: "Close the loop transparently.",
+              text: "Share themes and improvements with customers to rebuild trust.",
+            },
+          },
+        },
+        4: {
+          title: "Final thoughts",
+          p1:
+            "Ethical feedback systems aren't about dodging criticism — they're about earning credibility. A healthy CX programme measures itself not just by the height of the NPS bar, but by the integrity behind it.",
+          p2a: "True improvement comes from facing uncomfortable truths…",
+          p2b: " and creating a space where customers feel safe enough to voice them.",
+        },
+      },
+      cta: {
+        p1: "Want help building an ethical, trustworthy NPS programme?",
+        p2:
+          "NPS Me helps you design fair sampling, remove bias, and create feedback loops customers can believe in.",
+        btnServices: "Explore NPS Me services",
+        btnBook: "Book a discovery call",
+      },
+    },
+    blogEthicsOfContactSelection: {
+      seo: {
+        title:
+          "Are We Asking the Right People? The Ethics of Contact Selection in Customer Feedback | NPS Me",
+        description:
+          "Cherry-picking who receives a survey can inflate NPS® and damage credibility. Principles and guardrails to keep feedback fair, representative, and actionable.",
+      },
+      header: {
+        iconLabel: "Sampling Integrity",
+        tag: "CX & NPS / Blog",
+        accent: "Are We Asking the Right People?",
+        title: "The Ethics of Contact Selection in Customer Feedback",
+        subtitle:
+          "Cherry-picking who receives a survey can inflate NPS and damage credibility. Here’s how to keep sampling fair, representative, and actionable.",
+      },
+      intro: {
+        p1a:
+          "In CX, data integrity is everything. One of the easiest ways to distort customer truth is deciding",
+        p1b: "who",
+        p1c:
+          "gets surveyed. If sampling can be steered — intentionally or not — the resulting Net Promoter Score (NPS)® becomes a measure of survey design, not advocacy.",
+        p1d: "",
+      },
+      sections: {
+        1: {
+          title: 'The temptation to “shape” the sample',
+          p1a:
+            "Many teams use CRM fields like",
+          p1b: "“Available for Survey”",
+          p1c: "or account-level",
+          p1d: "“Do Not Survey” (DNS)",
+          p1e:
+            ". These are useful controls — legal, contractual or truly unsuitable contacts do exist — but they also create a slippery slope.",
+          p2:
+            "It becomes tempting to exclude unhappy voices to protect a quarterly metric.",
+          p3:
+            "Over time this looks like improvement on paper, while real friction persists. Leadership allocates investment based on biased data; customers notice they aren’t being asked — or worse, that their voices don’t count.",
+        },
+        2: {
+          title: "Response rates vs authenticity",
+          p1a:
+            "Driving responses is good; coaching scores is not. Reminders should focus on",
+          p1b: "participation",
+          p1c:
+            "(“Your feedback helps us improve”), not outcomes",
+          p1d:
+            "(“Please give us 9-10”). The latter erodes trust and undermines the very purpose of feedback.",
+          p1e: "",
+          quoteLine1:
+            "“If you’re happy, give us a 9 or 10 — anything else counts as bad.”",
+          quoteLine2:
+            "This common message may lift the number, but it destroys credibility.",
+          p2:
+            "The moment respondents sense that the goal is to “look good” rather than learn, the value of the entire programme starts to erode.",
+        },
+        3: {
+          title: "Guardrails for ethical contact selection",
+          bullets: {
+            1: {
+              bold: "Automate random sampling with auditable rules.",
+              text:
+                "Define eligibility (tenure, recent activity, legal constraints) and log every exclusion with a reason.",
+            },
+            2: {
+              bold: "Separate ownership of score from ownership of action.",
+              text: "CX ops should run sampling; teams own fixes and outcomes.",
+            },
+            3: {
+              bold: "Tighten DNS controls.",
+              text:
+                "Require written rationale and time-bound reviews. Use approvals for account-wide DNS to prevent misuse.",
+            },
+            4: {
+              bold: "Rotate fairly and cap frequency.",
+              text:
+                "Avoid over-surveying helpful contacts and under-surveying detractors; set cool-off periods.",
+            },
+            5: {
+              bold: "Standardise comms content.",
+              text:
+                "Company-authored reminder templates reduce coaching risk while improving response rates.",
+            },
+            6: {
+              bold: "Publish what you learned.",
+              text:
+                "Share themes, fixes shipped, and measurable impact. Transparency earns future participation.",
+            },
+          },
+        },
+        4: {
+          title: "What “good” looks like",
+          p1: "You’ll know your programme is healthy when:",
+          bullets: {
+            1: "Exclusions trend low and are clearly justified.",
+            2: "Response rates climb without coaching language.",
+            3: "The distribution of scores is stable and believable.",
+            4:
+              "Leaders celebrate problems found and fixed — not just a single number on a slide.",
+          },
+        },
+        5: {
+          title: "Key takeaways",
+          bullets: {
+            1: "Ethical sampling protects data integrity.",
+            2: "Automate eligibility; audit exclusions.",
+            3: "Reward learning and improvement, not score-keeping.",
+            4: "Transparency builds trust and future response.",
+          },
+          attribution:
+            "Attribution: NPS® and Net Promoter Score® are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References here are descriptive only. NPS Me is independent and not affiliated with those parties.",
+        },
+      },
+      cta: {
+        p1: "Want help tightening sampling rules and boosting trustworthy response rates?",
+        p2:
+          "NPS Me can design ethical sampling logic, DNS governance and communication frameworks that protect the integrity — and credibility — of your NPS programme.",
+        btnServices: "Explore NPS Me services",
+        btnBook: "Book a discovery call",
+      },
+    },
+    blogSendingNpsBeforeChristmas: {
+      seo: {
+        title: "Sending an NPS survey before Christmas (without annoying your customers)",
+        description:
+          "How to run a respectful, effective pre-Christmas NPS pulse - and what to do with the insights.",
+      },
+      header: {
+        iconLabel: "NPS Survey",
+        tag: "CX & NPS / Blog",
+        accent: "How to Send an NPS Survey Before Christmas",
+        title: "Even If You’ve Never Done One Before",
+        subtitle:
+          "A practical, founder-friendly guide to launching a respectful, high-signal NPS pulse before the holidays.",
+      },
+
+      intro: {
+        p1a: "As the year winds down, many companies enter",
+        p1b: "“reflection mode.”",
+        p1c:
+          "Customers are taking stock of the brands they rely on, inboxes quieten slightly, and people find themselves with just enough mental space to offer thoughtful feedback.",
+        p2:
+          "That’s why the period between late November and mid-December is one of the most effective windows of the year to send an NPS survey - especially if you’ve never run one before.",
+        p3:
+          "Better yet: with the right approach, you can launch a clean, branded, high-response NPS survey in under 48 hours, even if you’re starting from scratch.",
+        p4: "In this guide, you’ll learn exactly how to do it.",
+      },
+
+      sections: {
+        1: {
+          title: "Why Sending an NPS Survey Before Christmas Works So Well",
+          p1: "It sounds counter-intuitive - December is “busy”, right?",
+          p2:
+            "Yes and no. Emails about discounts or logistics get ignored. But feedback requests hit differently in December:",
+          bullets: {
+            1: "• People are reflective and open to giving input",
+            2: "• Customers appreciate being asked before the new year starts",
+            3: "• You get richer qualitative comments - not rushed mid-year replies",
+            4: "• January inboxes become chaos, so December has higher engagement",
+          },
+          p4a:
+            "For small and mid-size businesses - especially those with relationship-based customer models - this window is",
+          p4b: "a golden opportunity.",
+          p4c: "",
+        },
+
+        2: {
+          title: "What You Need to Send an NPS Survey (It’s Less Than You Think)",
+          p1: "Here’s everything you need to run an NPS survey:",
+          p2a: "You do not need a CRM or complex automation.",
+          p2b: "A clean, simple setup works perfectly.",
+
+          k1: {
+            label: "A list of customers",
+            p1: "A simple Excel/CSV with:",
+            bullets: {
+              1: "• First name",
+              2: "• Last name",
+              3: "• Company name (optional)",
+              4: "• Email",
+            },
+          },
+
+          k2: {
+            label: "Your logo + colours",
+            p1: "To make the email feel branded and trustworthy.",
+          },
+
+          k3: {
+            label: "One question",
+            p1: "The NPS standard:",
+            q: "“How likely are you to recommend us to a friend or colleague?”",
+            scale: "Scale:",
+            range: "0-10",
+          },
+
+          k4: {
+            label: "One optional open-text question",
+            q: "“What’s the main reason for your score?”",
+          },
+
+          k5: {
+            label: "A way to send the surveys",
+            p1: "You can use your ESP (Brevo, Mailjet, HubSpot…), or",
+            p2: "NPSme can handle everything for you.",
+          },
+
+          k6: {
+            label: "A way to track results",
+            p1: "You need:",
+            bullets: {
+              1: "• Overall NPS",
+              2: "• Response rate",
+              3: "• Score distribution (promoters/passives/detractors)",
+              4: "• Themes from comments",
+            },
+          },
+        },
+
+        3: {
+          title: "When Exactly Should You Send It?",
+          p1: "Here’s the surprisingly simple rule:",
+          p2: "The earlier in December, the better.",
+          p3: "But even mid-December works if you time it well.",
+
+          bestWindows: "Best windows:",
+          bullets: {
+            1: { range: "1-14 December", note: "Highest quality responses" },
+            2: {
+              range: "15-20 December",
+              note: "Still safe, especially if your product is digital or operational",
+            },
+            3: "• Avoid 21-25 December (unless B2C retail or hospitality)",
+          },
+
+          p4: "Within those windows:",
+          rules: {
+            1: "• Send on Mon-Wed mornings",
+            2: "• Around 9:00-11:00am local time",
+            3: "• Avoid Friday afternoons",
+          },
+
+          p5a: "Responses typically land within",
+          p5b: "24-48 hours.",
+          p5c: "",
+        },
+
+        4: {
+          title: "How to Craft the Email for Maximum Response",
+          p1:
+            "The email is everything. If the email feels long or corporate, response rate collapses.",
+
+          principlesTitle: "Principles:",
+          principles: {
+            1: "• Write like a human",
+            2: "• Keep it short",
+            3: "• Make it founder-led if possible",
+            4: "• Reassure: 10-20 seconds max",
+            5: "• Avoid marketing language",
+          },
+
+          templateEn: {
+            label: "Example template (English)",
+            body:
+    `Subject: Quick question before the holidays?
+
+    Hi {{name}},
+    As we wrap up the year, we’re reflecting on how we’re doing. Would you mind answering one quick question?
+
+    It takes 10 seconds, and your feedback genuinely helps shape our priorities for next year.
+
+    👉 {{survey_link}}
+
+    Thank you - it means a lot.
+    {{Founder name}}`,
+          },
+        },
+
+        5: {
+          title: "Avoid These Common Mistakes (Beginner Mistakes That Hurt Results)",
+          p1: "These are the pitfalls that even big brands fall into:",
+          items: {
+            1: { title: "❌ Sending from a “no-reply” address", note: "Kills trust. Always send from a person." },
+            2: { title: "❌ Asking too many questions", note: "NPS works because it’s fast. Stick to 1-2 questions max." },
+            3: { title: "❌ Mixing transactional and overall NPS", note: "Keep milestone feedback separate from relationship feedback." },
+            4: { title: "❌ Not closing the loop", note: "A short callback to detractors in January can transform your reputation." },
+            5: { title: "❌ Incentivising answers", note: "It introduces bias and skews your NPS." },
+          },
+        },
+
+        6: {
+          title: "What to Do With the Results (A Simple, Actionable Framework)",
+          p1: "Once the responses come in, here’s how to use them:",
+          promoters: {
+            label: "Promoters (9-10)",
+            bullets: {
+              1: "• Ask for permission to use comments as testimonials",
+              2: "• Encourage them to leave a Trustpilot/Google review",
+              3: "• Identify what delighted them",
+            },
+          },
+          passives: {
+            label: "Passives (7-8)",
+            bullets: {
+              1: "• Ask what almost made it a 9",
+              2: "• Often low-effort fixes exist here (small UX or process issues)",
+            },
+          },
+          detractors: {
+            label: "Detractors (0-6)",
+            bullets: {
+              1: "• Prioritise these for callbacks",
+              2: "• Categorise their feedback: speed, clarity, service, price, etc.",
+              3: "• Fix recurring problems early in Q1 to lift NPS fast",
+            },
+          },
+          p2a: "A good January debrief turns feedback into",
+          p2b: "an actionable roadmap.",
+          p2c: "",
+        },
+
+        7: {
+          title: "Tools to Run Your Survey (From Free to Turnkey)",
+          p1: "You don’t need enterprise software.",
+
+          beginner: {
+            label: "Beginner option (free):",
+            bullets: {
+              1: "• Google Forms + manual NPS calculation",
+              2: "• Good for very small batches",
+            },
+          },
+
+          mid: {
+            label: "Mid-range option:",
+            bullets: {
+              1: "• Your email tool + a lightweight survey link",
+              2: "• Manual spreadsheets for results",
+            },
+          },
+
+          turnkey: {
+            label: "Turnkey option (NPSme):",
+            p1: "What we can provide:",
+            bullets: {
+              1: "• Branded emails (your logo, your colours)",
+              2: "• Survey in English or French",
+              3: "• Personalised messaging",
+              4: "• Automatic link generation",
+              5: "• One-time invites or milestone-triggered",
+              6: "• Response rate dashboard",
+              7: "• NPS score + promoter/passive/detractor split",
+              8: "• Text analytics (themes, sentiment, keyword extraction)",
+              9: "• Support with closing the loop",
+              10: "• Exportable Excel / PDF packs for board reporting",
+            },
+          },
+
+          p2a: "Setup time:",
+          p2b: "24-48 hours after receiving your customer file.",
+          p2c: "",
+        },
+
+        8: {
+          title: "How NPSme Can Run Your Pre-Christmas Survey for You",
+          p1: "If you want this handled for you before Christmas, here’s the process:",
+          steps: {
+            1: "Send us your customer file (CSV or Excel)",
+            2: "We build your email invite (English, French, or both)",
+            3: "We apply your branding (logo, colours, tone)",
+            4: "We send your survey - either through your email tool or our own",
+            "5a": "You get a real-time dashboard showing:",
+            "5bullets": {
+              1: "response rate",
+              2: "NPS",
+              3: "score distribution",
+              4: "milestone scores (optional)",
+              5: "key themes from comments",
+            },
+            6: "In January, we provide a short CX insights deck and recommendations",
+          },
+          p2:
+            "This gives you clarity for Q1 planning - and it requires almost no setup from your side.",
+        },
+      },
+
+      conclusion: {
+        title: "Conclusion",
+        p1:
+          "Sending an NPS survey before Christmas is one of the simplest, highest-ROI actions a business can take. Whether you have 20 customers or 2,000, a well-timed NPS survey gives you:",
+        bullets: {
+          1: "• immediate visibility into customer sentiment",
+          2: "• actionable feedback to fix issues early in the new year",
+          3: "• a structured way to prioritise CX improvements in Q1",
+        },
+        p2: "And you can launch a professional, branded version in under 48 hours.",
+        p3: "If you’d like help setting it up - or want to try the demo - you can start here:",
+        btnDemo: "Try the NPS demo experience",
+        btnBook: "Book a free discovery call",
+      },
+    },
+
     dataAutomation: {
       seoTitle: "Data, Automation & Insight — Transform Your Reporting | NPS Me",
       seoDescription:
@@ -975,6 +1762,822 @@ export const TRANSLATIONS = {
       socialListening: "Social listening",
       blog: "Blog",
       cxCockpit: "Cockpit CX",
+    },
+    blog: {
+      seo: {
+        title: "Blog | NPS Me – Analyses CX & NPS pragmatiques",
+        description:
+          "Des analyses concrètes et sans jargon pour améliorer l’expérience client (CX) et le Net Promoter Score (NPS), de manière éthique.",
+      },
+      header: {
+        iconLabel: "Analyses",
+        tag: "CX & NPS / Blog",
+        accent: "Des enseignements concrets",
+        title: " issus du terrain.",
+        subtitle: "Moins de buzzwords, plus d’impact.",
+      },
+      readPost: "Lire l’article",
+
+      posts: {
+        ethicsOfContactSelection: {
+          title:
+            "Interrogeons-nous les bonnes personnes ? Sélection éthique des contacts en NPS B2B",
+          excerpt:
+            "Lorsque les équipes choisissent qui interroger, les résultats peuvent se biaiser. Un guide pratique sur l’échantillonnage équitable et la gouvernance.",
+        },
+        ethicalSurveys: {
+          title:
+            "Quand la fatigue des enquêtes s’installe : l’éthique des enquêtes d’expérience client",
+          excerpt:
+            "Comment la sélection des contacts et la pression à la réponse peuvent fausser le NPS — et comment l’éviter.",
+        },
+        closingTheLoop: {
+          title:
+            "Au-delà du score : pourquoi fermer la boucle renforce la confiance",
+          excerpt:
+            "Le NPS est plus qu’un chiffre. Découvrez pourquoi le suivi client construit la crédibilité et des améliorations durables.",
+        },
+        whatToDoWithNps: {
+          title: "Que faire concrètement avec vos scores NPS",
+          excerpt:
+            "Présenter le NPS correctement, éviter les pièges d’échantillons réduits et cibler des actions qui améliorent réellement le business.",
+        },
+        sendingBeforeChristmas: {
+          title:
+            "Envoyer une enquête NPS avant Noël (sans agacer vos clients)",
+          excerpt:
+            "Comment lancer une enquête NPS efficace et respectueuse avant les fêtes — et exploiter les enseignements.",
+        },
+        whyNpsIsntImproving: {
+          title:
+            "Pourquoi votre NPS n’augmente pas — même quand votre CX s’améliore",
+          excerpt:
+            "Quand l’expérience progresse mais que le score stagne, le problème vient rarement du NPS lui-même.",
+        },
+        dataVisualisationCx: {
+          title:
+            "Exploiter la data visualisation pour révéler des insights CX cachés",
+          excerpt:
+            "Aller au-delà des beaux tableaux de bord pour mettre en lumière les frictions et attentes clients.",
+        },
+      },
+    },
+    blogClosingLoop: {
+      seo: {
+        title:
+          "Au-delà du score : pourquoi fermer la boucle renforce la confiance | NPS Me",
+        description:
+          "Le feedback client n’a de valeur que lorsqu’il mène à l’action. Découvrez pourquoi fermer la boucle crée une confiance durable.",
+      },
+      header: {
+        iconLabel: "Fermeture de boucle",
+        tag: "CX & NPS / Blog",
+        accent: "Au-delà du score :",
+        title: "Pourquoi fermer la boucle renforce la confiance",
+        subtitle:
+          "Pourquoi agir sur le feedback compte plus que le mesurer.",
+      },
+      intro: {
+        p1:
+          "La plupart des organisations mesurent le feedback. Peu agissent réellement. Et encore moins expliquent aux clients ce qui a changé.",
+        p2:
+          "J’ai vu de nombreuses équipes suivre leur NPS avec des tableaux de bord sophistiqués, alors que le vrai travail commence après les résultats.",
+      },
+      sections: {
+        1: {
+          title: "Quand l’enquête se termine, l’histoire commence",
+          p1:
+            "Un rapport NPS peut donner un sentiment de clôture, mais le feedback n’est utile que s’il déclenche une action.",
+          p2:
+            "Les équipes les plus efficaces s’attaquent aux causes profondes plutôt que de courir après les scores.",
+        },
+        2: {
+          title: "Le silence qui abîme la confiance",
+          p1:
+            "Une enquête sans suivi ressemble à une conversation interrompue.",
+          p2:
+            "La transparence, même imparfaite, reconstruit la crédibilité avec le temps.",
+        },
+        3: {
+          title:
+            "Différences culturelles : quand un sept ne veut pas dire la même chose",
+          p1:
+            "Les normes culturelles influencent fortement les scores NPS selon les pays.",
+          p2:
+            "Le contexte et les verbatims comptent plus que le chiffre brut.",
+        },
+        4: {
+          title: "Regarder au-delà du chiffre",
+          p1:
+            "Le NPS est une boussole, pas une compétition.",
+          p2:
+            "Quand l’on se concentre sur les tendances, les scores évoluent naturellement.",
+        },
+        5: {
+          title:
+            "Fermer la boucle sans exposer toute sa stratégie",
+          p1:
+            "Chaque organisation doit trouver son propre rythme pour fermer la boucle.",
+          p2:
+            "Il n’existe pas de formule magique, seulement des actions cohérentes.",
+        },
+        6: {
+          title: "Le résultat le plus important",
+          p1:
+            "Les clients se souviennent de la manière dont leur retour a été traité.",
+          p2:
+            "Ce n’est pas la perfection qui crée la fidélité, mais la crédibilité.",
+        },
+      },
+      cta: {
+        lead:
+          "Prêt à transformer le feedback en actions réellement perçues par vos clients ?",
+        sub:
+          "NPS Me vous aide à concevoir des enquêtes équitables, fermer la boucle de manière cohérente et présenter des résultats actionnables.",
+        services: "Découvrir les services NPS Me",
+        book: "Planifier un échange",
+      },
+    },
+    blogCxDataViz: {
+      seo: {
+        baseTitle:
+          "Comment utiliser la datavisualisation pour explorer vos données CX et révéler des insights vraiment actionnables",
+        description:
+          "La plupart des entreprises ont plus de dashboards CX que de temps. Découvrez comment utiliser la datavisualisation pour repérer les tendances, trouver les frictions et transformer les signaux NPS en prochaines actions claires.",
+      },
+      header: {
+        iconLabel: "Data",
+        tag: "CX & NPS / Blog",
+        accent: "Comment utiliser la datavisualisation",
+        title: "pour révéler des insights CX cachés",
+        subtitle:
+          "Allez au-delà des jolis dashboards. Concevez des visuels qui rendent l’action suivante évidente.",
+      },
+      intro: {
+        p1:
+          "La plupart des entreprises ont plus de dashboards que de temps. Pourtant, malgré tous les rapports, les frictions client restent invisibles, les décisions stagnent et les dirigeants ont l’impression qu’il manque l’histoire.",
+        p2:
+          "Le problème n’est généralement pas l’absence de visuels. C’est que la plupart des graphiques n’expliquent rien.",
+        p3:
+          "Bien utilisée, la datavisualisation transforme des signaux CX bruts en quelque chose que les équipes peuvent interpréter et appliquer immédiatement. Mal utilisée, elle devient juste un endroit de plus où faire défiler.",
+        p4:
+          "Dans cet article, on voit comment utiliser la visualisation correctement, avec des exemples issus du terrain CX, pour que vos équipes voient l’essentiel et aillent plus vite.",
+      },
+      sections: {
+        1: {
+          title: "Les dashboards ne sont pas la destination, c’est la lentille",
+          p1:
+            "Un dashboard n’est pas l’insight. C’est l’outil qui vous aide à le trouver. Dans beaucoup d’équipes CX, on voit :",
+          bullets: {
+            1: "• Des dizaines de dashboards, mais aucune source de vérité unique",
+            2: "• Des graphiques impressionnants… qui ne répondent pas aux questions",
+            3: "• Des rapports qui décrivent ce qui se passe, mais pas pourquoi",
+            4: "• Des visuels pensés pour l’orateur, pas pour le lecteur",
+          },
+          p2a: "Une bonne visualisation CX n’a qu’un objectif :",
+          p2b: "rendre l’action suivante évidente.",
+        },
+        2: {
+          title: "Les trois niveaux d’insight visuel en expérience client",
+          layer1: {
+            label: "Niveau 1 – Repérer des motifs (tendances macro)",
+            p1:
+              "Ces visuels vous indiquent si quelque chose dérive, se stabilise ou casse. Vous cherchez une forme, pas une précision parfaite :",
+            bullets: {
+              1: "• Sentiment ou NPS dans le temps",
+              2: "• Volume de tickets pour 1 000 clients",
+              3: "• Tendances de taux de remboursement",
+              4: "• Résolution au premier contact par mois",
+            },
+            p2a: "À ce niveau, vous vous demandez :",
+            p2b: "« Est-ce qu’il se passe quelque chose d’intéressant ? »",
+            p2c: "– pas encore",
+            p2d: "« Pourquoi ? »",
+          },
+          layer2: {
+            label: "Niveau 2 – Chasser la friction (le où et le pourquoi)",
+            p1:
+              "Dès qu’une tendance mérite d’être investiguée, la visualisation aide à localiser les points précis :",
+            bullets: {
+              1: "• Heatmaps de satisfaction par canal ou ligne produit",
+              2: "• Courbes de drop-off montrant où l’onboarding échoue",
+              3: "• Cartographies de parcours où les temps d’attente explosent",
+              4: "• Fréquence de thèmes reliée à la valeur client",
+            },
+            p2a: "Ici, la question devient :",
+            p2b: "« Où exactement l’expérience se dégrade-t-elle ? »",
+          },
+          layer3: {
+            label:
+              "Niveau 3 – Écarts d’attentes (quand votre réalité diffère de celle du client)",
+            p1:
+              "Certains des meilleurs insights viennent de la comparaison entre métriques opérationnelles et ressenti client :",
+            bullets: {
+              1: "• Livraison rapide + sentiment négatif → attente mal calibrée",
+              2: "• CSAT élevé + churn élevé → décalage produit–marché",
+              3: "• NPS bas + KPIs opérationnels bons → problème de communication",
+            },
+            p2:
+              "Ces visuels révèlent des déconnexions que le texte masque : le client ressent une chose, pendant que vos dashboards affirment que tout va bien.",
+          },
+        },
+        3: {
+          title: "Des visuels qui délivrent régulièrement de l’insight en CX",
+          items: {
+            1: {
+              title: "1) Heatmap “thèmes x valeur”",
+              p1:
+                "Montrez quels thèmes sont le plus liés au revenu, au churn ou au coût support. Les lignes sont les thèmes, les colonnes des segments de valeur ou des produits. Plus la cellule est sombre, plus l’impact business est fort.",
+              p2:
+                "Cela fait ressortir immédiatement les sujets “petits mais bruyants” versus ceux qui érodent silencieusement la fidélité de vos clients les plus précieux.",
+            },
+            2: {
+              title: "2) Clustering de verbatims (simple, sans hype IA)",
+              p1:
+                "Regroupez les commentaires en 8 à 12 catégories étiquetées par des humains, puis visualisez leur volume et leur sentiment dans le temps. Pas besoin d’un modèle complexe : commencez avec des règles simples et des tags.",
+              p2:
+                "Vous verrez vite ce qui génère le plus de douleur et quels thèmes positifs méritent d’être renforcés.",
+            },
+            3: {
+              title: "3) Diagramme de Sankey du parcours client",
+              p1:
+                "Un Sankey montre les volumes à travers les étapes d’un parcours : où les gens abandonnent, réessaient, escaladent au support ou convertissent.",
+              p2:
+                "C’est particulièrement utile pour l’onboarding, l’installation et la résiliation, où beaucoup de choses se jouent sur une fenêtre courte.",
+            },
+            4: {
+              title: "4) Nuage de points NPS vs rétention",
+              p1:
+                "Placez les clients selon leur score NPS sur un axe et la rétention ou l’ancienneté sur l’autre. Si des Promoteurs churnent, vous avez un écart d’attentes. Si des Détracteurs restent, c’est peut-être un sujet prix–valeur.",
+              p2:
+                "Cette vue évite d’obséder sur des scores de segments à faible valeur et aide à se concentrer sur les clients qui façonnent votre revenu futur.",
+            },
+            5: {
+              title: "5) Courbes de tendance par sujet de ticket",
+              p1:
+                "De simples courbes par thème de ticket prédisent souvent un risque de churn ou de revenu avant même que les scores bougent. Une petite hausse sur un sujet, dans un segment clé, est souvent le signal d’alerte le plus précoce.",
+            },
+          },
+        },
+        4: {
+          title: "Erreurs fréquentes qui tuent l’insight",
+          bullets: {
+            1: "• Trop agréger (« NPS global » masque presque tout ce qui est utile)",
+            2: "• Utiliser des moyennes au lieu de distributions ou de segments",
+            3: "• Mettre le design et la couleur avant la clarté et les libellés",
+            4: "• Visualiser des données sales ou incohérentes",
+            5: "• Croire que le graphique est la réponse, alors qu’il doit lancer la discussion",
+          },
+          p1:
+            "Un graphique honnête, même un peu “moche”, vaut mieux qu’un beau dashboard de bruit. Si un visuel pousse les gens à discuter du format au lieu de la décision, changez-le.",
+        },
+        5: {
+          title: "Un workflow simple pour transformer des visuels en action",
+          steps: {
+            1: {
+              title: "Étape 1 – Partir d’une question",
+              p1: "Exemples :",
+              bullets: {
+                1: "• Pourquoi la satisfaction onboarding stagne malgré la simplification du processus ?",
+                2: "• Quels thèmes nous coûtent le plus en revenu ou en temps support ?",
+              },
+            },
+            2: {
+              title: "Étape 2 – Construire le plus petit visuel qui y répond",
+              p1:
+                "Un graphique. Un insight. Pas de bruit. Si vous avez besoin de trois filtres, recommencez. Les meilleurs visuels CX sont d’une clarté presque ennuyeuse.",
+            },
+            3: {
+              title: "Étape 3 – L’interpréter en une seule phrase",
+              p1:
+                "Si le graphique nécessite un paragraphe pour expliquer ce qu’il dit, c’est le mauvais graphique. Les décideurs doivent pouvoir regarder et dire : « OK, on perd des clients à forte valeur pendant l’installation. »",
+            },
+            4: {
+              title: "Étape 4 – Assigner un propriétaire",
+              p1a: "Tout visuel utile doit se terminer par :",
+              p1b: "« Qui en est responsable, et que fait-on ensuite ? »",
+              p2:
+                "Une heatmap magnifique sans propriétaire n’est que de la décoration. L’insight ne compte qu’une fois que quelqu’un est responsable de le faire évoluer.",
+            },
+          },
+        },
+        6: {
+          title: "Quick wins à mettre en place cette semaine",
+          bullets: {
+            1: "• Une courbe de rétention segmentée Promoteurs / Passifs / Détracteurs pour un produit clé",
+            2: "• Une heatmap des thèmes de plainte par bande de valeur client (haut / moyen / bas, pour commencer)",
+            3: "• Une timeline de parcours montrant où les clients attendent le plus",
+            4: "• Un suivi simple « vous avez dit / nous avons fait » à côté de chaque dashboard pour rendre l’action visible",
+          },
+          p1:
+            "Rien de tout cela ne demande une IA complexe. Il faut des données propres, des questions claires et des visuels qui respectent le temps de vos parties prenantes.",
+        },
+      },
+      closing: {
+        title: "Transformer des visuels en décisions",
+        p1a:
+          "Si vous voulez de l’aide pour visualiser vos données CX afin que l’action suivante devienne évidente,",
+        p1b: "peut :",
+        bullets: {
+          1: "• Relier les données entre enquête, support et CRM",
+          2: "• Construire des dashboards légers que vos équipes lisent vraiment",
+          3: "• Concevoir un petit set de visuels qui vous fait passer de « graphiques intéressants » à des décisions répétables",
+        },
+        ctaBtn: "Réserver un court échange",
+        p2:
+          "et on regardera où la visualisation peut faire la plus grande différence dans votre programme.",
+      },
+    },
+    blogEthicalSurveys: {
+      seo: {
+        title:
+          "Quand la fatigue du feedback s'installe : l'éthique des enquêtes d'expérience client | NPS Me",
+        description:
+          "Réflexion d’un ancien Head of Customer Experience (Europe) dans les Télécoms sur l’éthique des enquêtes, la sélection des contacts et la création de systèmes de feedback réellement fiables.",
+      },
+      header: {
+        iconLabel: "NPS éthique",
+        tag: "CX & NPS / Blog",
+        accent: "Quand la fatigue du feedback s'installe :",
+        title: "l'éthique de l'expérience client et des enquêtes",
+        subtitle: "Comment construire des programmes NPS fiables et résistants aux biais.",
+      },
+      intro: {
+        p1a:
+          "Chaque entreprise veut être centrée client, mais peu se demandent si leurs processus de feedback le sont",
+        p1b: "de manière éthique",
+        p1c:
+          ". Mesurer le Net Promoter Score (NPS) est une chose. S’assurer que la manière de collecter ce feedback reflète réellement la réalité en est une autre.",
+        p1d: "",
+      },
+      sections: {
+        1: {
+          title: "Sélection des contacts : le biais invisible",
+          p1a:
+            "Dans mon ancienne entreprise, nous utilisions Salesforce pour gérer la “sélection des contacts” de notre programme NPS B2B. Chaque Account Manager pouvait marquer un contact comme",
+          p1b: "« Disponible pour l’enquête »",
+          p1c: "ou",
+          p1d: "« Non adapté à l’enquête ».",
+          p1e: "",
+          p2:
+            "Sur le papier, cela semblait équitable. En pratique, des contacts mécontents pouvaient être discrètement exclus, ou des comptes entiers marqués DNS (Do Not Survey) sans contrôle.",
+          p3:
+            "Nous avons ensuite mis en place une validation au niveau VP pour les DNS, mais le problème restait : quand les personnes évaluées choisissent qui s’exprime, le NPS ne mesure plus l’adhésion client, il mesure l’éthique de l’enquête.",
+        },
+        2: {
+          title: "Taux de réponse vs authenticité",
+          p1:
+            "Une fois la fenêtre d’enquête ouverte, les Account Managers étaient encouragés à “relancer” les clients — souvent trop fortement.",
+          quote: "« Donnez-nous 9 ou 10, sinon c’est considéré comme mauvais. »",
+          quoteNote: "Un vrai poster trouvé un jour dans l’ascenseur d’un hôtel Mercure.",
+          p2:
+            "Coach­er ou mettre la pression détruit l’intégrité des données. Le programme devient du théâtre de performance : on chasse les chiffres plutôt que la vérité.",
+        },
+        3: {
+          title: "Comment rétablir la confiance dans le feedback",
+          bullets: {
+            1: {
+              bold: "Dissocier les incentives des scores.",
+              text: "Récompenser les comportements qui améliorent les résultats, pas des métriques manipulées.",
+            },
+            2: {
+              bold: 'Auditer la logique "Do Not Survey".',
+              text: "Les DNS doivent être justifiés et validés au niveau VP.",
+            },
+            3: {
+              bold: "Encadrer la communication avant enquête.",
+              text: "Le message doit venir de l’entreprise, pas des AM individuellement.",
+            },
+            4: {
+              bold: "Faire tourner l’échantillon.",
+              text: "Réinterroger toujours les mêmes contacts crée fatigue et biais.",
+            },
+            5: {
+              bold: "Boucler la boucle en toute transparence.",
+              text: "Partager les thèmes et améliorations avec les clients pour reconstruire la confiance.",
+            },
+          },
+        },
+        4: {
+          title: "Dernières réflexions",
+          p1:
+            "Les systèmes de feedback éthiques ne servent pas à éviter la critique — ils servent à gagner en crédibilité. Un programme CX sain ne se juge pas seulement à la hauteur de la barre NPS, mais à l’intégrité qui se cache derrière.",
+          p2a: "Le vrai progrès vient du fait d’affronter des vérités inconfortables…",
+          p2b: " et de créer un espace où les clients se sentent suffisamment en sécurité pour les exprimer.",
+        },
+      },
+      cta: {
+        p1: "Envie d’aide pour construire un programme NPS éthique et fiable ?",
+        p2:
+          "NPS Me vous aide à concevoir un échantillonnage juste, à réduire les biais et à créer des boucles de feedback auxquelles les clients peuvent croire.",
+        btnServices: "Découvrir les services NPS Me",
+        btnBook: "Réserver un appel découverte",
+      },
+    },
+    blogEthicsOfContactSelection: {
+      seo: {
+        title:
+          "Interroge-t-on les bonnes personnes ? L’éthique de la sélection des contacts dans le feedback client | NPS Me",
+        description:
+          "Choisir à la main qui reçoit l’enquête peut gonfler le NPS® et nuire à la crédibilité. Principes et garde-fous pour un feedback juste, représentatif et actionnable.",
+      },
+      header: {
+        iconLabel: "Intégrité de l’échantillon",
+        tag: "CX & NPS / Blog",
+        accent: "Interroge-t-on les bonnes personnes ?",
+        title: "L’éthique de la sélection des contacts dans le feedback client",
+        subtitle:
+          "Choisir à la main qui reçoit l’enquête peut gonfler le NPS et nuire à la crédibilité. Voici comment garder un échantillonnage juste, représentatif et actionnable.",
+      },
+      intro: {
+        p1a:
+          "En CX, l’intégrité des données est essentielle. L’un des moyens les plus simples de déformer la vérité client est de décider",
+        p1b: "qui",
+        p1c:
+          "sera interrogé. Si l’échantillon peut être orienté — volontairement ou non — le Net Promoter Score (NPS)® devient une mesure de design d’enquête, pas d’adhésion.",
+        p1d: "",
+      },
+      sections: {
+        1: {
+          title: "La tentation de “façonner” l’échantillon",
+          p1a:
+            "Beaucoup d’équipes utilisent des champs CRM du type",
+          p1b: "« Disponible pour l’enquête »",
+          p1c: "ou au niveau compte",
+          p1d: "« Do Not Survey » (DNS)",
+          p1e:
+            ". Ce sont des contrôles utiles — contraintes légales, contractuelles, ou contacts réellement inadaptés — mais ils créent aussi une pente glissante.",
+          p2:
+            "Il devient tentant d’exclure les voix mécontentes pour protéger un indicateur trimestriel.",
+          p3:
+            "Avec le temps, cela ressemble à une amélioration sur le papier, alors que les frictions réelles persistent. La direction investit sur la base de données biaisées ; les clients remarquent qu’on ne les interroge pas — ou pire, que leur voix ne compte pas.",
+        },
+        2: {
+          title: "Taux de réponse vs authenticité",
+          p1a:
+            "Augmenter la participation est positif ; coacher les notes ne l’est pas. Les relances doivent encourager la",
+          p1b: "participation",
+          p1c:
+            "(« Votre feedback nous aide à nous améliorer »), pas le résultat",
+          p1d:
+            "(« Donnez-nous 9-10 »). La seconde approche érode la confiance et contredit l’objectif même du feedback.",
+          p1e: "",
+          quoteLine1:
+            "« Si vous êtes satisfait, mettez 9 ou 10 — tout le reste est considéré comme mauvais. »",
+          quoteLine2:
+            "Ce message peut faire monter le chiffre, mais il détruit la crédibilité.",
+          p2:
+            "Dès que les répondants sentent que l’objectif est de “bien paraître” plutôt que d’apprendre, la valeur de tout le programme commence à s’éroder.",
+        },
+        3: {
+          title: "Garde-fous pour une sélection éthique des contacts",
+          bullets: {
+            1: {
+              bold: "Automatiser un échantillonnage aléatoire avec des règles auditables.",
+              text:
+                "Définir l’éligibilité (ancienneté, activité récente, contraintes légales) et tracer chaque exclusion avec une raison.",
+            },
+            2: {
+              bold: "Séparer la responsabilité du score de celle des actions.",
+              text: "Les ops CX gèrent l’échantillon ; les équipes possèdent les correctifs et les résultats.",
+            },
+            3: {
+              bold: "Renforcer les contrôles DNS.",
+              text:
+                "Exiger une justification écrite et des revues dans le temps. Mettre des validations pour les DNS “compte entier” afin d’éviter les abus.",
+            },
+            4: {
+              bold: "Faire tourner l’échantillon et limiter la fréquence.",
+              text:
+                "Éviter de sur-solliciter les contacts “faciles” et de sous-solliciter les détracteurs ; définir des périodes de refroidissement.",
+            },
+            5: {
+              bold: "Standardiser le contenu des communications.",
+              text:
+                "Des modèles de relance rédigés par l’entreprise réduisent le risque de coaching tout en améliorant les taux de réponse.",
+            },
+            6: {
+              bold: "Publier ce que vous avez appris.",
+              text:
+                "Partager les thèmes, les correctifs livrés et l’impact mesurable. La transparence favorise la participation future.",
+            },
+          },
+        },
+        4: {
+          title: "À quoi ressemble un programme sain",
+          p1: "Votre programme est en bonne santé lorsque :",
+          bullets: {
+            1: "Les exclusions restent faibles et sont clairement justifiées.",
+            2: "Les taux de réponse progressent sans langage de coaching.",
+            3: "La distribution des notes est stable et crédible.",
+            4:
+              "Les leaders célèbrent les problèmes identifiés et corrigés — pas seulement un chiffre sur une slide.",
+          },
+        },
+        5: {
+          title: "À retenir",
+          bullets: {
+            1: "Un échantillonnage éthique protège l’intégrité des données.",
+            2: "Automatiser l’éligibilité ; auditer les exclusions.",
+            3: "Récompenser l’apprentissage et l’amélioration, pas la “tenue du score”.",
+            4: "La transparence construit la confiance et la participation future.",
+          },
+          attribution:
+            "Attribution : NPS® et Net Promoter Score® sont des marques déposées de Bain & Company, Inc., Fred Reichheld et Satmetrix Systems, Inc. Les références ici sont descriptives uniquement. NPS Me est indépendant et n’est affilié à aucune de ces entités.",
+        },
+      },
+      cta: {
+        p1:
+          "Besoin d’aide pour renforcer les règles d’échantillonnage et augmenter des taux de réponse fiables ?",
+        p2:
+          "NPS Me peut concevoir une logique d’échantillonnage éthique, une gouvernance DNS et des cadres de communication qui protègent l’intégrité — et la crédibilité — de votre programme NPS.",
+        btnServices: "Découvrir les services NPS Me",
+        btnBook: "Réserver un appel découverte",
+      },
+    },
+    blogSendingNpsBeforeChristmas: {
+      seo: {
+        title: "Envoyer une enquête NPS avant Noël (sans agacer vos clients)",
+        description:
+          "Comment lancer un pulse NPS pré-Noël, respectueux et efficace - et quoi faire des enseignements.",
+      },
+      header: {
+        iconLabel: "Enquête NPS",
+        tag: "CX & NPS / Blog",
+        accent: "Comment envoyer une enquête NPS avant Noël",
+        title: "Même si vous n’en avez jamais fait",
+        subtitle:
+          "Un guide pratique, orienté fondateurs, pour lancer un pulse NPS respectueux et à fort signal avant les fêtes.",
+      },
+
+      intro: {
+        p1a: "Quand l’année touche à sa fin, beaucoup d’entreprises passent en",
+        p1b: "« mode bilan ».",
+        p1c:
+          "Les clients font le point sur les marques sur lesquelles ils comptent, les boîtes mail se calment légèrement, et les gens ont juste assez d’espace mental pour donner un feedback réfléchi.",
+        p2:
+          "C’est pourquoi la période entre fin novembre et mi-décembre est l’une des fenêtres les plus efficaces de l’année pour envoyer une enquête NPS - surtout si vous n’en avez jamais lancé.",
+        p3:
+          "Encore mieux : avec la bonne approche, vous pouvez lancer une enquête NPS propre, brandée et avec un bon taux de réponse en moins de 48 heures, même en partant de zéro.",
+        p4: "Dans ce guide, vous allez apprendre exactement comment faire.",
+      },
+
+      sections: {
+        1: {
+          title: "Pourquoi envoyer une enquête NPS avant Noël fonctionne si bien",
+          p1: "Cela peut sembler contre-intuitif - décembre est « chargé », non ?",
+          p2:
+            "Oui et non. Les emails de promos ou de logistique sont souvent ignorés. Mais les demandes de feedback ont un autre impact en décembre :",
+          bullets: {
+            1: "• Les gens sont plus réflexifs et ouverts à donner leur avis",
+            2: "• Les clients apprécient d’être sollicités avant la nouvelle année",
+            3: "• Les commentaires qualitatifs sont plus riches - pas des réponses expédiées en plein milieu d’année",
+            4: "• En janvier, les boîtes mail explosent ; décembre a donc un meilleur engagement",
+          },
+          p4a:
+            "Pour les petites et moyennes entreprises - surtout avec des modèles relationnels - cette fenêtre est",
+          p4b: "une opportunité en or.",
+          p4c: "",
+        },
+
+        2: {
+          title:
+            "Ce qu’il vous faut pour envoyer une enquête NPS (c’est moins que vous ne pensez)",
+          p1: "Voici tout ce dont vous avez besoin pour lancer une enquête NPS :",
+          p2a: "Vous n’avez pas besoin d’un CRM ni d’une automatisation complexe.",
+          p2b: "Une mise en place simple fonctionne parfaitement.",
+
+          k1: {
+            label: "Une liste de clients",
+            p1: "Un simple Excel/CSV avec :",
+            bullets: {
+              1: "• Prénom",
+              2: "• Nom",
+              3: "• Nom de l’entreprise (optionnel)",
+              4: "• Email",
+            },
+          },
+
+          k2: {
+            label: "Votre logo + vos couleurs",
+            p1: "Pour que l’email soit cohérent, brandé, et inspire confiance.",
+          },
+
+          k3: {
+            label: "Une question",
+            p1: "Le standard NPS :",
+            q: "« Quelle est la probabilité que vous nous recommandiez à un ami ou collègue ? »",
+            scale: "Échelle :",
+            range: "0-10",
+          },
+
+          k4: {
+            label: "Une question texte optionnelle",
+            q: "« Quelle est la raison principale de votre note ? »",
+          },
+
+          k5: {
+            label: "Un moyen d’envoyer les enquêtes",
+            p1: "Vous pouvez utiliser votre outil emailing (Brevo, Mailjet, HubSpot…), ou",
+            p2: "NPSme peut tout gérer pour vous.",
+          },
+
+          k6: {
+            label: "Un moyen de suivre les résultats",
+            p1: "Il vous faut :",
+            bullets: {
+              1: "• NPS global",
+              2: "• Taux de réponse",
+              3: "• Répartition des notes (promoteurs/passifs/détracteurs)",
+              4: "• Thèmes issus des commentaires",
+            },
+          },
+        },
+
+        3: {
+          title: "À quel moment exactement l’envoyer ?",
+          p1: "Voici une règle étonnamment simple :",
+          p2: "Plus tôt en décembre, mieux c’est.",
+          p3: "Mais mi-décembre fonctionne aussi si vous choisissez le bon timing.",
+
+          bestWindows: "Meilleures fenêtres :",
+          bullets: {
+            1: { range: "1-14 décembre", note: "Réponses de meilleure qualité" },
+            2: {
+              range: "15-20 décembre",
+              note: "Toujours OK, surtout si votre produit est digital ou vos opérations stables",
+            },
+            3: "• Évitez 21-25 décembre (sauf B2C retail ou hôtellerie/restauration)",
+          },
+
+          p4: "Dans ces fenêtres :",
+          rules: {
+            1: "• Envoyez le lundi au mercredi matin",
+            2: "• Vers 9h-11h (heure locale)",
+            3: "• Évitez le vendredi après-midi",
+          },
+
+          p5a: "Les réponses arrivent généralement sous",
+          p5b: "24-48 heures.",
+          p5c: "",
+        },
+
+        4: {
+          title: "Comment rédiger l’email pour maximiser le taux de réponse",
+          p1:
+            "L’email fait tout. S’il est long ou trop corporate, le taux de réponse s’effondre.",
+
+          principlesTitle: "Principes :",
+          principles: {
+            1: "• Écrivez comme un humain",
+            2: "• Faites court",
+            3: "• Si possible, faites-le porter par le fondateur",
+            4: "• Rassurez : 10-20 secondes max",
+            5: "• Évitez le langage marketing",
+          },
+
+          templateFr: {
+            label: "Exemple de template (Français)",
+            body:
+    `Objet : Une petite question avant les fêtes ?
+
+    Bonjour {{name}},
+    En cette fin d’année, nous prenons un moment pour réfléchir à ce que nous pouvons améliorer.
+    Pourriez-vous répondre à une seule question ?
+
+    Cela prend moins de 20 secondes, et votre avis compte vraiment pour nous.
+
+    👉 {{survey_link}}
+
+    Merci beaucoup,
+    {{Nom du fondateur}}`,
+          },
+        },
+
+        5: {
+          title:
+            "Évitez ces erreurs fréquentes (les erreurs de débutant qui plombent les résultats)",
+          p1: "Voici les pièges, même dans de grandes entreprises :",
+          items: {
+            1: { title: "❌ Envoyer depuis une adresse « no-reply »", note: "Ça casse la confiance. Envoyez toujours depuis une personne." },
+            2: { title: "❌ Poser trop de questions", note: "Le NPS marche parce que c’est rapide. 1-2 questions max." },
+            3: { title: "❌ Mélanger NPS transactionnel et NPS relationnel", note: "Séparez le feedback « étape » du feedback « relation »." },
+            4: { title: "❌ Ne pas “closing the loop”", note: "Un rappel aux détracteurs en janvier peut transformer votre réputation." },
+            5: { title: "❌ Incentiver les réponses", note: "Cela introduit du biais et fausse votre NPS." },
+          },
+        },
+
+        6: {
+          title: "Que faire des résultats (un cadre simple et actionnable)",
+          p1: "Une fois les réponses reçues, voici comment les utiliser :",
+          promoters: {
+            label: "Promoteurs (9-10)",
+            bullets: {
+              1: "• Demandez l’autorisation d’utiliser les verbatims en témoignages",
+              2: "• Encouragez un avis Trustpilot/Google",
+              3: "• Identifiez ce qui les a vraiment enchantés",
+            },
+          },
+          passives: {
+            label: "Passifs (7-8)",
+            bullets: {
+              1: "• Demandez ce qui aurait presque fait passer à 9",
+              2: "• Souvent, des correctifs “faibles efforts” existent (petits irritants UX ou process)",
+            },
+          },
+          detractors: {
+            label: "Détracteurs (0-6)",
+            bullets: {
+              1: "• Priorisez-les pour un rappel",
+              2: "• Catégorisez : vitesse, clarté, service, prix, etc.",
+              3: "• Corrigez les sujets récurrents tôt au T1 pour faire remonter le NPS vite",
+            },
+          },
+          p2a: "Un bon débrief de janvier transforme le feedback en",
+          p2b: "feuille de route actionnable.",
+          p2c: "",
+        },
+
+        7: {
+          title: "Outils pour lancer l’enquête (du gratuit au clé-en-main)",
+          p1: "Vous n’avez pas besoin d’un logiciel “enterprise”.",
+
+          beginner: {
+            label: "Option débutant (gratuite) :",
+            bullets: {
+              1: "• Google Forms + calcul NPS manuel",
+              2: "• Bien pour de très petits volumes",
+            },
+          },
+
+          mid: {
+            label: "Option intermédiaire :",
+            bullets: {
+              1: "• Votre outil emailing + un lien d’enquête léger",
+              2: "• Tableurs manuels pour analyser",
+            },
+          },
+
+          turnkey: {
+            label: "Option clé-en-main (NPSme) :",
+            p1: "Ce que nous pouvons fournir :",
+            bullets: {
+              1: "• Emails brandés (logo, couleurs)",
+              2: "• Enquête en anglais ou en français",
+              3: "• Message personnalisé",
+              4: "• Génération automatique des liens",
+              5: "• Invitations one-shot ou déclenchées par milestone",
+              6: "• Dashboard taux de réponse",
+              7: "• NPS + split promoteurs/passifs/détracteurs",
+              8: "• Analyse texte (thèmes, sentiment, mots-clés)",
+              9: "• Support pour closing the loop",
+              10: "• Exports Excel / packs PDF pour reporting",
+            },
+          },
+
+          p2a: "Temps de mise en place :",
+          p2b: "24-48h après réception du fichier clients.",
+          p2c: "",
+        },
+
+        8: {
+          title: "Comment NPSme peut gérer votre enquête pré-Noël pour vous",
+          p1: "Si vous voulez que ce soit géré pour vous avant Noël, voici le process :",
+          steps: {
+            1: "Envoyez-nous votre fichier clients (CSV ou Excel)",
+            2: "Nous construisons l’invitation email (anglais, français, ou les deux)",
+            3: "Nous appliquons votre branding (logo, couleurs, ton)",
+            4: "Nous envoyons l’enquête - via votre outil email ou le nôtre",
+            "5a": "Vous avez un dashboard temps réel indiquant :",
+            "5bullets": {
+              1: "taux de réponse",
+              2: "NPS",
+              3: "répartition des notes",
+              4: "scores par milestone (optionnel)",
+              5: "thèmes clés des commentaires",
+            },
+            6: "En janvier, nous livrons un mini deck d’insights CX et des recommandations",
+          },
+          p2:
+            "Vous obtenez une vraie clarté pour planifier le T1 - et cela demande presque zéro mise en place de votre côté.",
+        },
+      },
+
+      conclusion: {
+        title: "Conclusion",
+        p1:
+          "Envoyer une enquête NPS avant Noël est l’une des actions les plus simples et au meilleur ROI pour une entreprise. Que vous ayez 20 clients ou 2 000, une enquête bien timée vous donne :",
+        bullets: {
+          1: "• une visibilité immédiate sur le sentiment client",
+          2: "• un feedback actionnable pour corriger tôt dans la nouvelle année",
+          3: "• une structure pour prioriser les améliorations CX au T1",
+        },
+        p2: "Et vous pouvez lancer une version pro, brandée, en moins de 48 heures.",
+        p3:
+          "Si vous voulez de l’aide pour la mettre en place - ou tester la démo - commencez ici :",
+        btnDemo: "Tester l’expérience démo NPS",
+        btnBook: "Réserver un appel découverte gratuit",
+      },
     },
     cxCockpit: {
       seoTitle: "Cockpit CX (Démo) | NPS Me",

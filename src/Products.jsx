@@ -27,10 +27,6 @@ export default function Products() {
           "products.seoDescription",
           "Pick a CX package to improve outcomes."
         )}
-        alternates={[
-          { lang: "en", href: "https://www.npsme.com/products" },
-          { lang: "fr", href: "https://www.npsme.com/fr/products" },
-        ]}
       />
 
       <PageHeader

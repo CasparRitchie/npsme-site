@@ -6,35 +6,36 @@ const BASE_URL = "https://www.npsme.com";
 
 function normalisePath(path) {
   if (!path) return "/";
-  if (path === "/") return "/";
-  return path.startsWith("/") ? path : `/${path}`;
+  let p = path.startsWith("/") ? path : `/${path}`;
+  if (p !== "/" && p.endsWith("/")) p = p.slice(0, -1);
+  return p;
 }
 
 // For a given current path + lang, compute the EN and FR equivalents
 function computeLangUrls(path, lang) {
   const p = normalisePath(path);
 
-  // If this is a French route like /fr or /fr/xyz, derive the English path
   if (lang === "fr") {
-    const enPath = p === "/fr" ? "/" : p.replace(/^\/fr/, "") || "/";
     const frPath = p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
+    const enPath = frPath === "/fr" ? "/" : frPath.replace(/^\/fr/, "") || "/";
+
     return {
       enUrl: `${BASE_URL}${enPath}`,
       frUrl: `${BASE_URL}${frPath}`,
       xDefaultUrl: `${BASE_URL}${enPath}`,
-      canonicalUrl: `${BASE_URL}${frPath}`, // current page is French
+      canonicalUrl: `${BASE_URL}${frPath}`,
     };
   }
 
-  // English page
   const frPath = p === "/" ? "/fr" : `/fr${p}`;
   return {
     enUrl: `${BASE_URL}${p}`,
     frUrl: `${BASE_URL}${frPath}`,
     xDefaultUrl: `${BASE_URL}${p}`,
-    canonicalUrl: `${BASE_URL}${p}`, // current page is English
+    canonicalUrl: `${BASE_URL}${p}`,
   };
 }
+
 
 export default function Seo({
   path = "/",

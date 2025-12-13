@@ -10,11 +10,9 @@ export function localizePath(path = "/", lang = "en") {
   const clean = stripLangPrefix(path || "/");
 
   if (lang === "fr") {
-    // ensure leading slash
     const base = clean.startsWith("/") ? clean : `/${clean}`;
     return base === "/" ? "/fr" : `/fr${base}`;
   }
 
-  // en: no prefix
   return clean.startsWith("/") ? clean : `/${clean}`;
 }

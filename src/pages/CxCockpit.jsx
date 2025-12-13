@@ -1,9 +1,11 @@
 // src/pages/CxCockpit.jsx
 import React from "react";
 import Seo from "../components/Seo";
+import PageHeader from "../components/PageHeader";
 import DemoResultsPanel from "../components/DemoResultsPanel";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { translations } from "../i18n/translations.js";
+import { localizePath } from "../i18n/pathHelpers.js";
 
 export default function CxCockpit() {
   const { lang } = useLanguage();
@@ -15,49 +17,41 @@ export default function CxCockpit() {
     "Explore your customer experience cockpit: NPS, journey stages, response funnels and verbatim themes in one place."
   );
 
+  const path = localizePath("/cx-cockpit", lang);
+
   return (
     <>
-      <Seo path="/cx-cockpit" title={title} description={description} />
+      <Seo path={path} lang={lang} title={title} description={description} />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 space-y-8">
-        {/* Header / hero */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-3xl bg-gradient-to-tr from-[#7C3AED] via-[#4F46E5] to-[#22C55E] flex items-center justify-center text-xs font-semibold shadow-lg shadow-emerald-500/40">
-              CX
-            </div>
-            <div>
-              <p className="text-xs tracking-[0.18em] text-slate-400 uppercase">
-                {translations(lang, "cxCockpit.badge", "CX cockpit · demo")}
-              </p>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-slate-50">
-                {translations(lang, "cxCockpit.headline", "Fly your customer experience spaceship")}
-              </h1>
-              <p className="mt-1 text-sm text-slate-400 max-w-xl">
-                {translations(
-                  lang,
-                  "cxCockpit.intro",
-                  "A single view of NPS scores, journey stages, response funnels and verbatim themes. This demo cockpit uses the live NPS Me sandbox data."
-                )}
-              </p>
-            </div>
+      <PageHeader
+        iconLabel={translations(lang, "cxCockpit.iconLabel", "CX Cockpit")}
+        tag={translations(lang, "cxCockpit.tag", "NPS Me / Demo")}
+        accent={translations(lang, "cxCockpit.accent", "CX cockpit")}
+        title={translations(lang, "cxCockpit.headerTitle", "fly your customer experience spaceship")}
+        subtitle={translations(
+          lang,
+          "cxCockpit.headerSubtitle",
+          "A single view of NPS scores, journey stages, response funnels and verbatim themes. This demo cockpit uses the live NPS Me sandbox data."
+        )}
+      >
+        {/* Optional: “live feed” pill row inside header, so it matches your page header style */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-300">
+            <span className="inline-flex h-2 w-2 rounded-full bg-[#22C55E] animate-pulse" />
+            <span>{translations(lang, "cxCockpit.liveFeed", "Live demo data feed")}</span>
           </div>
 
-          <div className="mt-2 sm:mt-0 flex flex-col items-start sm:items-end gap-2 text-xs text-slate-400">
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{translations(lang, "cxCockpit.liveFeed", "Live demo data feed")}</span>
-            </div>
-            <p className="max-w-xs text-[11px] text-slate-500">
-              {translations(
-                lang,
-                "cxCockpit.liveFeedNote",
-                "For a real client build, this cockpit would connect to your production survey and CRM events."
-              )}
-            </p>
-          </div>
-        </header>
+          <p className="max-w-xl text-[11px] text-slate-400">
+            {translations(
+              lang,
+              "cxCockpit.liveFeedNote",
+              "For a real client build, this cockpit would connect to your production survey and CRM events."
+            )}
+          </p>
+        </div>
+      </PageHeader>
 
+      <div className="mx-auto max-w-7xl px-6 py-8 sm:py-12 space-y-8">
         {/* Main cockpit grid */}
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start">
           {/* Left */}

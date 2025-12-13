@@ -66,8 +66,7 @@ const POSTS = [
 ];
 
 export default function BlogIndex() {
-  const { lang } = useLanguage(); // ✅ add
-  const prefix = lang === "fr" ? "/fr" : ""; // ✅ add
+  const { lang } = useLanguage();
 
   const posts = [...POSTS].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -77,16 +76,16 @@ export default function BlogIndex() {
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/blog"
-        title="Blog | NPS Me - Practical CX & NPS Insights"
-        description="Opinionated, practitioner-grade guidance on improving customer experience (CX) and Net Promoter Score (NPS) ethically."
+        title={translations(lang, "blog.seo.title")}
+        description={translations(lang, "blog.seo.description")}
       />
 
       <PageHeader
-        iconLabel="Insights"
-        tag="CX & NPS / Blog"
-        accent="Pragmatic lessons"
-        title=" from real programmes."
-        subtitle="Fewer buzzwords, more outcomes."
+        iconLabel={translations(lang, "blog.header.iconLabel")}
+        tag={translations(lang, "blog.header.tag")}
+        accent={translations(lang, "blog.header.accent")}
+        title={translations(lang, "blog.header.title")}
+        subtitle={translations(lang, "blog.header.subtitle")}
       />
 
       <section className="mx-auto max-w-7xl px-6 py-10">
@@ -98,7 +97,7 @@ export default function BlogIndex() {
             >
               <div className="text-xs text-slate-400">
                 <time dateTime={p.date}>
-                  {new Date(p.date).toLocaleDateString(undefined, {
+                  {new Date(p.date).toLocaleDateString(lang, {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -108,12 +107,14 @@ export default function BlogIndex() {
               </div>
 
               <h2 className="mt-2 text-xl font-semibold text-white">
-                <Link to={`${prefix}/blog/${p.slug}`} className="hover:underline">
-                  {p.title}
+                <Link to={`/blog/${p.slug}`} className="hover:underline">
+                  {translations(lang, p.titleKey)}
                 </Link>
               </h2>
 
-              <p className="mt-2 text-slate-300 text-sm">{p.excerpt}</p>
+              <p className="mt-2 text-slate-300 text-sm">
+                {translations(lang, p.excerptKey)}
+              </p>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {p.tags.map((t) => (
@@ -128,10 +129,10 @@ export default function BlogIndex() {
 
               <div className="mt-4">
                 <Link
-                  to={`${prefix}/blog/${p.slug}`}
+                  to={`/blog/${p.slug}`}
                   className="inline-flex items-center gap-2 text-sm text-[#22C55E] hover:text-[#16A34A]"
                 >
-                  Read post →
+                  {translations(lang, "blog.readPost")} →
                 </Link>
               </div>
             </article>

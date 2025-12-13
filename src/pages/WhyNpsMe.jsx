@@ -4,32 +4,51 @@ import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import { CheckCircle2, ArrowRight, LineChart, Users, Wrench } from "lucide-react";
 import PageHeader from "../components/PageHeader";
-
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
 
 export default function WhyNpsMe() {
+  const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+
+  const valueCards = [
+    {
+      icon: LineChart,
+      title: tr("whyNpsMe.whatYouGet.cards.pnl.title"),
+      points: translations(lang, "whyNpsMe.whatYouGet.cards.pnl.points", []),
+    },
+    {
+      icon: Users,
+      title: tr("whyNpsMe.whatYouGet.cards.teams.title"),
+      points: translations(lang, "whyNpsMe.whatYouGet.cards.teams.points", []),
+    },
+    {
+      icon: Wrench,
+      title: tr("whyNpsMe.whatYouGet.cards.systems.title"),
+      points: translations(lang, "whyNpsMe.whatYouGet.cards.systems.points", []),
+    },
+  ];
+
+  const reassuranceItems = translations(lang, "whyNpsMe.reassurance.items", []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path="/why-nps-me"
-        title="Why NPS Me: Pragmatic CX consulting for real business impact"
-        description="NPS Me helps you turn customer feedback into measurable outcomes: higher retention, more repeat revenue, and lower support costs, without big-consultancy overhead."
+        title={tr("whyNpsMe.seoTitle")}
+        description={tr("whyNpsMe.seoDescription")}
       />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10">
-        <PageHeader
-          iconLabel="Why NPS Me"
-          tag="NPS Me / Why NPS Me"
-        >
+        <PageHeader iconLabel={tr("whyNpsMe.header.iconLabel")} tag={tr("whyNpsMe.header.tag")}>
           <>
             <h1 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-white">
-              CX consulting that connects feedback to the bottom line
+              {tr("whyNpsMe.header.title")}
             </h1>
 
             <p className="mt-4 max-w-2xl text-slate-300">
-              NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it
-              into fewer churn events, more repeat revenue, and less firefighting in support.
-              We help you do that, quickly, without a huge consulting army on your payroll.
+              {tr("whyNpsMe.header.intro")}
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -37,15 +56,16 @@ export default function WhyNpsMe() {
                 to="/book"
                 className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
               >
-                Book a discovery call
+                {tr("whyNpsMe.header.ctaBook")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
 
+              {/* keep anchors stable as agreed */}
               <a
                 href="/#demo"
                 className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
               >
-                Try the NPS style demo
+                {tr("whyNpsMe.header.ctaDemo")}
               </a>
             </div>
           </>
@@ -55,43 +75,16 @@ export default function WhyNpsMe() {
       {/* What we actually do */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <h2 className="text-2xl md:text-3xl font-semibold text-white">
-          What you get when you work with NPS Me
+          {tr("whyNpsMe.whatYouGet.title")}
         </h2>
         <p className="mt-3 max-w-3xl text-slate-300">
-          We combine CX strategy, data analysis, and hands on enablement. That means we do not only
-          tell you where the problems are. We help fix them with you. That can include survey design,
-          review mining, workflow changes, scripts, training, dashboards, and even changes to your
-          digital journeys and internal tools.
+          {tr("whyNpsMe.whatYouGet.body")}
         </p>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
-          <ValueCard
-            icon={LineChart}
-            title="From feedback to P and L"
-            points={[
-              "Tie customer feedback to repeat rate, churn, and ticket volume.",
-              "Prioritise changes by commercial impact, not loudest voice.",
-              "Make it easy for Finance and CX to speak the same language.",
-            ]}
-          />
-          <ValueCard
-            icon={Users}
-            title="Practical help for your teams"
-            points={[
-              "Coaching for account, support, and product teams.",
-              "Templates, playbooks, and scripts that fit your tone of voice.",
-              "Support to embed new routines, not just one off workshops.",
-            ]}
-          />
-          <ValueCard
-            icon={Wrench}
-            title="Systems and journeys that work"
-            points={[
-              "Help to tune surveys, journeys, forms, and messaging.",
-              "Partner with your product or IT teams on small but high impact changes.",
-              "Make better use of the tools you already own before buying new ones.",
-            ]}
-          />
+          {valueCards.map((card) => (
+            <ValueCard key={card.title} icon={card.icon} title={card.title} points={card.points} />
+          ))}
         </div>
       </section>
 
@@ -99,42 +92,38 @@ export default function WhyNpsMe() {
       <section className="mx-auto max-w-7xl px-6 pb-12">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl font-semibold text-white">
-            Why choose us instead of a big consulting firm
+            {tr("whyNpsMe.vs.title")}
           </h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
-            Large audit and consulting firms can do great work, but they also come with high
-            overhead, long lead times, and a lot of people in the room. NPS Me is built to be
-            lean, expert, and focused on movement, not theatre.
+            {tr("whyNpsMe.vs.body")}
           </p>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2 text-sm">
             <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
               <h3 className="text-sm font-semibold text-slate-200 mb-2">
-                Typical big consultancy
+                {tr("whyNpsMe.vs.leftTitle")}
               </h3>
               <ul className="space-y-2 text-slate-300">
-                <li>Layers of partners, directors, and juniors on projects.</li>
-                <li>Set piece reports and frameworks that may not fit your reality.</li>
-                <li>High day rates and long commitments before you see value.</li>
-                <li>Focus on the slide deck more than on your teams changing how they work.</li>
+                {translations(lang, "whyNpsMe.vs.leftPoints", []).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </div>
 
             <div className="rounded-2xl border border-[#22C55E]/40 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-5">
-              <h3 className="text-sm font-semibold text-slate-50 mb-2">NPS Me approach</h3>
+              <h3 className="text-sm font-semibold text-slate-50 mb-2">
+                {tr("whyNpsMe.vs.rightTitle")}
+              </h3>
               <ul className="space-y-2 text-slate-200">
-                <li>Direct access to an experienced CX lead, not a revolving junior team.</li>
-                <li>Work shaped around your existing tools and data, not a generic template.</li>
-                <li>Transparent, scoped engagements that respect your budget.</li>
-                <li>Hands on support for implementation, not just recommendations.</li>
+                {translations(lang, "whyNpsMe.vs.rightPoints", []).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </div>
           </div>
 
           <p className="mt-6 text-xs text-slate-400">
-            NPS Me is part of the cxms.fr group, which combines customer experience expertise with
-            practical digital and data skills. That means we can help you both understand the story
-            in your feedback and build the processes, content, and journeys that move the numbers.
+            {tr("whyNpsMe.vs.footnote")}
           </p>
         </div>
       </section>
@@ -143,17 +132,11 @@ export default function WhyNpsMe() {
       <section className="mx-auto max-w-7xl px-6 pb-16">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl font-semibold text-white">
-            How working with us feels
+            {tr("whyNpsMe.reassurance.title")}
           </h2>
+
           <div className="mt-5 grid gap-6 md:grid-cols-3 text-sm">
-            {[
-              "Clear framing of the problem and what success looks like.",
-              "Regular, honest check ins. No hiding behind jargon.",
-              "Simple artefacts your teams actually read and use.",
-              "Respect for your constraints, culture, and in house expertise.",
-              "A focus on sustainable change, not one quarter spikes.",
-              "A partner who can speak to execs and practitioners in the same week.",
-            ].map((item) => (
+            {reassuranceItems.map((item) => (
               <div key={item} className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#22C55E]" />
                 <span className="text-slate-300">{item}</span>
@@ -166,14 +149,15 @@ export default function WhyNpsMe() {
               to="/products"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
-              Explore productized services
+              {tr("whyNpsMe.reassurance.ctaProducts")}
               <ArrowRight className="h-4 w-4" />
             </Link>
+
             <Link
               to="/book"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
             >
-              Book discovery
+              {tr("whyNpsMe.reassurance.ctaBook")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -192,8 +176,9 @@ function ValueCard({ icon: Icon, title, points }) {
         </div>
         <h3 className="font-semibold text-white">{title}</h3>
       </div>
+
       <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-        {points.map((p) => (
+        {(points || []).map((p) => (
           <li key={p}>{p}</li>
         ))}
       </ul>

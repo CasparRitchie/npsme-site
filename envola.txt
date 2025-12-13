@@ -1,6 +1,7 @@
 Caspar to do
 1) French language for relevant pages
 5) Link 1 and 4 in one shot
+6) Check out Intercom API and potential connections
 
 Caspar Completed:
 3) Fix invitation and ability to respond - done
@@ -11,11 +12,12 @@ Caspar scheduled for next phase:
 
 
 Nic to do:
-Send Caspar a draft of the mail
+1- Complete- Send Caspar a draft of the mail
 Later - And details about the Airtable so I can work out rules on sending timings
 Agree actual data : Name, Still a customer?, email
 Date of subscription start, (later)
 Which email are we sending from?
+
 
 Split by
 Type of piou piou device that they have

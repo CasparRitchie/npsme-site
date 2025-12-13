@@ -121,7 +121,6 @@ export const TRANSLATIONS = {
         bookCta: "Request a discovery call",
       },
     },
-
     products: {
       seoTitle:
         "Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me",
@@ -314,6 +313,92 @@ export const TRANSLATIONS = {
         dash: "-",
       },
     },
+    whyNpsMe: {
+      seoTitle: "Why NPS Me: Pragmatic CX consulting for real business impact",
+      seoDescription:
+        "NPS Me helps you turn customer feedback into measurable outcomes: higher retention, more repeat revenue, and lower support costs, without big-consultancy overhead.",
+
+      header: {
+        iconLabel: "Why NPS Me",
+        tag: "NPS Me / Why NPS Me",
+        title: "CX consulting that connects feedback to the bottom line",
+        intro:
+          "NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it into fewer churn events, more repeat revenue, and less firefighting in support. We help you do that, quickly, without a huge consulting army on your payroll.",
+        ctaBook: "Book a discovery call",
+        ctaDemo: "Try the NPS style demo",
+      },
+
+      whatYouGet: {
+        title: "What you get when you work with NPS Me",
+        body:
+          "We combine CX strategy, data analysis, and hands on enablement. That means we do not only tell you where the problems are. We help fix them with you. That can include survey design, review mining, workflow changes, scripts, training, dashboards, and even changes to your digital journeys and internal tools.",
+        cards: {
+          pnl: {
+            title: "From feedback to P and L",
+            points: [
+              "Tie customer feedback to repeat rate, churn, and ticket volume.",
+              "Prioritise changes by commercial impact, not loudest voice.",
+              "Make it easy for Finance and CX to speak the same language.",
+            ],
+          },
+          teams: {
+            title: "Practical help for your teams",
+            points: [
+              "Coaching for account, support, and product teams.",
+              "Templates, playbooks, and scripts that fit your tone of voice.",
+              "Support to embed new routines, not just one off workshops.",
+            ],
+          },
+          systems: {
+            title: "Systems and journeys that work",
+            points: [
+              "Help to tune surveys, journeys, forms, and messaging.",
+              "Partner with your product or IT teams on small but high impact changes.",
+              "Make better use of the tools you already own before buying new ones.",
+            ],
+          },
+        },
+      },
+
+      vs: {
+        title: "Why choose us instead of a big consulting firm",
+        body:
+          "Large audit and consulting firms can do great work, but they also come with high overhead, long lead times, and a lot of people in the room. NPS Me is built to be lean, expert, and focused on movement, not theatre.",
+
+        leftTitle: "Typical big consultancy",
+        leftPoints: [
+          "Layers of partners, directors, and juniors on projects.",
+          "Set piece reports and frameworks that may not fit your reality.",
+          "High day rates and long commitments before you see value.",
+          "Focus on the slide deck more than on your teams changing how they work.",
+        ],
+
+        rightTitle: "NPS Me approach",
+        rightPoints: [
+          "Direct access to an experienced CX lead, not a revolving junior team.",
+          "Work shaped around your existing tools and data, not a generic template.",
+          "Transparent, scoped engagements that respect your budget.",
+          "Hands on support for implementation, not just recommendations.",
+        ],
+
+        footnote:
+          "NPS Me is part of the cxms.fr group, which combines customer experience expertise with practical digital and data skills. That means we can help you both understand the story in your feedback and build the processes, content, and journeys that move the numbers.",
+      },
+
+      reassurance: {
+        title: "How working with us feels",
+        items: [
+          "Clear framing of the problem and what success looks like.",
+          "Regular, honest check ins. No hiding behind jargon.",
+          "Simple artefacts your teams actually read and use.",
+          "Respect for your constraints, culture, and in house expertise.",
+          "A focus on sustainable change, not one quarter spikes.",
+          "A partner who can speak to execs and practitioners in the same week.",
+        ],
+        ctaProducts: "Explore productized services",
+        ctaBook: "Book discovery",
+      },
+    },
   },
   fr: {
     navbar: {
@@ -435,7 +520,6 @@ export const TRANSLATIONS = {
         bookCta: "Demander un rendez-vous",
       },
     },
-
     products: {
       seoTitle:
         "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",
@@ -629,6 +713,92 @@ export const TRANSLATIONS = {
 
       misc: {
         dash: "-",
+      },
+    },
+    whyNpsMe: {
+      seoTitle: "Pourquoi NPS Me : un conseil CX pragmatique pour un impact business réel",
+      seoDescription:
+        "NPS Me vous aide à transformer le feedback client en résultats mesurables : plus de rétention, plus de revenus récurrents, et moins de coûts support, sans l’overhead des grands cabinets.",
+
+      header: {
+        iconLabel: "Pourquoi NPS Me",
+        tag: "NPS Me / Pourquoi NPS Me",
+        title: "Un conseil CX qui relie le feedback à l’impact business",
+        intro:
+          "NPS Me existe pour combler un écart. Beaucoup d’équipes collectent du NPS et des données d’enquête. Peu les transforment en moins de churn, plus de revenus récurrents, et moins de “firefighting” côté support. Nous vous aidons à y arriver, rapidement, sans une armée de consultants sur votre payroll.",
+        ctaBook: "Prendre un appel découverte",
+        ctaDemo: "Tester la démo NPS",
+      },
+
+      whatYouGet: {
+        title: "Ce que vous obtenez en travaillant avec NPS Me",
+        body:
+          "Nous combinons stratégie CX, analyse de données et accompagnement terrain. Concrètement : on ne se contente pas d’indiquer où sont les problèmes. On vous aide à les résoudre. Cela peut inclure la conception d’enquêtes, l’analyse des avis, des ajustements de workflows, des scripts et formations, des dashboards, et des évolutions de parcours digitaux ou d’outils internes.",
+        cards: {
+          pnl: {
+            title: "Du feedback au P&L",
+            points: [
+              "Relier le feedback client à la rétention, au churn et au volume de tickets.",
+              "Prioriser par impact commercial, pas par “la voix la plus forte”.",
+              "Aligner Finance et CX avec un langage commun et des métriques actionnables.",
+            ],
+          },
+          teams: {
+            title: "De l’aide concrète pour vos équipes",
+            points: [
+              "Coaching pour les équipes account, support et produit.",
+              "Templates, playbooks et scripts adaptés à votre ton de marque.",
+              "Accompagnement pour ancrer de nouvelles routines, pas seulement des ateliers ponctuels.",
+            ],
+          },
+          systems: {
+            title: "Des systèmes et parcours qui fonctionnent",
+            points: [
+              "Optimisation des enquêtes, parcours, formulaires et messages.",
+              "Partenariat avec vos équipes produit ou IT sur des changements petits mais à fort impact.",
+              "Mieux exploiter les outils que vous avez déjà avant d’en acheter de nouveaux.",
+            ],
+          },
+        },
+      },
+
+      vs: {
+        title: "Pourquoi nous choisir plutôt qu’un grand cabinet",
+        body:
+          "Les grands cabinets peuvent faire du très bon travail, mais ils viennent aussi avec une structure coûteuse, des délais longs, et beaucoup de monde dans la pièce. NPS Me est construit pour être lean, expert, et focalisé sur le mouvement, pas sur le théâtre.",
+
+        leftTitle: "Cabinet “classique”",
+        leftPoints: [
+          "Couches de partners, directeurs et juniors sur les missions.",
+          "Rapports et frameworks “standard” qui ne collent pas toujours à votre réalité.",
+          "TJM élevés et engagements longs avant de voir de la valeur.",
+          "Focus sur le deck plus que sur le changement réel dans les équipes.",
+        ],
+
+        rightTitle: "Approche NPS Me",
+        rightPoints: [
+          "Accès direct à un lead CX expérimenté, pas une équipe junior qui tourne.",
+          "Travail construit autour de vos outils et données existants, pas un template générique.",
+          "Missions cadrées et transparentes, compatibles avec votre budget.",
+          "Aide à l’implémentation, pas seulement des recommandations.",
+        ],
+
+        footnote:
+          "NPS Me fait partie du groupe cxms.fr, qui combine expertise CX et compétences data/digital concrètes. Cela permet de comprendre l’histoire dans vos feedbacks et de construire les process, contenus et parcours qui font bouger les chiffres.",
+      },
+
+      reassurance: {
+        title: "Ce que ça fait de travailler avec nous",
+        items: [
+          "Un cadrage clair : problème, objectifs, et définition du succès.",
+          "Des points réguliers, honnêtes. Pas de jargon pour se cacher.",
+          "Des livrables simples que les équipes lisent vraiment et utilisent.",
+          "Respect de vos contraintes, de votre culture et de l’expertise interne.",
+          "Un focus sur le changement durable, pas des pics sur un trimestre.",
+          "Un partenaire capable de parler aux execs et aux opérationnels la même semaine.",
+        ],
+        ctaProducts: "Découvrir les offres packagées",
+        ctaBook: "Prendre rendez-vous",
       },
     },
   },

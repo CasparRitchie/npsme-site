@@ -398,6 +398,109 @@ export const TRANSLATIONS = {
         "Here we’ll add an AI “co-pilot” that reads the charts and verbatim themes and gives you a short briefing: where NPS is drifting, which journey stages are hurting, and where to focus next.",
       copilotPlaceholder: "AI commentary placeholder",
     },
+    dataAutomation: {
+      seoTitle: "Data, Automation & Insight — Transform Your Reporting | NPS Me",
+      seoDescription:
+        "How NPS Me helps teams clean up messy data, connect systems, and automate reporting so people spend less time in spreadsheets and more time improving customer experience.",
+
+      header: {
+        iconLabel: "Data, automation & insight",
+        tag: "CX • Data • Automation",
+        title: "Your data should work for you, not the other way around",
+        subtitle:
+          "We help you connect, clean and automate your customer and operational data so teams spend less time wrangling spreadsheets and more time improving customer experience, revenue and retention.",
+        ctaBook: "Book a discovery call",
+        ctaImpact: "Explore impact calculator",
+        footnote:
+          "NPS Me combines CX, data and engineering skills in one place. No army of juniors, no eight-week slide decks. Just practical changes that free your people from manual reporting and make it obvious where to act.",
+      },
+
+      problem: {
+        title: "When data is messy, decisions slow down",
+        intro:
+          "Most teams are not short of data. They are short of time, trust and a clear view of what the numbers are saying. Common patterns we see:",
+        bullets: [
+          "Ten dashboards, zero decisions because no one trusts which view is right.",
+          "Analysts exporting the same CSVs every week to rebuild the same reports.",
+          "No clear link between NPS, churn and actual revenue outcomes.",
+          "Different teams maintain their own spreadsheets and definitions of “the truth”.",
+        ],
+        outro:
+          "It is not that people do not care about data. It is that systems do not talk to each other and no one has the time or remit to untangle it.",
+      },
+
+      leaders: {
+        title: "What we hear from leaders",
+        quote1:
+          "“We have survey tools, CRM, support systems and product analytics, but I still cannot get a simple, joined up view of what customers are telling us and what it costs us if we ignore it.”",
+        quote2:
+          "“Every quarter we rebuild the same analysis from scratch instead of improving the underlying data flows.”",
+        note:
+          "NPS Me exists to close that gap. We come from CX, operations and data backgrounds, which means we are as comfortable in SQL and APIs as we are in stakeholder workshops.",
+      },
+
+      help: {
+        title: "How we help your data work harder",
+        intro:
+          "We do not just recommend new tools. We work with what you already have, connect the right tables, build light automation and leave you with assets your team can run without us.",
+        cards: {
+          unify: {
+            title: "Unify your data",
+            text:
+              "Merge CRM, survey, support and billing data into a usable view. Clear keys, repeatable joins and definitions that Finance, CX and Ops can agree on.",
+          },
+          automate: {
+            title: "Automate reporting",
+            text:
+              "Replace manual exports with scripts and APIs that refresh dashboards on a schedule. Less copy-paste, fewer errors, more time to interpret what the numbers mean.",
+          },
+          insight: {
+            title: "Build insight layers",
+            text:
+              "Tie NPS and CSAT to churn, repeat purchase and support cost. Identify which themes actually move revenue, not just the score.",
+          },
+          upskill: {
+            title: "Upskill your team",
+            text:
+              "We sit with your analysts, product managers and CX leaders to make sure they can read, question and use the new views without needing a consultant in the room.",
+          },
+        },
+        outro:
+          "Because we also design surveys, journeys and internal processes, we can go further than a typical reporting project. We do not stop at “here is your dashboard”. We help you plug those insights back into scripts, playbooks, SLAs and product changes.",
+      },
+
+      outcomes: {
+        title: "What this changes in practice",
+        intro:
+          "You do not need another giant consulting project. You need a cleaner, more honest picture of what is going on and simple ways to act on it every week.",
+        bullets: [
+          "Faster time from “something looks wrong” to “we know what to fix”.",
+          "Reduced manual reporting hours without adding another headcount.",
+          "Fewer surprises between CX, Finance and Exec teams when numbers are challenged.",
+          "Clear link between customer sentiment, operational friction and financial impact.",
+        ],
+        rightIntro:
+          "In previous roles and client work, we have seen simple automation and better joins unlock more value than a brand new tool ever could. Things like:",
+        rightBullets: [
+          "Joining NPS verbatims to refund and ticket data to size the real cost of problems.",
+          "Automating weekly CX packs that used to take several hours of copy-paste work.",
+          "Feeding “you said, we did” themes straight from analysis into internal comms.",
+        ],
+        note:
+          "These are not off-the-shelf products. They are tailored to your stack and maturity, and built to be maintained by your own team rather than a long term external dependency.",
+      },
+
+      cta: {
+        title: "Most companies do not need more dashboards. They need better data.",
+        body:
+          "If your teams are drowning in exports and still arguing about whose numbers are right, we can help you tidy the foundations and automate the boring parts so you can focus on customers again.",
+        ctaBook: "Book a discovery call",
+        ctaProducts: "View productized services",
+        footnote:
+          "NPS Me is independent and works alongside your existing partners, tools and teams.",
+      },
+    },
+
     liveAdmin: {
       seoTitle: "Live Survey Admin | NPS Me",
       seoDescription: "Review and send live NPS invitations from your Envola customer list.",
@@ -1116,6 +1219,109 @@ export const TRANSLATIONS = {
         "Ici, nous ajouterons un “co-pilote” IA qui lit les graphiques et les thèmes verbatim et vous donne un briefing : où le NPS dérive, quelles étapes du parcours posent problème, et où concentrer vos efforts.",
       copilotPlaceholder: "Emplacement du commentaire IA",
     },
+    dataAutomation: {
+      seoTitle: "Données, automatisation & insight — Transformez votre reporting | NPS Me",
+      seoDescription:
+        "Comment NPS Me aide les équipes à assainir des données complexes, connecter les systèmes et automatiser le reporting pour passer moins de temps sur Excel et plus de temps à améliorer l’expérience client.",
+
+      header: {
+        iconLabel: "Données, automatisation & insight",
+        tag: "CX • Données • Automatisation",
+        title: "Vos données doivent travailler pour vous, pas l’inverse",
+        subtitle:
+          "Nous vous aidons à connecter, nettoyer et automatiser vos données clients et opérationnelles pour que les équipes passent moins de temps à “bricoler” des fichiers et plus de temps à améliorer l’expérience client, le revenu et la rétention.",
+        ctaBook: "Réserver un échange découverte",
+        ctaImpact: "Explorer le simulateur d’impact",
+        footnote:
+          "NPS Me réunit des compétences CX, data et engineering au même endroit. Pas d’armée de juniors, pas de decks de 60 slides. Juste des améliorations pragmatiques qui libèrent vos équipes du reporting manuel et rendent l’action évidente.",
+      },
+
+      problem: {
+        title: "Quand les données sont bancales, les décisions ralentissent",
+        intro:
+          "La plupart des équipes ne manquent pas de données. Elles manquent de temps, de confiance et d’une vue claire sur ce que les chiffres racontent. Les situations que l’on voit souvent :",
+        bullets: [
+          "Dix dashboards, zéro décision parce que personne ne sait lequel est “vrai”.",
+          "Des analystes qui exportent les mêmes CSV chaque semaine pour reconstruire les mêmes rapports.",
+          "Aucun lien clair entre NPS, churn et impact réel sur le revenu.",
+          "Chaque équipe entretient ses propres fichiers et sa propre définition de “la vérité”.",
+        ],
+        outro:
+          "Ce n’est pas que les gens ne s’intéressent pas à la donnée. C’est que les systèmes ne se parlent pas — et que personne n’a le temps (ou le mandat) pour démêler tout ça.",
+      },
+
+      leaders: {
+        title: "Ce que l’on entend chez les dirigeants",
+        quote1:
+          "« On a des outils d’enquête, un CRM, des systèmes support et de la product analytics, mais je n’arrive toujours pas à obtenir une vue simple et unifiée de ce que les clients nous disent — et de ce que ça nous coûte de l’ignorer. »",
+        quote2:
+          "« Chaque trimestre, on reconstruit la même analyse à partir de zéro au lieu d’améliorer les flux de données à la source. »",
+        note:
+          "NPS Me existe pour combler cet écart. Nous venons de la CX, des opérations et de la data : aussi à l’aise en SQL et APIs qu’en ateliers avec les parties prenantes.",
+      },
+
+      help: {
+        title: "Comment on fait travailler vos données plus efficacement",
+        intro:
+          "On ne se contente pas de recommander de nouveaux outils. On part de votre stack, on connecte les bonnes tables, on met une automatisation légère en place et on vous laisse des assets maintenables par votre équipe, sans dépendance longue durée.",
+        cards: {
+          unify: {
+            title: "Unifier vos données",
+            text:
+              "Assembler CRM, enquêtes, support et facturation dans une vue exploitable. Des clés claires, des jointures reproductibles et des définitions alignées entre Finance, CX et Ops.",
+          },
+          automate: {
+            title: "Automatiser le reporting",
+            text:
+              "Remplacer les exports manuels par des scripts et des APIs qui rafraîchissent les dashboards selon un planning. Moins de copier-coller, moins d’erreurs, plus de temps pour interpréter.",
+          },
+          insight: {
+            title: "Construire des couches d’insight",
+            text:
+              "Relier NPS et CSAT au churn, au repeat purchase et aux coûts support. Identifier les thèmes qui déplacent réellement le revenu — pas seulement le score.",
+          },
+          upskill: {
+            title: "Faire monter l’équipe en compétence",
+            text:
+              "On travaille avec vos analystes, PM et leaders CX pour qu’ils puissent lire, challenger et utiliser les nouvelles vues sans avoir un consultant dans la pièce.",
+          },
+        },
+        outro:
+          "Comme on sait aussi concevoir des enquêtes, des parcours et des processus internes, on va plus loin qu’un projet de reporting classique. On ne s’arrête pas à « voici votre dashboard ». On vous aide à réinjecter les insights dans les scripts, playbooks, SLA et évolutions produit.",
+      },
+
+      outcomes: {
+        title: "Ce que ça change concrètement",
+        intro:
+          "Vous n’avez pas besoin d’un énième grand projet. Vous avez besoin d’une image plus propre, plus honnête de ce qui se passe — et de moyens simples d’agir chaque semaine.",
+        bullets: [
+          "Plus rapide entre « quelque chose cloche » et « on sait quoi corriger ».",
+          "Moins d’heures de reporting manuel, sans recruter une personne de plus.",
+          "Moins de surprises entre CX, Finance et Direction quand les chiffres sont challengés.",
+          "Un lien clair entre sentiment client, frictions opérationnelles et impact financier.",
+        ],
+        rightIntro:
+          "Dans nos expériences précédentes et chez nos clients, une automatisation simple et de meilleures jointures créent souvent plus de valeur qu’un nouvel outil. Par exemple :",
+        rightBullets: [
+          "Relier les verbatims NPS aux remboursements et tickets pour chiffrer le coût réel des problèmes.",
+          "Automatiser des “packs CX” hebdo qui prenaient plusieurs heures de copier-coller.",
+          "Alimenter des thèmes « vous avez dit / nous avons fait » directement depuis l’analyse vers la com interne.",
+        ],
+        note:
+          "Ce ne sont pas des produits “sur étagère”. C’est adapté à votre stack et à votre maturité, et conçu pour être maintenu par votre équipe plutôt que de créer une dépendance externe longue durée.",
+      },
+
+      cta: {
+        title: "La plupart des entreprises n’ont pas besoin de plus de dashboards. Elles ont besoin de meilleures données.",
+        body:
+          "Si vos équipes se noient dans les exports et débattent encore de la bonne version des chiffres, on peut vous aider à assainir les fondations et automatiser les tâches ingrates — pour que vous reveniez à l’essentiel : vos clients.",
+        ctaBook: "Réserver un échange découverte",
+        ctaProducts: "Voir les offres packagées",
+        footnote:
+          "NPS Me est indépendant et travaille aux côtés de vos partenaires, outils et équipes existants.",
+      },
+    },
+
      liveAdmin: {
       seoTitle: "Admin enquête live | NPS Me",
       seoDescription:

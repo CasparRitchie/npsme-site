@@ -18,6 +18,110 @@ export const TRANSLATIONS = {
       blog: "Blog",
       cxCockpit: "CX Cockpit",
     },
+    landing: {
+      seo: {
+        title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
+        description:
+          "Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase.",
+      },
+
+      hero: {
+        h1: {
+          lead: "Customer Experience (CX) consulting to improve",
+          nps: "Net Promoter Score (NPS)®",
+          tail: "retention, and revenue.",
+          accent: "Turn feedback into growth.",
+        },
+        body:
+          "NPS Me helps teams run NPS and milestone feedback through their existing stack (Intercom, HubSpot, helpdesks, product tools, or CSV). We add the missing layer: survey governance, unbiased sampling, and decision-grade insight so feedback turns into measurable retention and revenue.",
+        ctaPrimary: "Book a free discovery",
+        ctaMethod: "See the 4-stage method",
+        ctaDemo: "Try the NPS®-style demo",
+        proof: {
+          mining: "Review mining",
+          enablement: "Hands-on enablement",
+          lift: "Measurable lift",
+        },
+        chips: ["Intercom", "HubSpot", "Zendesk", "Product events", "CSV upload"],
+        chipsNote:
+          "Use NPS Me alongside your existing tools. We focus on governance, analysis and action, not replacing your CS platform.",
+      },
+
+      method: {
+        title: "A simple, repeatable CX method to lift NPS®",
+        body:
+          "Clear steps, fast wins, and compounding improvements. We meet you where you are and prioritise what moves the needle.",
+        cards: [
+          {
+            title: "1) Discovery",
+            desc: "Audit reviews, surveys, and internal flows. Map friction. Establish baseline metrics.",
+          },
+          {
+            title: "2) Recommend",
+            desc: "Prioritised playbook of fixes and experiments with owners, effort/impact scoring, and timelines.",
+          },
+          {
+            title: "3) Implement",
+            desc: "Embed changes with teams: scripts, templates, automation, training. Hands-on support to unblock fast.",
+          },
+          {
+            title: "4) Monitor",
+            desc: "Track NPS/CSAT/CES and review velocity. Iterate monthly. Celebrate wins and scale what works.",
+          },
+        ],
+      },
+
+      demoBlock: {
+        title: "Try the NPS®-style demo (close-the-loop ready)",
+        body:
+          "The demo shows how invitations, survey responses, and NPS metrics link together. In real deployments, targeting and sending often stay in your CS platform and NPS Me ingests responses to drive analysis and action. These numbers are live from the demo environment.",
+        cta: "Run the live demo & see full results",
+        note:
+          "Opens the dedicated demo page where you can send yourself an invitation, complete the survey, and explore NPS & milestone scores.",
+      },
+
+      platform: {
+        title: "Not another survey tool",
+        body:
+          "Most teams already have ways to send surveys. NPS Me helps you run a fair, consistent, decision-grade programme across whatever tools you use.",
+        cards: [
+          {
+            title: "Governance",
+            desc: "Sampling, cadence, anti-gaming, and comparability over time so the score means something.",
+          },
+          {
+            title: "Interpretation",
+            desc: "Theme and driver analysis, confidence checks, and clear prioritisation so action is obvious.",
+          },
+          {
+            title: "Close the loop",
+            desc: "Follow-up workflows and outcome tracking so responses lead to measurable changes.",
+          },
+        ],
+      },
+
+      about: {
+        title: "About us",
+        body:
+          "We are experienced NPS and CX consultants. We combine quantitative analysis with hands-on team enablement to remove friction, improve sentiment, and grow revenue. We reference Net Promoter Score (NPS)® descriptively as one of several customer metrics.",
+        bullets: [
+          "Deep-dive review mining across Trustpilot, Google, and in-product surveys",
+          "Voice-of-Customer to Voice-of-Process mapping",
+          "Prioritised roadmaps with effort/impact scoring and owners",
+          "Enablement: playbooks, scripts, templates, and training",
+          "Measurement: NPS/CSAT/CES instrumentation and review velocity",
+        ],
+      },
+
+      contact: {
+        title: "Ready to turn feedback into growth?",
+        body:
+          "Book a free 30-minute discovery session. We’ll review your current scores and identify quick wins.",
+        emailCta: "Email hello@npsme.com",
+        bookCta: "Request a discovery call",
+      },
+    },
+
     products: {
       seoTitle:
         "Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me",
@@ -228,6 +332,110 @@ export const TRANSLATIONS = {
       blog: "Blog",
       cxCockpit: "Cockpit CX",
     },
+    landing: {
+      seo: {
+        title: "Conseil CX & amélioration du NPS® | NPS Me",
+        description:
+          "Conseil CX pragmatique pour diagnostiquer les frictions, prioriser les actions et livrer des gains mesurables : hausse du NPS®, baisse du churn, hausse de la rétention.",
+      },
+
+      hero: {
+        h1: {
+          lead: "Conseil en expérience client (CX) pour améliorer le",
+          nps: "Net Promoter Score (NPS)®",
+          tail: "la rétention et la croissance.",
+          accent: "Transformer le feedback en décisions.",
+        },
+        body:
+          "NPS Me aide les équipes à piloter le NPS et les feedbacks « par étape » via leur stack existante (Intercom, HubSpot, helpdesk, événements produit ou CSV). Nous apportons la couche qui manque souvent : gouvernance d’enquête, échantillonnage robuste et insights actionnables pour relier le verbatim aux priorités business.",
+        ctaPrimary: "Réserver un échange",
+        ctaMethod: "Voir la méthode en 4 étapes",
+        ctaDemo: "Tester la démo NPS®",
+        proof: {
+          mining: "Analyse d’avis",
+          enablement: "Mise en œuvre terrain",
+          lift: "Gains mesurables",
+        },
+        chips: ["Intercom", "HubSpot", "Zendesk", "Événements produit", "Import CSV"],
+        chipsNote:
+          "NPS Me complète vos outils existants. Notre focus : gouvernance, analyse et mise en action — pas le remplacement de votre plateforme CS.",
+      },
+
+      method: {
+        title: "Une méthode CX simple et reproductible pour faire progresser le NPS®",
+        body:
+          "Étapes claires, quick wins et amélioration continue. On s’adapte à votre contexte et on priorise ce qui a le plus d’impact.",
+        cards: [
+          {
+            title: "1) Diagnostic",
+            desc: "Analyse des avis, enquêtes et parcours internes. Cartographie des frictions. Baseline des indicateurs.",
+          },
+          {
+            title: "2) Recommandations",
+            desc: "Plan d’actions priorisé (impact/effort), responsables, séquencement et hypothèses de gains.",
+          },
+          {
+            title: "3) Mise en œuvre",
+            desc: "Outillage, automatisations, scripts et formation. Accompagnement opérationnel pour livrer vite.",
+          },
+          {
+            title: "4) Pilotage",
+            desc: "Suivi NPS/CSAT/CES et vélocité d’avis. Itérations mensuelles, arbitrages et passage à l’échelle.",
+          },
+        ],
+      },
+
+      demoBlock: {
+        title: "Tester la démo NPS® (prête pour le close-the-loop)",
+        body:
+          "La démo montre le lien entre invitations, réponses et indicateurs NPS. En production, le ciblage et l’envoi restent souvent dans votre plateforme CS ; NPS Me ingère les retours pour analyser, prioriser et déclencher des actions. Les chiffres affichés ici proviennent de l’environnement de démo.",
+        cta: "Lancer la démo et voir les résultats",
+        note:
+          "Ouvre la page dédiée : vous pouvez vous envoyer une invitation, répondre, puis explorer le NPS et les scores par étape.",
+      },
+
+      platform: {
+        title: "Pas un énième outil d’enquête",
+        body:
+          "La plupart des équipes ont déjà un outil d’envoi. NPS Me vous aide à opérer un programme fiable, comparable dans le temps et utile pour décider — quel que soit votre stack.",
+        cards: [
+          {
+            title: "Gouvernance",
+            desc: "Échantillonnage, cadence, anti-biais et comparabilité pour que le score soit interprétable.",
+          },
+          {
+            title: "Interprétation",
+            desc: "Analyse des thèmes et drivers, contrôles de robustesse et priorisation claire des actions.",
+          },
+          {
+            title: "Close the loop",
+            desc: "Workflows de suivi et mesure d’impact pour relier feedback → actions → résultats.",
+          },
+        ],
+      },
+
+      about: {
+        title: "À propos",
+        body:
+          "Nous combinons expertise NPS/CX, analyse quantitative et accompagnement opérationnel. Objectif : réduire les frictions, améliorer le ressenti et piloter des gains mesurables. Le NPS® est utilisé de manière descriptive, aux côtés d’autres métriques.",
+        bullets: [
+          "Analyse approfondie des avis (Google, Trustpilot, in-product)",
+          "VoC → VoP : relier la voix du client aux processus",
+          "Roadmap priorisée (impact/effort) et responsabilisation",
+          "Enablement : playbooks, scripts, templates, formation",
+          "Mesure : instrumentation NPS/CSAT/CES et vélocité d’avis",
+        ],
+      },
+
+      contact: {
+        title: "Prêt à transformer le feedback en croissance ?",
+        body:
+          "Réservez un échange de 30 minutes. On passe en revue vos scores et on identifie des quick wins concrets.",
+        emailCta: "Écrire à hello@npsme.com",
+        bookCta: "Demander un rendez-vous",
+      },
+    },
+
     products: {
       seoTitle:
         "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",

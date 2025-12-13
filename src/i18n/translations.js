@@ -18,6 +18,88 @@ export const TRANSLATIONS = {
       blog: "Blog",
       cxCockpit: "CX Cockpit",
     },
+    milestonePage: {
+      seoTitle: "Milestone (Transactional) NPS® & Survey Signals | NPS Me",
+      seoDescription:
+        "Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX.",
+
+      header: {
+        iconLabel: "Milestone / transactional NPS",
+        tag: "NPS Me / Milestone NPS",
+        title: "Milestone (Transactional) NPS & Survey Signals",
+        intro:
+          "A practical framework to capture feedback at key journey moments, turn it into prioritised work, and measure lift. We reference Net Promoter Score (NPS)® descriptively alongside CSAT, CES and behavioral data.",
+        ctaImpact: "Estimate your impact",
+        ctaBook: "Book discovery",
+      },
+
+      method: {
+        title: "The 4-stage method (simple, repeatable)",
+        intro:
+          "Clear steps, fast wins, and compounding improvements. We meet you where you are and prioritise what moves the needle.",
+        cards: [
+          {
+            title: "1) Discovery",
+            desc: "Audit reviews, surveys, tickets and flows. Map friction. Establish baseline metrics.",
+          },
+          {
+            title: "2) Recommend",
+            desc: "Prioritised playbook with owners, effort/impact scores and timelines.",
+          },
+          {
+            title: "3) Implement",
+            desc: "Hands-on enablement: scripts, templates, automation, training. Unblock fast.",
+          },
+          {
+            title: "4) Monitor",
+            desc: "Track NPS/CSAT/CES & review velocity. Iterate monthly. Celebrate and scale wins.",
+          },
+        ],
+      },
+
+      fit: {
+        title: "Where milestone surveys fit",
+        cards: [
+          {
+            title: "Order placed",
+            q: "Based on your ordering experience, how likely are you to recommend us (0-10)?",
+            why: "Test checkout clarity, pricing transparency and payment reliability.",
+          },
+          {
+            title: "Onboarding finished",
+            q: "After onboarding, how likely are you to recommend us (0-10)?",
+            why: "Gauge setup friction, documentation gaps, enablement quality.",
+          },
+          {
+            title: "First delivery/use",
+            q: "After your first delivery/use, how likely are you to recommend us (0-10)?",
+            why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX.",
+          },
+        ],
+      },
+
+      checklist: {
+        stepsTitle: "Implementation in 5 steps",
+        steps: [
+          "Map milestones (checkout, onboarding, first value, renewal, support closure).",
+          "Trigger surveys via your existing stack (ESP, product, helpdesk, CDP).",
+          "Ask 0-10 + one open text; keep it short.",
+          "Pipe results into a central view and tag by milestone.",
+          "Close the loop and run monthly root-cause reviews.",
+        ],
+      },
+
+      track: {
+        title: "What we track",
+        items: [
+          "Score distribution by milestone (Promoters/Passives/Detractors).",
+          "Themes by frequency & impact (effort vs. volume).",
+          "Time-to-contact & close-the-loop rates.",
+          "Downstream effects (repeat tickets, churn risk, review velocity).",
+        ],
+      },
+    },
+
     landing: {
       seo: {
         title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
@@ -417,6 +499,88 @@ export const TRANSLATIONS = {
       blog: "Blog",
       cxCockpit: "Cockpit CX",
     },
+    milestonePage: {
+      seoTitle: "NPS® transactionnel (milestones) & signaux d’enquête | NPS Me",
+      seoDescription:
+        "Captez le sentiment client aux moments clés du parcours pour révéler les frictions en contexte. Mettez en place le close-the-loop et le suivi des thèmes pour une CX actionnable.",
+
+      header: {
+        iconLabel: "NPS milestone / transactionnel",
+        tag: "NPS Me / NPS Milestone",
+        title: "NPS transactionnel (milestones) & signaux d’enquête",
+        intro:
+          "Un cadre pratique pour capter le feedback aux moments clés du parcours, le transformer en plan d’action priorisé, et mesurer l’amélioration. Nous utilisons la référence Net Promoter Score (NPS)® de façon descriptive, aux côtés de la CSAT, du CES et des données comportementales.",
+        ctaImpact: "Estimer votre impact",
+        ctaBook: "Prendre rendez-vous",
+      },
+
+      method: {
+        title: "La méthode en 4 étapes (simple, répétable)",
+        intro:
+          "Des étapes claires, des quick wins, et des améliorations qui se cumulent. On part de votre réalité et on priorise ce qui fait bouger les résultats.",
+        cards: [
+          {
+            title: "1) Diagnostic",
+            desc: "Audit des avis, enquêtes, tickets et parcours. Cartographie des frictions. Définition d’une baseline.",
+          },
+          {
+            title: "2) Recommandations",
+            desc: "Playbook priorisé avec responsables, scores effort/impact et calendrier.",
+          },
+          {
+            title: "3) Mise en œuvre",
+            desc: "Accompagnement terrain : scripts, templates, automatisations, formation. Déblocage rapide.",
+          },
+          {
+            title: "4) Pilotage",
+            desc: "Suivi NPS/CSAT/CES & dynamique des avis. Itérations mensuelles. On consolide et on scale ce qui marche.",
+          },
+        ],
+      },
+
+      fit: {
+        title: "Où placer les enquêtes “milestone”",
+        cards: [
+          {
+            title: "Commande passée",
+            q: "Suite à votre expérience de commande, quelle est la probabilité que vous nous recommandiez (0–10) ?",
+            why: "Tester la clarté du checkout, la transparence des prix et la fiabilité du paiement.",
+          },
+          {
+            title: "Onboarding terminé",
+            q: "Après l’onboarding, quelle est la probabilité que vous nous recommandiez (0–10) ?",
+            why: "Mesurer les frictions de mise en route, les trous de documentation et la qualité d’activation.",
+          },
+          {
+            title: "Première utilisation / livraison",
+            q: "Après votre première utilisation/livraison, quelle est la probabilité que vous nous recommandiez (0–10) ?",
+            why: "Révéler la vitesse/précision, la maturité produit et la qualité de la première expérience.",
+          },
+        ],
+      },
+
+      checklist: {
+        stepsTitle: "Mise en œuvre en 5 étapes",
+        steps: [
+          "Définir les milestones (checkout, onboarding, premier bénéfice, renouvellement, clôture support).",
+          "Déclencher les enquêtes via votre stack existant (ESP, produit, helpdesk, CDP).",
+          "Poser la question 0–10 + une question ouverte ; rester court.",
+          "Centraliser les résultats et taguer par milestone.",
+          "Boucler la boucle (close-the-loop) et mener une revue mensuelle des causes racines.",
+        ],
+      },
+
+      track: {
+        title: "Ce que nous suivons",
+        items: [
+          "Distribution des scores par milestone (Promoteurs/Passifs/Détracteurs).",
+          "Thèmes par fréquence & impact (effort vs volume).",
+          "Délais de recontact & taux de close-the-loop.",
+          "Effets aval (répétition des tickets, risque de churn, dynamique des avis).",
+        ],
+      },
+    },
+
     landing: {
       seo: {
         title: "Conseil CX & amélioration du NPS® | NPS Me",

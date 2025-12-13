@@ -6,10 +6,10 @@ import "./styles.css";
 import { LanguageProvider } from "./i18n/LanguageContext.jsx";
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <LanguageProvider>
       <BrowserRouter>
+    <LanguageProvider>
         <AppShell />
-      </BrowserRouter>
     </LanguageProvider>
+      </BrowserRouter>
   </React.StrictMode>
 );

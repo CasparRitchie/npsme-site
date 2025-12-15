@@ -4353,8 +4353,9 @@ export const TRANSLATIONS = {
  * Very small translation helper.
  * Example: t(lang, "navbar.bookDiscovery", "Book discovery")
  */
+// src/i18n/translations.js
+
 export function translations(lang, path, fallback) {
-  // ✅ Guard: never crash if a caller passes undefined/null/non-string
   if (typeof path !== "string" || !path.trim()) {
     return fallback !== undefined ? fallback : "";
   }
@@ -4371,6 +4372,9 @@ export function translations(lang, path, fallback) {
     }
   }
 
-  if (typeof current === "string") return current;
+  // ✅ Return any valid resolved value (strings, arrays, objects, numbers, booleans)
+  if (current !== undefined) return current;
+
   return fallback !== undefined ? fallback : path;
 }
+

@@ -1134,7 +1134,6 @@ export const TRANSLATIONS = {
         secondary: "Book a discovery call",
       },
     },
-
     dataAutomation: {
       seoTitle: "Data, Automation & Insight — Transform Your Reporting | NPS Me",
       seoDescription:
@@ -1800,6 +1799,8 @@ export const TRANSLATIONS = {
             "What to fix first and what can wait",
             "A weekly CX Pulse leaders actually read",
           ],
+          diagramCaption:
+            "Example loop: Intercom captures feedback → NPS Me adds intelligence → decisions → actions back into Intercom.",
           footer: "Instead of another dashboard, teams get clarity, narrative, and priorities.",
         },
 
@@ -3993,6 +3994,8 @@ export const TRANSLATIONS = {
             "Quoi corriger d’abord, quoi attendre",
             "Un CX Pulse hebdo lisible par la direction",
           ],
+          diagramCaption:
+            "Exemple de boucle : Intercom capte le feedback → NPS Me ajoute l’intelligence → décisions → actions de retour dans Intercom.",
           footer: "Au lieu d’un dashboard de plus, vous obtenez clarté, récit et priorités.",
         },
 
@@ -4377,4 +4380,3 @@ export function translations(lang, path, fallback) {
 
   return fallback !== undefined ? fallback : path;
 }
-

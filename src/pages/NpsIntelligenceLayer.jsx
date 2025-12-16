@@ -159,7 +159,26 @@ export default function NpsIntelligenceLayer() {
               "Intercom can tell you who responded, what score they gave, and what they wrote. NPS Me adds the strategic layer that turns that into priorities."
             )}
           </p>
-
+          {/* Diagram: Intercom + NPS Me loop */}
+          <figure className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4 md:p-6">
+            <img
+              src="/npsme_intercom_diagram.png"
+              alt="Intercom + NPS Me intelligence loop: People send feedback via Intercom, NPS Me turns it into decisions, and actions flow back into Intercom."
+              title="Intercom + NPS Me intelligence layer loop"
+              loading="lazy"
+              decoding="async"
+              width={1200}
+              height={900}
+              className="w-full h-auto rounded-2xl"
+            />
+            <figcaption className="mt-3 text-xs text-slate-400">
+              {translations(
+                lang,
+                "npsIntelligenceLayer.sections.intercom.diagramCaption",
+                "Example loop: Intercom captures feedback → NPS Me adds intelligence → decisions → actions back into Intercom."
+              )}
+            </figcaption>
+          </figure>
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="text-sm font-semibold text-white">

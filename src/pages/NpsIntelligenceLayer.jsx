@@ -162,7 +162,7 @@ export default function NpsIntelligenceLayer() {
           {/* Diagram: Intercom + NPS Me loop */}
           <figure className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4 md:p-6">
             <img
-              src="/npsme_intercom_diagram.png"
+              src="/npsme_intercom_diagram2.png"
               alt="Intercom + NPS Me intelligence loop: People send feedback via Intercom, NPS Me turns it into decisions, and actions flow back into Intercom."
               title="Intercom + NPS Me intelligence layer loop"
               loading="lazy"

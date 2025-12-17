@@ -2057,6 +2057,7 @@ app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
       .map((c) => {
         const ca = c.custom_attributes || {};
         const startDate = ca.start_date; // unix seconds
+        if (!startDate) return null;               // <- ignore unknowns for now
         return {
           id: c.id,
           email: c.email,

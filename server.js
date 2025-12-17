@@ -2026,6 +2026,81 @@ app.get("/api/intercom/contact/:id", async (req, res) => {
   }
 });
 
+function monthsBetween(startUnixSeconds, now = new Date()) {
+  const start = new Date(startUnixSeconds * 1000);
+  const months =
+    (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  return Math.max(0, months);
+}
+
+app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
+  try {
+    // Pull first page (good enough for prototype). Later we’ll paginate.
+    const response = await fetch("https://api.intercom.io/contacts?per_page=150", {
+      headers: {
+        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+        Accept: "application/json",
+        "Intercom-Version": "2.14",
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("[intercom] contacts fetch failed", data);
+      return res.status(500).json({ error: data });
+    }
+
+    const now = new Date();
+
+    const rows = (data.data || [])
+      .filter((c) => c?.role === "user")
+      .map((c) => {
+        const ca = c.custom_attributes || {};
+        const startDate = ca.start_date; // unix seconds
+        return {
+          id: c.id,
+          email: c.email,
+          name: c.name,
+          device_type: ca.device_type || null,
+          envola_role: ca.envola_role || null,
+          start_date: startDate || null,
+          months_since_start: startDate ? monthsBetween(startDate, now) : null,
+        };
+      });
+
+    // Cohort grouping
+    const cohorts = {};
+    for (const r of rows) {
+      const key = r.months_since_start == null ? "unknown" : String(r.months_since_start);
+      cohorts[key] ||= { cohort: key, count: 0, by_role: {}, by_device: {} };
+      cohorts[key].count += 1;
+
+      if (r.envola_role) {
+        cohorts[key].by_role[r.envola_role] = (cohorts[key].by_role[r.envola_role] || 0) + 1;
+      }
+      if (r.device_type) {
+        cohorts[key].by_device[r.device_type] = (cohorts[key].by_device[r.device_type] || 0) + 1;
+      }
+    }
+
+    const sorted = Object.values(cohorts).sort((a, b) => {
+      if (a.cohort === "unknown") return 1;
+      if (b.cohort === "unknown") return -1;
+      return Number(a.cohort) - Number(b.cohort);
+    });
+
+    res.json({
+      ok: true,
+      total_users: rows.length,
+      cohorts: sorted,
+      sample_users: rows.slice(0, 5),
+    });
+  } catch (err) {
+    console.error("[intercom] cohort error", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // ---------- Static assets & caching ----------
 

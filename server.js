@@ -1973,6 +1973,36 @@ app.get("/api/intercom/ping", async (_req, res) => {
   }
 });
 
+app.get("/api/intercom/users", async (_req, res) => {
+  try {
+    const response = await fetch(
+      "https://api.intercom.io/contacts?per_page=10",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+          Accept: "application/json",
+          "Intercom-Version": "2.14",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("[intercom] users fetch failed", data);
+      return res.status(500).json({ error: data });
+    }
+
+    res.json({
+      total: data.total_count,
+      sample: data.data?.slice(0, 2),
+    });
+  } catch (err) {
+    console.error("[intercom] users error", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // ---------- Static assets & caching ----------
 

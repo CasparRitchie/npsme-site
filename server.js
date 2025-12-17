@@ -2003,6 +2003,29 @@ app.get("/api/intercom/users", async (_req, res) => {
   }
 });
 
+app.get("/api/intercom/contact/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const response = await fetch(`https://api.intercom.io/contacts/${id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+        Accept: "application/json",
+        "Intercom-Version": "2.14",
+      },
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      return res.status(500).json({ ok: false, status: response.status, body: text });
+    }
+
+    return res.json(JSON.parse(text));
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 
 // ---------- Static assets & caching ----------
 

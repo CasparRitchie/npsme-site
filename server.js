@@ -1944,6 +1944,36 @@ app.post("/api/live-survey/submit", async (req, res) => {
   }
 });
 
+// ---- Intercom smoke test (read-only) ----
+app.get("/api/intercom/ping", async (_req, res) => {
+  try {
+    const response = await fetch("https://api.intercom.io/me", {
+      headers: {
+        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+        Accept: "application/json",
+        "Intercom-Version": "2.14",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("[intercom] ping failed", data);
+      return res.status(500).json({ ok: false, data });
+    }
+
+    res.json({
+      ok: true,
+      app: data.app?.name,
+      email: data.email,
+    });
+  } catch (err) {
+    console.error("[intercom] ping error", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

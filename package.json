@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "compression": "^1.8.1",
+    "csv-parse": "^6.1.0",
     "express": "^4.21.2",
     "framer-motion": "^12.23.24",
     "helmet": "^7.2.0",

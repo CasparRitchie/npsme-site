@@ -2103,6 +2103,117 @@ app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
 });
 
 
+import zlib from "zlib";
+import { parse } from "csv-parse/sync";
+
+const INTERCOM_HEADERS_JSON = {
+  Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+  Accept: "application/json",
+  "Intercom-Version": "2.14",
+  "Content-Type": "application/json",
+};
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function createExportJob({ created_at_after, created_at_before }) {
+  const r = await fetch("https://api.intercom.io/export/content/data", {
+    method: "POST",
+    headers: INTERCOM_HEADERS_JSON,
+    body: JSON.stringify({ created_at_after, created_at_before }),
+  });
+
+  const data = await r.json();
+  if (!r.ok) {
+    throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
+  }
+  return data; // includes id + links
+}
+
+async function getExportJob(jobId) {
+  const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+      Accept: "application/json",
+      "Intercom-Version": "2.14",
+    },
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
+  return data;
+}
+
+async function downloadGzipCsv(downloadUrl) {
+  const r = await fetch(downloadUrl, {
+    headers: {
+      Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+      Accept: "application/octet-stream",
+      "Intercom-Version": "2.14",
+    },
+  });
+  if (!r.ok) {
+    const text = await r.text().catch(() => "");
+    throw new Error(`Download failed: ${r.status} ${text}`);
+  }
+  const buf = Buffer.from(await r.arrayBuffer());
+  const csvBuf = zlib.gunzipSync(buf);
+  return csvBuf.toString("utf8");
+}
+
+function isLikelySurveyRow(row) {
+  // TODO: refine once you see real headers.
+  // Common patterns: content type fields, or body containing survey markers.
+  const blob = JSON.stringify(row).toLowerCase();
+  return blob.includes("survey") || blob.includes("nps");
+}
+
+app.get("/api/intercom/survey-responses/raw", async (req, res) => {
+  try {
+    const hours = Number(req.query.hours || 24);
+    const now = Math.floor(Date.now() / 1000);
+    const created_at_before = now;
+    const created_at_after = now - hours * 3600;
+
+    // 1) Create export job (note: only 1 active job allowed per workspace)
+    const job = await createExportJob({ created_at_after, created_at_before });
+
+    // 2) Poll until complete
+    const jobId = job.id;
+    let status = job;
+    for (let i = 0; i < 30; i++) { // ~30 * 2s = ~60s max
+      status = await getExportJob(jobId);
+      if (status.status === "complete" && status.download_url) break;
+      if (status.status === "failed") throw new Error(`Export job failed: ${JSON.stringify(status)}`);
+      await sleep(2000);
+    }
+    if (!(status.status === "complete" && status.download_url)) {
+      return res.status(504).json({ ok: false, error: "Export job timed out", job: status });
+    }
+
+    // 3) Download + parse CSV
+    const csvText = await downloadGzipCsv(status.download_url);
+    const records = parse(csvText, { columns: true, skip_empty_lines: true });
+
+    // 4) Filter “survey-ish” rows (you will tighten this once you inspect headers)
+    const surveyRows = records.filter(isLikelySurveyRow);
+
+    return res.json({
+      ok: true,
+      range: { created_at_after, created_at_before, hours },
+      total_rows: records.length,
+      matched_rows: surveyRows.length,
+      // return small sample + raw rows (or paginate)
+      sample_headers: records[0] ? Object.keys(records[0]) : [],
+      sample_rows: surveyRows.slice(0, 10),
+      rows: surveyRows,
+    });
+  } catch (err) {
+    console.error("[intercom] survey raw export error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

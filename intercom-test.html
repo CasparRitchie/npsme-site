@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intercom NPS Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 40px;
+      max-width: 720px;
+      line-height: 1.6;
+    }
+    h1 {
+      margin-bottom: 0.2em;
+    }
+    p {
+      color: #444;
+    }
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+    }
+    button.primary {
+      background: #3f2cff;
+      color: white;
+      border-color: #3f2cff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Intercom NPS Test Page</h1>
+
+  <p>
+    This page exists purely to test the Intercom Messenger and NPS survey flow.
+    It allows us to trigger surveys instantly and generate real survey responses
+    so we can validate API exports and downstream analytics.
+  </p>
+
+  <p>
+    You should see the Intercom Messenger in the bottom-right corner.
+    Use the button below to manually start the NPS survey.
+  </p>
+
+  <div class="actions">
+    <button
+      class="primary"
+      onclick="Intercom('startSurvey', 'YOUR_SURVEY_ID')"
+    >
+      Start NPS Survey
+    </button>
+
+    <button onclick="Intercom('show')">
+      Open Messenger
+    </button>
+  </div>
+
+  <!-- Intercom settings -->
+  <script>
+    window.intercomSettings = {
+      api_base: "https://api-iam.intercom.io",
+      app_id: "f8sv0f9h",
+      email: "casparr@hotmail.com",
+      name: "Caspar Test"
+    };
+  </script>
+
+  <!-- Intercom loader -->
+  <script>
+  (function(){
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+      ic('reattach_activator');
+      ic('update', w.intercomSettings);
+    } else {
+      var d = document;
+      var i = function(){ i.c(arguments); };
+      i.q = [];
+      i.c = function(args){ i.q.push(args); };
+      w.Intercom = i;
+      var l = function(){
+        var s = d.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = 'https://widget.intercom.io/widget/f8sv0f9h';
+        var x = d.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+      };
+      if (document.readyState === 'complete') {
+        l();
+      } else if (w.attachEvent) {
+        w.attachEvent('onload', l);
+      } else {
+        w.addEventListener('load', l, false);
+      }
+    }
+  })();
+  </script>
+
+</body>
+</html>

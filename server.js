@@ -2228,6 +2228,71 @@ app.get("/api/intercom/survey-responses/raw", async (req, res) => {
   }
 });
 
+
+app.get("/api/intercom/survey-export/start", async (req, res) => {
+  try {
+    const hours = Number(req.query.hours || 24);
+    const now = Math.floor(Date.now() / 1000);
+    const created_at_before = now;
+    const created_at_after = now - hours * 3600;
+
+    const job = await createExportJob({ created_at_after, created_at_before });
+
+    const jobId = job.job_identifier || job.job_identfier || job.id;
+    if (!jobId) {
+      return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
+    }
+
+    return res.json({
+      ok: true,
+      job_identifier: jobId,
+      range: { created_at_after, created_at_before, hours },
+      status: job.status || "pending",
+    });
+  } catch (err) {
+    console.error("[intercom] export start error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
+app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+    const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
+
+    const status = await getExportJob(jobId);
+
+    // Not ready yet → return quickly
+    if (!(status.status === "complete" && status.download_url)) {
+      return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
+    }
+
+    // Ready → download + parse
+    const csvText = await downloadGzipCsv(status.download_url);
+    const records = parse(csvText, { columns: true, skip_empty_lines: true });
+
+    // filter: temporary, improves once we see headers
+    let surveyRows = records.filter(isLikelySurveyRow);
+    if (surveyId) {
+      surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
+    }
+
+    return res.json({
+      ok: true,
+      job_identifier: jobId,
+      status: "complete",
+      total_rows: records.length,
+      matched_rows: surveyRows.length,
+      sample_headers: records[0] ? Object.keys(records[0]) : [],
+      sample_rows: surveyRows.slice(0, 10),
+    });
+  } catch (err) {
+    console.error("[intercom] export status error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ---------- Static assets & caching ----------
 
 // Long cache for hashed assets (Vite puts them in /assets)

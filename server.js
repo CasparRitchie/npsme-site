@@ -2303,7 +2303,7 @@ app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
     }
 
     // Ready → download + parse
-    const csvText = await downloadGzipCsv(status.download_url);
+    const csvText = await downloadExportCsv(status.download_url);
     const records = parse(csvText, { columns: true, skip_empty_lines: true });
 
     // filter: temporary, improves once we see headers

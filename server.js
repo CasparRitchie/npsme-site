@@ -2171,42 +2171,25 @@ function isLikelySurveyRow(row) {
 app.get("/api/intercom/survey-responses/raw", async (req, res) => {
   try {
     const hours = Number(req.query.hours || 24);
-    const now = Math.floor(Date.now() / 1000);
-    const created_at_before = now;
-    const created_at_after = now - hours * 3600;
+    const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
 
-    // 1) Create export job (note: only 1 active job allowed per workspace)
-    const job = await createExportJob({ created_at_after, created_at_before });
+    // ... export job, download, parse CSV into `records`
 
-    // 2) Poll until complete
-    const jobId = job.id;
-    let status = job;
-    for (let i = 0; i < 30; i++) { // ~30 * 2s = ~60s max
-      status = await getExportJob(jobId);
-      if (status.status === "complete" && status.download_url) break;
-      if (status.status === "failed") throw new Error(`Export job failed: ${JSON.stringify(status)}`);
-      await sleep(2000);
-    }
-    if (!(status.status === "complete" && status.download_url)) {
-      return res.status(504).json({ ok: false, error: "Export job timed out", job: status });
-    }
-
-    // 3) Download + parse CSV
-    const csvText = await downloadGzipCsv(status.download_url);
-    const records = parse(csvText, { columns: true, skip_empty_lines: true });
-
-    // 4) Filter “survey-ish” rows (you will tighten this once you inspect headers)
-    const surveyRows = records.filter(isLikelySurveyRow);
+    const surveyRows = records
+      .filter(isLikelySurveyRow)
+      .filter((row) => {
+        if (!surveyId) return true;
+        const blob = JSON.stringify(row);
+        return blob.includes(surveyId); // temporary until we know the exact column
+      });
 
     return res.json({
       ok: true,
-      range: { created_at_after, created_at_before, hours },
-      total_rows: records.length,
-      matched_rows: surveyRows.length,
-      // return small sample + raw rows (or paginate)
+      survey_id: surveyId,
       sample_headers: records[0] ? Object.keys(records[0]) : [],
       sample_rows: surveyRows.slice(0, 10),
-      rows: surveyRows,
+      matched_rows: surveyRows.length,
+      total_rows: records.length
     });
   } catch (err) {
     console.error("[intercom] survey raw export error", err);

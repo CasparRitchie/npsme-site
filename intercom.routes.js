@@ -11,8 +11,41 @@ function sleep(ms) {
 }
 
 // (kept for compatibility; decode now uses unzipSync which handles gzip/deflate)
-function isGzipBuffer(buf) {
-  return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
+function isZipBuffer(buf) {
+  return buf && buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b && buf[2] === 0x03 && buf[3] === 0x04;
+}
+
+function decodeExportPayloadToCsvText(buf) {
+  // ZIP (PK..)
+  if (isZipBuffer(buf)) {
+    const zip = new AdmZip(buf);
+    const entries = zip.getEntries();
+
+    // Prefer CSV files; otherwise take first file entry
+    const csvEntry =
+      entries.find((e) => !e.isDirectory && String(e.entryName).toLowerCase().endsWith(".csv")) ||
+      entries.find((e) => !e.isDirectory);
+
+    if (!csvEntry) {
+      throw new Error("ZIP contained no files");
+    }
+
+    const fileBuf = csvEntry.getData();
+    return fileBuf.toString("utf8");
+  }
+
+  // GZIP
+  if (isGzipBuffer(buf)) {
+    return zlib.gunzipSync(buf).toString("utf8");
+  }
+
+  // Plain text
+  if (looksLikeText(buf)) {
+    return buf.toString("utf8");
+  }
+
+  const head = buf.subarray(0, 16).toString("hex").match(/.{1,2}/g)?.join(" ") || "";
+  throw new Error(`Intercom payload not decodable. First 16 bytes: ${head}`);
 }
 
 function pickHostFallback(url, host) {
@@ -111,7 +144,8 @@ async function downloadExportCsv(downloadUrl, { token }) {
         );
       }
 
-      return decodeToUtf8MaybeCompressed(buf);
+      // return decodeToUtf8MaybeCompressed(buf);
+      return decodeExportPayloadToCsvText(buf);
     }
 
     const buf = Buffer.from(await r.arrayBuffer());

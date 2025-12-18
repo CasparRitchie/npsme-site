@@ -215,7 +215,14 @@ app.use((req, res, next) => {
 const BLOCKED_PATHS = [
   "/.env",
   "/.git",
-  "/vendor/phpunit",
+  "/.git/config",
+  "/.svn",
+  "/.hg",
+  "/wp-admin",
+  "/wp-login.php",
+  "/phpmyadmin",
+  "/cgi-bin",
+  "/vendor",
   "/_ignition",
 ];
 

@@ -9,7 +9,6 @@ import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -24,18 +23,25 @@ const mailer = nodemailer.createTransport({
   },
 });
 
-
-
 function generateInvitationId() {
   const ts = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `INV-${ts}-${rand}`;
 }
 
-async function sendInvitationEmail({ email, customerId, customerName, businessName, stage, surveyId }) {
+async function sendInvitationEmail({
+  email,
+  customerId,
+  customerName,
+  businessName,
+  stage,
+  surveyId,
+}) {
   const name = customerName ? `Hi ${customerName},` : "Hi,";
   const invitationId = generateInvitationId();
-  const surveyUrl = `https://www.npsme.com/demo-invitation-survey?inv=${encodeURIComponent(invitationId)}`;
+  const surveyUrl = `https://www.npsme.com/demo-invitation-survey?inv=${encodeURIComponent(
+    invitationId
+  )}`;
 
   const subject = "We’d love your feedback (1–2 minutes)";
 
@@ -84,9 +90,7 @@ async function sendLiveInvitationEmail({
   fromEmail,
   invitationId: explicitInvitationId, // <– allow override
 }) {
-  const politeName = customerName
-    ? `Bonjour ${customerName},`
-    : "Bonjour,";
+  const politeName = customerName ? `Bonjour ${customerName},` : "Bonjour,";
 
   const invitationId = explicitInvitationId || generateInvitationId();
   const surveyUrl = `https://www.npsme.com/live-invitation-survey?inv=${encodeURIComponent(
@@ -212,6 +216,7 @@ app.use((req, res, next) => {
   return next();
 });
 
+// --------- Block common probe paths BEFORE APIs + static ---------
 const BLOCKED_PATHS = [
   "/.env",
   "/.git",
@@ -233,6 +238,7 @@ app.use((req, res, next) => {
   }
   next();
 });
+
 // ---- Dropbox token management (auto-refresh) ----
 const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
 const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
@@ -267,9 +273,7 @@ async function getDropboxAccessToken() {
   // No refresh token configured: use legacy static token as a fallback
   if (!DROPBOX_REFRESH_TOKEN) {
     if (!LEGACY_DROPBOX_TOKEN) {
-      console.warn(
-        "[npsme] No Dropbox token available; skipping Dropbox operations."
-      );
+      console.warn("[npsme] No Dropbox token available; skipping Dropbox operations.");
       return null;
     }
     return LEGACY_DROPBOX_TOKEN;
@@ -290,47 +294,37 @@ async function getDropboxAccessToken() {
 
   const resp = await fetch("https://api.dropbox.com/oauth2/token", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params,
   });
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => "");
-    console.error(
-      `[npsme] Dropbox token refresh failed (${resp.status}):`,
-      text
-    );
-    throw new Error(
-      `Dropbox token refresh failed (${resp.status}): ${text || "no body"}`
-    );
+    console.error(`[npsme] Dropbox token refresh failed (${resp.status}):`, text);
+    throw new Error(`Dropbox token refresh failed (${resp.status}): ${text || "no body"}`);
   }
 
   const data = await resp.json();
   cachedDropboxToken = data.access_token;
-  const expiresIn =
-    typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60;
+  const expiresIn = typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60;
   cachedDropboxExpiry = now + expiresIn;
 
   return cachedDropboxToken;
 }
 
 // Small CSV escaper (supports , or ;)
-  function escapeCsv(value, delimiter = ",") {
-    const v = value == null ? "" : String(value);
+function escapeCsv(value, delimiter = ",") {
+  const v = value == null ? "" : String(value);
 
-    // We must quote if the value contains a quote, newline, or the delimiter itself
-    const pattern =
-      delimiter === ","
-        ? /[",\n]/
-        : new RegExp(`[\"${delimiter}\n]`);
+  // We must quote if the value contains a quote, newline, or the delimiter itself
+  const pattern =
+    delimiter === "," ? /[",\n]/ : new RegExp(`[\"${delimiter}\n]`);
 
-    if (pattern.test(v)) {
-      return `"${v.replace(/"/g, '""')}"`;
-    }
-    return v;
+  if (pattern.test(v)) {
+    return `"${v.replace(/"/g, '""')}"`;
   }
+  return v;
+}
 
 async function readDropboxFile(path) {
   const token = await getDropboxAccessToken();
@@ -395,7 +389,7 @@ async function appendInvitationRow(row) {
   }
 
   const header =
-  "invitationId,customerId,customerName,businessName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
+    "invitationId,customerId,customerName,businessName,email,stage,surveyId,sentAt,resentCount,lastSentAt,status,responseId";
 
   const existing = await readDropboxFile(INVITATIONS_PATH).catch((err) => {
     console.error("[npsme] Error reading invitations.csv", err);
@@ -463,17 +457,13 @@ async function findInvitationById(invitationId) {
     "rows"
   );
 
-  const match =
-    rows.find((r) => normalise(r.invitationId) === target) || null;
+  const match = rows.find((r) => normalise(r.invitationId) === target) || null;
 
   if (!match) {
     const sample = rows.slice(0, 5).map((r) => normalise(r.invitationId));
     console.log("[npsme] findInvitationById: not found. Sample IDs:", sample);
   } else {
-    console.log(
-      "[npsme] findInvitationById: found invitation",
-      JSON.stringify(match.invitationId)
-    );
+    console.log("[npsme] findInvitationById: found invitation", JSON.stringify(match.invitationId));
   }
 
   return match;
@@ -638,7 +628,6 @@ async function appendDemoResponseRow(row) {
 }
 
 // --- CSV helpers for demo responses (handles , and ;) ---
-
 function detectDelimiter(headerLine) {
   const commaCount = (headerLine.match(/,/g) || []).length;
   const semiCount = (headerLine.match(/;/g) || []).length;
@@ -712,8 +701,8 @@ function parseCsvWithHeader(csvText) {
 
   return rows;
 }
-// --- Invitation summary helpers (for response rate visuals) ---
 
+// --- Invitation summary helpers (for response rate visuals) ---
 function isInvitationResponded(invitation) {
   const status = (invitation.status || "").toLowerCase().trim();
   const responseId =
@@ -824,9 +813,7 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
 
   // Completed = unique invitations with at least one demo response
   const completedIds = new Set(
-    demoResponses
-      .map((r) => (r.invitationId || "").trim())
-      .filter(Boolean)
+    demoResponses.map((r) => (r.invitationId || "").trim()).filter(Boolean)
   );
 
   let started = 0;
@@ -860,39 +847,21 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
     // --- By month (based on sentAt) ---
     const monthKey = monthKeyFromDate(inv.sentAt);
     if (!byMonthMap.has(monthKey)) {
-      byMonthMap.set(monthKey, {
-        month: monthKey,
-        sent: 0,
-        started: 0,
-        completed: 0,
-      });
+      byMonthMap.set(monthKey, { month: monthKey, sent: 0, started: 0, completed: 0 });
     }
     const monthBucket = byMonthMap.get(monthKey);
     monthBucket.sent++;
-    if (status === "started" || status === "responded" || isCompleted) {
-      monthBucket.started++;
-    }
-    if (isCompleted) {
-      monthBucket.completed++;
-    }
+    if (status === "started" || status === "responded" || isCompleted) monthBucket.started++;
+    if (isCompleted) monthBucket.completed++;
 
     // --- By stage ---
     if (!byStageMap.has(stage)) {
-      byStageMap.set(stage, {
-        stage,
-        sent: 0,
-        started: 0,
-        completed: 0,
-      });
+      byStageMap.set(stage, { stage, sent: 0, started: 0, completed: 0 });
     }
     const stageBucket = byStageMap.get(stage);
     stageBucket.sent++;
-    if (status === "started" || status === "responded" || isCompleted) {
-      stageBucket.started++;
-    }
-    if (isCompleted) {
-      stageBucket.completed++;
-    }
+    if (status === "started" || status === "responded" || isCompleted) stageBucket.started++;
+    if (isCompleted) stageBucket.completed++;
   }
 
   // For now, "opened" ~= "started"
@@ -910,7 +879,6 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
   const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
     a.month > b.month ? 1 : -1
   );
-
   const byStage = Array.from(byStageMap.values());
 
   return { overall, byMonth, byStage };
@@ -919,6 +887,9 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
 // --- Demo API (in-memory) ---
 let demoResponses = [];
 
+// -------------------- API ROUTES (keep before static) --------------------
+
+// Demo response endpoint
 app.post("/api/demo/response", async (req, res) => {
   try {
     const { score, comment, invitationId } = req.body || {};
@@ -1017,38 +988,33 @@ app.post("/api/send-invitation", async (req, res) => {
     }
 
     // 1) Decide who the email appears to come from
-    const effectiveFromName =
-      fromName || process.env.ZOHO_FROM_NAME || "NPS Me";
-
-    const effectiveFromEmail =
-      fromEmail || process.env.ZOHO_FROM_EMAIL;
+    const effectiveFromName = fromName || process.env.ZOHO_FROM_NAME || "NPS Me";
+    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
 
     // Reply-To: explicitly provided, or fall back to from
-    const effectiveReplyTo =
-      replyToEmail || effectiveFromEmail;
+    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
 
     if (!effectiveFromEmail) {
       console.error("[npsme] No from email configured");
       return res.status(500).json({ error: "Email configuration error" });
     }
 
-    // 2) Build content + ID (still pass the raw values so the template can personalise signature etc.)
-    const { subject, plainText, html, invitationId } =
-      await sendInvitationEmail({
-        email,
-        customerId,
-        customerName,
-        businessName,
-        stage,
-        surveyId,
-        fromName: effectiveFromName,
-        fromEmail: effectiveFromEmail,
-        replyToEmail: effectiveReplyTo,
-      });
+    // 2) Build content + ID
+    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName: effectiveFromName,
+      fromEmail: effectiveFromEmail,
+      replyToEmail: effectiveReplyTo,
+    });
 
     const sentAt = new Date().toISOString();
 
-    // 3) Log to Dropbox (including invitationId)
+    // 3) Log to Dropbox
     await appendInvitationRow({
       invitationId,
       customerId,
@@ -1075,11 +1041,7 @@ app.post("/api/send-invitation", async (req, res) => {
       html,
     });
 
-    res.json({
-      ok: true,
-      invitationId,
-      messageId: info.messageId,
-    });
+    res.json({ ok: true, invitationId, messageId: info.messageId });
   } catch (err) {
     console.error("[npsme] Error in /api/send-invitation", err);
     res.status(500).json({ error: "Failed to send invitation" });
@@ -1100,22 +1062,15 @@ app.post("/api/send-live-invitation", async (req, res) => {
       fromEmail,
       replyToEmail,
       typeOfDevice,
-      assistanteMaternelle, // frontend will POST this as free-text
+      assistanteMaternelle,
     } = req.body || {};
 
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
+    if (!email) return res.status(400).json({ error: "Email is required" });
 
     // 1) Decide who the email appears to come from
-    const effectiveFromName =
-      fromName || "Nicholas d'Envola"; // default with the H and Envola brand
-
-    const effectiveFromEmail =
-      fromEmail || process.env.ZOHO_FROM_EMAIL;
-
-    const effectiveReplyTo =
-      replyToEmail || effectiveFromEmail;
+    const effectiveFromName = fromName || "Nicholas d'Envola";
+    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
+    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
 
     if (!effectiveFromEmail) {
       console.error("[npsme] LIVE: No from email configured");
@@ -1123,21 +1078,20 @@ app.post("/api/send-live-invitation", async (req, res) => {
     }
 
     // 2) Build LIVE email content + ID
-    const { subject, plainText, html, invitationId } =
-      await sendLiveInvitationEmail({
-        email,
-        customerId,
-        customerName,
-        businessName,
-        stage,
-        surveyId,
-        fromName: effectiveFromName,
-        fromEmail: effectiveFromEmail,
-      });
+    const { subject, plainText, html, invitationId } = await sendLiveInvitationEmail({
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName: effectiveFromName,
+      fromEmail: effectiveFromEmail,
+    });
 
     const sentAt = new Date().toISOString();
 
-    // 3) Log to LIVE invitations CSV (includes typeOfDevice + assistanteMaternelle)
+    // 3) Log to LIVE invitations CSV
     await appendLiveInvitationRow({
       invitationId,
       customerId,
@@ -1166,11 +1120,7 @@ app.post("/api/send-live-invitation", async (req, res) => {
       html,
     });
 
-    res.json({
-      ok: true,
-      invitationId,
-      messageId: info.messageId,
-    });
+    res.json({ ok: true, invitationId, messageId: info.messageId });
   } catch (err) {
     console.error("[npsme] Error in /api/send-live-invitation", err);
     res.status(500).json({ error: "Failed to send live invitation" });
@@ -1181,55 +1131,31 @@ app.post("/api/send-live-invitation", async (req, res) => {
 app.get("/api/demo-survey/lookup", async (req, res) => {
   try {
     const invRaw = req.query.inv;
-    const inv =
-      typeof invRaw === "string" ? invRaw.trim() : "";
+    const inv = typeof invRaw === "string" ? invRaw.trim() : "";
 
     console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
 
-    if (!inv) {
-      return res.status(400).json({ error: "Missing invitation id" });
-    }
+    if (!inv) return res.status(400).json({ error: "Missing invitation id" });
 
     const invitation = await findInvitationById(inv);
-    if (!invitation) {
-      console.log(
-        "[npsme] lookup: no invitation found for id =",
-        inv
-      );
-      return res.status(404).json({ error: "Invitation not found" });
-    }
+    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
 
-    // Be defensive: treat as responded only if status is "responded"
-    // OR responseId is present and non-empty
     const status = (invitation.status || "").toLowerCase().trim();
     const responseId =
       typeof invitation.responseId === "string"
         ? invitation.responseId.trim()
         : invitation.responseId;
 
-    const alreadyResponded =
-      status === "responded" || (responseId && responseId !== "");
-
+    const alreadyResponded = status === "responded" || (responseId && responseId !== "");
     if (alreadyResponded) {
-      console.log(
-        "[npsme] lookup: invitation already responded:",
-        invitation.invitationId,
-        "status =",
-        status,
-        "responseId =",
-        responseId
-      );
-      return res
-        .status(409)
-        .json({ error: "Invitation already responded" });
+      return res.status(409).json({ error: "Invitation already responded" });
     }
 
-    // 🔹 Mark this invitation as "started" the first time the survey is opened
+    // Mark started (best effort)
     try {
       await markInvitationStarted(invitation.invitationId);
     } catch (e) {
       console.error("[npsme] Failed to mark invitation started", e);
-      // non-fatal
     }
 
     return res.json({
@@ -1260,20 +1186,11 @@ app.post("/api/demo-survey/submit", async (req, res) => {
     }
 
     const invitation = await findInvitationById(invitationId);
-    if (!invitation) {
-      return res.status(404).json({ error: "Invitation not found" });
-    }
-    if (invitation.responseId) {
-      return res.status(409).json({ error: "Invitation already responded" });
-    }
+    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
+    if (invitation.responseId) return res.status(409).json({ error: "Invitation already responded" });
 
-    // Decide whether this is an overall NPS or milestone NPS response
     const rawStage = (invitation.stage || "").toLowerCase().trim();
-
-    const type =
-      !rawStage || rawStage === "overall"
-        ? "overall"
-        : "milestone";
+    const type = !rawStage || rawStage === "overall" ? "overall" : "milestone";
 
     const responseId = `RESP-${Date.now().toString(36).toUpperCase()}`;
     const createdAt = new Date().toISOString();
@@ -1310,13 +1227,9 @@ app.get("/api/demo-responses", async (req, res) => {
       return null;
     });
 
-    if (!csv) {
-      return res.json({ rows: [] });
-    }
+    if (!csv) return res.json({ rows: [] });
 
     const rows = parseCsvWithHeader(csv);
-
-    // Optionally normalise score + createdAt types here
     const normalised = rows.map((r) => ({
       ...r,
       score: r.score !== undefined && r.score !== "" ? Number(r.score) : null,
@@ -1333,7 +1246,7 @@ app.get("/api/demo-responses", async (req, res) => {
 // Load all LIVE responses (for the live dashboard)
 app.get("/api/live-responses", async (req, res) => {
   try {
-    const rows = await loadLiveResponses(); // already defined helper
+    const rows = await loadLiveResponses();
     res.json({ rows });
   } catch (err) {
     console.error("[npsme] Error in /api/live-responses", err);
@@ -1369,16 +1282,13 @@ app.get("/api/demo-funnel", async (req, res) => {
         (inv) => (inv.stage || "").trim() === stage
       );
     }
-    // Set of invitationIds that survive the invite filter
+
     const allowedInvitationIds = new Set(
-      filteredInvitations
-        .map((inv) => (inv.invitationId || "").trim())
-        .filter(Boolean)
+      filteredInvitations.map((inv) => (inv.invitationId || "").trim()).filter(Boolean)
     );
 
     const totalSent = filteredInvitations.length;
 
-    // Completed = unique invitations (from filtered set) with at least one demo response
     const completedIds = new Set(
       demoResponses
         .map((r) => (r.invitationId || "").trim())
@@ -1400,7 +1310,6 @@ app.get("/api/demo-funnel", async (req, res) => {
       return `${y}-${m}`;
     };
 
-    // --- 2) Build month + stage buckets based on FILTERED invites ---
     for (const inv of filteredInvitations) {
       const id = (inv.invitationId || "").trim();
       const stage = (inv.stage || "").trim() || "Unspecified";
@@ -1409,50 +1318,28 @@ app.get("/api/demo-funnel", async (req, res) => {
 
       if (isCompleted) completed++;
 
-      // "started" means survey link opened or completed
       if (status === "started" || status === "responded" || isCompleted) {
         started++;
       }
 
-      // --- By month (based on sentAt) ---
       const monthKey = monthKeyFromDate(inv.sentAt);
       if (!byMonthMap.has(monthKey)) {
-        byMonthMap.set(monthKey, {
-          month: monthKey,
-          sent: 0,
-          started: 0,
-          completed: 0,
-        });
+        byMonthMap.set(monthKey, { month: monthKey, sent: 0, started: 0, completed: 0 });
       }
       const monthBucket = byMonthMap.get(monthKey);
       monthBucket.sent++;
-      if (status === "started" || status === "responded" || isCompleted) {
-        monthBucket.started++;
-      }
-      if (isCompleted) {
-        monthBucket.completed++;
-      }
+      if (status === "started" || status === "responded" || isCompleted) monthBucket.started++;
+      if (isCompleted) monthBucket.completed++;
 
-      // --- By stage ---
       if (!byStageMap.has(stage)) {
-        byStageMap.set(stage, {
-          stage,
-          sent: 0,
-          started: 0,
-          completed: 0,
-        });
+        byStageMap.set(stage, { stage, sent: 0, started: 0, completed: 0 });
       }
       const stageBucket = byStageMap.get(stage);
       stageBucket.sent++;
-      if (status === "started" || status === "responded" || isCompleted) {
-        stageBucket.started++;
-      }
-      if (isCompleted) {
-        stageBucket.completed++;
-      }
+      if (status === "started" || status === "responded" || isCompleted) stageBucket.started++;
+      if (isCompleted) stageBucket.completed++;
     }
 
-    // For now, "opened" ~= "started"
     const opened = started;
 
     const overall = {
@@ -1467,24 +1354,18 @@ app.get("/api/demo-funnel", async (req, res) => {
     const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
       a.month > b.month ? 1 : -1
     );
-
     const byStage = Array.from(byStageMap.values());
 
-    res.json({
-      overall,
-      byMonth,
-      byStage,
-    });
+    res.json({ overall, byMonth, byStage });
   } catch (err) {
     console.error("[npsme] Error in /api/demo-funnel", err);
     res.status(500).json({ error: "Failed to compute demo funnel" });
   }
 });
 
-
 // PSEUDO PATHS – adjust to your actual Dropbox paths
 const LIVE_INVITATIONS_PATH = "/npsme/live/invitations.csv";
-const LIVE_RESPONSES_PATH   = "/npsme/live/responses.csv";
+const LIVE_RESPONSES_PATH = "/npsme/live/responses.csv";
 
 async function loadLiveInvitations() {
   const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
@@ -1529,10 +1410,11 @@ async function appendLiveInvitationRow(row) {
     row.status || "sent",
     row.responseId || "",
   ];
-    const existing = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
-      console.error("[npsme] Error reading live invitations.csv", err);
-      return null;
-    });
+
+  const existing = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
+    console.error("[npsme] Error reading live invitations.csv", err);
+    return null;
+  });
 
   const line = fields.map(escapeCsv).join(",");
 
@@ -1586,9 +1468,7 @@ async function appendLiveResponseRow(row) {
 async function findLiveInvitationById(invitationId) {
   const rows = await loadLiveInvitations();
   return (
-    rows.find(
-      (r) => (r.invitationId || "").trim() === (invitationId || "").trim()
-    ) || null
+    rows.find((r) => (r.invitationId || "").trim() === (invitationId || "").trim()) || null
   );
 }
 
@@ -1647,11 +1527,9 @@ async function markLiveInvitationSent(invitationId, sentAtIso) {
 
       const now = sentAtIso || new Date().toISOString();
       if (!alreadyHadSentAt) {
-        // first time we send this one
         rowObj.sentAt = now;
         rowObj.resentCount = currentResent;
       } else {
-        // resend
         rowObj.resentCount = currentResent + 1;
       }
       rowObj.lastSentAt = now;
@@ -1701,15 +1579,10 @@ app.get("/api/live-survey/lookup", async (req, res) => {
     const inv = req.query.inv;
     console.log("[npsme] /api/live-survey/lookup called with inv =", inv);
 
-    if (!inv) {
-      return res.status(400).json({ error: "Missing invitation id" });
-    }
+    if (!inv) return res.status(400).json({ error: "Missing invitation id" });
 
     const invitation = await findLiveInvitationById(inv);
-    if (!invitation) {
-      console.warn("[npsme] live lookup: no invitation found for id =", inv);
-      return res.status(404).json({ error: "Invitation not found" });
-    }
+    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
 
     const status = (invitation.status || "").toLowerCase().trim();
     const responseId =
@@ -1717,16 +1590,9 @@ app.get("/api/live-survey/lookup", async (req, res) => {
         ? invitation.responseId.trim()
         : invitation.responseId;
 
-    const alreadyResponded =
-      status === "responded" || (responseId && responseId !== "");
+    const alreadyResponded = status === "responded" || (responseId && responseId !== "");
+    if (alreadyResponded) return res.status(409).json({ error: "Invitation already responded" });
 
-    if (alreadyResponded) {
-      return res
-        .status(409)
-        .json({ error: "Invitation already responded" });
-    }
-
-    // Mark as started (best effort)
     try {
       await markLiveInvitationStarted(invitation.invitationId);
     } catch (e) {
@@ -1761,9 +1627,7 @@ app.get("/api/live-invitations", async (req, res) => {
     const statusFilterRaw = (req.query.status || "").toString().trim().toLowerCase();
     const includeAll = req.query.all === "1" || req.query.all === "true";
 
-    if (includeAll || !statusFilterRaw) {
-      return res.json({ rows });
-    }
+    if (includeAll || !statusFilterRaw) return res.json({ rows });
 
     const filtered = rows.filter((row) => {
       const s = (row.status || "").toLowerCase().trim() || "pending";
@@ -1787,10 +1651,7 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
     }
 
     const allRows = await loadLiveInvitations();
-
-    const byId = new Map(
-      allRows.map((row) => [(row.invitationId || "").trim(), row])
-    );
+    const byId = new Map(allRows.map((row) => [(row.invitationId || "").trim(), row]));
 
     const results = [];
 
@@ -1805,16 +1666,11 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
 
       const status = (row.status || "").toLowerCase().trim();
       if (status === "sent" || status === "responded") {
-        results.push({
-          invitationId: id,
-          ok: false,
-          error: `Already ${status}`,
-        });
+        results.push({ invitationId: id, ok: false, error: `Already ${status}` });
         continue;
       }
 
       try {
-        // Build the live email using the *existing* invitationId from the CSV
         const { subject, plainText, html } = await sendLiveInvitationEmail({
           email: row.email,
           customerId: row.customerId || "",
@@ -1824,12 +1680,10 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
           surveyId: row.surveyId || "",
           fromName: "Nicholas d'Envola",
           fromEmail: process.env.ZOHO_FROM_EMAIL,
-          invitationId: id, // <- reuse existing ID
+          invitationId: id,
         });
 
-        if (!process.env.ZOHO_FROM_EMAIL) {
-          throw new Error("ZOHO_FROM_EMAIL not configured");
-        }
+        if (!process.env.ZOHO_FROM_EMAIL) throw new Error("ZOHO_FROM_EMAIL not configured");
 
         await mailer.sendMail({
           from: `"Nicholas d'Envola" <${process.env.ZOHO_FROM_EMAIL}>`,
@@ -1842,7 +1696,6 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
         });
 
         await markLiveInvitationSent(id);
-
         results.push({ invitationId: id, ok: true });
       } catch (e) {
         console.error("[npsme] Error sending live invitation", id, e);
@@ -1857,25 +1710,19 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
   }
 });
 
-// Resend a LIVE invitation (allowed for status "sent" or "started", blocked if "responded")
+// Resend a LIVE invitation
 app.post("/api/live-invitations/resend", async (req, res) => {
   try {
     const { invitationId } = req.body || {};
     const id = (invitationId || "").trim();
 
-    if (!id) {
-      return res.status(400).json({ error: "invitationId is required" });
-    }
+    if (!id) return res.status(400).json({ error: "invitationId is required" });
 
     const inv = await findLiveInvitationById(id);
-    if (!inv) {
-      return res.status(404).json({ error: "Invitation not found" });
-    }
+    if (!inv) return res.status(404).json({ error: "Invitation not found" });
 
     const status = (inv.status || "").toLowerCase().trim() || "pending";
-    if (status === "responded") {
-      return res.status(409).json({ error: "Invitation already responded" });
-    }
+    if (status === "responded") return res.status(409).json({ error: "Invitation already responded" });
     if (status === "pending") {
       return res.status(409).json({ error: "Invitation not sent yet. Use Send from Pending." });
     }
@@ -1907,7 +1754,6 @@ app.post("/api/live-invitations/resend", async (req, res) => {
     });
 
     await markLiveInvitationSent(id);
-
     res.json({ ok: true, invitationId: id });
   } catch (err) {
     console.error("[npsme] Error in /api/live-invitations/resend", err);
@@ -1919,17 +1765,13 @@ app.post("/api/live-survey/submit", async (req, res) => {
   try {
     const { invitationId, score, comment } = req.body || {};
 
-    if (!invitationId) {
-      return res.status(400).json({ error: "Missing invitation id" });
-    }
+    if (!invitationId) return res.status(400).json({ error: "Missing invitation id" });
     if (typeof score !== "number" || Number.isNaN(score)) {
       return res.status(400).json({ error: "Score must be a number" });
     }
 
     const invitation = await findLiveInvitationById(invitationId);
-    if (!invitation) {
-      return res.status(404).json({ error: "Invitation not found" });
-    }
+    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
 
     const status = (invitation.status || "").toLowerCase().trim();
     const existingResponseId =
@@ -1937,17 +1779,10 @@ app.post("/api/live-survey/submit", async (req, res) => {
         ? invitation.responseId.trim()
         : invitation.responseId;
 
-    const alreadyResponded =
-      status === "responded" || (existingResponseId && existingResponseId !== "");
+    const alreadyResponded = status === "responded" || (existingResponseId && existingResponseId !== "");
+    if (alreadyResponded) return res.status(409).json({ error: "Invitation already responded" });
 
-    if (alreadyResponded) {
-      return res
-        .status(409)
-        .json({ error: "Invitation already responded" });
-    }
-
-    const responseId = generateResponseId(); // same helper as demo, e.g. RESP-...
-
+    const responseId = generateResponseId();
     const createdAt = new Date().toISOString();
 
     await appendLiveResponseRow({
@@ -1959,7 +1794,6 @@ app.post("/api/live-survey/submit", async (req, res) => {
     });
 
     await markLiveInvitationResponded(invitationId, responseId);
-
     return res.json({ ok: true, responseId });
   } catch (err) {
     console.error("[npsme] Error in /api/live-survey/submit", err);
@@ -1967,438 +1801,15 @@ app.post("/api/live-survey/submit", async (req, res) => {
   }
 });
 
-// // ---- Intercom smoke test (read-only) ----
-// app.get("/api/intercom/ping", async (_req, res) => {
-//   try {
-//     const response = await fetch("https://api.intercom.io/me", {
-//       headers: {
-//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//         Accept: "application/json",
-//         "Intercom-Version": "2.14",
-//       },
-//     });
-
-//     const data = await response.json();
-
-//     if (!response.ok) {
-//       console.error("[intercom] ping failed", data);
-//       return res.status(500).json({ ok: false, data });
-//     }
-
-//     res.json({
-//       ok: true,
-//       app: data.app?.name,
-//       email: data.email,
-//     });
-//   } catch (err) {
-//     console.error("[intercom] ping error", err);
-//     res.status(500).json({ ok: false, error: err.message });
-//   }
-// });
-
-// app.get("/api/intercom/users", async (_req, res) => {
-//   try {
-//     const response = await fetch(
-//       "https://api.intercom.io/contacts?per_page=10",
-//       {
-//         headers: {
-//           Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//           Accept: "application/json",
-//           "Intercom-Version": "2.14",
-//         },
-//       }
-//     );
-
-//     const data = await response.json();
-
-//     if (!response.ok) {
-//       console.error("[intercom] users fetch failed", data);
-//       return res.status(500).json({ error: data });
-//     }
-
-//     res.json({
-//       total: data.total_count,
-//       sample: data.data?.slice(0, 2),
-//     });
-//   } catch (err) {
-//     console.error("[intercom] users error", err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// app.get("/api/intercom/contact/:id", async (req, res) => {
-//   try {
-//     const id = req.params.id;
-
-//     const response = await fetch(`https://api.intercom.io/contacts/${id}`, {
-//       headers: {
-//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//         Accept: "application/json",
-//         "Intercom-Version": "2.14",
-//       },
-//     });
-
-//     const text = await response.text();
-//     if (!response.ok) {
-//       return res.status(500).json({ ok: false, status: response.status, body: text });
-//     }
-
-//     return res.json(JSON.parse(text));
-//   } catch (err) {
-//     return res.status(500).json({ ok: false, error: err.message });
-//   }
-// });
-
-// function monthsBetween(startUnixSeconds, now = new Date()) {
-//   const start = new Date(startUnixSeconds * 1000);
-//   const months =
-//     (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-//   return Math.max(0, months);
-// }
-
-// app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
-//   try {
-//     // Pull first page (good enough for prototype). Later we’ll paginate.
-//     const response = await fetch("https://api.intercom.io/contacts?per_page=150", {
-//       headers: {
-//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//         Accept: "application/json",
-//         "Intercom-Version": "2.14",
-//       },
-//     });
-
-//     const data = await response.json();
-//     if (!response.ok) {
-//       console.error("[intercom] contacts fetch failed", data);
-//       return res.status(500).json({ error: data });
-//     }
-
-//     const now = new Date();
-
-//     const rows = (data.data || [])
-//       .filter((c) => c?.role === "user")
-//       .map((c) => {
-//         const ca = c.custom_attributes || {};
-//         const startDate = ca.start_date; // unix seconds
-//         if (!startDate) return null;               // <- ignore unknowns for now
-//         return {
-//           id: c.id,
-//           email: c.email,
-//           name: c.name,
-//           device_type: ca.device_type || null,
-//           envola_role: ca.envola_role || null,
-//           start_date: startDate || null,
-//           months_since_start: startDate ? monthsBetween(startDate, now) : null,
-//         };
-//       });
-
-//     // Cohort grouping
-//     const cohorts = {};
-//     for (const r of rows) {
-//       const key = r.months_since_start == null ? "unknown" : String(r.months_since_start);
-//       cohorts[key] ||= { cohort: key, count: 0, by_role: {}, by_device: {} };
-//       cohorts[key].count += 1;
-
-//       if (r.envola_role) {
-//         cohorts[key].by_role[r.envola_role] = (cohorts[key].by_role[r.envola_role] || 0) + 1;
-//       }
-//       if (r.device_type) {
-//         cohorts[key].by_device[r.device_type] = (cohorts[key].by_device[r.device_type] || 0) + 1;
-//       }
-//     }
-
-//     const sorted = Object.values(cohorts).sort((a, b) => {
-//       if (a.cohort === "unknown") return 1;
-//       if (b.cohort === "unknown") return -1;
-//       return Number(a.cohort) - Number(b.cohort);
-//     });
-
-//     res.json({
-//       ok: true,
-//       total_users: rows.length,
-//       cohorts: sorted,
-//       sample_users: rows.slice(0, 5),
-//     });
-//   } catch (err) {
-//     console.error("[intercom] cohort error", err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-
-// import zlib from "zlib";
-// import { parse } from "csv-parse/sync";
-
-// const INTERCOM_HEADERS_JSON = {
-//   Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//   Accept: "application/json",
-//   "Intercom-Version": "2.14",
-//   "Content-Type": "application/json",
-// };
-
-// function sleep(ms) {
-//   return new Promise((r) => setTimeout(r, ms));
-// }
-
-// async function createExportJob({ created_at_after, created_at_before }) {
-//   const r = await fetch("https://api.intercom.io/export/content/data", {
-//     method: "POST",
-//     headers: INTERCOM_HEADERS_JSON,
-//     body: JSON.stringify({ created_at_after, created_at_before }),
-//   });
-
-//   const data = await r.json();
-//   if (!r.ok) {
-//     throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
-//   }
-//   return data; // includes id + links
-// }
-
-// async function getExportJob(jobId) {
-//   const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
-//     headers: {
-//       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//       Accept: "application/json",
-//       "Intercom-Version": "2.14",
-//     },
-//   });
-//   const data = await r.json();
-//   if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
-//   return data;
-// }
-
-
-// function isGzipBuffer(buf) {
-//   return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-// }
-
-// import zlib from "zlib";
-
-// function sniff(buf) {
-//   const b0 = buf?.[0], b1 = buf?.[1], b2 = buf?.[2], b3 = buf?.[3];
-//   return {
-//     isGzip: b0 === 0x1f && b1 === 0x8b,
-//     isZip:  b0 === 0x50 && b1 === 0x4b, // "PK" (just in case)
-//     headHex: [b0,b1,b2,b3].map(x => (x ?? 0).toString(16).padStart(2,"0")).join(" "),
-//   };
-// }
-
-// async function downloadExportCsv(downloadUrl) {
-//   const r = await fetch(downloadUrl, {
-//     redirect: "manual",
-//     headers: {
-//       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-//       Accept: "application/octet-stream",
-//       "Intercom-Version": "2.14",
-//     },
-//   });
-
-
-//   // Handle redirect to signed URL (no auth)
-//   if (r.status >= 300 && r.status < 400) {
-//     const loc = r.headers.get("location");
-//     if (!loc) throw new Error("Intercom download redirect missing Location header");
-
-//     const fileResp = await fetch(loc);
-//     const buf = Buffer.from(await fileResp.arrayBuffer());
-//     if (!fileResp.ok) {
-//       throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 500)}`);
-//     }
-
-//     const { isGzip } = sniff(buf);
-//     if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
-
-//     // fallback: sometimes servers still gzip without standard header; try once
-//     try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
-//     return buf.toString("utf8");
-//   }
-
-//   const buf = Buffer.from(await r.arrayBuffer());
-//   if (!r.ok) {
-//     throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 500)}`);
-//   }
-
-//   const { isGzip } = sniff(buf);
-//   if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
-
-//   // fallback gunzip attempt (covers weird edge cases)
-//   try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
-
-//   return buf.toString("utf8");
-// }
-
-// function isLikelySurveyRow(row) {
-//   // TODO: refine once you see real headers.
-//   // Common patterns: content type fields, or body containing survey markers.
-//   const blob = JSON.stringify(row).toLowerCase();
-//   return blob.includes("survey") || blob.includes("nps");
-// }
-
-// app.get("/api/intercom/survey-responses/raw", async (req, res) => {
-//   try {
-//     const hours = Number(req.query.hours || 24);
-//     const now = Math.floor(Date.now() / 1000);
-//     const created_at_before = now;
-//     const created_at_after = now - hours * 3600;
-
-//     // 1) Create export job
-//     const job = await createExportJob({ created_at_after, created_at_before });
-//     const jobId = job.job_identifier || job.job_identfier || job.id;
-//     if (!jobId) {
-//       return res.status(500).json({ ok: false, error: "Intercom export job_identifier missing", job });
-//     }
-//     // 2) Poll until complete
-//     let status = job;
-//     for (let i = 0; i < 30; i++) {
-//       status = await getExportJob(jobId);
-//       if (status.status === "complete" && status.download_url) break;
-//       if (status.status === "failed") {
-//         return res.status(500).json({ ok: false, error: "Export job failed", status });
-//       }
-//       await sleep(2000);
-//     }
-
-//     const done = status.status === "complete" || status.status === "completed";
-
-//     if (!(done && status.download_url)) {
-//       return res.json({
-//         ok: true,
-//         job_identifier: jobId,
-//         status: status.status,
-//         progress: status,
-//       });
-//     }
-
-
-//     // 3) Download + parse CSV
-//     const csvText = await downloadExportCsv(status.download_url);
-//     const records = parse(csvText, {
-//       columns: true,
-//       skip_empty_lines: true,
-//     });
-
-//     // 4) Filter survey-ish rows
-//     const surveyRows = records.filter(isLikelySurveyRow);
-
-//     return res.json({
-//       ok: true,
-//       range: { created_at_after, created_at_before, hours },
-//       total_rows: records.length,
-//       matched_rows: surveyRows.length,
-//       sample_headers: records[0] ? Object.keys(records[0]) : [],
-//       sample_rows: surveyRows.slice(0, 10),
-//       // keep rows out for now if huge; add back later if you want
-//       // rows: surveyRows,
-//     });
-//   } catch (err) {
-//     console.error("[intercom] survey raw export error", err);
-//     return res.status(500).json({
-//       ok: false,
-//       error: err.message,
-//       // super helpful while debugging in prod:
-//       stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
-//     });
-//   }
-// });
-
-
-// app.get("/api/intercom/survey-export/start", async (req, res) => {
-//   try {
-//     const hours = Number(req.query.hours || 24);
-//     const now = Math.floor(Date.now() / 1000);
-//     const created_at_before = now;
-//     const created_at_after = now - hours * 3600;
-
-//     const job = await createExportJob({ created_at_after, created_at_before });
-
-//     const jobId = job.job_identifier || job.job_identfier || job.id;
-//     if (!jobId) {
-//       return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
-//     }
-
-//     return res.json({
-//       ok: true,
-//       job_identifier: jobId,
-//       range: { created_at_after, created_at_before, hours },
-//       status: job.status || "pending",
-//     });
-//   } catch (err) {
-//     console.error("[intercom] export start error", err);
-//     return res.status(500).json({ ok: false, error: err.message });
-//   }
-// });
-
-
-// app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
-//   try {
-//     const jobId = req.params.jobId;
-//     const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
-
-//     const status = await getExportJob(jobId);
-
-//     // Not ready yet → return quickly
-//     const isDone = ["complete", "completed"].includes(String(status.status || "").toLowerCase());
-
-//     if (!(isDone && status.download_url)) {
-//       return res.json({
-//         ok: true,
-//         job_identifier: jobId,
-//         status: status.status,
-//         progress: status,
-//       });
-//     }
-
-//     // Ready → download + parse
-//     const csvText = await downloadExportCsv(status.download_url);
-//     const records = parse(csvText, { columns: true, skip_empty_lines: true });
-
-//     // filter: temporary, improves once we see headers
-//     let surveyRows = records.filter(isLikelySurveyRow);
-//     if (surveyId) {
-//       surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
-//     }
-
-//     return res.json({
-//       ok: true,
-//       job_identifier: jobId,
-//       status: "complete",
-//       total_rows: records.length,
-//       matched_rows: surveyRows.length,
-//       sample_headers: records[0] ? Object.keys(records[0]) : [],
-//       sample_rows: surveyRows.slice(0, 10),
-//     });
-//   } catch (err) {
-//     console.error("[intercom] export status error", err);
-//     return res.status(500).json({ ok: false, error: err.message });
-//   }
-// });
+// ---- Intercom router mount (kept exactly; now safely before static) ----
 app.use("/api/intercom", createIntercomRouter());
-
-// ---------- Static assets & caching ----------
-
-// Long cache for hashed assets (Vite puts them in /assets)
-app.use(
-  "/assets",
-  express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
-);
-
-// Short cache for other static assets
-app.use(
-  express.static(dist, {
-    maxAge: "1h",
-    index: false,
-  })
-);
-
 
 // --- Social summary endpoint for npsme.com ---
 app.get("/api/social-summary", async (req, res) => {
   try {
     const company = (req.query.company || "").trim();
     if (!company) {
-      return res
-        .status(400)
-        .json({ error: "company query parameter is required" });
+      return res.status(400).json({ error: "company query parameter is required" });
     }
 
     const response = await openai.responses.create({
@@ -2458,16 +1869,10 @@ app.get("/api/social-summary", async (req, res) => {
     try {
       parsed = JSON.parse(jsonText);
     } catch (e) {
-      console.error(
-        "Failed to parse JSON from /api/social-summary:",
-        e,
-        jsonText
-      );
-      // Fallback: treat everything as a plain summary
+      console.error("Failed to parse JSON from /api/social-summary:", e, jsonText);
       parsed = { summary: jsonText, competitor_summary: "" };
     }
 
-    // 🧼 Normalise strings: unescape '\n' and trim
     const normalise = (value) =>
       typeof value === "string" ? value.replace(/\\n/g, "\n").trim() : "";
 
@@ -2482,12 +1887,25 @@ app.get("/api/social-summary", async (req, res) => {
     });
   } catch (err) {
     console.error("Error in /api/social-summary:", err);
-    res
-      .status(500)
-      .json({ error: "Internal error generating social summary" });
+    res.status(500).json({ error: "Internal error generating social summary" });
   }
 });
 
+// -------------------- STATIC (after APIs) --------------------
+
+// Long cache for hashed assets (Vite puts them in /assets)
+app.use(
+  "/assets",
+  express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
+);
+
+// Short cache for other static assets
+app.use(
+  express.static(dist, {
+    maxAge: "1h",
+    index: false,
+  })
+);
 
 // ---------- Inject canonical + og:url for SEO ----------
 app.get("*", (req, res, next) => {
@@ -2497,7 +1915,6 @@ app.get("*", (req, res, next) => {
   // Never serve SPA HTML for file-ish paths (/.env, /.git/config, /favicon.ico, etc)
   if (req.path.includes(".")) return next();
 
-  // your existing canonical/og:url injection...
   res.set("Cache-Control", "no-store, must-revalidate");
 
   const pathOnly = req.originalUrl.split("?")[0] || "/";
@@ -2533,7 +1950,6 @@ app.get("*", (req, res, next) => {
 
   res.type("html").send(html);
 });
-
 
 app.listen(PORT, () => {
   console.log(`NPS Me running on :${PORT} (${PROD ? "prod" : "dev"})`);

@@ -9,6 +9,10 @@ import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
 
+/* -----------------------------
+   External clients (OpenAI / SMTP)
+------------------------------ */
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -22,6 +26,10 @@ const mailer = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
+
+/* -----------------------------
+   Small ID + email template helpers
+------------------------------ */
 
 function generateInvitationId() {
   const ts = Date.now().toString(36).toUpperCase();
@@ -159,6 +167,16 @@ async function sendLiveInvitationEmail({
   return { invitationId, subject, plainText, html };
 }
 
+function generateResponseId() {
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `R-${ts}-${rand}`;
+}
+
+/* -----------------------------
+   Paths / runtime constants
+------------------------------ */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -168,8 +186,13 @@ const PORT = process.env.PORT || 3000;
 
 // --- Adjust if you ever move away from www ---
 const CANONICAL_HOST = "www.npsme.com";
+
 const dist = path.join(__dirname, "dist");
 const baseIndexHtml = fs.readFileSync(path.join(dist, "index.html"), "utf8");
+
+/* -----------------------------
+   Core Express config + middleware
+------------------------------ */
 
 // Needed behind Heroku/Cloudflare so req.ip / x-forwarded-proto work
 app.set("trust proxy", 1);
@@ -216,7 +239,6 @@ app.use((req, res, next) => {
   return next();
 });
 
-// --------- Block common probe paths BEFORE APIs + static ---------
 const BLOCKED_PATHS = [
   "/.env",
   "/.git",
@@ -239,7 +261,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// ---- Dropbox token management (auto-refresh) ----
+/* -----------------------------
+   Dropbox token management (auto-refresh)
+------------------------------ */
+
 const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
 const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
 const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
@@ -251,8 +276,7 @@ const INVITATIONS_PATH =
   process.env.DROPBOX_INVITATIONS_PATH || "/npsme/invitations.csv";
 const DEMO_RESPONSES_PATH =
   process.env.DROPBOX_DEMO_RESPONSES_PATH || "/npsme/demo-responses.csv";
-const RESPONSES_PATH =
-  process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
+const RESPONSES_PATH = process.env.DROPBOX_RESPONSES_PATH || "/npsme/responses.csv";
 
 if (!DROPBOX_REFRESH_TOKEN && !LEGACY_DROPBOX_TOKEN) {
   console.warn(
@@ -294,19 +318,24 @@ async function getDropboxAccessToken() {
 
   const resp = await fetch("https://api.dropbox.com/oauth2/token", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     body: params,
   });
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => "");
     console.error(`[npsme] Dropbox token refresh failed (${resp.status}):`, text);
-    throw new Error(`Dropbox token refresh failed (${resp.status}): ${text || "no body"}`);
+    throw new Error(
+      `Dropbox token refresh failed (${resp.status}): ${text || "no body"}`
+    );
   }
 
   const data = await resp.json();
   cachedDropboxToken = data.access_token;
-  const expiresIn = typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60;
+  const expiresIn =
+    typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60;
   cachedDropboxExpiry = now + expiresIn;
 
   return cachedDropboxToken;
@@ -318,7 +347,9 @@ function escapeCsv(value, delimiter = ",") {
 
   // We must quote if the value contains a quote, newline, or the delimiter itself
   const pattern =
-    delimiter === "," ? /[",\n]/ : new RegExp(`[\"${delimiter}\n]`);
+    delimiter === ","
+      ? /[",\n]/
+      : new RegExp(`[\"${delimiter}\n]`);
 
   if (pattern.test(v)) {
     return `"${v.replace(/"/g, '""')}"`;
@@ -380,6 +411,10 @@ async function writeDropboxFile(path, contents) {
     throw new Error(`Dropbox upload failed (${res.status}): ${text}`);
   }
 }
+
+/* -----------------------------
+   Demo invitations / responses (Dropbox CSV)
+------------------------------ */
 
 // Append a single invitation row into invitations.csv
 async function appendInvitationRow(row) {
@@ -463,7 +498,10 @@ async function findInvitationById(invitationId) {
     const sample = rows.slice(0, 5).map((r) => normalise(r.invitationId));
     console.log("[npsme] findInvitationById: not found. Sample IDs:", sample);
   } else {
-    console.log("[npsme] findInvitationById: found invitation", JSON.stringify(match.invitationId));
+    console.log(
+      "[npsme] findInvitationById: found invitation",
+      JSON.stringify(match.invitationId)
+    );
   }
 
   return match;
@@ -531,12 +569,6 @@ async function markInvitationStarted(invitationId) {
 
   const updatedCsv = updatedLines.join("\n") + "\n";
   await writeDropboxFile(INVITATIONS_PATH, updatedCsv);
-}
-
-function generateResponseId() {
-  const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `R-${ts}-${rand}`;
 }
 
 async function appendResponseRow(row) {
@@ -627,7 +659,10 @@ async function appendDemoResponseRow(row) {
   await writeDropboxFile(DEMO_RESPONSES_PATH, contents);
 }
 
-// --- CSV helpers for demo responses (handles , and ;) ---
+/* -----------------------------
+   CSV helpers for demo responses (handles , and ;)
+------------------------------ */
+
 function detectDelimiter(headerLine) {
   const commaCount = (headerLine.match(/,/g) || []).length;
   const semiCount = (headerLine.match(/;/g) || []).length;
@@ -702,7 +737,10 @@ function parseCsvWithHeader(csvText) {
   return rows;
 }
 
-// --- Invitation summary helpers (for response rate visuals) ---
+/* -----------------------------
+   Invitation summary helpers (for response rate visuals)
+------------------------------ */
+
 function isInvitationResponded(invitation) {
   const status = (invitation.status || "").toLowerCase().trim();
   const responseId =
@@ -800,7 +838,10 @@ async function buildInvitationSummary() {
 
 async function loadDemoResponses() {
   const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
-    console.error("[npsme] Error reading demo-responses.csv in loadDemoResponses", err);
+    console.error(
+      "[npsme] Error reading demo-responses.csv in loadDemoResponses",
+      err
+    );
     return null;
   });
 
@@ -847,21 +888,39 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
     // --- By month (based on sentAt) ---
     const monthKey = monthKeyFromDate(inv.sentAt);
     if (!byMonthMap.has(monthKey)) {
-      byMonthMap.set(monthKey, { month: monthKey, sent: 0, started: 0, completed: 0 });
+      byMonthMap.set(monthKey, {
+        month: monthKey,
+        sent: 0,
+        started: 0,
+        completed: 0,
+      });
     }
     const monthBucket = byMonthMap.get(monthKey);
     monthBucket.sent++;
-    if (status === "started" || status === "responded" || isCompleted) monthBucket.started++;
-    if (isCompleted) monthBucket.completed++;
+    if (status === "started" || status === "responded" || isCompleted) {
+      monthBucket.started++;
+    }
+    if (isCompleted) {
+      monthBucket.completed++;
+    }
 
     // --- By stage ---
     if (!byStageMap.has(stage)) {
-      byStageMap.set(stage, { stage, sent: 0, started: 0, completed: 0 });
+      byStageMap.set(stage, {
+        stage,
+        sent: 0,
+        started: 0,
+        completed: 0,
+      });
     }
     const stageBucket = byStageMap.get(stage);
     stageBucket.sent++;
-    if (status === "started" || status === "responded" || isCompleted) stageBucket.started++;
-    if (isCompleted) stageBucket.completed++;
+    if (status === "started" || status === "responded" || isCompleted) {
+      stageBucket.started++;
+    }
+    if (isCompleted) {
+      stageBucket.completed++;
+    }
   }
 
   // For now, "opened" ~= "started"
@@ -879,489 +938,15 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
   const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
     a.month > b.month ? 1 : -1
   );
+
   const byStage = Array.from(byStageMap.values());
 
   return { overall, byMonth, byStage };
 }
 
-// --- Demo API (in-memory) ---
-let demoResponses = [];
-
-// -------------------- API ROUTES (keep before static) --------------------
-
-// Demo response endpoint
-app.post("/api/demo/response", async (req, res) => {
-  try {
-    const { score, comment, invitationId } = req.body || {};
-
-    if (typeof score !== "number" || score < 0 || score > 10) {
-      return res.status(400).json({ error: "Invalid score" });
-    }
-
-    const trimmedComment = (comment || "").slice(0, 500);
-
-    // Keep the in-memory demo metric for the homepage widget
-    demoResponses.push({ score, comment: trimmedComment, ts: Date.now() });
-
-    // Log to Dropbox for later analysis
-    const responseId = generateResponseId();
-    const createdAt = new Date().toISOString();
-
-    await appendResponseRow({
-      responseId,
-      invitationId: invitationId || "",
-      score,
-      comment: trimmedComment,
-      createdAt,
-    });
-
-    res.json({ ok: true, responseId });
-  } catch (err) {
-    console.error("[npsme] Error in /api/demo/response", err);
-    res.status(500).json({ error: "Failed to save response" });
-  }
-});
-
-app.get("/api/demo/metrics", (_req, res) => {
-  if (!demoResponses.length) return res.json({ nps: null, count: 0 });
-  const promoters = demoResponses.filter((r) => r.score >= 9).length;
-  const detractors = demoResponses.filter((r) => r.score <= 6).length;
-  const total = demoResponses.length;
-  const nps = Math.round(((promoters - detractors) / total) * 100);
-  res.json({ nps, count: total });
-});
-
-app.post("/api/intake", (req, res) => {
-  console.log("INTAKE", req.body);
-  res.json({ ok: true });
-});
-
-app.get("/sitemap.xml", (_req, res) => {
-  res.set("Cache-Control", "public, max-age=0");
-  res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
-});
-
-// Health check
-app.get("/healthz", (_req, res) => {
-  res.set("Cache-Control", "no-store");
-  res.type("text/plain").send("ok");
-});
-app.head("/healthz", (_req, res) => {
-  res.set("Cache-Control", "no-store");
-  res.status(200).end();
-});
-
-app.post("/api/send-test-email", async (req, res) => {
-  const { to } = req.body;
-
-  try {
-    const info = await mailer.sendMail({
-      from: `"NPS Me" <hello@npsme.com>`,
-      to,
-      subject: "NPS Me SMTP Test",
-      text: "This is a test email from the NPS Me server. Everything works!",
-    });
-
-    res.json({ ok: true, info });
-  } catch (err) {
-    console.error("SMTP ERROR", err);
-    res.status(500).json({ ok: false, error: err.message });
-  }
-});
-
-app.post("/api/send-invitation", async (req, res) => {
-  try {
-    const {
-      email,
-      customerId,
-      customerName,
-      businessName,
-      stage,
-      surveyId,
-      fromName,
-      fromEmail,
-      replyToEmail,
-    } = req.body || {};
-
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
-
-    // 1) Decide who the email appears to come from
-    const effectiveFromName = fromName || process.env.ZOHO_FROM_NAME || "NPS Me";
-    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
-
-    // Reply-To: explicitly provided, or fall back to from
-    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
-
-    if (!effectiveFromEmail) {
-      console.error("[npsme] No from email configured");
-      return res.status(500).json({ error: "Email configuration error" });
-    }
-
-    // 2) Build content + ID
-    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
-      email,
-      customerId,
-      customerName,
-      businessName,
-      stage,
-      surveyId,
-      fromName: effectiveFromName,
-      fromEmail: effectiveFromEmail,
-      replyToEmail: effectiveReplyTo,
-    });
-
-    const sentAt = new Date().toISOString();
-
-    // 3) Log to Dropbox
-    await appendInvitationRow({
-      invitationId,
-      customerId,
-      customerName,
-      businessName,
-      email,
-      stage,
-      surveyId,
-      sentAt,
-      resentCount: 0,
-      lastSentAt: sentAt,
-      status: "sent",
-      responseId: "",
-    });
-
-    // 4) Send email via Zoho
-    const info = await mailer.sendMail({
-      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
-      to: email,
-      replyTo: effectiveReplyTo,
-      bcc: "hello@npsme.com",
-      subject,
-      text: plainText,
-      html,
-    });
-
-    res.json({ ok: true, invitationId, messageId: info.messageId });
-  } catch (err) {
-    console.error("[npsme] Error in /api/send-invitation", err);
-    res.status(500).json({ error: "Failed to send invitation" });
-  }
-});
-
-// NEW: send LIVE Envola invitation
-app.post("/api/send-live-invitation", async (req, res) => {
-  try {
-    const {
-      email,
-      customerId,
-      customerName,
-      businessName,
-      stage,
-      surveyId,
-      fromName,
-      fromEmail,
-      replyToEmail,
-      typeOfDevice,
-      assistanteMaternelle,
-    } = req.body || {};
-
-    if (!email) return res.status(400).json({ error: "Email is required" });
-
-    // 1) Decide who the email appears to come from
-    const effectiveFromName = fromName || "Nicholas d'Envola";
-    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
-    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
-
-    if (!effectiveFromEmail) {
-      console.error("[npsme] LIVE: No from email configured");
-      return res.status(500).json({ error: "Email configuration error" });
-    }
-
-    // 2) Build LIVE email content + ID
-    const { subject, plainText, html, invitationId } = await sendLiveInvitationEmail({
-      email,
-      customerId,
-      customerName,
-      businessName,
-      stage,
-      surveyId,
-      fromName: effectiveFromName,
-      fromEmail: effectiveFromEmail,
-    });
-
-    const sentAt = new Date().toISOString();
-
-    // 3) Log to LIVE invitations CSV
-    await appendLiveInvitationRow({
-      invitationId,
-      customerId,
-      customerName,
-      businessName,
-      email,
-      stage,
-      surveyId,
-      typeOfDevice: typeOfDevice || "",
-      assistanteMaternelle: assistanteMaternelle || "",
-      sentAt,
-      resentCount: 0,
-      lastSentAt: sentAt,
-      status: "sent",
-      responseId: "",
-    });
-
-    // 4) Send email via Zoho
-    const info = await mailer.sendMail({
-      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
-      to: email,
-      replyTo: effectiveReplyTo,
-      bcc: "hello@npsme.com",
-      subject,
-      text: plainText,
-      html,
-    });
-
-    res.json({ ok: true, invitationId, messageId: info.messageId });
-  } catch (err) {
-    console.error("[npsme] Error in /api/send-live-invitation", err);
-    res.status(500).json({ error: "Failed to send live invitation" });
-  }
-});
-
-// Validate a demo survey link
-app.get("/api/demo-survey/lookup", async (req, res) => {
-  try {
-    const invRaw = req.query.inv;
-    const inv = typeof invRaw === "string" ? invRaw.trim() : "";
-
-    console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
-
-    if (!inv) return res.status(400).json({ error: "Missing invitation id" });
-
-    const invitation = await findInvitationById(inv);
-    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
-
-    const status = (invitation.status || "").toLowerCase().trim();
-    const responseId =
-      typeof invitation.responseId === "string"
-        ? invitation.responseId.trim()
-        : invitation.responseId;
-
-    const alreadyResponded = status === "responded" || (responseId && responseId !== "");
-    if (alreadyResponded) {
-      return res.status(409).json({ error: "Invitation already responded" });
-    }
-
-    // Mark started (best effort)
-    try {
-      await markInvitationStarted(invitation.invitationId);
-    } catch (e) {
-      console.error("[npsme] Failed to mark invitation started", e);
-    }
-
-    return res.json({
-      ok: true,
-      invitation: {
-        invitationId: invitation.invitationId,
-        customerId: invitation.customerId || "",
-        customerName: invitation.customerName || "",
-        businessName: invitation.businessName || "",
-        email: invitation.email || "",
-        stage: invitation.stage || "",
-        surveyId: invitation.surveyId || "",
-      },
-    });
-  } catch (err) {
-    console.error("[npsme] Error in /api/demo-survey/lookup", err);
-    res.status(500).json({ error: "Lookup failed" });
-  }
-});
-
-// Submit a demo survey response
-app.post("/api/demo-survey/submit", async (req, res) => {
-  try {
-    const { invitationId, score, comment } = req.body || {};
-
-    if (!invitationId || typeof score !== "number" || score < 0 || score > 10) {
-      return res.status(400).json({ error: "Invalid payload" });
-    }
-
-    const invitation = await findInvitationById(invitationId);
-    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
-    if (invitation.responseId) return res.status(409).json({ error: "Invitation already responded" });
-
-    const rawStage = (invitation.stage || "").toLowerCase().trim();
-    const type = !rawStage || rawStage === "overall" ? "overall" : "milestone";
-
-    const responseId = `RESP-${Date.now().toString(36).toUpperCase()}`;
-    const createdAt = new Date().toISOString();
-
-    await appendDemoResponseRow({
-      responseId,
-      invitationId,
-      customerId: invitation.customerId || "",
-      customerName: invitation.customerName || "",
-      businessName: invitation.businessName || "",
-      email: invitation.email || "",
-      stage: invitation.stage || "",
-      surveyId: invitation.surveyId || "",
-      type,
-      score,
-      comment: (comment || "").slice(0, 1000),
-      createdAt,
-    });
-
-    await markInvitationResponded(invitationId, responseId);
-
-    res.json({ ok: true, responseId });
-  } catch (err) {
-    console.error("[npsme] Error in /api/demo-survey/submit", err);
-    res.status(500).json({ error: "Failed to save response" });
-  }
-});
-
-// Load all demo responses (for the demo dashboard)
-app.get("/api/demo-responses", async (req, res) => {
-  try {
-    const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
-      console.error("[npsme] Error reading demo-responses.csv", err);
-      return null;
-    });
-
-    if (!csv) return res.json({ rows: [] });
-
-    const rows = parseCsvWithHeader(csv);
-    const normalised = rows.map((r) => ({
-      ...r,
-      score: r.score !== undefined && r.score !== "" ? Number(r.score) : null,
-      createdAt: r.createdAt || r.createdAt,
-    }));
-
-    res.json({ rows: normalised });
-  } catch (err) {
-    console.error("[npsme] Error in /api/demo-responses", err);
-    res.status(500).json({ error: "Failed to load demo responses" });
-  }
-});
-
-// Load all LIVE responses (for the live dashboard)
-app.get("/api/live-responses", async (req, res) => {
-  try {
-    const rows = await loadLiveResponses();
-    res.json({ rows });
-  } catch (err) {
-    console.error("[npsme] Error in /api/live-responses", err);
-    res.status(500).json({ error: "Failed to load live responses" });
-  }
-});
-
-app.get("/api/demo-funnel", async (req, res) => {
-  try {
-    const { customer, company, stage } = req.query;
-
-    const invitations = await loadInvitations();
-    const demoResponses = await loadDemoResponses();
-
-    // --- 1) Apply filters to invitations ---
-    let filteredInvitations = invitations;
-
-    if (customer) {
-      filteredInvitations = filteredInvitations.filter(
-        (inv) => (inv.customerName || "").trim() === customer
-      );
-    }
-
-    if (company) {
-      filteredInvitations = filteredInvitations.filter((inv) => {
-        const name = (inv.businessName || inv.companyName || "").trim();
-        return name === company;
-      });
-    }
-
-    if (stage) {
-      filteredInvitations = filteredInvitations.filter(
-        (inv) => (inv.stage || "").trim() === stage
-      );
-    }
-
-    const allowedInvitationIds = new Set(
-      filteredInvitations.map((inv) => (inv.invitationId || "").trim()).filter(Boolean)
-    );
-
-    const totalSent = filteredInvitations.length;
-
-    const completedIds = new Set(
-      demoResponses
-        .map((r) => (r.invitationId || "").trim())
-        .filter((id) => id && allowedInvitationIds.has(id))
-    );
-
-    let started = 0;
-    let completed = 0;
-
-    const byMonthMap = new Map();
-    const byStageMap = new Map();
-
-    const monthKeyFromDate = (dateStr) => {
-      if (!dateStr) return "Unknown";
-      const d = new Date(dateStr);
-      if (Number.isNaN(d.getTime())) return "Unknown";
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      return `${y}-${m}`;
-    };
-
-    for (const inv of filteredInvitations) {
-      const id = (inv.invitationId || "").trim();
-      const stage = (inv.stage || "").trim() || "Unspecified";
-      const status = (inv.status || "").toLowerCase().trim();
-      const isCompleted = id && completedIds.has(id);
-
-      if (isCompleted) completed++;
-
-      if (status === "started" || status === "responded" || isCompleted) {
-        started++;
-      }
-
-      const monthKey = monthKeyFromDate(inv.sentAt);
-      if (!byMonthMap.has(monthKey)) {
-        byMonthMap.set(monthKey, { month: monthKey, sent: 0, started: 0, completed: 0 });
-      }
-      const monthBucket = byMonthMap.get(monthKey);
-      monthBucket.sent++;
-      if (status === "started" || status === "responded" || isCompleted) monthBucket.started++;
-      if (isCompleted) monthBucket.completed++;
-
-      if (!byStageMap.has(stage)) {
-        byStageMap.set(stage, { stage, sent: 0, started: 0, completed: 0 });
-      }
-      const stageBucket = byStageMap.get(stage);
-      stageBucket.sent++;
-      if (status === "started" || status === "responded" || isCompleted) stageBucket.started++;
-      if (isCompleted) stageBucket.completed++;
-    }
-
-    const opened = started;
-
-    const overall = {
-      sent: totalSent,
-      opened,
-      started,
-      completed,
-      startRate: totalSent ? +((started / totalSent) * 100).toFixed(1) : null,
-      responseRate: totalSent ? +((completed / totalSent) * 100).toFixed(1) : null,
-    };
-
-    const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
-      a.month > b.month ? 1 : -1
-    );
-    const byStage = Array.from(byStageMap.values());
-
-    res.json({ overall, byMonth, byStage });
-  } catch (err) {
-    console.error("[npsme] Error in /api/demo-funnel", err);
-    res.status(500).json({ error: "Failed to compute demo funnel" });
-  }
-});
+/* -----------------------------
+   LIVE CSV (Dropbox) helpers
+------------------------------ */
 
 // PSEUDO PATHS – adjust to your actual Dropbox paths
 const LIVE_INVITATIONS_PATH = "/npsme/live/invitations.csv";
@@ -1427,7 +1012,10 @@ async function appendLiveInvitationRow(row) {
 
 async function loadLiveResponses() {
   const csv = await readDropboxFile(LIVE_RESPONSES_PATH).catch((err) => {
-    console.error("[npsme] Error reading live-responses.csv in loadLiveResponses", err);
+    console.error(
+      "[npsme] Error reading live-responses.csv in loadLiveResponses",
+      err
+    );
     return null;
   });
 
@@ -1468,7 +1056,9 @@ async function appendLiveResponseRow(row) {
 async function findLiveInvitationById(invitationId) {
   const rows = await loadLiveInvitations();
   return (
-    rows.find((r) => (r.invitationId || "").trim() === (invitationId || "").trim()) || null
+    rows.find(
+      (r) => (r.invitationId || "").trim() === (invitationId || "").trim()
+    ) || null
   );
 }
 
@@ -1527,9 +1117,11 @@ async function markLiveInvitationSent(invitationId, sentAtIso) {
 
       const now = sentAtIso || new Date().toISOString();
       if (!alreadyHadSentAt) {
+        // first time we send this one
         rowObj.sentAt = now;
         rowObj.resentCount = currentResent;
       } else {
+        // resend
         rowObj.resentCount = currentResent + 1;
       }
       rowObj.lastSentAt = now;
@@ -1574,15 +1166,584 @@ async function markLiveInvitationResponded(invitationId, responseId) {
   await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
 }
 
+/* -----------------------------
+   In-memory demo metrics store
+------------------------------ */
+
+let demoResponses = [];
+
+/* -----------------------------
+   Core / misc endpoints
+------------------------------ */
+
+app.post("/api/demo/response", async (req, res) => {
+  try {
+    const { score, comment, invitationId } = req.body || {};
+
+    if (typeof score !== "number" || score < 0 || score > 10) {
+      return res.status(400).json({ error: "Invalid score" });
+    }
+
+    const trimmedComment = (comment || "").slice(0, 500);
+
+    // Keep the in-memory demo metric for the homepage widget
+    demoResponses.push({ score, comment: trimmedComment, ts: Date.now() });
+
+    // Log to Dropbox for later analysis
+    const responseId = generateResponseId();
+    const createdAt = new Date().toISOString();
+
+    await appendResponseRow({
+      responseId,
+      invitationId: invitationId || "",
+      score,
+      comment: trimmedComment,
+      createdAt,
+    });
+
+    res.json({ ok: true, responseId });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo/response", err);
+    res.status(500).json({ error: "Failed to save response" });
+  }
+});
+
+app.get("/api/demo/metrics", (_req, res) => {
+  if (!demoResponses.length) return res.json({ nps: null, count: 0 });
+  const promoters = demoResponses.filter((r) => r.score >= 9).length;
+  const detractors = demoResponses.filter((r) => r.score <= 6).length;
+  const total = demoResponses.length;
+  const nps = Math.round(((promoters - detractors) / total) * 100);
+  res.json({ nps, count: total });
+});
+
+app.post("/api/intake", (req, res) => {
+  console.log("INTAKE", req.body);
+  res.json({ ok: true });
+});
+
+app.get("/sitemap.xml", (_req, res) => {
+  res.set("Cache-Control", "public, max-age=0");
+  res.sendFile(path.join(__dirname, "public", "sitemap.xml"));
+});
+
+// Health check
+app.get("/healthz", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.type("text/plain").send("ok");
+});
+app.head("/healthz", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.status(200).end();
+});
+
+/* -----------------------------
+   Email endpoints
+------------------------------ */
+
+app.post("/api/send-test-email", async (req, res) => {
+  const { to } = req.body;
+
+  try {
+    const info = await mailer.sendMail({
+      from: `"NPS Me" <hello@npsme.com>`,
+      to,
+      subject: "NPS Me SMTP Test",
+      text: "This is a test email from the NPS Me server. Everything works!",
+    });
+
+    res.json({ ok: true, info });
+  } catch (err) {
+    console.error("SMTP ERROR", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post("/api/send-invitation", async (req, res) => {
+  try {
+    const {
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName,
+      fromEmail,
+      replyToEmail,
+    } = req.body || {};
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    // 1) Decide who the email appears to come from
+    const effectiveFromName = fromName || process.env.ZOHO_FROM_NAME || "NPS Me";
+
+    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
+
+    // Reply-To: explicitly provided, or fall back to from
+    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
+
+    if (!effectiveFromEmail) {
+      console.error("[npsme] No from email configured");
+      return res.status(500).json({ error: "Email configuration error" });
+    }
+
+    // 2) Build content + ID (still pass the raw values so the template can personalise signature etc.)
+    const { subject, plainText, html, invitationId } = await sendInvitationEmail({
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName: effectiveFromName,
+      fromEmail: effectiveFromEmail,
+      replyToEmail: effectiveReplyTo,
+    });
+
+    const sentAt = new Date().toISOString();
+
+    // 3) Log to Dropbox (including invitationId)
+    await appendInvitationRow({
+      invitationId,
+      customerId,
+      customerName,
+      businessName,
+      email,
+      stage,
+      surveyId,
+      sentAt,
+      resentCount: 0,
+      lastSentAt: sentAt,
+      status: "sent",
+      responseId: "",
+    });
+
+    // 4) Send email via Zoho
+    const info = await mailer.sendMail({
+      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
+      to: email,
+      replyTo: effectiveReplyTo,
+      bcc: "hello@npsme.com",
+      subject,
+      text: plainText,
+      html,
+    });
+
+    res.json({
+      ok: true,
+      invitationId,
+      messageId: info.messageId,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/send-invitation", err);
+    res.status(500).json({ error: "Failed to send invitation" });
+  }
+});
+
+// NEW: send LIVE Envola invitation
+app.post("/api/send-live-invitation", async (req, res) => {
+  try {
+    const {
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName,
+      fromEmail,
+      replyToEmail,
+      typeOfDevice,
+      assistanteMaternelle, // frontend will POST this as free-text
+    } = req.body || {};
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    // 1) Decide who the email appears to come from
+    const effectiveFromName = fromName || "Nicholas d'Envola"; // default with the H and Envola brand
+
+    const effectiveFromEmail = fromEmail || process.env.ZOHO_FROM_EMAIL;
+
+    const effectiveReplyTo = replyToEmail || effectiveFromEmail;
+
+    if (!effectiveFromEmail) {
+      console.error("[npsme] LIVE: No from email configured");
+      return res.status(500).json({ error: "Email configuration error" });
+    }
+
+    // 2) Build LIVE email content + ID
+    const { subject, plainText, html, invitationId } = await sendLiveInvitationEmail({
+      email,
+      customerId,
+      customerName,
+      businessName,
+      stage,
+      surveyId,
+      fromName: effectiveFromName,
+      fromEmail: effectiveFromEmail,
+    });
+
+    const sentAt = new Date().toISOString();
+
+    // 3) Log to LIVE invitations CSV (includes typeOfDevice + assistanteMaternelle)
+    await appendLiveInvitationRow({
+      invitationId,
+      customerId,
+      customerName,
+      businessName,
+      email,
+      stage,
+      surveyId,
+      typeOfDevice: typeOfDevice || "",
+      assistanteMaternelle: assistanteMaternelle || "",
+      sentAt,
+      resentCount: 0,
+      lastSentAt: sentAt,
+      status: "sent",
+      responseId: "",
+    });
+
+    // 4) Send email via Zoho
+    const info = await mailer.sendMail({
+      from: `"${effectiveFromName}" <${effectiveFromEmail}>`,
+      to: email,
+      replyTo: effectiveReplyTo,
+      bcc: "hello@npsme.com",
+      subject,
+      text: plainText,
+      html,
+    });
+
+    res.json({
+      ok: true,
+      invitationId,
+      messageId: info.messageId,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/send-live-invitation", err);
+    res.status(500).json({ error: "Failed to send live invitation" });
+  }
+});
+
+/* -----------------------------
+   Demo survey link + submit
+------------------------------ */
+
+// Validate a demo survey link
+app.get("/api/demo-survey/lookup", async (req, res) => {
+  try {
+    const invRaw = req.query.inv;
+    const inv = typeof invRaw === "string" ? invRaw.trim() : "";
+
+    console.log("[npsme] /api/demo-survey/lookup called with inv =", inv);
+
+    if (!inv) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
+
+    const invitation = await findInvitationById(inv);
+    if (!invitation) {
+      console.log("[npsme] lookup: no invitation found for id =", inv);
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+
+    // Be defensive: treat as responded only if status is "responded"
+    // OR responseId is present and non-empty
+    const status = (invitation.status || "").toLowerCase().trim();
+    const responseId =
+      typeof invitation.responseId === "string"
+        ? invitation.responseId.trim()
+        : invitation.responseId;
+
+    const alreadyResponded = status === "responded" || (responseId && responseId !== "");
+
+    if (alreadyResponded) {
+      console.log(
+        "[npsme] lookup: invitation already responded:",
+        invitation.invitationId,
+        "status =",
+        status,
+        "responseId =",
+        responseId
+      );
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    // 🔹 Mark this invitation as "started" the first time the survey is opened
+    try {
+      await markInvitationStarted(invitation.invitationId);
+    } catch (e) {
+      console.error("[npsme] Failed to mark invitation started", e);
+      // non-fatal
+    }
+
+    return res.json({
+      ok: true,
+      invitation: {
+        invitationId: invitation.invitationId,
+        customerId: invitation.customerId || "",
+        customerName: invitation.customerName || "",
+        businessName: invitation.businessName || "",
+        email: invitation.email || "",
+        stage: invitation.stage || "",
+        surveyId: invitation.surveyId || "",
+      },
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-survey/lookup", err);
+    res.status(500).json({ error: "Lookup failed" });
+  }
+});
+
+// Submit a demo survey response
+app.post("/api/demo-survey/submit", async (req, res) => {
+  try {
+    const { invitationId, score, comment } = req.body || {};
+
+    if (!invitationId || typeof score !== "number" || score < 0 || score > 10) {
+      return res.status(400).json({ error: "Invalid payload" });
+    }
+
+    const invitation = await findInvitationById(invitationId);
+    if (!invitation) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
+    if (invitation.responseId) {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    // Decide whether this is an overall NPS or milestone NPS response
+    const rawStage = (invitation.stage || "").toLowerCase().trim();
+
+    const type = !rawStage || rawStage === "overall" ? "overall" : "milestone";
+
+    const responseId = `RESP-${Date.now().toString(36).toUpperCase()}`;
+    const createdAt = new Date().toISOString();
+
+    await appendDemoResponseRow({
+      responseId,
+      invitationId,
+      customerId: invitation.customerId || "",
+      customerName: invitation.customerName || "",
+      businessName: invitation.businessName || "",
+      email: invitation.email || "",
+      stage: invitation.stage || "",
+      surveyId: invitation.surveyId || "",
+      type,
+      score,
+      comment: (comment || "").slice(0, 1000),
+      createdAt,
+    });
+
+    await markInvitationResponded(invitationId, responseId);
+
+    res.json({ ok: true, responseId });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-survey/submit", err);
+    res.status(500).json({ error: "Failed to save response" });
+  }
+});
+
+// Load all demo responses (for the demo dashboard)
+app.get("/api/demo-responses", async (req, res) => {
+  try {
+    const csv = await readDropboxFile(DEMO_RESPONSES_PATH).catch((err) => {
+      console.error("[npsme] Error reading demo-responses.csv", err);
+      return null;
+    });
+
+    if (!csv) {
+      return res.json({ rows: [] });
+    }
+
+    const rows = parseCsvWithHeader(csv);
+
+    // Optionally normalise score + createdAt types here
+    const normalised = rows.map((r) => ({
+      ...r,
+      score: r.score !== undefined && r.score !== "" ? Number(r.score) : null,
+      createdAt: r.createdAt || r.createdAt,
+    }));
+
+    res.json({ rows: normalised });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-responses", err);
+    res.status(500).json({ error: "Failed to load demo responses" });
+  }
+});
+
+app.get("/api/demo-funnel", async (req, res) => {
+  try {
+    const { customer, company, stage } = req.query;
+
+    const invitations = await loadInvitations();
+    const demoResponses = await loadDemoResponses();
+
+    // --- 1) Apply filters to invitations ---
+    let filteredInvitations = invitations;
+
+    if (customer) {
+      filteredInvitations = filteredInvitations.filter(
+        (inv) => (inv.customerName || "").trim() === customer
+      );
+    }
+
+    if (company) {
+      filteredInvitations = filteredInvitations.filter((inv) => {
+        const name = (inv.businessName || inv.companyName || "").trim();
+        return name === company;
+      });
+    }
+
+    if (stage) {
+      filteredInvitations = filteredInvitations.filter(
+        (inv) => (inv.stage || "").trim() === stage
+      );
+    }
+    // Set of invitationIds that survive the invite filter
+    const allowedInvitationIds = new Set(
+      filteredInvitations.map((inv) => (inv.invitationId || "").trim()).filter(Boolean)
+    );
+
+    const totalSent = filteredInvitations.length;
+
+    // Completed = unique invitations (from filtered set) with at least one demo response
+    const completedIds = new Set(
+      demoResponses
+        .map((r) => (r.invitationId || "").trim())
+        .filter((id) => id && allowedInvitationIds.has(id))
+    );
+
+    let started = 0;
+    let completed = 0;
+
+    const byMonthMap = new Map();
+    const byStageMap = new Map();
+
+    const monthKeyFromDate = (dateStr) => {
+      if (!dateStr) return "Unknown";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "Unknown";
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`;
+    };
+
+    // --- 2) Build month + stage buckets based on FILTERED invites ---
+    for (const inv of filteredInvitations) {
+      const id = (inv.invitationId || "").trim();
+      const stage = (inv.stage || "").trim() || "Unspecified";
+      const status = (inv.status || "").toLowerCase().trim();
+      const isCompleted = id && completedIds.has(id);
+
+      if (isCompleted) completed++;
+
+      // "started" means survey link opened or completed
+      if (status === "started" || status === "responded" || isCompleted) {
+        started++;
+      }
+
+      // --- By month (based on sentAt) ---
+      const monthKey = monthKeyFromDate(inv.sentAt);
+      if (!byMonthMap.has(monthKey)) {
+        byMonthMap.set(monthKey, {
+          month: monthKey,
+          sent: 0,
+          started: 0,
+          completed: 0,
+        });
+      }
+      const monthBucket = byMonthMap.get(monthKey);
+      monthBucket.sent++;
+      if (status === "started" || status === "responded" || isCompleted) {
+        monthBucket.started++;
+      }
+      if (isCompleted) {
+        monthBucket.completed++;
+      }
+
+      // --- By stage ---
+      if (!byStageMap.has(stage)) {
+        byStageMap.set(stage, {
+          stage,
+          sent: 0,
+          started: 0,
+          completed: 0,
+        });
+      }
+      const stageBucket = byStageMap.get(stage);
+      stageBucket.sent++;
+      if (status === "started" || status === "responded" || isCompleted) {
+        stageBucket.started++;
+      }
+      if (isCompleted) {
+        stageBucket.completed++;
+      }
+    }
+
+    // For now, "opened" ~= "started"
+    const opened = started;
+
+    const overall = {
+      sent: totalSent,
+      opened,
+      started,
+      completed,
+      startRate: totalSent ? +((started / totalSent) * 100).toFixed(1) : null,
+      responseRate: totalSent ? +((completed / totalSent) * 100).toFixed(1) : null,
+    };
+
+    const byMonth = Array.from(byMonthMap.values()).sort((a, b) =>
+      a.month > b.month ? 1 : -1
+    );
+
+    const byStage = Array.from(byStageMap.values());
+
+    res.json({
+      overall,
+      byMonth,
+      byStage,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/demo-funnel", err);
+    res.status(500).json({ error: "Failed to compute demo funnel" });
+  }
+});
+
+/* -----------------------------
+   LIVE APIs
+------------------------------ */
+
+// Load all LIVE responses (for the live dashboard)
+app.get("/api/live-responses", async (req, res) => {
+  try {
+    const rows = await loadLiveResponses(); // already defined helper
+    res.json({ rows });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-responses", err);
+    res.status(500).json({ error: "Failed to load live responses" });
+  }
+});
+
 app.get("/api/live-survey/lookup", async (req, res) => {
   try {
     const inv = req.query.inv;
     console.log("[npsme] /api/live-survey/lookup called with inv =", inv);
 
-    if (!inv) return res.status(400).json({ error: "Missing invitation id" });
+    if (!inv) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
 
     const invitation = await findLiveInvitationById(inv);
-    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
+    if (!invitation) {
+      console.warn("[npsme] live lookup: no invitation found for id =", inv);
+      return res.status(404).json({ error: "Invitation not found" });
+    }
 
     const status = (invitation.status || "").toLowerCase().trim();
     const responseId =
@@ -1591,8 +1752,12 @@ app.get("/api/live-survey/lookup", async (req, res) => {
         : invitation.responseId;
 
     const alreadyResponded = status === "responded" || (responseId && responseId !== "");
-    if (alreadyResponded) return res.status(409).json({ error: "Invitation already responded" });
 
+    if (alreadyResponded) {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    // Mark as started (best effort)
     try {
       await markLiveInvitationStarted(invitation.invitationId);
     } catch (e) {
@@ -1627,7 +1792,9 @@ app.get("/api/live-invitations", async (req, res) => {
     const statusFilterRaw = (req.query.status || "").toString().trim().toLowerCase();
     const includeAll = req.query.all === "1" || req.query.all === "true";
 
-    if (includeAll || !statusFilterRaw) return res.json({ rows });
+    if (includeAll || !statusFilterRaw) {
+      return res.json({ rows });
+    }
 
     const filtered = rows.filter((row) => {
       const s = (row.status || "").toLowerCase().trim() || "pending";
@@ -1647,10 +1814,13 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
     const { invitationIds } = req.body || {};
 
     if (!Array.isArray(invitationIds) || invitationIds.length === 0) {
-      return res.status(400).json({ error: "invitationIds must be a non-empty array" });
+      return res
+        .status(400)
+        .json({ error: "invitationIds must be a non-empty array" });
     }
 
     const allRows = await loadLiveInvitations();
+
     const byId = new Map(allRows.map((row) => [(row.invitationId || "").trim(), row]));
 
     const results = [];
@@ -1666,11 +1836,16 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
 
       const status = (row.status || "").toLowerCase().trim();
       if (status === "sent" || status === "responded") {
-        results.push({ invitationId: id, ok: false, error: `Already ${status}` });
+        results.push({
+          invitationId: id,
+          ok: false,
+          error: `Already ${status}`,
+        });
         continue;
       }
 
       try {
+        // Build the live email using the *existing* invitationId from the CSV
         const { subject, plainText, html } = await sendLiveInvitationEmail({
           email: row.email,
           customerId: row.customerId || "",
@@ -1680,10 +1855,12 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
           surveyId: row.surveyId || "",
           fromName: "Nicholas d'Envola",
           fromEmail: process.env.ZOHO_FROM_EMAIL,
-          invitationId: id,
+          invitationId: id, // <- reuse existing ID
         });
 
-        if (!process.env.ZOHO_FROM_EMAIL) throw new Error("ZOHO_FROM_EMAIL not configured");
+        if (!process.env.ZOHO_FROM_EMAIL) {
+          throw new Error("ZOHO_FROM_EMAIL not configured");
+        }
 
         await mailer.sendMail({
           from: `"Nicholas d'Envola" <${process.env.ZOHO_FROM_EMAIL}>`,
@@ -1696,6 +1873,7 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
         });
 
         await markLiveInvitationSent(id);
+
         results.push({ invitationId: id, ok: true });
       } catch (e) {
         console.error("[npsme] Error sending live invitation", id, e);
@@ -1710,21 +1888,29 @@ app.post("/api/live-invitations/send-batch", async (req, res) => {
   }
 });
 
-// Resend a LIVE invitation
+// Resend a LIVE invitation (allowed for status "sent" or "started", blocked if "responded")
 app.post("/api/live-invitations/resend", async (req, res) => {
   try {
     const { invitationId } = req.body || {};
     const id = (invitationId || "").trim();
 
-    if (!id) return res.status(400).json({ error: "invitationId is required" });
+    if (!id) {
+      return res.status(400).json({ error: "invitationId is required" });
+    }
 
     const inv = await findLiveInvitationById(id);
-    if (!inv) return res.status(404).json({ error: "Invitation not found" });
+    if (!inv) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
 
     const status = (inv.status || "").toLowerCase().trim() || "pending";
-    if (status === "responded") return res.status(409).json({ error: "Invitation already responded" });
+    if (status === "responded") {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
     if (status === "pending") {
-      return res.status(409).json({ error: "Invitation not sent yet. Use Send from Pending." });
+      return res.status(409).json({
+        error: "Invitation not sent yet. Use Send from Pending.",
+      });
     }
 
     if (!process.env.ZOHO_FROM_EMAIL) {
@@ -1754,6 +1940,7 @@ app.post("/api/live-invitations/resend", async (req, res) => {
     });
 
     await markLiveInvitationSent(id);
+
     res.json({ ok: true, invitationId: id });
   } catch (err) {
     console.error("[npsme] Error in /api/live-invitations/resend", err);
@@ -1765,13 +1952,17 @@ app.post("/api/live-survey/submit", async (req, res) => {
   try {
     const { invitationId, score, comment } = req.body || {};
 
-    if (!invitationId) return res.status(400).json({ error: "Missing invitation id" });
+    if (!invitationId) {
+      return res.status(400).json({ error: "Missing invitation id" });
+    }
     if (typeof score !== "number" || Number.isNaN(score)) {
       return res.status(400).json({ error: "Score must be a number" });
     }
 
     const invitation = await findLiveInvitationById(invitationId);
-    if (!invitation) return res.status(404).json({ error: "Invitation not found" });
+    if (!invitation) {
+      return res.status(404).json({ error: "Invitation not found" });
+    }
 
     const status = (invitation.status || "").toLowerCase().trim();
     const existingResponseId =
@@ -1779,10 +1970,15 @@ app.post("/api/live-survey/submit", async (req, res) => {
         ? invitation.responseId.trim()
         : invitation.responseId;
 
-    const alreadyResponded = status === "responded" || (existingResponseId && existingResponseId !== "");
-    if (alreadyResponded) return res.status(409).json({ error: "Invitation already responded" });
+    const alreadyResponded =
+      status === "responded" || (existingResponseId && existingResponseId !== "");
 
-    const responseId = generateResponseId();
+    if (alreadyResponded) {
+      return res.status(409).json({ error: "Invitation already responded" });
+    }
+
+    const responseId = generateResponseId(); // same helper as demo, e.g. RESP-...
+
     const createdAt = new Date().toISOString();
 
     await appendLiveResponseRow({
@@ -1794,6 +1990,7 @@ app.post("/api/live-survey/submit", async (req, res) => {
     });
 
     await markLiveInvitationResponded(invitationId, responseId);
+
     return res.json({ ok: true, responseId });
   } catch (err) {
     console.error("[npsme] Error in /api/live-survey/submit", err);
@@ -1801,10 +1998,34 @@ app.post("/api/live-survey/submit", async (req, res) => {
   }
 });
 
-// ---- Intercom router mount (kept exactly; now safely before static) ----
+/* -----------------------------
+   Intercom router (mounted)
+------------------------------ */
+
 app.use("/api/intercom", createIntercomRouter());
 
-// --- Social summary endpoint for npsme.com ---
+/* -----------------------------
+   Static assets & caching
+------------------------------ */
+
+// Long cache for hashed assets (Vite puts them in /assets)
+app.use(
+  "/assets",
+  express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
+);
+
+// Short cache for other static assets
+app.use(
+  express.static(dist, {
+    maxAge: "1h",
+    index: false,
+  })
+);
+
+/* -----------------------------
+   Social summary endpoint for npsme.com
+------------------------------ */
+
 app.get("/api/social-summary", async (req, res) => {
   try {
     const company = (req.query.company || "").trim();
@@ -1870,13 +2091,16 @@ app.get("/api/social-summary", async (req, res) => {
       parsed = JSON.parse(jsonText);
     } catch (e) {
       console.error("Failed to parse JSON from /api/social-summary:", e, jsonText);
+      // Fallback: treat everything as a plain summary
       parsed = { summary: jsonText, competitor_summary: "" };
     }
 
+    // 🧼 Normalise strings: unescape '\n' and trim
     const normalise = (value) =>
       typeof value === "string" ? value.replace(/\\n/g, "\n").trim() : "";
 
-    const summary = normalise(parsed.summary) || "No summary available for this company.";
+    const summary =
+      normalise(parsed.summary) || "No summary available for this company.";
     const competitorSummary = normalise(parsed.competitor_summary);
 
     res.json({
@@ -1891,23 +2115,10 @@ app.get("/api/social-summary", async (req, res) => {
   }
 });
 
-// -------------------- STATIC (after APIs) --------------------
+/* -----------------------------
+   SPA HTML: inject canonical + og:url for SEO
+------------------------------ */
 
-// Long cache for hashed assets (Vite puts them in /assets)
-app.use(
-  "/assets",
-  express.static(path.join(dist, "assets"), { maxAge: "1y", immutable: true })
-);
-
-// Short cache for other static assets
-app.use(
-  express.static(dist, {
-    maxAge: "1h",
-    index: false,
-  })
-);
-
-// ---------- Inject canonical + og:url for SEO ----------
 app.get("*", (req, res, next) => {
   // Never serve SPA HTML for API routes
   if (req.path.startsWith("/api/")) return next();
@@ -1915,6 +2126,7 @@ app.get("*", (req, res, next) => {
   // Never serve SPA HTML for file-ish paths (/.env, /.git/config, /favicon.ico, etc)
   if (req.path.includes(".")) return next();
 
+  // your existing canonical/og:url injection...
   res.set("Cache-Control", "no-store, must-revalidate");
 
   const pathOnly = req.originalUrl.split("?")[0] || "/";
@@ -1950,6 +2162,10 @@ app.get("*", (req, res, next) => {
 
   res.type("html").send(html);
 });
+
+/* -----------------------------
+   Start server
+------------------------------ */
 
 app.listen(PORT, () => {
   console.log(`NPS Me running on :${PORT} (${PROD ? "prod" : "dev"})`);

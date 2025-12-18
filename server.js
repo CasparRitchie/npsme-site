@@ -2144,21 +2144,41 @@ async function getExportJob(jobId) {
   return data;
 }
 
-async function downloadGzipCsv(downloadUrl) {
+async function downloadExportCsv(downloadUrl) {
   const r = await fetch(downloadUrl, {
+    // Intercom download endpoints often redirect to a signed URL
+    redirect: "follow",
     headers: {
       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-      Accept: "application/octet-stream",
+      Accept: "*/*",
       "Intercom-Version": "2.14",
     },
   });
-  if (!r.ok) {
-    const text = await r.text().catch(() => "");
-    throw new Error(`Download failed: ${r.status} ${text}`);
-  }
+
   const buf = Buffer.from(await r.arrayBuffer());
-  const csvBuf = zlib.gunzipSync(buf);
-  return csvBuf.toString("utf8");
+
+  if (!r.ok) {
+    const preview = buf.toString("utf8", 0, 400);
+    throw new Error(`Download failed: ${r.status} ${preview}`);
+  }
+
+  // Detect gzip by magic bytes: 0x1f 0x8b
+  const isGzip = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
+
+  if (isGzip) {
+    return zlib.gunzipSync(buf).toString("utf8");
+  }
+
+  // Otherwise treat as plain text CSV (or error HTML)
+  const text = buf.toString("utf8");
+
+  // Optional: quick guardrail so you see if you're getting HTML instead of CSV
+  const sniff = text.slice(0, 200).toLowerCase();
+  if (sniff.includes("<html") || sniff.includes("<!doctype")) {
+    throw new Error(`Download returned HTML (not CSV). First bytes: ${text.slice(0, 200)}`);
+  }
+
+  return text;
 }
 
 function isLikelySurveyRow(row) {
@@ -2205,8 +2225,7 @@ app.get("/api/intercom/survey-responses/raw", async (req, res) => {
 
 
     // 3) Download + parse CSV
-    const csvText = await downloadGzipCsv(status.download_url);
-
+    const csvText = await downloadExportCsv(status.download_url);
     const records = parse(csvText, {
       columns: true,
       skip_empty_lines: true,

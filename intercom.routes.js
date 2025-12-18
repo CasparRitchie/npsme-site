@@ -10,6 +10,7 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+// (kept for compatibility; decode now uses unzipSync which handles gzip/deflate)
 function isGzipBuffer(buf) {
   return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
 }
@@ -24,16 +25,57 @@ function pickHostFallback(url, host) {
   }
 }
 
-function shouldGunzip(resp, buf, url) {
-  const ce = (resp?.headers?.get("content-encoding") || "").toLowerCase();
-  const ct = (resp?.headers?.get("content-type") || "").toLowerCase();
-  const u = String(url || "").toLowerCase();
+/**
+ * Heuristic: is this buffer probably human-readable text?
+ * (Used as a fallback when unzipSync doesn't apply.)
+ */
+function looksLikeText(buf) {
+  if (!buf || buf.length === 0) return false;
+  const sample = buf.subarray(0, Math.min(buf.length, 200));
+  let printable = 0;
 
-  return (
-    isGzipBuffer(buf) ||
-    ce.includes("gzip") ||
-    ct.includes("gzip") ||
-    u.endsWith(".gz")
+  for (const b of sample) {
+    // allow tab/newline/carriage return
+    if (b === 9 || b === 10 || b === 13) {
+      printable++;
+      continue;
+    }
+    // printable ASCII range
+    if (b >= 32 && b <= 126) {
+      printable++;
+    }
+  }
+
+  return printable / sample.length > 0.8;
+}
+
+/**
+ * Robust decode:
+ * - First attempt zlib.unzipSync (handles gzip + deflate)
+ * - If that fails, accept plain text buffers
+ * - Otherwise throw a useful "first bytes hex" error
+ */
+function decodeToUtf8MaybeCompressed(buf) {
+  // Try auto-detect gzip/deflate via unzipSync
+  try {
+    const out = zlib.unzipSync(buf);
+    return out.toString("utf8");
+  } catch (_) {
+    // Not zlib/gzip/deflate (or already decompressed)
+  }
+
+  if (looksLikeText(buf)) {
+    return buf.toString("utf8");
+  }
+
+  const head =
+    buf
+      .subarray(0, 16)
+      .toString("hex")
+      .match(/.{1,2}/g)
+      ?.join(" ") || "";
+  throw new Error(
+    `Intercom download was not decodable as CSV text. First 16 bytes: ${head}`
   );
 }
 
@@ -41,7 +83,7 @@ function shouldGunzip(resp, buf, url) {
  * Download export CSV from Intercom.
  * Handles:
  * - 302/303 redirect to signed URL
- * - gzipped CSV vs plain CSV
+ * - gzip/deflate vs plain CSV (via decodeToUtf8MaybeCompressed)
  * - optional fallback to api.eu.intercom.io if 404
  */
 async function downloadExportCsv(downloadUrl, { token }) {
@@ -51,45 +93,35 @@ async function downloadExportCsv(downloadUrl, { token }) {
     "Intercom-Version": INTERCOM_EXPORT_VERSION,
   };
 
-  const decode = (resp, buf, url) => {
-    if (shouldGunzip(resp, buf, url)) {
-      try {
-        return zlib.gunzipSync(buf).toString("utf8");
-      } catch (e) {
-        // If gunzip fails, surface a helpful preview instead of garbage
-        const previewHex = buf.slice(0, 16).toString("hex");
-        throw new Error(
-          `Expected gzip but gunzip failed. First 16 bytes (hex): ${previewHex}. ${e.message}`
-        );
-      }
-    }
-    return buf.toString("utf8");
-  };
-
   const tryOnce = async (url) => {
     const r = await fetch(url, { redirect: "manual", headers });
 
     // Intercom often redirects to a signed URL
     if (r.status >= 300 && r.status < 400) {
       const loc = r.headers.get("location");
-      if (!loc) throw new Error("Intercom download redirect missing Location header");
+      if (!loc)
+        throw new Error("Intercom download redirect missing Location header");
 
       const fileResp = await fetch(loc); // signed URL usually needs no auth
       const buf = Buffer.from(await fileResp.arrayBuffer());
 
       if (!fileResp.ok) {
-        throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`);
+        throw new Error(
+          `File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`
+        );
       }
 
-      return decode(fileResp, buf, loc);
+      return decodeToUtf8MaybeCompressed(buf);
     }
 
     const buf = Buffer.from(await r.arrayBuffer());
     if (!r.ok) {
-      throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
+      throw new Error(
+        `Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`
+      );
     }
 
-    return decode(r, buf, url);
+    return decodeToUtf8MaybeCompressed(buf);
   };
 
   // First try as-is
@@ -110,8 +142,12 @@ export function createIntercomRouter() {
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
   // Guard: keep failures obvious
-  router.use((req, res, next) => {
-    if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
+  router.use((_req, res, next) => {
+    if (!token) {
+      return res
+        .status(500)
+        .json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
+    }
     next();
   });
 
@@ -128,21 +164,30 @@ export function createIntercomRouter() {
     });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
+    if (!r.ok)
+      throw new Error(
+        `Export job create failed: ${r.status} ${JSON.stringify(data)}`
+      );
     return data;
   }
 
   async function getExportJob(jobId) {
-    const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Intercom-Version": INTERCOM_EXPORT_VERSION,
-      },
-    });
+    const r = await fetch(
+      `https://api.intercom.io/export/content/data/${jobId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Intercom-Version": INTERCOM_EXPORT_VERSION,
+        },
+      }
+    );
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
+    if (!r.ok)
+      throw new Error(
+        `Export job status failed: ${r.status} ${JSON.stringify(data)}`
+      );
     return data;
   }
 
@@ -180,9 +225,17 @@ export function createIntercomRouter() {
       });
 
       const jobId = job.job_identifier || job.job_identfier || job.id;
-      if (!jobId) return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
+      if (!jobId)
+        return res
+          .status(500)
+          .json({ ok: false, error: "Missing job_identifier", job });
 
-      res.json({ ok: true, job_identifier: jobId, status: job.status || "pending", export_version: INTERCOM_EXPORT_VERSION });
+      res.json({
+        ok: true,
+        job_identifier: jobId,
+        status: job.status || "pending",
+        export_version: INTERCOM_EXPORT_VERSION,
+      });
     } catch (err) {
       console.error("[intercom] export start error", err);
       res.status(500).json({ ok: false, error: err.message });
@@ -194,8 +247,8 @@ export function createIntercomRouter() {
       const jobId = req.params.jobId;
       const status = await getExportJob(jobId);
 
-      const s = String(status.status || "").toLowerCase();
-      const done = ["complete", "completed"].includes(s);
+      const st = String(status.status || "").toLowerCase();
+      const done = ["complete", "completed"].includes(st);
 
       res.json({
         ok: true,
@@ -219,32 +272,29 @@ export function createIntercomRouter() {
       const limit = Math.min(Number(req.query.limit || 200), 2000);
 
       const status = await getExportJob(jobId);
-      const s = String(status.status || "").toLowerCase();
-      const done = ["complete", "completed"].includes(s);
+      const st = String(status.status || "").toLowerCase();
+      const done = ["complete", "completed"].includes(st);
 
       if (!(done && status.download_url)) {
-        return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
+        return res.json({
+          ok: true,
+          job_identifier: jobId,
+          status: status.status,
+          progress: status,
+        });
       }
 
-      let csvText = await downloadExportCsv(status.download_url, { token });
+      const csvText = await downloadExportCsv(status.download_url, { token });
 
-      let records;
-      try {
-        records = parse(csvText, { columns: true, skip_empty_lines: true });
-      } catch (e) {
-        // If we somehow still got gzipped content as a UTF-8 string, try to recover
-        const s = String(csvText || "");
-        if (s.startsWith("\u001f\u008b") || s.startsWith("�\b")) {
-          const buf = Buffer.from(csvText, "binary");
-          const unzipped = zlib.gunzipSync(buf).toString("utf8");
-          records = parse(unzipped, { columns: true, skip_empty_lines: true });
-        } else {
-          throw e;
-        }
-      }
+      // At this point csvText should be real UTF-8 CSV text.
+      const records = parse(csvText, { columns: true, skip_empty_lines: true });
 
       let surveyRows = records.filter(isLikelySurveyRow);
-      if (surveyId) surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
+      if (surveyId) {
+        surveyRows = surveyRows.filter((row) =>
+          JSON.stringify(row).includes(surveyId)
+        );
+      }
 
       res.json({
         ok: true,

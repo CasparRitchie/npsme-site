@@ -8,7 +8,6 @@ import fs from "fs";
 import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
-import { registerIntercomRoutes } from "./intercom.routes.js";
 
 
 const openai = new OpenAI({
@@ -175,8 +174,6 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(compression());
 
-registerIntercomRoutes(app);
-
 // Security headers (CSP off so we don’t break your current inline styles/scripts)
 app.use(
   helmet({
@@ -215,6 +212,20 @@ app.use((req, res, next) => {
   return next();
 });
 
+const BLOCKED_PATHS = [
+  "/.env",
+  "/.git",
+  "/vendor/phpunit",
+  "/_ignition",
+];
+
+app.use((req, res, next) => {
+  const p = req.path || "";
+  if (BLOCKED_PATHS.some((b) => p === b || p.startsWith(b + "/"))) {
+    return res.status(404).type("text/plain").send("Not found");
+  }
+  next();
+});
 // ---- Dropbox token management (auto-refresh) ----
 const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
 const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
@@ -2470,8 +2481,16 @@ app.get("/api/social-summary", async (req, res) => {
   }
 });
 
+
 // ---------- Inject canonical + og:url for SEO ----------
-app.get("*", (req, res) => {
+app.get("*", (req, res, next) => {
+  // Never serve SPA HTML for API routes
+  if (req.path.startsWith("/api/")) return next();
+
+  // Never serve SPA HTML for file-ish paths (/.env, /.git/config, /favicon.ico, etc)
+  if (req.path.includes(".")) return next();
+
+  // your existing canonical/og:url injection...
   res.set("Cache-Control", "no-store, must-revalidate");
 
   const pathOnly = req.originalUrl.split("?")[0] || "/";

@@ -1,66 +1,31 @@
 // intercom.routes.js
 import express from "express";
 import zlib from "zlib";
+import AdmZip from "adm-zip";
 import { parse } from "csv-parse/sync";
 
 // Data-export endpoints behave best pinned to their own API version
 const INTERCOM_EXPORT_VERSION = process.env.INTERCOM_EXPORT_VERSION || "2.7";
+const INTERCOM_EXPORT_DEBUG = process.env.INTERCOM_EXPORT_DEBUG === "1";
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+function hex16(buf) {
+  return Buffer.from(buf || [])
+    .subarray(0, 16)
+    .toString("hex")
+    .match(/.{1,2}/g)
+    ?.join(" ") || "";
 }
 
-// (kept for compatibility; decode now uses unzipSync which handles gzip/deflate)
 function isZipBuffer(buf) {
   return buf && buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b && buf[2] === 0x03 && buf[3] === 0x04;
 }
 
-function decodeExportPayloadToCsvText(buf) {
-  // ZIP (PK..)
-  if (isZipBuffer(buf)) {
-    const zip = new AdmZip(buf);
-    const entries = zip.getEntries();
-
-    // Prefer CSV files; otherwise take first file entry
-    const csvEntry =
-      entries.find((e) => !e.isDirectory && String(e.entryName).toLowerCase().endsWith(".csv")) ||
-      entries.find((e) => !e.isDirectory);
-
-    if (!csvEntry) {
-      throw new Error("ZIP contained no files");
-    }
-
-    const fileBuf = csvEntry.getData();
-    return fileBuf.toString("utf8");
-  }
-
-  // GZIP
-  if (isGzipBuffer(buf)) {
-    return zlib.gunzipSync(buf).toString("utf8");
-  }
-
-  // Plain text
-  if (looksLikeText(buf)) {
-    return buf.toString("utf8");
-  }
-
-  const head = buf.subarray(0, 16).toString("hex").match(/.{1,2}/g)?.join(" ") || "";
-  throw new Error(`Intercom payload not decodable. First 16 bytes: ${head}`);
-}
-
-function pickHostFallback(url, host) {
-  try {
-    const u = new URL(url);
-    u.host = host;
-    return u.toString();
-  } catch {
-    return url;
-  }
+function isGzipBuffer(buf) {
+  return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
 }
 
 /**
  * Heuristic: is this buffer probably human-readable text?
- * (Used as a fallback when unzipSync doesn't apply.)
  */
 function looksLikeText(buf) {
   if (!buf || buf.length === 0) return false;
@@ -74,49 +39,71 @@ function looksLikeText(buf) {
       continue;
     }
     // printable ASCII range
-    if (b >= 32 && b <= 126) {
-      printable++;
-    }
+    if (b >= 32 && b <= 126) printable++;
   }
 
   return printable / sample.length > 0.8;
 }
 
 /**
- * Robust decode:
- * - First attempt zlib.unzipSync (handles gzip + deflate)
- * - If that fails, accept plain text buffers
- * - Otherwise throw a useful "first bytes hex" error
+ * Decode Intercom export payload to CSV text.
+ * Handles:
+ * - ZIP (PK..)
+ * - gzip/deflate (via unzipSync / gunzipSync)
+ * - plain text CSV
  */
-function decodeToUtf8MaybeCompressed(buf) {
-  // Try auto-detect gzip/deflate via unzipSync
+function decodeExportPayloadToCsvText(buf) {
+  if (!buf || buf.length === 0) throw new Error("Intercom export download returned empty body");
+
+  // 1) ZIP
+  if (isZipBuffer(buf)) {
+    const zip = new AdmZip(buf);
+    const entries = zip.getEntries();
+
+    const csvEntry =
+      entries.find((e) => !e.isDirectory && String(e.entryName).toLowerCase().endsWith(".csv")) ||
+      entries.find((e) => !e.isDirectory);
+
+    if (!csvEntry) throw new Error("Intercom export ZIP contained no files");
+
+    const fileBuf = csvEntry.getData();
+    return fileBuf.toString("utf8");
+  }
+
+  // 2) gzip (fast-path)
+  if (isGzipBuffer(buf)) {
+    return zlib.gunzipSync(buf).toString("utf8");
+  }
+
+  // 3) deflate/gzip via unzipSync (works for Content-Encoding deflate/gzip)
   try {
     const out = zlib.unzipSync(buf);
     return out.toString("utf8");
-  } catch (_) {
-    // Not zlib/gzip/deflate (or already decompressed)
+  } catch {
+    // not zlib-compressed
   }
 
-  if (looksLikeText(buf)) {
-    return buf.toString("utf8");
-  }
+  // 4) plain text
+  if (looksLikeText(buf)) return buf.toString("utf8");
 
-  const head =
-    buf
-      .subarray(0, 16)
-      .toString("hex")
-      .match(/.{1,2}/g)
-      ?.join(" ") || "";
-  throw new Error(
-    `Intercom download was not decodable as CSV text. First 16 bytes: ${head}`
-  );
+  throw new Error(`Intercom payload not decodable. First 16 bytes: ${hex16(buf)}`);
+}
+
+function pickHostFallback(url, host) {
+  try {
+    const u = new URL(url);
+    u.host = host;
+    return u.toString();
+  } catch {
+    return url;
+  }
 }
 
 /**
  * Download export CSV from Intercom.
  * Handles:
  * - 302/303 redirect to signed URL
- * - gzip/deflate vs plain CSV (via decodeToUtf8MaybeCompressed)
+ * - ZIP/gzip/deflate/plain CSV
  * - optional fallback to api.eu.intercom.io if 404
  */
 async function downloadExportCsv(downloadUrl, { token }) {
@@ -129,36 +116,46 @@ async function downloadExportCsv(downloadUrl, { token }) {
   const tryOnce = async (url) => {
     const r = await fetch(url, { redirect: "manual", headers });
 
+    if (INTERCOM_EXPORT_DEBUG) {
+      console.log("[intercom] download status", r.status, "url", url);
+      console.log("[intercom] content-type", r.headers.get("content-type"));
+      console.log("[intercom] content-encoding", r.headers.get("content-encoding"));
+    }
+
     // Intercom often redirects to a signed URL
     if (r.status >= 300 && r.status < 400) {
       const loc = r.headers.get("location");
-      if (!loc)
-        throw new Error("Intercom download redirect missing Location header");
+      if (!loc) throw new Error("Intercom download redirect missing Location header");
 
       const fileResp = await fetch(loc); // signed URL usually needs no auth
       const buf = Buffer.from(await fileResp.arrayBuffer());
 
-      if (!fileResp.ok) {
-        throw new Error(
-          `File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`
-        );
+      if (INTERCOM_EXPORT_DEBUG) {
+        console.log("[intercom] signed download status", fileResp.status);
+        console.log("[intercom] signed first16", hex16(buf));
       }
 
-      // return decodeToUtf8MaybeCompressed(buf);
+      if (!fileResp.ok) {
+        throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`);
+      }
+
       return decodeExportPayloadToCsvText(buf);
     }
 
     const buf = Buffer.from(await r.arrayBuffer());
-    if (!r.ok) {
-      throw new Error(
-        `Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`
-      );
+
+    if (INTERCOM_EXPORT_DEBUG) {
+      console.log("[intercom] direct first16", hex16(buf));
     }
 
-    return decodeToUtf8MaybeCompressed(buf);
+    if (!r.ok) {
+      throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
+    }
+
+    // IMPORTANT: use the same decoder here too (ZIP included)
+    return decodeExportPayloadToCsvText(buf);
   };
 
-  // First try as-is
   try {
     return await tryOnce(downloadUrl);
   } catch (e) {
@@ -175,13 +172,8 @@ export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
-  // Guard: keep failures obvious
   router.use((_req, res, next) => {
-    if (!token) {
-      return res
-        .status(500)
-        .json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
-    }
+    if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
     next();
   });
 
@@ -198,30 +190,21 @@ export function createIntercomRouter() {
     });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok)
-      throw new Error(
-        `Export job create failed: ${r.status} ${JSON.stringify(data)}`
-      );
+    if (!r.ok) throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
     return data;
   }
 
   async function getExportJob(jobId) {
-    const r = await fetch(
-      `https://api.intercom.io/export/content/data/${jobId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Intercom-Version": INTERCOM_EXPORT_VERSION,
-        },
-      }
-    );
+    const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Intercom-Version": INTERCOM_EXPORT_VERSION,
+      },
+    });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok)
-      throw new Error(
-        `Export job status failed: ${r.status} ${JSON.stringify(data)}`
-      );
+    if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
     return data;
   }
 
@@ -230,7 +213,6 @@ export function createIntercomRouter() {
     return blob.includes("survey") || blob.includes("nps");
   }
 
-  // Optional smoke test
   router.get("/ping", async (_req, res) => {
     try {
       const response = await fetch("https://api.intercom.io/me", {
@@ -259,17 +241,9 @@ export function createIntercomRouter() {
       });
 
       const jobId = job.job_identifier || job.job_identfier || job.id;
-      if (!jobId)
-        return res
-          .status(500)
-          .json({ ok: false, error: "Missing job_identifier", job });
+      if (!jobId) return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
 
-      res.json({
-        ok: true,
-        job_identifier: jobId,
-        status: job.status || "pending",
-        export_version: INTERCOM_EXPORT_VERSION,
-      });
+      res.json({ ok: true, job_identifier: jobId, status: job.status || "pending", export_version: INTERCOM_EXPORT_VERSION });
     } catch (err) {
       console.error("[intercom] export start error", err);
       res.status(500).json({ ok: false, error: err.message });
@@ -310,25 +284,14 @@ export function createIntercomRouter() {
       const done = ["complete", "completed"].includes(st);
 
       if (!(done && status.download_url)) {
-        return res.json({
-          ok: true,
-          job_identifier: jobId,
-          status: status.status,
-          progress: status,
-        });
+        return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
       }
 
       const csvText = await downloadExportCsv(status.download_url, { token });
-
-      // At this point csvText should be real UTF-8 CSV text.
       const records = parse(csvText, { columns: true, skip_empty_lines: true });
 
       let surveyRows = records.filter(isLikelySurveyRow);
-      if (surveyId) {
-        surveyRows = surveyRows.filter((row) =>
-          JSON.stringify(row).includes(surveyId)
-        );
-      }
+      if (surveyId) surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
 
       res.json({
         ok: true,

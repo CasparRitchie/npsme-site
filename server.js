@@ -8,6 +8,7 @@ import fs from "fs";
 import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
+import { registerIntercomRoutes } from "./intercom.routes.js";
 
 
 const openai = new OpenAI({
@@ -173,6 +174,8 @@ app.set("trust proxy", 1);
 // Core middleware
 app.use(express.json());
 app.use(compression());
+
+registerIntercomRoutes(app);
 
 // Security headers (CSP off so we don’t break your current inline styles/scripts)
 app.use(

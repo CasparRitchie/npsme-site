@@ -2192,8 +2192,9 @@ app.get("/api/intercom/survey-responses/raw", async (req, res) => {
       await sleep(2000);
     }
 
-    if (!(status.status === "complete" && status.download_url)) {
-      return res.status(504).json({ ok: false, error: "Export job timed out", status });
+    const done = (status.status === "complete" || status.status === "completed");
+    if (!(done && status.download_url)) {
+        return res.status(504).json({ ok: false, error: "Export job timed out", status });
     }
 
     // 3) Download + parse CSV

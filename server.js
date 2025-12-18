@@ -7,6 +7,8 @@ import helmet from "helmet";
 import fs from "fs";
 import nodemailer from "nodemailer";
 import OpenAI from "openai";
+import { createIntercomRouter } from "./intercom.routes.js";
+
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1944,411 +1946,412 @@ app.post("/api/live-survey/submit", async (req, res) => {
   }
 });
 
-// ---- Intercom smoke test (read-only) ----
-app.get("/api/intercom/ping", async (_req, res) => {
-  try {
-    const response = await fetch("https://api.intercom.io/me", {
-      headers: {
-        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-        Accept: "application/json",
-        "Intercom-Version": "2.14",
-      },
-    });
+// // ---- Intercom smoke test (read-only) ----
+// app.get("/api/intercom/ping", async (_req, res) => {
+//   try {
+//     const response = await fetch("https://api.intercom.io/me", {
+//       headers: {
+//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//         Accept: "application/json",
+//         "Intercom-Version": "2.14",
+//       },
+//     });
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    if (!response.ok) {
-      console.error("[intercom] ping failed", data);
-      return res.status(500).json({ ok: false, data });
-    }
+//     if (!response.ok) {
+//       console.error("[intercom] ping failed", data);
+//       return res.status(500).json({ ok: false, data });
+//     }
 
-    res.json({
-      ok: true,
-      app: data.app?.name,
-      email: data.email,
-    });
-  } catch (err) {
-    console.error("[intercom] ping error", err);
-    res.status(500).json({ ok: false, error: err.message });
-  }
-});
+//     res.json({
+//       ok: true,
+//       app: data.app?.name,
+//       email: data.email,
+//     });
+//   } catch (err) {
+//     console.error("[intercom] ping error", err);
+//     res.status(500).json({ ok: false, error: err.message });
+//   }
+// });
 
-app.get("/api/intercom/users", async (_req, res) => {
-  try {
-    const response = await fetch(
-      "https://api.intercom.io/contacts?per_page=10",
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-          Accept: "application/json",
-          "Intercom-Version": "2.14",
-        },
-      }
-    );
+// app.get("/api/intercom/users", async (_req, res) => {
+//   try {
+//     const response = await fetch(
+//       "https://api.intercom.io/contacts?per_page=10",
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//           Accept: "application/json",
+//           "Intercom-Version": "2.14",
+//         },
+//       }
+//     );
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    if (!response.ok) {
-      console.error("[intercom] users fetch failed", data);
-      return res.status(500).json({ error: data });
-    }
+//     if (!response.ok) {
+//       console.error("[intercom] users fetch failed", data);
+//       return res.status(500).json({ error: data });
+//     }
 
-    res.json({
-      total: data.total_count,
-      sample: data.data?.slice(0, 2),
-    });
-  } catch (err) {
-    console.error("[intercom] users error", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     res.json({
+//       total: data.total_count,
+//       sample: data.data?.slice(0, 2),
+//     });
+//   } catch (err) {
+//     console.error("[intercom] users error", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-app.get("/api/intercom/contact/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
+// app.get("/api/intercom/contact/:id", async (req, res) => {
+//   try {
+//     const id = req.params.id;
 
-    const response = await fetch(`https://api.intercom.io/contacts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-        Accept: "application/json",
-        "Intercom-Version": "2.14",
-      },
-    });
+//     const response = await fetch(`https://api.intercom.io/contacts/${id}`, {
+//       headers: {
+//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//         Accept: "application/json",
+//         "Intercom-Version": "2.14",
+//       },
+//     });
 
-    const text = await response.text();
-    if (!response.ok) {
-      return res.status(500).json({ ok: false, status: response.status, body: text });
-    }
+//     const text = await response.text();
+//     if (!response.ok) {
+//       return res.status(500).json({ ok: false, status: response.status, body: text });
+//     }
 
-    return res.json(JSON.parse(text));
-  } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
+//     return res.json(JSON.parse(text));
+//   } catch (err) {
+//     return res.status(500).json({ ok: false, error: err.message });
+//   }
+// });
 
-function monthsBetween(startUnixSeconds, now = new Date()) {
-  const start = new Date(startUnixSeconds * 1000);
-  const months =
-    (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  return Math.max(0, months);
-}
+// function monthsBetween(startUnixSeconds, now = new Date()) {
+//   const start = new Date(startUnixSeconds * 1000);
+//   const months =
+//     (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+//   return Math.max(0, months);
+// }
 
-app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
-  try {
-    // Pull first page (good enough for prototype). Later we’ll paginate.
-    const response = await fetch("https://api.intercom.io/contacts?per_page=150", {
-      headers: {
-        Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-        Accept: "application/json",
-        "Intercom-Version": "2.14",
-      },
-    });
+// app.get("/api/intercom/cohorts/start-date", async (_req, res) => {
+//   try {
+//     // Pull first page (good enough for prototype). Later we’ll paginate.
+//     const response = await fetch("https://api.intercom.io/contacts?per_page=150", {
+//       headers: {
+//         Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//         Accept: "application/json",
+//         "Intercom-Version": "2.14",
+//       },
+//     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      console.error("[intercom] contacts fetch failed", data);
-      return res.status(500).json({ error: data });
-    }
+//     const data = await response.json();
+//     if (!response.ok) {
+//       console.error("[intercom] contacts fetch failed", data);
+//       return res.status(500).json({ error: data });
+//     }
 
-    const now = new Date();
+//     const now = new Date();
 
-    const rows = (data.data || [])
-      .filter((c) => c?.role === "user")
-      .map((c) => {
-        const ca = c.custom_attributes || {};
-        const startDate = ca.start_date; // unix seconds
-        if (!startDate) return null;               // <- ignore unknowns for now
-        return {
-          id: c.id,
-          email: c.email,
-          name: c.name,
-          device_type: ca.device_type || null,
-          envola_role: ca.envola_role || null,
-          start_date: startDate || null,
-          months_since_start: startDate ? monthsBetween(startDate, now) : null,
-        };
-      });
+//     const rows = (data.data || [])
+//       .filter((c) => c?.role === "user")
+//       .map((c) => {
+//         const ca = c.custom_attributes || {};
+//         const startDate = ca.start_date; // unix seconds
+//         if (!startDate) return null;               // <- ignore unknowns for now
+//         return {
+//           id: c.id,
+//           email: c.email,
+//           name: c.name,
+//           device_type: ca.device_type || null,
+//           envola_role: ca.envola_role || null,
+//           start_date: startDate || null,
+//           months_since_start: startDate ? monthsBetween(startDate, now) : null,
+//         };
+//       });
 
-    // Cohort grouping
-    const cohorts = {};
-    for (const r of rows) {
-      const key = r.months_since_start == null ? "unknown" : String(r.months_since_start);
-      cohorts[key] ||= { cohort: key, count: 0, by_role: {}, by_device: {} };
-      cohorts[key].count += 1;
+//     // Cohort grouping
+//     const cohorts = {};
+//     for (const r of rows) {
+//       const key = r.months_since_start == null ? "unknown" : String(r.months_since_start);
+//       cohorts[key] ||= { cohort: key, count: 0, by_role: {}, by_device: {} };
+//       cohorts[key].count += 1;
 
-      if (r.envola_role) {
-        cohorts[key].by_role[r.envola_role] = (cohorts[key].by_role[r.envola_role] || 0) + 1;
-      }
-      if (r.device_type) {
-        cohorts[key].by_device[r.device_type] = (cohorts[key].by_device[r.device_type] || 0) + 1;
-      }
-    }
+//       if (r.envola_role) {
+//         cohorts[key].by_role[r.envola_role] = (cohorts[key].by_role[r.envola_role] || 0) + 1;
+//       }
+//       if (r.device_type) {
+//         cohorts[key].by_device[r.device_type] = (cohorts[key].by_device[r.device_type] || 0) + 1;
+//       }
+//     }
 
-    const sorted = Object.values(cohorts).sort((a, b) => {
-      if (a.cohort === "unknown") return 1;
-      if (b.cohort === "unknown") return -1;
-      return Number(a.cohort) - Number(b.cohort);
-    });
+//     const sorted = Object.values(cohorts).sort((a, b) => {
+//       if (a.cohort === "unknown") return 1;
+//       if (b.cohort === "unknown") return -1;
+//       return Number(a.cohort) - Number(b.cohort);
+//     });
 
-    res.json({
-      ok: true,
-      total_users: rows.length,
-      cohorts: sorted,
-      sample_users: rows.slice(0, 5),
-    });
-  } catch (err) {
-    console.error("[intercom] cohort error", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-import zlib from "zlib";
-import { parse } from "csv-parse/sync";
-
-const INTERCOM_HEADERS_JSON = {
-  Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-  Accept: "application/json",
-  "Intercom-Version": "2.14",
-  "Content-Type": "application/json",
-};
-
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-async function createExportJob({ created_at_after, created_at_before }) {
-  const r = await fetch("https://api.intercom.io/export/content/data", {
-    method: "POST",
-    headers: INTERCOM_HEADERS_JSON,
-    body: JSON.stringify({ created_at_after, created_at_before }),
-  });
-
-  const data = await r.json();
-  if (!r.ok) {
-    throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
-  }
-  return data; // includes id + links
-}
-
-async function getExportJob(jobId) {
-  const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-      Accept: "application/json",
-      "Intercom-Version": "2.14",
-    },
-  });
-  const data = await r.json();
-  if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
-  return data;
-}
+//     res.json({
+//       ok: true,
+//       total_users: rows.length,
+//       cohorts: sorted,
+//       sample_users: rows.slice(0, 5),
+//     });
+//   } catch (err) {
+//     console.error("[intercom] cohort error", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
-function isGzipBuffer(buf) {
-  return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-}
+// import zlib from "zlib";
+// import { parse } from "csv-parse/sync";
 
-import zlib from "zlib";
+// const INTERCOM_HEADERS_JSON = {
+//   Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//   Accept: "application/json",
+//   "Intercom-Version": "2.14",
+//   "Content-Type": "application/json",
+// };
 
-function sniff(buf) {
-  const b0 = buf?.[0], b1 = buf?.[1], b2 = buf?.[2], b3 = buf?.[3];
-  return {
-    isGzip: b0 === 0x1f && b1 === 0x8b,
-    isZip:  b0 === 0x50 && b1 === 0x4b, // "PK" (just in case)
-    headHex: [b0,b1,b2,b3].map(x => (x ?? 0).toString(16).padStart(2,"0")).join(" "),
-  };
-}
+// function sleep(ms) {
+//   return new Promise((r) => setTimeout(r, ms));
+// }
 
-async function downloadExportCsv(downloadUrl) {
-  const r = await fetch(downloadUrl, {
-    redirect: "manual",
-    headers: {
-      Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-      Accept: "application/octet-stream",
-      "Intercom-Version": "2.14",
-    },
-  });
+// async function createExportJob({ created_at_after, created_at_before }) {
+//   const r = await fetch("https://api.intercom.io/export/content/data", {
+//     method: "POST",
+//     headers: INTERCOM_HEADERS_JSON,
+//     body: JSON.stringify({ created_at_after, created_at_before }),
+//   });
 
+//   const data = await r.json();
+//   if (!r.ok) {
+//     throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
+//   }
+//   return data; // includes id + links
+// }
 
-  // Handle redirect to signed URL (no auth)
-  if (r.status >= 300 && r.status < 400) {
-    const loc = r.headers.get("location");
-    if (!loc) throw new Error("Intercom download redirect missing Location header");
-
-    const fileResp = await fetch(loc);
-    const buf = Buffer.from(await fileResp.arrayBuffer());
-    if (!fileResp.ok) {
-      throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 500)}`);
-    }
-
-    const { isGzip } = sniff(buf);
-    if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
-
-    // fallback: sometimes servers still gzip without standard header; try once
-    try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
-    return buf.toString("utf8");
-  }
-
-  const buf = Buffer.from(await r.arrayBuffer());
-  if (!r.ok) {
-    throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 500)}`);
-  }
-
-  const { isGzip } = sniff(buf);
-  if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
-
-  // fallback gunzip attempt (covers weird edge cases)
-  try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
-
-  return buf.toString("utf8");
-}
-
-function isLikelySurveyRow(row) {
-  // TODO: refine once you see real headers.
-  // Common patterns: content type fields, or body containing survey markers.
-  const blob = JSON.stringify(row).toLowerCase();
-  return blob.includes("survey") || blob.includes("nps");
-}
-
-app.get("/api/intercom/survey-responses/raw", async (req, res) => {
-  try {
-    const hours = Number(req.query.hours || 24);
-    const now = Math.floor(Date.now() / 1000);
-    const created_at_before = now;
-    const created_at_after = now - hours * 3600;
-
-    // 1) Create export job
-    const job = await createExportJob({ created_at_after, created_at_before });
-    const jobId = job.job_identifier || job.job_identfier || job.id;
-    if (!jobId) {
-      return res.status(500).json({ ok: false, error: "Intercom export job_identifier missing", job });
-    }
-    // 2) Poll until complete
-    let status = job;
-    for (let i = 0; i < 30; i++) {
-      status = await getExportJob(jobId);
-      if (status.status === "complete" && status.download_url) break;
-      if (status.status === "failed") {
-        return res.status(500).json({ ok: false, error: "Export job failed", status });
-      }
-      await sleep(2000);
-    }
-
-    const done = status.status === "complete" || status.status === "completed";
-
-    if (!(done && status.download_url)) {
-      return res.json({
-        ok: true,
-        job_identifier: jobId,
-        status: status.status,
-        progress: status,
-      });
-    }
+// async function getExportJob(jobId) {
+//   const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
+//     headers: {
+//       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//       Accept: "application/json",
+//       "Intercom-Version": "2.14",
+//     },
+//   });
+//   const data = await r.json();
+//   if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
+//   return data;
+// }
 
 
-    // 3) Download + parse CSV
-    const csvText = await downloadExportCsv(status.download_url);
-    const records = parse(csvText, {
-      columns: true,
-      skip_empty_lines: true,
-    });
+// function isGzipBuffer(buf) {
+//   return buf && buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
+// }
 
-    // 4) Filter survey-ish rows
-    const surveyRows = records.filter(isLikelySurveyRow);
+// import zlib from "zlib";
 
-    return res.json({
-      ok: true,
-      range: { created_at_after, created_at_before, hours },
-      total_rows: records.length,
-      matched_rows: surveyRows.length,
-      sample_headers: records[0] ? Object.keys(records[0]) : [],
-      sample_rows: surveyRows.slice(0, 10),
-      // keep rows out for now if huge; add back later if you want
-      // rows: surveyRows,
-    });
-  } catch (err) {
-    console.error("[intercom] survey raw export error", err);
-    return res.status(500).json({
-      ok: false,
-      error: err.message,
-      // super helpful while debugging in prod:
-      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
-    });
-  }
-});
+// function sniff(buf) {
+//   const b0 = buf?.[0], b1 = buf?.[1], b2 = buf?.[2], b3 = buf?.[3];
+//   return {
+//     isGzip: b0 === 0x1f && b1 === 0x8b,
+//     isZip:  b0 === 0x50 && b1 === 0x4b, // "PK" (just in case)
+//     headHex: [b0,b1,b2,b3].map(x => (x ?? 0).toString(16).padStart(2,"0")).join(" "),
+//   };
+// }
+
+// async function downloadExportCsv(downloadUrl) {
+//   const r = await fetch(downloadUrl, {
+//     redirect: "manual",
+//     headers: {
+//       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+//       Accept: "application/octet-stream",
+//       "Intercom-Version": "2.14",
+//     },
+//   });
 
 
-app.get("/api/intercom/survey-export/start", async (req, res) => {
-  try {
-    const hours = Number(req.query.hours || 24);
-    const now = Math.floor(Date.now() / 1000);
-    const created_at_before = now;
-    const created_at_after = now - hours * 3600;
+//   // Handle redirect to signed URL (no auth)
+//   if (r.status >= 300 && r.status < 400) {
+//     const loc = r.headers.get("location");
+//     if (!loc) throw new Error("Intercom download redirect missing Location header");
 
-    const job = await createExportJob({ created_at_after, created_at_before });
+//     const fileResp = await fetch(loc);
+//     const buf = Buffer.from(await fileResp.arrayBuffer());
+//     if (!fileResp.ok) {
+//       throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 500)}`);
+//     }
 
-    const jobId = job.job_identifier || job.job_identfier || job.id;
-    if (!jobId) {
-      return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
-    }
+//     const { isGzip } = sniff(buf);
+//     if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
 
-    return res.json({
-      ok: true,
-      job_identifier: jobId,
-      range: { created_at_after, created_at_before, hours },
-      status: job.status || "pending",
-    });
-  } catch (err) {
-    console.error("[intercom] export start error", err);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
+//     // fallback: sometimes servers still gzip without standard header; try once
+//     try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
+//     return buf.toString("utf8");
+//   }
+
+//   const buf = Buffer.from(await r.arrayBuffer());
+//   if (!r.ok) {
+//     throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 500)}`);
+//   }
+
+//   const { isGzip } = sniff(buf);
+//   if (isGzip) return zlib.gunzipSync(buf).toString("utf8");
+
+//   // fallback gunzip attempt (covers weird edge cases)
+//   try { return zlib.gunzipSync(buf).toString("utf8"); } catch {}
+
+//   return buf.toString("utf8");
+// }
+
+// function isLikelySurveyRow(row) {
+//   // TODO: refine once you see real headers.
+//   // Common patterns: content type fields, or body containing survey markers.
+//   const blob = JSON.stringify(row).toLowerCase();
+//   return blob.includes("survey") || blob.includes("nps");
+// }
+
+// app.get("/api/intercom/survey-responses/raw", async (req, res) => {
+//   try {
+//     const hours = Number(req.query.hours || 24);
+//     const now = Math.floor(Date.now() / 1000);
+//     const created_at_before = now;
+//     const created_at_after = now - hours * 3600;
+
+//     // 1) Create export job
+//     const job = await createExportJob({ created_at_after, created_at_before });
+//     const jobId = job.job_identifier || job.job_identfier || job.id;
+//     if (!jobId) {
+//       return res.status(500).json({ ok: false, error: "Intercom export job_identifier missing", job });
+//     }
+//     // 2) Poll until complete
+//     let status = job;
+//     for (let i = 0; i < 30; i++) {
+//       status = await getExportJob(jobId);
+//       if (status.status === "complete" && status.download_url) break;
+//       if (status.status === "failed") {
+//         return res.status(500).json({ ok: false, error: "Export job failed", status });
+//       }
+//       await sleep(2000);
+//     }
+
+//     const done = status.status === "complete" || status.status === "completed";
+
+//     if (!(done && status.download_url)) {
+//       return res.json({
+//         ok: true,
+//         job_identifier: jobId,
+//         status: status.status,
+//         progress: status,
+//       });
+//     }
 
 
-app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
-  try {
-    const jobId = req.params.jobId;
-    const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
+//     // 3) Download + parse CSV
+//     const csvText = await downloadExportCsv(status.download_url);
+//     const records = parse(csvText, {
+//       columns: true,
+//       skip_empty_lines: true,
+//     });
 
-    const status = await getExportJob(jobId);
+//     // 4) Filter survey-ish rows
+//     const surveyRows = records.filter(isLikelySurveyRow);
 
-    // Not ready yet → return quickly
-    const isDone = ["complete", "completed"].includes(String(status.status || "").toLowerCase());
+//     return res.json({
+//       ok: true,
+//       range: { created_at_after, created_at_before, hours },
+//       total_rows: records.length,
+//       matched_rows: surveyRows.length,
+//       sample_headers: records[0] ? Object.keys(records[0]) : [],
+//       sample_rows: surveyRows.slice(0, 10),
+//       // keep rows out for now if huge; add back later if you want
+//       // rows: surveyRows,
+//     });
+//   } catch (err) {
+//     console.error("[intercom] survey raw export error", err);
+//     return res.status(500).json({
+//       ok: false,
+//       error: err.message,
+//       // super helpful while debugging in prod:
+//       stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+//     });
+//   }
+// });
 
-    if (!(isDone && status.download_url)) {
-      return res.json({
-        ok: true,
-        job_identifier: jobId,
-        status: status.status,
-        progress: status,
-      });
-    }
 
-    // Ready → download + parse
-    const csvText = await downloadExportCsv(status.download_url);
-    const records = parse(csvText, { columns: true, skip_empty_lines: true });
+// app.get("/api/intercom/survey-export/start", async (req, res) => {
+//   try {
+//     const hours = Number(req.query.hours || 24);
+//     const now = Math.floor(Date.now() / 1000);
+//     const created_at_before = now;
+//     const created_at_after = now - hours * 3600;
 
-    // filter: temporary, improves once we see headers
-    let surveyRows = records.filter(isLikelySurveyRow);
-    if (surveyId) {
-      surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
-    }
+//     const job = await createExportJob({ created_at_after, created_at_before });
 
-    return res.json({
-      ok: true,
-      job_identifier: jobId,
-      status: "complete",
-      total_rows: records.length,
-      matched_rows: surveyRows.length,
-      sample_headers: records[0] ? Object.keys(records[0]) : [],
-      sample_rows: surveyRows.slice(0, 10),
-    });
-  } catch (err) {
-    console.error("[intercom] export status error", err);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
+//     const jobId = job.job_identifier || job.job_identfier || job.id;
+//     if (!jobId) {
+//       return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
+//     }
+
+//     return res.json({
+//       ok: true,
+//       job_identifier: jobId,
+//       range: { created_at_after, created_at_before, hours },
+//       status: job.status || "pending",
+//     });
+//   } catch (err) {
+//     console.error("[intercom] export start error", err);
+//     return res.status(500).json({ ok: false, error: err.message });
+//   }
+// });
+
+
+// app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
+//   try {
+//     const jobId = req.params.jobId;
+//     const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
+
+//     const status = await getExportJob(jobId);
+
+//     // Not ready yet → return quickly
+//     const isDone = ["complete", "completed"].includes(String(status.status || "").toLowerCase());
+
+//     if (!(isDone && status.download_url)) {
+//       return res.json({
+//         ok: true,
+//         job_identifier: jobId,
+//         status: status.status,
+//         progress: status,
+//       });
+//     }
+
+//     // Ready → download + parse
+//     const csvText = await downloadExportCsv(status.download_url);
+//     const records = parse(csvText, { columns: true, skip_empty_lines: true });
+
+//     // filter: temporary, improves once we see headers
+//     let surveyRows = records.filter(isLikelySurveyRow);
+//     if (surveyId) {
+//       surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
+//     }
+
+//     return res.json({
+//       ok: true,
+//       job_identifier: jobId,
+//       status: "complete",
+//       total_rows: records.length,
+//       matched_rows: surveyRows.length,
+//       sample_headers: records[0] ? Object.keys(records[0]) : [],
+//       sample_rows: surveyRows.slice(0, 10),
+//     });
+//   } catch (err) {
+//     console.error("[intercom] export status error", err);
+//     return res.status(500).json({ ok: false, error: err.message });
+//   }
+// });
+app.use("/api/intercom", createIntercomRouter());
 
 // ---------- Static assets & caching ----------
 
@@ -2463,7 +2466,6 @@ app.get("/api/social-summary", async (req, res) => {
       .json({ error: "Internal error generating social summary" });
   }
 });
-
 
 // ---------- Inject canonical + og:url for SEO ----------
 app.get("*", (req, res) => {

@@ -2145,61 +2145,52 @@ async function getExportJob(jobId) {
 }
 
 async function downloadExportCsv(downloadUrl) {
-  // 1) Hit Intercom's download endpoint with the Accept header they require
-  const r = await fetch(downloadUrl, {
-    redirect: "manual", // IMPORTANT: we want to inspect redirects ourselves
-    headers: {
-      Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-      Accept: "application/json",
-      "Intercom-Version": "2.14",
-    },
-  });
+  const intercomHeaders = {
+    Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+    Accept: "application/octet-stream", // IMPORTANT: request file bytes
+    "Intercom-Version": "2.14",
+  };
 
-  // 2) If Intercom redirects (common), follow the Location to the real file URL
-  if (r.status >= 300 && r.status < 400) {
-    const loc = r.headers.get("location");
-    if (!loc) throw new Error("Intercom download redirect missing Location header");
+  let url = downloadUrl;
 
-    const fileResp = await fetch(loc); // usually signed URL, no auth needed
-    const buf = Buffer.from(await fileResp.arrayBuffer());
+  for (let hop = 0; hop < 6; hop++) {
+    const r = await fetch(url, { headers: intercomHeaders, redirect: "manual" });
 
-    if (!fileResp.ok) {
-      throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`);
+    // Follow redirects ourselves (so we control headers)
+    if (r.status >= 300 && r.status < 400) {
+      const loc = r.headers.get("location");
+      if (!loc) throw new Error(`Intercom download redirect missing Location header (status ${r.status})`);
+      url = loc;
+      continue;
     }
 
+    const ct = (r.headers.get("content-type") || "").toLowerCase();
+    const buf = Buffer.from(await r.arrayBuffer());
+
+    if (!r.ok) {
+      // Most Intercom errors are JSON; show useful snippet
+      const snippet = buf.toString("utf8", 0, 800);
+      throw new Error(`Download failed: ${r.status} ${snippet}`);
+    }
+
+    // If Intercom (or a proxy) still returns JSON here, treat as error, not a file
+    if (ct.includes("application/json")) {
+      const snippet = buf.toString("utf8", 0, 1200);
+      throw new Error(`Download returned JSON, not a file: ${snippet}`);
+    }
+
+    // Some servers may already decompress; detect gzip by magic bytes
     const isGzip = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-    return isGzip ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
-  }
 
-  // 3) If Intercom returns JSON, it may include a signed URL
-  const contentType = (r.headers.get("content-type") || "").toLowerCase();
-  const buf = Buffer.from(await r.arrayBuffer());
-
-  if (!r.ok) {
-    throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
-  }
-
-  if (contentType.includes("application/json")) {
-    const json = JSON.parse(buf.toString("utf8") || "{}");
-    const signedUrl = json.url || json.download_url || json.downloadUrl;
-    if (!signedUrl) {
-      throw new Error(`Intercom JSON download response missing url: ${JSON.stringify(json).slice(0, 500)}`);
+    if (isGzip) {
+      return zlib.gunzipSync(buf).toString("utf8");
     }
 
-    const fileResp = await fetch(signedUrl);
-    const fileBuf = Buffer.from(await fileResp.arrayBuffer());
-
-    if (!fileResp.ok) {
-      throw new Error(`File download failed: ${fileResp.status} ${fileBuf.toString("utf8", 0, 400)}`);
-    }
-
-    const isGzip = fileBuf.length >= 2 && fileBuf[0] === 0x1f && fileBuf[1] === 0x8b;
-    return isGzip ? zlib.gunzipSync(fileBuf).toString("utf8") : fileBuf.toString("utf8");
+    // Not gzip → assume plain CSV text
+    return buf.toString("utf8");
   }
 
-  // 4) Otherwise, Intercom actually sent bytes/text directly
-  const isGzip = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-  return isGzip ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
+  throw new Error("Too many redirects while downloading export");
 }
 
 function isLikelySurveyRow(row) {

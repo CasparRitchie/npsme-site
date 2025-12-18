@@ -24,6 +24,19 @@ function pickHostFallback(url, host) {
   }
 }
 
+function shouldGunzip(resp, buf, url) {
+  const ce = (resp?.headers?.get("content-encoding") || "").toLowerCase();
+  const ct = (resp?.headers?.get("content-type") || "").toLowerCase();
+  const u = String(url || "").toLowerCase();
+
+  return (
+    isGzipBuffer(buf) ||
+    ce.includes("gzip") ||
+    ct.includes("gzip") ||
+    u.endsWith(".gz")
+  );
+}
+
 /**
  * Download export CSV from Intercom.
  * Handles:
@@ -38,6 +51,21 @@ async function downloadExportCsv(downloadUrl, { token }) {
     "Intercom-Version": INTERCOM_EXPORT_VERSION,
   };
 
+  const decode = (resp, buf, url) => {
+    if (shouldGunzip(resp, buf, url)) {
+      try {
+        return zlib.gunzipSync(buf).toString("utf8");
+      } catch (e) {
+        // If gunzip fails, surface a helpful preview instead of garbage
+        const previewHex = buf.slice(0, 16).toString("hex");
+        throw new Error(
+          `Expected gzip but gunzip failed. First 16 bytes (hex): ${previewHex}. ${e.message}`
+        );
+      }
+    }
+    return buf.toString("utf8");
+  };
+
   const tryOnce = async (url) => {
     const r = await fetch(url, { redirect: "manual", headers });
 
@@ -48,11 +76,12 @@ async function downloadExportCsv(downloadUrl, { token }) {
 
       const fileResp = await fetch(loc); // signed URL usually needs no auth
       const buf = Buffer.from(await fileResp.arrayBuffer());
+
       if (!fileResp.ok) {
         throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`);
       }
 
-      return isGzipBuffer(buf) ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
+      return decode(fileResp, buf, loc);
     }
 
     const buf = Buffer.from(await r.arrayBuffer());
@@ -60,7 +89,7 @@ async function downloadExportCsv(downloadUrl, { token }) {
       throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
     }
 
-    return isGzipBuffer(buf) ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
+    return decode(r, buf, url);
   };
 
   // First try as-is
@@ -197,8 +226,22 @@ export function createIntercomRouter() {
         return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
       }
 
-      const csvText = await downloadExportCsv(status.download_url, { token });
-      const records = parse(csvText, { columns: true, skip_empty_lines: true });
+      let csvText = await downloadExportCsv(status.download_url, { token });
+
+      let records;
+      try {
+        records = parse(csvText, { columns: true, skip_empty_lines: true });
+      } catch (e) {
+        // If we somehow still got gzipped content as a UTF-8 string, try to recover
+        const s = String(csvText || "");
+        if (s.startsWith("\u001f\u008b") || s.startsWith("�\b")) {
+          const buf = Buffer.from(csvText, "binary");
+          const unzipped = zlib.gunzipSync(buf).toString("utf8");
+          records = parse(unzipped, { columns: true, skip_empty_lines: true });
+        } else {
+          throw e;
+        }
+      }
 
       let surveyRows = records.filter(isLikelySurveyRow);
       if (surveyId) surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));

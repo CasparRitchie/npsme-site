@@ -2177,8 +2177,10 @@ app.get("/api/intercom/survey-responses/raw", async (req, res) => {
 
     // 1) Create export job
     const job = await createExportJob({ created_at_after, created_at_before });
-    const jobId = job.id;
-
+    const jobId = job.job_identifier || job.job_identfier || job.id;
+    if (!jobId) {
+      return res.status(500).json({ ok: false, error: "Intercom export job_identifier missing", job });
+    }
     // 2) Poll until complete
     let status = job;
     for (let i = 0; i < 30; i++) {

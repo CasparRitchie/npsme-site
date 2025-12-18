@@ -2145,40 +2145,61 @@ async function getExportJob(jobId) {
 }
 
 async function downloadExportCsv(downloadUrl) {
+  // 1) Hit Intercom's download endpoint with the Accept header they require
   const r = await fetch(downloadUrl, {
-    // Intercom download endpoints often redirect to a signed URL
-    redirect: "follow",
+    redirect: "manual", // IMPORTANT: we want to inspect redirects ourselves
     headers: {
       Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-      Accept: "*/*",
+      Accept: "application/json",
       "Intercom-Version": "2.14",
     },
   });
 
+  // 2) If Intercom redirects (common), follow the Location to the real file URL
+  if (r.status >= 300 && r.status < 400) {
+    const loc = r.headers.get("location");
+    if (!loc) throw new Error("Intercom download redirect missing Location header");
+
+    const fileResp = await fetch(loc); // usually signed URL, no auth needed
+    const buf = Buffer.from(await fileResp.arrayBuffer());
+
+    if (!fileResp.ok) {
+      throw new Error(`File download failed: ${fileResp.status} ${buf.toString("utf8", 0, 400)}`);
+    }
+
+    const isGzip = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
+    return isGzip ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
+  }
+
+  // 3) If Intercom returns JSON, it may include a signed URL
+  const contentType = (r.headers.get("content-type") || "").toLowerCase();
   const buf = Buffer.from(await r.arrayBuffer());
 
   if (!r.ok) {
-    const preview = buf.toString("utf8", 0, 400);
-    throw new Error(`Download failed: ${r.status} ${preview}`);
+    throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
   }
 
-  // Detect gzip by magic bytes: 0x1f 0x8b
+  if (contentType.includes("application/json")) {
+    const json = JSON.parse(buf.toString("utf8") || "{}");
+    const signedUrl = json.url || json.download_url || json.downloadUrl;
+    if (!signedUrl) {
+      throw new Error(`Intercom JSON download response missing url: ${JSON.stringify(json).slice(0, 500)}`);
+    }
+
+    const fileResp = await fetch(signedUrl);
+    const fileBuf = Buffer.from(await fileResp.arrayBuffer());
+
+    if (!fileResp.ok) {
+      throw new Error(`File download failed: ${fileResp.status} ${fileBuf.toString("utf8", 0, 400)}`);
+    }
+
+    const isGzip = fileBuf.length >= 2 && fileBuf[0] === 0x1f && fileBuf[1] === 0x8b;
+    return isGzip ? zlib.gunzipSync(fileBuf).toString("utf8") : fileBuf.toString("utf8");
+  }
+
+  // 4) Otherwise, Intercom actually sent bytes/text directly
   const isGzip = buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b;
-
-  if (isGzip) {
-    return zlib.gunzipSync(buf).toString("utf8");
-  }
-
-  // Otherwise treat as plain text CSV (or error HTML)
-  const text = buf.toString("utf8");
-
-  // Optional: quick guardrail so you see if you're getting HTML instead of CSV
-  const sniff = text.slice(0, 200).toLowerCase();
-  if (sniff.includes("<html") || sniff.includes("<!doctype")) {
-    throw new Error(`Download returned HTML (not CSV). First bytes: ${text.slice(0, 200)}`);
-  }
-
-  return text;
+  return isGzip ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
 }
 
 function isLikelySurveyRow(row) {

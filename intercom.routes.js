@@ -1,4 +1,5 @@
 // intercom.routes.js
+import express from "express";
 import zlib from "zlib";
 import { parse } from "csv-parse/sync";
 
@@ -28,7 +29,7 @@ function pickHostFallback(url, host) {
  * Handles:
  * - 302/303 redirect to signed URL
  * - gzipped CSV vs plain CSV
- * - fallback to api.eu.intercom.io if Intercom returns 404 (optional but handy)
+ * - optional fallback to api.eu.intercom.io if 404
  */
 async function downloadExportCsv(downloadUrl, { token }) {
   const headers = {
@@ -55,12 +56,10 @@ async function downloadExportCsv(downloadUrl, { token }) {
     }
 
     const buf = Buffer.from(await r.arrayBuffer());
-
     if (!r.ok) {
       throw new Error(`Download failed: ${r.status} ${buf.toString("utf8", 0, 400)}`);
     }
 
-    // Sometimes undici may already have decompressed; sniff before gunzip
     return isGzipBuffer(buf) ? zlib.gunzipSync(buf).toString("utf8") : buf.toString("utf8");
   };
 
@@ -68,8 +67,6 @@ async function downloadExportCsv(downloadUrl, { token }) {
   try {
     return await tryOnce(downloadUrl);
   } catch (e) {
-    // If Intercom returns 404 here, it can be region-host weirdness.
-    // Optional fallback: try EU host once.
     const msg = String(e?.message || "");
     if (msg.includes("404") && downloadUrl.includes("api.intercom.io")) {
       const euUrl = pickHostFallback(downloadUrl, "api.eu.intercom.io");
@@ -79,10 +76,16 @@ async function downloadExportCsv(downloadUrl, { token }) {
   }
 }
 
-export function registerIntercomRoutes(app) {
+export function createIntercomRouter() {
+  const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
-  // ---- Export helpers ----
+  // Guard: keep failures obvious
+  router.use((req, res, next) => {
+    if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
+    next();
+  });
+
   async function createExportJob({ created_at_after, created_at_before }) {
     const r = await fetch("https://api.intercom.io/export/content/data", {
       method: "POST",
@@ -96,9 +99,7 @@ export function registerIntercomRoutes(app) {
     });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
-    }
+    if (!r.ok) throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
     return data;
   }
 
@@ -112,9 +113,7 @@ export function registerIntercomRoutes(app) {
     });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
-    }
+    if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
     return data;
   }
 
@@ -123,14 +122,25 @@ export function registerIntercomRoutes(app) {
     return blob.includes("survey") || blob.includes("nps");
   }
 
-  // Guard (so you don’t crash prod silently)
-  app.use("/api/intercom", (req, res, next) => {
-    if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured”" });
-    next();
+  // Optional smoke test
+  router.get("/ping", async (_req, res) => {
+    try {
+      const response = await fetch("https://api.intercom.io/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Intercom-Version": "2.14",
+        },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return res.status(500).json({ ok: false, data });
+      return res.json({ ok: true, app: data.app?.name, email: data.email });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: err.message });
+    }
   });
 
-  // Start export job
-  app.get("/api/intercom/survey-export/start", async (req, res) => {
+  router.get("/survey-export/start", async (req, res) => {
     try {
       const hours = Number(req.query.hours || 24);
       const now = Math.floor(Date.now() / 1000);
@@ -143,20 +153,14 @@ export function registerIntercomRoutes(app) {
       const jobId = job.job_identifier || job.job_identfier || job.id;
       if (!jobId) return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
 
-      res.json({
-        ok: true,
-        job_identifier: jobId,
-        status: job.status || "pending",
-        export_version: INTERCOM_EXPORT_VERSION,
-      });
+      res.json({ ok: true, job_identifier: jobId, status: job.status || "pending", export_version: INTERCOM_EXPORT_VERSION });
     } catch (err) {
       console.error("[intercom] export start error", err);
       res.status(500).json({ ok: false, error: err.message });
     }
   });
 
-  // Status only (no download)
-  app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
+  router.get("/survey-export/status/:jobId", async (req, res) => {
     try {
       const jobId = req.params.jobId;
       const status = await getExportJob(jobId);
@@ -179,8 +183,7 @@ export function registerIntercomRoutes(app) {
     }
   });
 
-  // Download + parse (your “parse” endpoint)
-  app.get("/api/intercom/survey-export/parse/:jobId", async (req, res) => {
+  router.get("/survey-export/parse/:jobId", async (req, res) => {
     try {
       const jobId = req.params.jobId;
       const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
@@ -195,13 +198,10 @@ export function registerIntercomRoutes(app) {
       }
 
       const csvText = await downloadExportCsv(status.download_url, { token });
-
       const records = parse(csvText, { columns: true, skip_empty_lines: true });
 
       let surveyRows = records.filter(isLikelySurveyRow);
-      if (surveyId) {
-        surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
-      }
+      if (surveyId) surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
 
       res.json({
         ok: true,
@@ -218,4 +218,6 @@ export function registerIntercomRoutes(app) {
       res.status(500).json({ ok: false, error: err.message });
     }
   });
+
+  return router;
 }

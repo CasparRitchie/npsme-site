@@ -2171,29 +2171,58 @@ function isLikelySurveyRow(row) {
 app.get("/api/intercom/survey-responses/raw", async (req, res) => {
   try {
     const hours = Number(req.query.hours || 24);
-    const surveyId = req.query.survey_id ? String(req.query.survey_id) : null;
+    const now = Math.floor(Date.now() / 1000);
+    const created_at_before = now;
+    const created_at_after = now - hours * 3600;
 
-    // ... export job, download, parse CSV into `records`
+    // 1) Create export job
+    const job = await createExportJob({ created_at_after, created_at_before });
+    const jobId = job.id;
 
-    const surveyRows = records
-      .filter(isLikelySurveyRow)
-      .filter((row) => {
-        if (!surveyId) return true;
-        const blob = JSON.stringify(row);
-        return blob.includes(surveyId); // temporary until we know the exact column
-      });
+    // 2) Poll until complete
+    let status = job;
+    for (let i = 0; i < 30; i++) {
+      status = await getExportJob(jobId);
+      if (status.status === "complete" && status.download_url) break;
+      if (status.status === "failed") {
+        return res.status(500).json({ ok: false, error: "Export job failed", status });
+      }
+      await sleep(2000);
+    }
+
+    if (!(status.status === "complete" && status.download_url)) {
+      return res.status(504).json({ ok: false, error: "Export job timed out", status });
+    }
+
+    // 3) Download + parse CSV
+    const csvText = await downloadGzipCsv(status.download_url);
+
+    const records = parse(csvText, {
+      columns: true,
+      skip_empty_lines: true,
+    });
+
+    // 4) Filter survey-ish rows
+    const surveyRows = records.filter(isLikelySurveyRow);
 
     return res.json({
       ok: true,
-      survey_id: surveyId,
+      range: { created_at_after, created_at_before, hours },
+      total_rows: records.length,
+      matched_rows: surveyRows.length,
       sample_headers: records[0] ? Object.keys(records[0]) : [],
       sample_rows: surveyRows.slice(0, 10),
-      matched_rows: surveyRows.length,
-      total_rows: records.length
+      // keep rows out for now if huge; add back later if you want
+      // rows: surveyRows,
     });
   } catch (err) {
     console.error("[intercom] survey raw export error", err);
-    return res.status(500).json({ ok: false, error: err.message });
+    return res.status(500).json({
+      ok: false,
+      error: err.message,
+      // super helpful while debugging in prod:
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    });
   }
 });
 

@@ -2272,8 +2272,15 @@ app.get("/api/intercom/survey-export/status/:jobId", async (req, res) => {
     const status = await getExportJob(jobId);
 
     // Not ready yet → return quickly
-    if (!(status.status === "complete" && status.download_url)) {
-      return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
+    const isDone = ["complete", "completed"].includes(String(status.status || "").toLowerCase());
+
+    if (!(isDone && status.download_url)) {
+      return res.json({
+        ok: true,
+        job_identifier: jobId,
+        status: status.status,
+        progress: status,
+      });
     }
 
     // Ready → download + parse

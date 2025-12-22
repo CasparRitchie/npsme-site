@@ -190,40 +190,6 @@ export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
-  // Webhook receiver for Intercom survey events
-  // IMPORTANT: express.raw so signature is computed against exact raw bytes
-    const webhookHandler = (req, res) => {
-    try {
-      const clientSecret = process.env.INTERCOM_CLIENT_SECRET;
-      const sig = req.get("X-Body-Signature") || req.get("x-body-signature") || "";
-
-      const verdict = verifyIntercomSignature({
-        rawBody: req.body,          // Buffer from express.raw
-        signatureHeader: sig,
-        clientSecret,
-      });
-
-      if (!verdict.ok) {
-        return res.status(401).json({ ok: false, error: verdict.reason });
-      }
-
-      const event = JSON.parse(req.body.toString("utf8"));
-
-      console.log("[intercom webhook surveys]", {
-        type: event?.type,
-        topic: event?.topic,
-        created_at: event?.created_at,
-        item_type: event?.data?.item?.type,
-        item_id: event?.data?.item?.id,
-      });
-
-      return res.status(200).json({ ok: true });
-    } catch (err) {
-      console.error("[intercom webhook surveys] error", err);
-      return res.status(500).json({ ok: false, error: err.message });
-    }
-  };
-
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
     // Webhook receiver for Intercom (survey answers etc.)
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.

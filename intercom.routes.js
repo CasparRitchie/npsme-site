@@ -259,9 +259,20 @@ export function createIntercomRouter() {
       comment: answers.find(a => String(a.question_text || "").toLowerCase().includes("what could we have done"))?.response ?? null,
       answers_json: JSON.stringify(answers),
     };
+    console.log(
+  "[intercom webhook] survey summary",
+  JSON.stringify({
+    topic: record.topic,
+    receipt_id: record.receipt_id,
+    content_id: record.content_id,
+    email: record.email,
+    score: record.score,
+    comment_preview: (record.comment || "").slice(0, 120),
+    answers_count: JSON.parse(record.answers_json || "[]").length,
+  })
+);
 
-    console.log("[intercom webhook] survey record", record);
-
+    console.log("[intercom webhook] survey record:", JSON.stringify(record));
     console.log("[intercom webhook] received meta", {
       type: event?.type,
       topic: event?.topic,

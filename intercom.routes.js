@@ -239,6 +239,28 @@ export function createIntercomRouter() {
     }
 
     const event = JSON.parse(raw.toString("utf8"));
+    const item = event?.data?.item;
+    const cs = item?.content_stat;
+    const contact = item?.contact;
+    const answers = Array.isArray(item?.answers) ? item.answers : [];
+
+    const record = {
+      received_at: new Date().toISOString(),
+      topic: event?.topic,
+      content_id: cs?.content_id,          // survey id
+      receipt_id: cs?.receipt_id,          // useful unique per submission
+      stat_type: cs?.stat_type,            // "completion"
+      content_title: cs?.content_title,
+      contact_id: contact?.id,
+      external_id: contact?.external_id,
+      email: contact?.email,
+      name: contact?.name,
+      score: answers.find(a => String(a.question_text || "").toLowerCase().includes("how likely"))?.response ?? null,
+      comment: answers.find(a => String(a.question_text || "").toLowerCase().includes("what could we have done"))?.response ?? null,
+      answers_json: JSON.stringify(answers),
+    };
+
+    console.log("[intercom webhook] survey record", record);
 
     console.log("[intercom webhook] received meta", {
       type: event?.type,

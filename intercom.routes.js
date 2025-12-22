@@ -191,65 +191,71 @@ export function createIntercomRouter() {
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
-    // Webhook receiver for Intercom (survey answers etc.)
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
     // Webhook receiver for Intercom (survey answers etc.)
   const webhookHandler = (req, res) => {
-    try {
-      const secret = process.env.INTERCOM_WEBHOOK_SECRET;
-      if (!secret) {
-        return res.status(500).json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
-      }
-
-      const sigSha1 = req.get("X-Hub-Signature") || "";
-      const sigSha256 = req.get("X-Hub-Signature-256") || "";
-
-      const raw = req.body; // Buffer because of express.raw
-      console.log("[intercom webhook] sig header:", req.get("X-Hub-Signature"));
-      console.log("[intercom webhook] body len:", req.body?.length);
-      const expectedSha1 =
-        "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
-      const expectedSha256 =
-        "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
-      const received = sig;
-      const sha1 = "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
-
-      // TEMP debug (safe-ish): don’t log full body, just hashes
-      console.log("[intercom webhook] computed sha1:", sha1);
-      console.log("[intercom webhook] received sha1:", received);
-      const timingSafeEq = (a, b) => {
-        const aa = Buffer.from(a);
-        const bb = Buffer.from(b);
-        return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
-      };
-
-      const ok =
-        (sigSha1 && timingSafeEq(sigSha1, expectedSha1)) ||
-        (sigSha256 && timingSafeEq(sigSha256, expectedSha256));
-
-      if (!ok) {
-        console.log("[intercom webhook] signature mismatch", {
-          has_sha1: !!sigSha1,
-          has_sha256: !!sigSha256,
-        });
-        return res.status(401).json({ ok: false, error: "Invalid signature" });
-      }
-
-      const event = JSON.parse(raw.toString("utf8"));
-      console.log("[intercom webhook] received", {
-        type: event?.type,
-        topic: event?.topic,
-        item_type: event?.data?.item?.type,
-        item_id: event?.data?.item?.id,
-      });
-
-      return res.status(200).json({ ok: true });
-    } catch (err) {
-      console.error("[intercom webhook] error", err);
-      return res.status(500).json({ ok: false, error: err.message });
+  try {
+    const secret = process.env.INTERCOM_WEBHOOK_SECRET;
+    if (!secret) {
+      return res
+        .status(500)
+        .json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
     }
-  };
 
+    // Intercom signature headers (can be sha1, sometimes also sha256 depending on config/version)
+    const sigSha1 = req.get("X-Hub-Signature") || "";
+    const sigSha256 = req.get("X-Hub-Signature-256") || "";
+
+    // Because this route uses express.raw({ type: "application/json" })
+    const raw = req.body; // Buffer
+
+    // Compute expected signatures from raw bytes
+    const expectedSha1 =
+      "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
+    const expectedSha256 =
+      "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
+
+    // TEMP debug: hashes only (safe-ish)
+    console.log("[intercom webhook] sig header sha1:", sigSha1);
+    console.log("[intercom webhook] sig header sha256:", sigSha256 ? "(present)" : "(missing)");
+    console.log("[intercom webhook] body len:", raw?.length || 0);
+    console.log("[intercom webhook] computed sha1:", expectedSha1);
+    if (sigSha1) console.log("[intercom webhook] received sha1:", sigSha1);
+
+    const timingSafeEq = (a, b) => {
+      const aa = Buffer.from(a);
+      const bb = Buffer.from(b);
+      return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
+    };
+
+    const ok =
+      (sigSha1 && timingSafeEq(sigSha1, expectedSha1)) ||
+      (sigSha256 && timingSafeEq(sigSha256, expectedSha256));
+
+    if (!ok) {
+      console.log("[intercom webhook] signature mismatch", {
+        has_sha1: !!sigSha1,
+        has_sha256: !!sigSha256,
+      });
+      return res.status(401).json({ ok: false, error: "Invalid signature" });
+    }
+
+    // Parse JSON AFTER signature check
+    const event = JSON.parse(raw.toString("utf8"));
+
+    console.log("[intercom webhook] received", {
+      type: event?.type,
+      topic: event?.topic,
+      item_type: event?.data?.item?.type,
+      item_id: event?.data?.item?.id,
+    });
+
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error("[intercom webhook] error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+};
   const rawJson = express.raw({ type: ["application/json", "application/*+json"] });
 
   // ✅ Support both possible webhook URLs

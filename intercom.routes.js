@@ -176,45 +176,53 @@ export function createIntercomRouter() {
     // Webhook receiver for Intercom (survey answers etc.)
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
   router.post(
-  "/webhooks",
-  express.raw({
-    type: (req) => (req.headers["content-type"] || "").includes("application/json"),
-  }),
-  (req, res) => {
-    try {
-      const secret = process.env.INTERCOM_WEBHOOK_SECRET;
-      if (!secret) {
-        return res.status(500).json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
+    "/webhooks",
+    express.raw({ type: "application/json" }),
+    (req, res) => {
+      try {
+        const secret = process.env.INTERCOM_WEBHOOK_SECRET;
+        if (!secret) {
+          return res.status(500).json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
+        }
+
+        const sig = req.get("X-Hub-Signature") || ""; // Intercom uses this header  [oai_citation:3‡developers.intercom.com](https://developers.intercom.com/docs/references/1.3/webhooks/webhook-models.md?utm_source=chatgpt.com)
+        const expected = "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
+
+        // Timing-safe compare
+        const a = Buffer.from(sig);
+        const b = Buffer.from(expected);
+        const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+        if (!valid) {
+          return res.status(401).json({ ok: false, error: "Invalid signature" });
+        }
+
+        // Parse JSON AFTER signature check
+        const event = JSON.parse(req.body.toString("utf8"));
+
+        // You can log the minimal useful bits without spamming
+        const item = event?.data?.item;
+        const type = item?.type;
+
+        // For survey events, you'll typically look at:
+        // item.content_stat (may include answers/answer depending on stat type)  [oai_citation:4‡Gist](https://gist.github.com/OseasSon?direction=asc&sort=updated&utm_source=chatgpt.com)
+        // This varies by event subtype, so log once to learn the real shape.
+        console.log("[intercom webhook]", {
+          top_type: event?.type,
+          item_type: type,
+          created_at: item?.created_at,
+          content_stat_id: item?.content_stat?.id,
+        });
+
+        // TODO: persist into your DB/CSV/whatever you’re using.
+        // For now: acknowledge quickly.
+        return res.status(200).json({ ok: true });
+      } catch (err) {
+        console.error("[intercom webhook] error", err);
+        return res.status(500).json({ ok: false, error: err.message });
       }
-
-      const sig = req.get("X-Hub-Signature") || "";
-      const expected = "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
-
-      const a = Buffer.from(sig);
-      const b = Buffer.from(expected);
-      const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
-
-      if (!valid) {
-        return res.status(401).json({ ok: false, error: "Invalid signature" });
-      }
-
-      const event = JSON.parse(req.body.toString("utf8"));
-
-      const item = event?.data?.item;
-      console.log("[intercom webhook]", {
-        top_type: event?.type,
-        item_type: item?.type,
-        created_at: item?.created_at,
-        content_stat_id: item?.content_stat?.id,
-      });
-
-      return res.status(200).json({ ok: true });
-    } catch (err) {
-      console.error("[intercom webhook] error", err);
-      return res.status(500).json({ ok: false, error: err.message });
     }
-  }
-);
+  );
   router.use((_req, res, next) => {
     if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
     next();

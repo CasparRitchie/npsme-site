@@ -211,7 +211,12 @@ export function createIntercomRouter() {
         "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
       const expectedSha256 =
         "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
+      const received = sig;
+      const sha1 = "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
 
+      // TEMP debug (safe-ish): don’t log full body, just hashes
+      console.log("[intercom webhook] computed sha1:", sha1);
+      console.log("[intercom webhook] received sha1:", received);
       const timingSafeEq = (a, b) => {
         const aa = Buffer.from(a);
         const bb = Buffer.from(b);

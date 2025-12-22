@@ -202,31 +202,29 @@ export function createIntercomRouter() {
         .json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
     }
 
-    // Intercom signature headers (can be sha1, sometimes also sha256 depending on config/version)
-    const sigSha1 = req.get("X-Hub-Signature") || "";
-    const sigSha256 = req.get("X-Hub-Signature-256") || "";
+    // Intercom signs with SHA1 in X-Hub-Signature (sha1=...)  [oai_citation:1‡Intercom Developers](https://developers.intercom.com/docs/references/2.11/webhooks/webhook-models.md)
+    const sigSha1 = (req.get("X-Hub-Signature") || "").trim();
+    const sigSha256 = (req.get("X-Hub-Signature-256") || "").trim(); // usually absent for Intercom
 
-    // Because this route uses express.raw({ type: "application/json" })
-    const raw = req.body; // Buffer
+    const raw = req.body; // Buffer because of express.raw
 
-    // Compute expected signatures from raw bytes
     const expectedSha1 =
       "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
+
     const expectedSha256 =
       "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
-
-    // TEMP debug: hashes only (safe-ish)
-    console.log("[intercom webhook] sig header sha1:", sigSha1);
-    console.log("[intercom webhook] sig header sha256:", sigSha256 ? "(present)" : "(missing)");
-    console.log("[intercom webhook] body len:", raw?.length || 0);
-    console.log("[intercom webhook] computed sha1:", expectedSha1);
-    if (sigSha1) console.log("[intercom webhook] received sha1:", sigSha1);
 
     const timingSafeEq = (a, b) => {
       const aa = Buffer.from(a);
       const bb = Buffer.from(b);
       return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
     };
+
+    // Helpful debug (safe-ish)
+    console.log("[intercom webhook] sig header sha1:", sigSha1 || "(missing)");
+    console.log("[intercom webhook] sig header sha256:", sigSha256 || "(missing)");
+    console.log("[intercom webhook] body len:", raw?.length || 0);
+    console.log("[intercom webhook] computed sha1:", expectedSha1);
 
     const ok =
       (sigSha1 && timingSafeEq(sigSha1, expectedSha1)) ||
@@ -240,7 +238,6 @@ export function createIntercomRouter() {
       return res.status(401).json({ ok: false, error: "Invalid signature" });
     }
 
-    // Parse JSON AFTER signature check
     const event = JSON.parse(raw.toString("utf8"));
 
     console.log("[intercom webhook] received", {

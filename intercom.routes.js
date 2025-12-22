@@ -270,10 +270,12 @@ export function createIntercomRouter() {
     });
 
     // Dump the full payload in a grep-friendly way (each line prefixed)
-    const dump = raw.toString("utf8");
-    dump.split("\n").forEach((line) =>
-      console.log("[intercom webhook] full event:", line)
-    );
+    if (process.env.INTERCOM_WEBHOOK_DEBUG === "1") {
+      const dump = raw.toString("utf8");
+      const max = 4000; // keep logs sane
+      const clipped = dump.length > max ? dump.slice(0, max) + "…(truncated)" : dump;
+      console.log("[intercom webhook] raw event (clipped):", clipped);
+    }
 
     return res.status(200).json({ ok: true });
   } catch (err) {

@@ -240,12 +240,18 @@ export function createIntercomRouter() {
 
     const event = JSON.parse(raw.toString("utf8"));
 
-    console.log("[intercom webhook] received", {
+    console.log("[intercom webhook] received meta", {
       type: event?.type,
       topic: event?.topic,
       item_type: event?.data?.item?.type,
       item_id: event?.data?.item?.id,
     });
+
+    // Dump the full payload in a grep-friendly way (each line prefixed)
+    const dump = raw.toString("utf8");
+    dump.split("\n").forEach((line) =>
+      console.log("[intercom webhook] full event:", line)
+    );
 
     return res.status(200).json({ ok: true });
   } catch (err) {

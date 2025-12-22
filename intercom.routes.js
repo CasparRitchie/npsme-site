@@ -225,8 +225,72 @@ export function createIntercomRouter() {
   };
 
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
-  router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);
-  // router.post("/webhooks/surveys", express.raw({ type: "application/json" }), webhookHandler);
+    // Webhook receiver for Intercom (survey answers etc.)
+  // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
+  const webhookHandler = (req, res) => {
+    try {
+      const secret = process.env.INTERCOM_WEBHOOK_SECRET;
+      if (!secret) {
+        return res.status(500).json({
+          ok: false,
+          error: "INTERCOM_WEBHOOK_SECRET not configured",
+        });
+      }
+
+      // Accept either sha1 or sha256 signature headers (Intercom setups can vary)
+      const sigSha1 = req.get("X-Hub-Signature") || "";
+      const sigSha256 = req.get("X-Hub-Signature-256") || "";
+
+      const raw = req.body; // Buffer because of express.raw
+      const expectedSha1 =
+        "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
+      const expectedSha256 =
+        "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
+
+      const timingSafeEq = (a, b) => {
+        const aa = Buffer.from(a);
+        const bb = Buffer.from(b);
+        return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
+      };
+
+      const ok =
+        (sigSha1 && timingSafeEq(sigSha1, expectedSha1)) ||
+        (sigSha256 && timingSafeEq(sigSha256, expectedSha256));
+
+      if (!ok) {
+        console.log("[intercom webhook] signature mismatch", {
+          has_sha1: !!sigSha1,
+          has_sha256: !!sigSha256,
+        });
+        return res.status(401).json({ ok: false, error: "Invalid signature" });
+      }
+
+      const event = JSON.parse(raw.toString("utf8"));
+      console.log("[intercom webhook] received", {
+        type: event?.type,
+        topic: event?.topic,
+        item_type: event?.data?.item?.type,
+        item_id: event?.data?.item?.id,
+      });
+
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error("[intercom webhook] error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  };
+
+  // ✅ IMPORTANT: Register BOTH routes (because your Intercom URL is /webhooks/surveys)
+  const rawJson = express.raw({ type: ["application/json", "application/*+json"] });
+
+  router.post("/webhooks", rawJson, webhookHandler);
+  router.post("/webhooks/surveys", rawJson, webhookHandler);
+
+  // (Optional but helpful) make GET obvious
+  router.get("/webhooks/surveys", (_req, res) =>
+    res.status(405).json({ ok: false, error: "POST only" })
+  );
+  
 
   // Optional: quick “is this route alive?” check in browser/curl
   router.get("/webhooks/surveys", (_req, res) => res.json({ ok: true }));

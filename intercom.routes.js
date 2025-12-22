@@ -225,8 +225,8 @@ export function createIntercomRouter() {
   };
 
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
-  // router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);
-  router.post("/webhooks/surveys", express.raw({ type: "application/json" }), webhookHandler);
+  router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);
+  // router.post("/webhooks/surveys", express.raw({ type: "application/json" }), webhookHandler);
 
   // Optional: quick “is this route alive?” check in browser/curl
   router.get("/webhooks/surveys", (_req, res) => res.json({ ok: true }));

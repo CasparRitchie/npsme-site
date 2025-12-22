@@ -9,6 +9,7 @@ import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
 
+
 /* -----------------------------
    External clients (OpenAI / SMTP)
 ------------------------------ */
@@ -197,7 +198,9 @@ const baseIndexHtml = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 // Needed behind Heroku/Cloudflare so req.ip / x-forwarded-proto work
 app.set("trust proxy", 1);
 
-// Core middleware
+// Mount Intercom router ONCE, before express.json()
+app.use("/api/intercom", createIntercomRouter());
+
 app.use(express.json());
 app.use(compression());
 
@@ -1997,12 +2000,6 @@ app.post("/api/live-survey/submit", async (req, res) => {
     res.status(500).json({ error: "Failed to save response" });
   }
 });
-
-/* -----------------------------
-   Intercom router (mounted)
------------------------------- */
-
-app.use("/api/intercom", createIntercomRouter());
 
 /* -----------------------------
    Static assets & caching

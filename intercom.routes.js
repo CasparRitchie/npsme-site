@@ -3,6 +3,7 @@ import express from "express";
 import zlib from "zlib";
 import AdmZip from "adm-zip";
 import { parse } from "csv-parse/sync";
+import crypto from "crypto";
 
 // Data-export endpoints behave best pinned to their own API version
 const INTERCOM_EXPORT_VERSION = process.env.INTERCOM_EXPORT_VERSION || "2.7";
@@ -172,6 +173,48 @@ export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
+    // Webhook receiver for Intercom (survey answers etc.)
+  // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
+  router.post(
+  "/webhooks",
+  express.raw({
+    type: (req) => (req.headers["content-type"] || "").includes("application/json"),
+  }),
+  (req, res) => {
+    try {
+      const secret = process.env.INTERCOM_WEBHOOK_SECRET;
+      if (!secret) {
+        return res.status(500).json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
+      }
+
+      const sig = req.get("X-Hub-Signature") || "";
+      const expected = "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
+
+      const a = Buffer.from(sig);
+      const b = Buffer.from(expected);
+      const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+      if (!valid) {
+        return res.status(401).json({ ok: false, error: "Invalid signature" });
+      }
+
+      const event = JSON.parse(req.body.toString("utf8"));
+
+      const item = event?.data?.item;
+      console.log("[intercom webhook]", {
+        top_type: event?.type,
+        item_type: item?.type,
+        created_at: item?.created_at,
+        content_stat_id: item?.content_stat?.id,
+      });
+
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error("[intercom webhook] error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  }
+);
   router.use((_req, res, next) => {
     if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
     next();

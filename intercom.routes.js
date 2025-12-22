@@ -227,17 +227,14 @@ export function createIntercomRouter() {
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
     // Webhook receiver for Intercom (survey answers etc.)
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
+    // Webhook receiver for Intercom (survey answers etc.)
   const webhookHandler = (req, res) => {
     try {
       const secret = process.env.INTERCOM_WEBHOOK_SECRET;
       if (!secret) {
-        return res.status(500).json({
-          ok: false,
-          error: "INTERCOM_WEBHOOK_SECRET not configured",
-        });
+        return res.status(500).json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
       }
 
-      // Accept either sha1 or sha256 signature headers (Intercom setups can vary)
       const sigSha1 = req.get("X-Hub-Signature") || "";
       const sigSha256 = req.get("X-Hub-Signature-256") || "";
 
@@ -280,20 +277,16 @@ export function createIntercomRouter() {
     }
   };
 
-  // ✅ IMPORTANT: Register BOTH routes (because your Intercom URL is /webhooks/surveys)
   const rawJson = express.raw({ type: ["application/json", "application/*+json"] });
 
+  // ✅ Support both possible webhook URLs
   router.post("/webhooks", rawJson, webhookHandler);
   router.post("/webhooks/surveys", rawJson, webhookHandler);
 
-  // (Optional but helpful) make GET obvious
+  // Optional: make GET obvious
   router.get("/webhooks/surveys", (_req, res) =>
     res.status(405).json({ ok: false, error: "POST only" })
   );
-  
-
-  // Optional: quick “is this route alive?” check in browser/curl
-  router.get("/webhooks/surveys", (_req, res) => res.json({ ok: true }));
 
   router.use((_req, res, next) => {
     if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });

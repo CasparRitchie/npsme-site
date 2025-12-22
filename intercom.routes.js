@@ -205,6 +205,8 @@ export function createIntercomRouter() {
       const sigSha256 = req.get("X-Hub-Signature-256") || "";
 
       const raw = req.body; // Buffer because of express.raw
+      console.log("[intercom webhook] sig header:", req.get("X-Hub-Signature"));
+      console.log("[intercom webhook] body len:", req.body?.length);
       const expectedSha1 =
         "sha1=" + crypto.createHmac("sha1", secret).update(raw).digest("hex");
       const expectedSha256 =

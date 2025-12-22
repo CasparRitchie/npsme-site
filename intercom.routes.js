@@ -192,45 +192,40 @@ export function createIntercomRouter() {
 
   // Webhook receiver for Intercom survey events
   // IMPORTANT: express.raw so signature is computed against exact raw bytes
-  router.post(
-    "/webhooks/surveys",
-    express.raw({ type: "application/json" }),
-    (req, res) => {
-      try {
-        // IMPORTANT: this must be the OAUTH CLIENT SECRET from Intercom Developer Hub
-        const clientSecret = process.env.INTERCOM_CLIENT_SECRET;
-        const sig = req.get("X-Body-Signature") || req.get("x-body-signature") || "";
+    const webhookHandler = (req, res) => {
+    try {
+      const clientSecret = process.env.INTERCOM_CLIENT_SECRET;
+      const sig = req.get("X-Body-Signature") || req.get("x-body-signature") || "";
 
-        const verdict = verifyIntercomSignature({
-          rawBody: req.body,          // Buffer from express.raw
-          signatureHeader: sig,       // X-Body-Signature
-          clientSecret,
-        });
+      const verdict = verifyIntercomSignature({
+        rawBody: req.body,          // Buffer from express.raw
+        signatureHeader: sig,
+        clientSecret,
+      });
 
-        if (!verdict.ok) {
-          return res.status(401).json({ ok: false, error: verdict.reason });
-        }
-
-        const event = JSON.parse(req.body.toString("utf8"));
-
-        console.log("[intercom webhook surveys]", {
-          type: event?.type,
-          topic: event?.topic,
-          created_at: event?.created_at,
-          item_type: event?.data?.item?.type,
-          item_id: event?.data?.item?.id,
-        });
-
-        return res.status(200).json({ ok: true });
-      } catch (err) {
-        console.error("[intercom webhook surveys] error", err);
-        return res.status(500).json({ ok: false, error: err.message });
+      if (!verdict.ok) {
+        return res.status(401).json({ ok: false, error: verdict.reason });
       }
+
+      const event = JSON.parse(req.body.toString("utf8"));
+
+      console.log("[intercom webhook surveys]", {
+        type: event?.type,
+        topic: event?.topic,
+        created_at: event?.created_at,
+        item_type: event?.data?.item?.type,
+        item_id: event?.data?.item?.id,
+      });
+
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error("[intercom webhook surveys] error", err);
+      return res.status(500).json({ ok: false, error: err.message });
     }
-  );
+  };
 
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
-  router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);
+  // router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);
   router.post("/webhooks/surveys", express.raw({ type: "application/json" }), webhookHandler);
 
   // Optional: quick “is this route alive?” check in browser/curl

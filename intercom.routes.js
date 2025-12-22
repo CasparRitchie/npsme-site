@@ -9,6 +9,23 @@ import crypto from "crypto";
 const INTERCOM_EXPORT_VERSION = process.env.INTERCOM_EXPORT_VERSION || "2.7";
 const INTERCOM_EXPORT_DEBUG = process.env.INTERCOM_EXPORT_DEBUG === "1";
 
+function verifyIntercomSignature({ rawBody, signatureHeader, clientSecret }) {
+  if (!clientSecret) return { ok: false, reason: "Missing INTERCOM_CLIENT_SECRET" };
+  if (!signatureHeader) return { ok: false, reason: "Missing X-Body-Signature" };
+
+  // Intercom uses HMAC-SHA256 hex digest of the raw JSON body using OAuth client_secret
+  const expected = crypto
+    .createHmac("sha256", clientSecret)
+    .update(rawBody)
+    .digest("hex");
+
+  const a = Buffer.from(String(signatureHeader), "utf8");
+  const b = Buffer.from(String(expected), "utf8");
+
+  const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+  return ok ? { ok: true } : { ok: false, reason: "Invalid signature" };
+}
+
 function hex16(buf) {
   return Buffer.from(buf || [])
     .subarray(0, 16)
@@ -173,50 +190,44 @@ export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
 
-    // Webhook receiver for Intercom (survey answers etc.)
-  // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
+  // Webhook receiver for Intercom survey events
+  // IMPORTANT: express.raw so signature is computed against exact raw bytes
+  router.post(
+    "/webhooks/surveys",
+    express.raw({ type: "application/json" }),
+    (req, res) => {
+      try {
+        // IMPORTANT: this must be the OAUTH CLIENT SECRET from Intercom Developer Hub
+        const clientSecret = process.env.INTERCOM_CLIENT_SECRET;
+        const sig = req.get("X-Body-Signature") || req.get("x-body-signature") || "";
 
-  const webhookHandler = (req, res) => {
-    try {
-      const secret = process.env.INTERCOM_WEBHOOK_SECRET;
-      if (!secret) {
-        return res
-          .status(500)
-          .json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
+        const verdict = verifyIntercomSignature({
+          rawBody: req.body,          // Buffer from express.raw
+          signatureHeader: sig,       // X-Body-Signature
+          clientSecret,
+        });
+
+        if (!verdict.ok) {
+          return res.status(401).json({ ok: false, error: verdict.reason });
+        }
+
+        const event = JSON.parse(req.body.toString("utf8"));
+
+        console.log("[intercom webhook surveys]", {
+          type: event?.type,
+          topic: event?.topic,
+          created_at: event?.created_at,
+          item_type: event?.data?.item?.type,
+          item_id: event?.data?.item?.id,
+        });
+
+        return res.status(200).json({ ok: true });
+      } catch (err) {
+        console.error("[intercom webhook surveys] error", err);
+        return res.status(500).json({ ok: false, error: err.message });
       }
-      
-      const sig = req.get("X-Hub-Signature") || req.get("x-hub-signature") || "";
-      const expected =
-        "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");
-
-      // Timing-safe compare
-      const a = Buffer.from(sig);
-      const b = Buffer.from(expected);
-      const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
-
-      if (!valid) {
-        return res.status(401).json({ ok: false, error: "Invalid signature" });
-      }
-
-      // Parse JSON AFTER signature check
-      const event = JSON.parse(req.body.toString("utf8"));
-
-      const item = event?.data?.item;
-
-      console.log("[intercom webhook]", {
-        top_type: event?.type,
-        item_type: item?.type,
-        created_at: item?.created_at,
-        content_stat_id: item?.content_stat?.id,
-        path: req.path, // helpful to confirm which endpoint Intercom hit
-      });
-
-      return res.status(200).json({ ok: true });
-    } catch (err) {
-      console.error("[intercom webhook] error", err);
-      return res.status(500).json({ ok: false, error: err.message });
     }
-  };
+  );
 
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
   router.post("/webhooks", express.raw({ type: "application/json" }), webhookHandler);

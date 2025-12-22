@@ -184,7 +184,7 @@ export function createIntercomRouter() {
           .status(500)
           .json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
       }
-
+      
       const sig = req.get("X-Hub-Signature") || req.get("x-hub-signature") || "";
       const expected =
         "sha1=" + crypto.createHmac("sha1", secret).update(req.body).digest("hex");

@@ -68,6 +68,25 @@ export default function IntercomNpsAnalytics() {
           </p>
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("intercomNps.sections.whereIntercomFallsShort.title")}
+          </h2>
+
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {tr("intercomNps.sections.whereIntercomFallsShort.body")}
+          </p>
+
+          <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
+            {tr("intercomNps.sections.whereIntercomFallsShort.bullets", []).map(
+              (item) => (
+                <li key={item}>{item}</li>
+              )
+            )}
+          </ul>
+        </div>
+      </section>
       {/* TODO: sections we’ll write next: What Intercom gives you / What’s missing / How NPS Me fills the gap / FAQs */}
     </div>
   );

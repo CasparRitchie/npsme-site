@@ -1864,6 +1864,17 @@ export const TRANSLATIONS = {
           body:
             "Intercom makes it easy to send NPS surveys at the right moment and collect responses directly alongside conversations and user context. Teams can track scores, read individual comments, and respond to customers quickly.",
         },
+        whereIntercomFallsShort: {
+          title: "Where Intercom NPS starts to fall short at scale",
+          body:
+            "As response volumes grow, teams often struggle to move beyond reading individual comments. Scores fluctuate, themes repeat, but it becomes hard to answer simple questions: what actually drives the score, which issues matter most, and where to act first.",
+          bullets: [
+            "Comments remain siloed and difficult to analyse systematically",
+            "No confidence checks on sampling or response bias",
+            "Themes are identified manually and inconsistently",
+            "Teams struggle to prioritise actions with measurable impact",
+          ],
+        },
       }
     },
 
@@ -4079,6 +4090,17 @@ export const TRANSLATIONS = {
           title: "Ce qu’Intercom NPS fait déjà très bien",
           body:
             "Intercom permet d’envoyer facilement des enquêtes NPS au bon moment et de centraliser les réponses à côté des conversations et du contexte utilisateur. Les équipes peuvent suivre les scores, lire les verbatims et répondre rapidement aux clients.",
+        },
+        whereIntercomFallsShort: {
+          title: "Là où Intercom NPS montre ses limites à mesure que le volume augmente",
+          body:
+            "Lorsque le volume de réponses augmente, les équipes peinent à dépasser la lecture individuelle des verbatims. Les scores varient, les thèmes se répètent, mais il devient difficile de répondre à des questions simples: qu’est-ce qui influence réellement le score, quels sujets comptent le plus, et où agir en priorité.",
+          bullets: [
+            "Les verbatims restent dispersés et difficiles à analyser de manière systématique",
+            "Aucun contrôle de robustesse sur l’échantillonnage ou les biais de réponse",
+            "Les thèmes sont identifiés manuellement et de façon inégale",
+            "Difficulté à prioriser des actions avec un impact mesurable",
+          ],
         },
       }
     },

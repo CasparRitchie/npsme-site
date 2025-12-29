@@ -17,6 +17,11 @@ export default function IntercomNpsAnalytics() {
         path={location.pathname}
         title={tr("intercomNps.seo.title")}
         description={tr("intercomNps.seo.description")}
+        alternates={[
+          { lang: "en", href: "https://www.npsme.com/intercom-nps-analytics" },
+          { lang: "fr", href: "https://www.npsme.com/fr/analyse-nps-intercom" },
+          { lang: "x-default", href: "https://www.npsme.com/intercom-nps-analytics" },
+        ]}
       />
 
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Intercom NPS">
@@ -80,6 +85,25 @@ export default function IntercomNpsAnalytics() {
 
           <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
             {tr("intercomNps.sections.whereIntercomFallsShort.bullets", []).map(
+              (item) => (
+                <li key={item}>{item}</li>
+              )
+            )}
+          </ul>
+        </div>
+      </section>
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("intercomNps.sections.howNpsMeFillsTheGap.title")}
+          </h2>
+
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {tr("intercomNps.sections.howNpsMeFillsTheGap.body")}
+          </p>
+
+          <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
+            {tr("intercomNps.sections.howNpsMeFillsTheGap.bullets", []).map(
               (item) => (
                 <li key={item}>{item}</li>
               )

@@ -1420,6 +1420,67 @@ export const TRANSLATIONS = {
         emailCta: "Email hello@npsme.com",
         bookCta: "Request a discovery call",
       },
+      explainer: {
+        title: "What Net Promoter Score (NPS®) really measures",
+        intro:
+          "Net Promoter Score is a simple metric designed to capture customer sentiment and loyalty. It asks one core question and groups respondents into three categories.",
+        promoters: "Promoters",
+        passives: "Passives",
+        detractors: "Detractors",
+        formula:
+          "NPS® is calculated by subtracting the percentage of detractors from the percentage of promoters.",
+        whereFits:
+          "NPS is most useful when applied consistently across key moments in the customer journey:",
+        relationship:
+          "Relationship NPS to understand overall loyalty over time",
+        transactional:
+          "Transactional or milestone NPS after key interactions",
+        alongside:
+          "Alongside qualitative feedback to explain why scores move",
+        cautionsTitle:
+          "A few important cautions:",
+        cautions: [
+          "Small or biased samples can produce misleading scores",
+          "Scores alone don’t tell you what to fix",
+          "Gaming or over-surveying erodes trust and data quality",
+        ],
+      },
+
+      milestone: {
+        title: "Milestone NPS: measure what actually matters",
+        intro:
+          "Instead of relying on a single, generic score, milestone NPS measures sentiment at critical points in the customer journey.",
+        examples: {
+          order: {
+            title: "After first order",
+            question: "How likely are you to recommend us based on your first purchase?",
+            why: "Early friction here is a strong predictor of churn.",
+          },
+          onboarding: {
+            title: "After onboarding",
+            question: "How easy was it to get started?",
+            why: "Onboarding quality strongly influences long-term adoption.",
+          },
+          firstUse: {
+            title: "After first meaningful use",
+            question: "Did the product meet your expectations?",
+            why: "This moment often determines long-term value perception.",
+          },
+        },
+        stepsTitle: "How milestone NPS works",
+        steps: [
+          "Identify the moments that matter most to retention",
+          "Trigger surveys at those moments, not randomly",
+          "Analyse themes and drivers per milestone",
+          "Prioritise fixes with the highest downstream impact",
+        ],
+        trackTitle: "What you can track over time",
+        track: [
+          "NPS evolution by milestone",
+          "Drivers of promoters and detractors",
+          "Impact of fixes on later-stage scores",
+        ],
+      },
     },
     surveyProgramme: {
       seoTitle: "Your personalised NPS Survey Programme | NPS Me",
@@ -1873,6 +1934,18 @@ export const TRANSLATIONS = {
             "No confidence checks on sampling or response bias",
             "Themes are identified manually and inconsistently",
             "Teams struggle to prioritise actions with measurable impact",
+          ],
+        },
+        howNpsMeFillsTheGap: {
+          title: "How NPS Me adds the missing intelligence layer",
+          body:
+            "NPS Me works alongside Intercom to turn raw feedback into decision-grade insight. We don’t replace your survey tool. We help you understand what really drives the score, where to focus, and how to measure the impact of actions over time.",
+          bullets: [
+            "Sampling checks to ensure scores are comparable and interpretable",
+            "Automated theme and driver analysis across all comments",
+            "Clear prioritisation of issues based on impact, not volume",
+            "Close-the-loop workflows linked to measurable outcomes",
+            "Ongoing tracking to connect actions to retention and revenue",
           ],
         },
       }
@@ -3642,6 +3715,73 @@ export const TRANSLATIONS = {
         emailCta: "Écrire à hello@npsme.com",
         bookCta: "Demander un rendez-vous",
       },
+      explainer: {
+        title: "Que mesure réellement le Net Promoter Score (NPS®)",
+        intro:
+          "Le Net Promoter Score est un indicateur simple visant à mesurer le ressenti et la fidélité des clients. Il repose sur une question unique et classe les répondants en trois catégories.",
+        promoters: "Promoteurs",
+        passives: "Passifs",
+        detractors: "Détracteurs",
+        formula:
+          "Le NPS® est calculé en soustrayant le pourcentage de détracteurs au pourcentage de promoteurs.",
+        whereFits:
+          "Le NPS est particulièrement utile lorsqu’il est appliqué de manière cohérente aux moments clés du parcours client :",
+        relationship:
+          "NPS relationnel pour mesurer la fidélité globale dans le temps",
+        transactional:
+          "NPS transactionnel ou par étape après des interactions clés",
+        alongside:
+          "En complément du verbatim pour expliquer les variations de score",
+        cautionsTitle:
+          "Quelques points de vigilance :",
+        cautions: [
+          "Des échantillons trop faibles ou biaisés faussent le score",
+          "Un score seul n’indique pas quoi corriger",
+          "La sur-sollicitation dégrade la confiance et la qualité des réponses",
+        ],
+      },
+
+      milestone: {
+        title: "Le NPS par étape : mesurer ce qui compte vraiment",
+        intro:
+          "Plutôt qu’un score unique et générique, le NPS par étape mesure le ressenti aux moments critiques du parcours client.",
+        examples: {
+          order: {
+            title: "Après la première commande",
+            question:
+              "Quelle est la probabilité que vous nous recommandiez après votre premier achat ?",
+            why:
+              "Les frictions à ce stade sont fortement corrélées au churn.",
+          },
+          onboarding: {
+            title: "Après l’onboarding",
+            question:
+              "Avez-vous trouvé la prise en main simple et fluide ?",
+            why:
+              "La qualité de l’onboarding conditionne l’adoption à long terme.",
+          },
+          firstUse: {
+            title: "Après la première utilisation clé",
+            question:
+              "Le produit a-t-il répondu à vos attentes ?",
+            why:
+              "Ce moment façonne la perception de valeur durable.",
+          },
+        },
+        stepsTitle: "Comment fonctionne le NPS par étape",
+        steps: [
+          "Identifier les moments clés pour la rétention",
+          "Déclencher les enquêtes au bon moment",
+          "Analyser thèmes et drivers par étape",
+          "Prioriser les actions à fort impact",
+        ],
+        trackTitle: "Ce que vous pouvez suivre dans le temps",
+        track: [
+          "Évolution du NPS par étape",
+          "Drivers des promoteurs et détracteurs",
+          "Impact des actions sur les scores ultérieurs",
+        ],
+      },
     },
     surveyProgramme: {
       seoTitle: "Votre programme d’enquête NPS personnalisé | NPS Me",
@@ -4100,6 +4240,18 @@ export const TRANSLATIONS = {
             "Aucun contrôle de robustesse sur l’échantillonnage ou les biais de réponse",
             "Les thèmes sont identifiés manuellement et de façon inégale",
             "Difficulté à prioriser des actions avec un impact mesurable",
+          ],
+        },
+        howNpsMeFillsTheGap: {
+          title: "Comment NPS Me ajoute la couche d’intelligence manquante",
+          body:
+            "NPS Me fonctionne aux côtés d’Intercom pour transformer le feedback brut en insights exploitables pour la décision. Nous ne remplaçons pas votre outil d’enquête. Nous vous aidons à comprendre ce qui influence réellement le score, où concentrer les efforts et comment mesurer l’impact des actions dans le temps.",
+          bullets: [
+            "Contrôles d’échantillonnage pour garantir des scores comparables et interprétables",
+            "Analyse automatisée des thèmes et des drivers sur l’ensemble des verbatims",
+            "Priorisation claire des sujets selon l’impact, pas uniquement le volume",
+            "Workflows de suivi (close-the-loop) reliés à des résultats mesurables",
+            "Suivi dans le temps pour relier actions, rétention et performance",
           ],
         },
       }

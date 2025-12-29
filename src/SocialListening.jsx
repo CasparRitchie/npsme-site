@@ -1,13 +1,15 @@
 // src/SocialListening.jsx
 import React from "react";
-import { motion } from "framer-motion";
+import { useLocation, Link } from "react-router-dom";
 import Seo from "./components/Seo";
 import SocialTicker from "./components/SocialTicker";
 import PageHeader from "./components/PageHeader";
 import { translations as t } from "./i18n/translations";
-import { useLanguage } from "./i18n/LanguageContext"; // adjust import to match your project
+import { useLanguage } from "./i18n/LanguageContext";
+import { localizePath } from "./i18n/pathHelpers";
 
 export default function SocialListening() {
+  const location = useLocation();
   const { lang } = useLanguage();
 
   const cards = t(lang, "socialListening.track.cards", []);
@@ -17,7 +19,7 @@ export default function SocialListening() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/social-listening"
+        path={location.pathname}
         title={t(lang, "socialListening.seoTitle")}
         description={t(lang, "socialListening.seoDescription")}
       />
@@ -37,7 +39,9 @@ export default function SocialListening() {
               key={item.title}
               className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition"
             >
-              <h3 className="text-white text-xl font-medium mb-2">{item.title}</h3>
+              <h3 className="text-white text-xl font-medium mb-2">
+                {item.title}
+              </h3>
               <p className="text-slate-400 text-sm">{item.text}</p>
             </div>
           ))}
@@ -54,9 +58,9 @@ export default function SocialListening() {
 
           <div className="grid md:grid-cols-2 gap-6 mt-6">
             <div className="rounded-2xl border border-white/10 bg-[#0C1224] p-6">
-              <h4 className="text-lg text-white mb-2">
+              <h3 className="text-lg text-white mb-2">
                 {t(lang, "socialListening.example.positiveTitle")}
-              </h4>
+              </h3>
               <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
                 {positive.map((x) => (
                   <li key={x}>{x}</li>
@@ -65,9 +69,9 @@ export default function SocialListening() {
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-[#0C1224] p-6">
-              <h4 className="text-lg text-white mb-2">
+              <h3 className="text-lg text-white mb-2">
                 {t(lang, "socialListening.example.negativeTitle")}
-              </h4>
+              </h3>
               <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
                 {negative.map((x) => (
                   <li key={x}>{x}</li>
@@ -85,12 +89,13 @@ export default function SocialListening() {
           <p className="text-slate-400 mb-6">
             {t(lang, "socialListening.cta.body")}
           </p>
-          <a
-            href="/cx-pulse-sample"
+
+          <Link
+            to={localizePath("/cx-pulse-sample", lang)}
             className="inline-block rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#22C55E] px-6 py-3 font-medium text-white hover:opacity-90 transition"
           >
             {t(lang, "socialListening.cta.button")}
-          </a>
+          </Link>
         </div>
 
         <SocialTicker />

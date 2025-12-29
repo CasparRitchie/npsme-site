@@ -39,8 +39,7 @@ export default function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 overflow-x-hidden backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         {/* Brand */}
         <Link to={localizePath("/", lang)} className="flex items-center gap-3 shrink-0">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />

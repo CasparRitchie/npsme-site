@@ -13,10 +13,9 @@ export default function PageHeader({
   const hasCustomContent = Boolean(children);
 
   return (
-    <section className="relative overflow-visible border-b border-white/10">
+    <section className="relative z-0 overflow-visible border-b border-white/10">
       {/* Background gradients */}
-      <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_15%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_85%_30%,#22C55E_0%,transparent_25%)]" />
-
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-30 bg-[radial-gradient(circle_at_15%_20%,#7C3AED_0%,transparent_35%),radial-gradient(circle_at_85%_30%,#22C55E_0%,transparent_25%)]" />
       <div className="relative mx-auto max-w-7xl px-6 py-10 md:py-14">
         <motion.div
           initial={{ opacity: 0, y: 10 }}

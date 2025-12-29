@@ -1,5 +1,6 @@
+// src/Products.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
@@ -9,6 +10,7 @@ import { localizePath } from "./i18n/pathHelpers.js";
 
 export default function Products() {
   const { lang } = useLanguage();
+  const location = useLocation();
 
   // Use "dict" for grabbing arrays/objects (bullets etc.)
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
@@ -19,7 +21,7 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path={localizePath("/products", lang)}
+        path={location.pathname}
         lang={lang}
         title={translations(lang, "products.seoTitle", "Products | NPS Me")}
         description={translations(
@@ -134,7 +136,11 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
   const CTA = isInternal ? Link : "a";
   const ctaProps = isInternal
     ? { to: cta.href }
-    : { href: cta.href, target: cta.href.startsWith("http") ? "_blank" : undefined, rel: "noreferrer" };
+    : {
+        href: cta.href,
+        target: cta.href.startsWith("http") ? "_blank" : undefined,
+        rel: "noreferrer",
+      };
 
   return (
     <div

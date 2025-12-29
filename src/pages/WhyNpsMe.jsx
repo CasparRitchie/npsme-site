@@ -1,14 +1,16 @@
 // src/pages/WhyNpsMe.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Seo from "../components/Seo";
 import { CheckCircle2, ArrowRight, LineChart, Users, Wrench } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import { localizePath } from "../i18n/pathHelpers";
 
 export default function WhyNpsMe() {
   const { lang } = useLanguage();
+  const location = useLocation();
   const tr = (p, f) => translations(lang, p, f);
 
   const valueCards = [
@@ -31,12 +33,17 @@ export default function WhyNpsMe() {
 
   const reassuranceItems = translations(lang, "whyNpsMe.reassurance.items", []);
 
+  const bookPath = localizePath("/book", lang);
+  const productsPath = localizePath("/products", lang);
+  const demoHashPath = `${localizePath("/", lang)}#demo`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/why-nps-me"
+        path={location.pathname}
         title={tr("whyNpsMe.seoTitle")}
         description={tr("whyNpsMe.seoDescription")}
+        lang={lang}
       />
 
       {/* Hero */}
@@ -53,7 +60,7 @@ export default function WhyNpsMe() {
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Link
-                to="/book"
+                to={bookPath}
                 className="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
               >
                 {tr("whyNpsMe.header.ctaBook")}
@@ -61,12 +68,12 @@ export default function WhyNpsMe() {
               </Link>
 
               {/* keep anchors stable as agreed */}
-              <a
-                href="/#demo"
+              <Link
+                to={demoHashPath}
                 className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
               >
                 {tr("whyNpsMe.header.ctaDemo")}
-              </a>
+              </Link>
             </div>
           </>
         </PageHeader>
@@ -146,7 +153,7 @@ export default function WhyNpsMe() {
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              to="/products"
+              to={productsPath}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
               {tr("whyNpsMe.reassurance.ctaProducts")}
@@ -154,7 +161,7 @@ export default function WhyNpsMe() {
             </Link>
 
             <Link
-              to="/book"
+              to={bookPath}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
             >
               {tr("whyNpsMe.reassurance.ctaBook")}

@@ -1,24 +1,29 @@
 // src/MilestoneNps.jsx
 import React from "react";
 import { Star, LineChart, Wrench, Gauge, ClipboardList, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
+import { localizePath } from "./i18n/pathHelpers";
 
 export default function MilestoneNps() {
   const { lang } = useLanguage();
+  const location = useLocation();
 
   const methodCards = translations(lang, "milestonePage.method.cards", []);
   const fitCards = translations(lang, "milestonePage.fit.cards", []);
   const steps = translations(lang, "milestonePage.checklist.steps", []);
   const trackItems = translations(lang, "milestonePage.track.items", []);
 
+  const impactPath = localizePath("/impact", lang);
+  const homeWithContactHash = `${localizePath("/", lang)}#contact`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/milestone-nps"
+        path={location.pathname}
         title={translations(lang, "milestonePage.seoTitle", "Milestone (Transactional) NPS® & Survey Signals | NPS Me")}
         description={translations(
           lang,
@@ -47,18 +52,18 @@ export default function MilestoneNps() {
 
           <div className="mt-6 flex gap-3 flex-wrap">
             <Link
-              to="/impact"
+              to={impactPath}
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {translations(lang, "milestonePage.header.ctaImpact", "Estimate your impact")}
             </Link>
 
-            <a
-              href="/#contact"
+            <Link
+              to={homeWithContactHash}
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               {translations(lang, "milestonePage.header.ctaBook", "Book discovery")}
-            </a>
+            </Link>
           </div>
         </>
       </PageHeader>
@@ -154,4 +159,3 @@ export default function MilestoneNps() {
     </div>
   );
 }
-

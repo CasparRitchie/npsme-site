@@ -2116,6 +2116,10 @@ app.get("/api/social-summary", async (req, res) => {
    SPA HTML: inject canonical + og:url for SEO
 ------------------------------ */
 
+/* -----------------------------
+   SPA HTML: inject canonical + og:url + per-route meta + hreflang
+------------------------------ */
+
 app.get("*", (req, res, next) => {
   // Never serve SPA HTML for API routes
   if (req.path.startsWith("/api/")) return next();
@@ -2123,15 +2127,53 @@ app.get("*", (req, res, next) => {
   // Never serve SPA HTML for file-ish paths (/.env, /.git/config, /favicon.ico, etc)
   if (req.path.includes(".")) return next();
 
-  // your existing canonical/og:url injection...
   res.set("Cache-Control", "no-store, must-revalidate");
 
   const pathOnly = req.originalUrl.split("?")[0] || "/";
   const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
 
+  // --- Language detection (simple) ---
+  const isFr = pathOnly === "/fr" || pathOnly.startsWith("/fr/");
+  const htmlLang = isFr ? "fr" : "en";
+  const inLang = isFr ? "fr-FR" : "en-GB";
+
+  // --- Per-route meta (expand this map over time) ---
+  const DEFAULT_META = {
+    title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
+    description:
+      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue—diagnose friction, prioritise fixes, ship measurable gains.",
+  };
+
+  const ROUTE_META = {
+    "/": DEFAULT_META,
+    "/fr": {
+      title: "Conseil CX & Amélioration du NPS | NPS Me",
+      description:
+        "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance — diagnostiquer les frictions, prioriser, déployer et mesurer.",
+    },
+    // add more routes here as you go
+  };
+
+  const meta = ROUTE_META[pathOnly] || DEFAULT_META;
+
+  // --- Hreflang ---
+  // You can add more languages later; keep this simple for now.
+  const hreflang = `
+<link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="en-GB" />
+<link rel="alternate" href="https://${CANONICAL_HOST}/fr" hreflang="fr-FR" />
+<link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
+`.trim();
+
   let html = baseIndexHtml;
 
-  // Replace or insert canonical tag
+  // 1) Replace placeholders introduced in index.html
+  html = html.replace(/__TITLE__/g, meta.title);
+  html = html.replace(/__DESCRIPTION__/g, meta.description);
+  html = html.replace(/__LANG__/g, htmlLang);
+  html = html.replace(/__INLANG__/g, inLang);
+  html = html.replace(/__HREFLANG__/g, hreflang);
+
+  // 2) Canonical
   if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {
     html = html.replace(
       /<link\s+rel=["']canonical["'][^>]*>/i,
@@ -2144,7 +2186,7 @@ app.get("*", (req, res, next) => {
     );
   }
 
-  // Replace or insert og:url
+  // 3) og:url
   if (html.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
     html = html.replace(
       /<meta\s+property=["']og:url["'][^>]*>/i,
@@ -2156,6 +2198,24 @@ app.get("*", (req, res, next) => {
       `  <meta property="og:url" content="${fullUrl}" />\n</head>`
     );
   }
+
+  // 4) Keep OG/Twitter title/description aligned with <title>/<meta name="description">
+  html = html.replace(
+    /<meta\s+property=["']og:title["'][^>]*>/i,
+    `<meta property="og:title" content="${meta.title}" />`
+  );
+  html = html.replace(
+    /<meta\s+property=["']og:description["'][^>]*>/i,
+    `<meta property="og:description" content="${meta.description}" />`
+  );
+  html = html.replace(
+    /<meta\s+name=["']twitter:title["'][^>]*>/i,
+    `<meta name="twitter:title" content="${meta.title}" />`
+  );
+  html = html.replace(
+    /<meta\s+name=["']twitter:description["'][^>]*>/i,
+    `<meta name="twitter:description" content="${meta.description}" />`
+  );
 
   res.type("html").send(html);
 });

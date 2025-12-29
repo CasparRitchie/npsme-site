@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import React from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -11,7 +12,6 @@ export default function NavBar() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
   const { lang, setLang } = useLanguage();
 
   const headerLinks = ROUTES.filter(
@@ -38,7 +38,7 @@ export default function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
+    <header className="sticky top-0 z-30 overflow-x-hidden backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between">
         {/* Brand */}
         <Link to={localizePath("/", lang)} className="flex items-center gap-3">
@@ -49,7 +49,7 @@ export default function NavBar() {
         </Link>
 
         {/* Desktop */}
-        <header className="sticky top-0 z-30 overflow-x-hidden backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
+        <nav className="hidden md:flex min-w-0 items-center gap-6 text-sm text-slate-300">
           {headerLinks.map(({ path, label, labelKey }) => (
             <NavItem key={path} to={localizePath(path, lang)}>
               {translations(lang, labelKey, label)}
@@ -132,8 +132,7 @@ function NavItem({ to, children, mobile = false }) {
       to={to}
       className={({ isActive }) =>
         [
-          "px-2 py-1 rounded-lg transition",
-+         "min-w-0 whitespace-nowrap",
+          "min-w-0 whitespace-nowrap px-2 py-1 rounded-lg transition",
           mobile ? "text-base" : "text-sm",
           isActive ? "text-white" : "text-slate-300 hover:text-white",
         ].join(" ")

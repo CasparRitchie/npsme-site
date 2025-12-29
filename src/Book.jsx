@@ -1,10 +1,16 @@
 // src/Book.jsx
 import React from "react";
+import { useLocation } from "react-router-dom";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
-
+import { useLanguage } from "./i18n/LanguageContext";
+import { translations } from "./i18n/translations";
 
 export default function Book() {
+  const location = useLocation();
+  const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+
   const [status, setStatus] = React.useState("idle"); // idle | sending | success | error
   const [form, setForm] = React.useState({
     name: "",
@@ -13,8 +19,9 @@ export default function Book() {
     time: "",
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
     context: "",
-    company: "" // honeypot
+    company: "", // honeypot
   });
+
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const disabled = status === "success";
 
@@ -22,6 +29,7 @@ export default function Book() {
     e.preventDefault();
     if (form.company) return; // bot trap
     setStatus("sending");
+
     try {
       const payload = {
         _subject: "Discovery booking request (npsme.com)",
@@ -33,11 +41,13 @@ export default function Book() {
         timezone: form.tz,
         context: form.context,
       };
+
       const res = await fetch("https://formspree.io/f/mwprrzro", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
+
       setStatus(res.ok ? "success" : "error");
     } catch {
       setStatus("error");
@@ -47,21 +57,24 @@ export default function Book() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/book"
-        title="Book a discovery session | NPS Me"
-        description="Pick a time that works for you and we’ll confirm a 30-minute discovery call to discuss CX and NPS improvement."
+        path={location.pathname}
+        title={tr("book.seo.title")}
+        description={tr("book.seo.description")}
       />
+
       <PageHeader
-        iconLabel="Discovery call"
-        tag="NPS Me / Book"
-        title="Book a free discovery call"
-        subtitle="Share a bit about your current CX and NPS setup and we’ll explore where we can help - no obligation."
+        iconLabel={tr("book.header.iconLabel")}
+        tag={tr("book.header.tag")}
+        title={tr("book.header.title")}
+        subtitle={tr("book.header.subtitle")}
       />
 
       <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">
         <form
           onSubmit={onSubmit}
-          className={`mt-8 grid gap-4 text-left transition ${disabled ? "opacity-60 pointer-events-none" : ""}`}
+          className={`mt-8 grid gap-4 text-left transition ${
+            disabled ? "opacity-60 pointer-events-none" : ""
+          }`}
           aria-disabled={disabled}
         >
           {/* Honeypot */}
@@ -77,7 +90,7 @@ export default function Book() {
           <div className="grid md:grid-cols-2 gap-4">
             <input
               required
-              placeholder="Your name"
+              placeholder={tr("book.form.name")}
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
               className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
@@ -86,7 +99,7 @@ export default function Book() {
             <input
               required
               type="email"
-              placeholder="Your email"
+              placeholder={tr("book.form.email")}
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
               className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
@@ -102,6 +115,7 @@ export default function Book() {
               onChange={(e) => update("date", e.target.value)}
               className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100"
               disabled={disabled}
+              aria-label={tr("book.form.dateAria")}
             />
             <input
               required
@@ -110,10 +124,11 @@ export default function Book() {
               onChange={(e) => update("time", e.target.value)}
               className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100"
               disabled={disabled}
+              aria-label={tr("book.form.timeAria")}
             />
             <input
               required
-              placeholder="Time zone (e.g., Europe/Paris)"
+              placeholder={tr("book.form.tz")}
               value={form.tz}
               onChange={(e) => update("tz", e.target.value)}
               className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
@@ -132,7 +147,7 @@ export default function Book() {
           <textarea
             required
             rows={5}
-            placeholder="What would you like to focus on? (e.g., survey design, close-the-loop, onboarding friction, support response time, etc.)"
+            placeholder={tr("book.form.context")}
             value={form.context}
             onChange={(e) => update("context", e.target.value)}
             className="rounded-2xl bg-black/30 border border-white/10 p-3 text-sm text-slate-100 placeholder-slate-400"
@@ -143,17 +158,20 @@ export default function Book() {
             disabled={status === "sending" || disabled}
             className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition disabled:opacity-60"
           >
-            {status === "sending" ? "Sending…" : "Request booking"}
+            {status === "sending" ? tr("book.form.sending") : tr("book.form.submit")}
           </button>
 
           {status === "success" && (
-            <p className="mt-2 text-sm text-[#22C55E]">
-              Thanks! I’ll confirm shortly and send a calendar invite.
-            </p>
+            <p className="mt-2 text-sm text-[#22C55E]">{tr("book.form.success")}</p>
           )}
+
           {status === "error" && (
             <p className="mt-2 text-sm text-red-400">
-              Sorry—something went wrong. Please email <a href="mailto:hello@npsme.com" className="underline">hello@npsme.com</a>.
+              {tr("book.form.errorPrefix")}{" "}
+              <a href="mailto:hello@npsme.com" className="underline">
+                hello@npsme.com
+              </a>
+              .
             </p>
           )}
         </form>

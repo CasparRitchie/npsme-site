@@ -48,6 +48,33 @@ export const TRANSLATIONS = {
         "Here we’ll add an AI “co-pilot” that reads the charts and verbatim themes and gives you a short briefing: where NPS is drifting, which journey stages are hurting, and where to focus next.",
       copilotPlaceholder: "AI commentary placeholder",
     },
+    book: {
+      seo: {
+        title: "Book a discovery session | NPS Me",
+        description:
+          "Pick a time that works for you and we’ll confirm a 30-minute discovery call to discuss CX and NPS improvement.",
+      },
+      header: {
+        iconLabel: "Discovery call",
+        tag: "NPS Me / Book",
+        title: "Book a free discovery call",
+        subtitle:
+          "Share a bit about your current CX and NPS setup and we’ll explore where we can help - no obligation.",
+      },
+      form: {
+        name: "Your name",
+        email: "Your email",
+        tz: "Time zone (e.g., Europe/Paris)",
+        context:
+          "What would you like to focus on? (e.g., survey design, close-the-loop, onboarding friction, support response time, etc.)",
+        submit: "Request booking",
+        sending: "Sending…",
+        success: "Thanks! I’ll confirm shortly and send a calendar invite.",
+        errorPrefix: "Sorry—something went wrong. Please email",
+        dateAria: "Preferred date",
+        timeAria: "Preferred time",
+      },
+    },
     blog: {
       seo: {
         title: "Blog | NPS Me – Practical CX & NPS Insights",
@@ -2264,6 +2291,7 @@ export const TRANSLATIONS = {
       },
     },
   },
+
   fr: {
     navbar: {
       bookDiscovery: "Prendre rendez-vous",
@@ -3432,6 +3460,33 @@ export const TRANSLATIONS = {
       copilotBody:
         "Ici, nous ajouterons un “co-pilote” IA qui lit les graphiques et les thèmes verbatim et vous donne un briefing : où le NPS dérive, quelles étapes du parcours posent problème, et où concentrer vos efforts.",
       copilotPlaceholder: "Emplacement du commentaire IA",
+    },
+    book: {
+      seo: {
+        title: "Réserver un échange | NPS Me",
+        description:
+          "Choisissez un créneau et je confirmerai un échange de 30 minutes pour discuter de votre CX et de vos progrès NPS.",
+      },
+      header: {
+        iconLabel: "Échange",
+        tag: "NPS Me / Réserver",
+        title: "Réserver un échange gratuit",
+        subtitle:
+          "Partagez un peu de contexte sur votre CX et votre programme NPS, et voyons ensemble où je peux vous aider - sans engagement.",
+      },
+      form: {
+        name: "Votre nom",
+        email: "Votre email",
+        tz: "Fuseau horaire (ex : Europe/Paris)",
+        context:
+          "Sur quoi souhaitez-vous vous concentrer ? (ex : design de l’enquête, close-the-loop, friction onboarding, temps de réponse support, etc.)",
+        submit: "Demander un créneau",
+        sending: "Envoi…",
+        success: "Merci ! Je confirme rapidement et j’enverrai une invitation calendrier.",
+        errorPrefix: "Désolé, une erreur est survenue. Vous pouvez écrire à",
+        dateAria: "Date souhaitée",
+        timeAria: "Heure souhaitée",
+      },
     },
     dataAutomation: {
       seoTitle: "Données, automatisation & insight — Transformez votre reporting | NPS Me",

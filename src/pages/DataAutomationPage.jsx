@@ -1,6 +1,6 @@
 // src/DataAutomationPage.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Database,
   Link2,
@@ -15,25 +15,34 @@ import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import { localizePath } from "../i18n/pathHelpers";
 
 export default function DataAutomationPage() {
+  const location = useLocation();
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
 
   const problemBullets = translations(lang, "dataAutomation.problem.bullets", []);
   const outcomesBullets = translations(lang, "dataAutomation.outcomes.bullets", []);
-  const outcomesRightBullets = translations(lang, "dataAutomation.outcomes.rightBullets", []);
+  const outcomesRightBullets = translations(
+    lang,
+    "dataAutomation.outcomes.rightBullets",
+    []
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/data-automation"
+        path={location.pathname}
         title={tr("dataAutomation.seoTitle")}
         description={tr("dataAutomation.seoDescription")}
       />
 
       {/* Hero */}
-      <PageHeader iconLabel={tr("dataAutomation.header.iconLabel")} tag={tr("dataAutomation.header.tag")}>
+      <PageHeader
+        iconLabel={tr("dataAutomation.header.iconLabel")}
+        tag={tr("dataAutomation.header.tag")}
+      >
         <>
           <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-white max-w-3xl">
             {tr("dataAutomation.header.title")}
@@ -46,7 +55,7 @@ export default function DataAutomationPage() {
           {/* CTA buttons - preserved structure */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
-              to="/book"
+              to={localizePath("/book", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {tr("dataAutomation.header.ctaBook")}
@@ -54,7 +63,7 @@ export default function DataAutomationPage() {
             </Link>
 
             <Link
-              to="/impact"
+              to={localizePath("/impact", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               {tr("dataAutomation.header.ctaImpact")}
@@ -237,7 +246,7 @@ export default function DataAutomationPage() {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              to="/book"
+              to={localizePath("/book", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {tr("dataAutomation.cta.ctaBook")}
@@ -245,7 +254,7 @@ export default function DataAutomationPage() {
             </Link>
 
             <Link
-              to="/products"
+              to={localizePath("/products", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               {tr("dataAutomation.cta.ctaProducts")}

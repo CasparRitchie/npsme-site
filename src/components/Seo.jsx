@@ -58,8 +58,8 @@ export default function Seo({
     Array.isArray(alternates) && alternates.length > 0
       ? alternates
       : [
-          { lang: "en", href: enUrl },
-          { lang: "fr", href: frUrl },
+          { lang: "en-GB", href: enUrl },
+          { lang: "fr-FR", href: frUrl },
           { lang: "x-default", href: xDefaultUrl },
         ];
 

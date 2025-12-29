@@ -192,7 +192,7 @@ function NavItem({ to, children, mobile = false }) {
 
 function DesktopDropdown({ label, items }) {
   return (
-    <div className="relative group">
+    <div className="relative group z-50">
       <button
         type="button"
         className="shrink-0 px-2 py-1 rounded-lg text-slate-300 hover:text-white transition inline-flex items-center gap-2 whitespace-nowrap"
@@ -201,8 +201,8 @@ function DesktopDropdown({ label, items }) {
         <span className="text-slate-500">▾</span>
       </button>
 
-      <div className="absolute left-0 top-full pt-2 hidden group-hover:block">
-        <div className="w-72 rounded-2xl border border-white/10 bg-[#0B0F19]/95 backdrop-blur shadow-xl p-2">
+      <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+        <div className="w-72 rounded-2xl border border-white/10 bg-[#0B0F19]/95 backdrop-blur shadow-xl p-2 z-50">
           {items.map((it) => (
             <NavLink
               key={it.to}
@@ -210,7 +210,9 @@ function DesktopDropdown({ label, items }) {
               className={({ isActive }) =>
                 [
                   "block px-3 py-2 rounded-xl transition",
-                  isActive ? "text-white bg-white/10" : "text-slate-300 hover:text-white hover:bg-white/5",
+                  isActive
+                    ? "text-white bg-white/10"
+                    : "text-slate-300 hover:text-white hover:bg-white/5",
                 ].join(" ")
               }
             >

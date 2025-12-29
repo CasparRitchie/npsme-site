@@ -1378,6 +1378,10 @@ export const TRANSLATIONS = {
         note:
           "Opens the dedicated demo page where you can send yourself an invitation, complete the survey, and explore NPS & milestone scores.",
       },
+      demo: {
+        label: "Live demo NPS®",
+        basedOn: "Based on {count} responses",
+      },
 
       platform: {
         title: "Analytics on top of your surveys",
@@ -3672,6 +3676,10 @@ export const TRANSLATIONS = {
         cta: "Lancer la démo et voir les résultats",
         note:
           "Ouvre la page dédiée : vous pouvez vous envoyer une invitation, répondre, puis explorer le NPS et les scores par étape.",
+      },
+      demo: {
+        label: "Démo NPS® en direct",
+        basedOn: "Basé sur {count} réponses",
       },
 
       platform: {

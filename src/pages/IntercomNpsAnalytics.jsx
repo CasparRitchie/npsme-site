@@ -28,6 +28,16 @@ export default function IntercomNpsAnalytics() {
             <p className="mt-5 text-slate-300 max-w-2xl">
               {tr("intercomNps.intro")}
             </p>
+            <p className="mt-4 text-slate-300 max-w-2xl">
+              {tr("intercomNps.pillarLinkPrefix")}{" "}
+              <Link
+                to={lang === "fr" ? "/fr/nps-intelligence-layer" : "/nps-intelligence-layer"}
+                className="underline decoration-white/30 underline-offset-4 hover:text-white"
+              >
+                {tr("intercomNps.pillarLinkText")}
+              </Link>
+              {tr("intercomNps.pillarLinkSuffix")}
+            </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
@@ -48,7 +58,16 @@ export default function IntercomNpsAnalytics() {
           </div>
         </div>
       </PageHeader>
-
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("intercomNps.sections.whatIntercomDoesWell.title")}
+          </h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {tr("intercomNps.sections.whatIntercomDoesWell.body")}
+          </p>
+        </div>
+      </section>
       {/* TODO: sections we’ll write next: What Intercom gives you / What’s missing / How NPS Me fills the gap / FAQs */}
     </div>
   );

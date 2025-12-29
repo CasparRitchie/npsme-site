@@ -1397,6 +1397,7 @@ export const TRANSLATIONS = {
             desc: "Follow-up workflows and outcome tracking so responses lead to measurable changes.",
           },
         ],
+        linkIntercomText: "See how this works with Intercom NPS.",
       },
 
       about: {
@@ -1854,6 +1855,16 @@ export const TRANSLATIONS = {
       intro: "Intercom helps you collect NPS. NPS Me adds the intelligence layer: sampling checks, theme and driver analysis, prioritisation, close-the-loop workflows and impact tracking.",
       cta: "Book a free discovery",
       secondaryCta: "See the intelligence layer",
+      pillarLinkPrefix: "This is one example. The core approach is explained in the",
+      pillarLinkText: "NPS intelligence layer",
+      pillarLinkSuffix: ".",
+      sections: {
+        whatIntercomDoesWell: {
+          title: "What Intercom NPS already does well",
+          body:
+            "Intercom makes it easy to send NPS surveys at the right moment and collect responses directly alongside conversations and user context. Teams can track scores, read individual comments, and respond to customers quickly.",
+        },
+      }
     },
 
     socialListeningIndex: {
@@ -3597,6 +3608,7 @@ export const TRANSLATIONS = {
             desc: "Workflows de suivi et mesure d’impact pour relier feedback → actions → résultats.",
           },
         ],
+        linkIntercomText: "Voir un exemple avec Intercom NPS.",
       },
 
       about: {
@@ -4059,6 +4071,16 @@ export const TRANSLATIONS = {
       intro: "Intercom aide à collecter le NPS. NPS Me ajoute la couche d’intelligence: contrôles d’échantillonnage, analyse des thèmes et drivers, priorisation, workflows de suivi et mesure d’impact.",
       cta: "Réserver un échange",
       secondaryCta: "Voir la couche d’intelligence",
+      pillarLinkPrefix: "Ceci est un exemple. L’approche centrale est expliquée dans la",
+      pillarLinkText: "couche d’intelligence NPS",
+      pillarLinkSuffix: ".",
+      sections: {
+        whatIntercomDoesWell: {
+          title: "Ce qu’Intercom NPS fait déjà très bien",
+          body:
+            "Intercom permet d’envoyer facilement des enquêtes NPS au bon moment et de centraliser les réponses à côté des conversations et du contexte utilisateur. Les équipes peuvent suivre les scores, lire les verbatims et répondre rapidement aux clients.",
+        },
+      }
     },
 
     socialListeningIndex: {

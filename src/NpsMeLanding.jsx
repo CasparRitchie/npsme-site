@@ -324,7 +324,13 @@ export default function NpsMeLanding() {
             {tr("landing.platform.title")}
           </h2>
           <p className="mt-3 text-slate-300 max-w-3xl">
-            {tr("landing.platform.body")}
+            {tr("landing.platform.body")}{" "}
+            <Link
+              to={lang === "fr" ? "/fr/analyse-nps-intercom" : "/intercom-nps-analytics"}
+              className="underline decoration-white/30 underline-offset-4 hover:text-white"
+            >
+              {tr("landing.platform.linkIntercomText")}
+            </Link>
           </p>
 
           <div className="mt-8 grid gap-6 md:grid-cols-3">

@@ -1,0 +1,104 @@
+.
+├── .DS_Store
+├── .github
+│   └── workflows
+│       └── keepalive.yml
+├── .gitignore
+├── .nvmrc
+├── .vscode
+│   └── settings.json
+├── Procfile
+├── envola.txt
+├── index.html
+├── intercom-test.html
+├── intercom.routes.js
+├── note
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── favicon-16.png
+│   ├── favicon-192.png
+│   ├── favicon-32.png
+│   ├── favicon-48.png
+│   ├── favicon-512.png
+│   ├── favicon-64.png
+│   ├── favicon.ico
+│   ├── favicon.png
+│   ├── favicon.svg
+│   ├── figmanpsme.png
+│   ├── linkedin_cover1.png
+│   ├── npsme_intercom_diagram.png
+│   ├── npsme_intercom_diagram2.png
+│   ├── og-image.jpg
+│   ├── og-image.png
+│   ├── robots.txt
+│   ├── site.webmanifest
+│   └── sitemap.xml
+├── repo_tree.txt
+├── server.js
+├── src
+│   ├── App.jsx
+│   ├── Book.jsx
+│   ├── CxPulseSample.jsx
+│   ├── ImpactPage.jsx
+│   ├── Layout.jsx
+│   ├── MilestoneNps.jsx
+│   ├── NpsMeLanding.jsx
+│   ├── NpsSurveyProgramme.jsx
+│   ├── Privacy.jsx
+│   ├── Products.jsx
+│   ├── SocialListening.jsx
+│   ├── Terms.jsx
+│   ├── components
+│   │   ├── DemoResultsPanel.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── PageHeader.jsx
+│   │   ├── ScrollToTop.jsx
+│   │   ├── Seo.jsx
+│   │   ├── SiteFooter.jsx
+│   │   └── SocialTicker.jsx
+│   ├── data
+│   │   └── socialReports.js
+│   ├── i18n
+│   │   ├── LanguageContext.jsx
+│   │   ├── pathHelpers.js
+│   │   └── translations.js
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── BlogClosingTheLoop.jsx
+│   │   ├── BlogDataVisualisation.jsx
+│   │   ├── BlogEthicalSurveys.jsx
+│   │   ├── BlogEthicsOfContactSelection.jsx
+│   │   ├── BlogIndex.jsx
+│   │   ├── BlogSendingNpsBeforeChristmas.jsx
+│   │   ├── BlogWhatToDoWithNpsScores.jsx
+│   │   ├── BlogWhyNpsIsntImproving.jsx
+│   │   ├── CxCockpit.jsx
+│   │   ├── DataAutomationPage.jsx
+│   │   ├── DemoInvitationSurvey.jsx
+│   │   ├── DemoSurvey.jsx
+│   │   ├── DemoSurveyPage.jsx
+│   │   ├── DemoThankYou.jsx
+│   │   ├── IntercomNpsAnalytics.jsx
+│   │   ├── LiveInvitationSurvey.jsx
+│   │   ├── LiveResultsPanel.jsx
+│   │   ├── LiveSurveyAdminPage.jsx
+│   │   ├── LiveSurveyPage.jsx
+│   │   ├── LiveThankYou.jsx
+│   │   ├── NpsIntelligenceLayer.jsx
+│   │   ├── SocialListeningIndex.jsx
+│   │   ├── SocialListeningReport.jsx
+│   │   ├── WhatIsNps.jsx
+│   │   └── WhyNpsMe.jsx
+│   ├── routesManifest.js
+│   ├── routesRegistry.js
+│   ├── scripts
+│   │   └── generate-sitemap.mjs
+│   └── styles.css
+├── tailwind.config.js
+├── utils
+│   └── nps.js
+└── vite.config.js
+
+12 directories, 90 files

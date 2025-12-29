@@ -1,14 +1,16 @@
 // src/pages/WhatIsNps.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import { localizePath } from "../i18n/pathHelpers";
 
 export default function WhatIsNps() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
 
   const calcSteps = translations(lang, "whatIsNps.calc.steps", []);
   const relBullets = translations(lang, "whatIsNps.types.relationship.bullets", []);
@@ -18,10 +20,13 @@ export default function WhatIsNps() {
   const betterList = translations(lang, "whatIsNps.pitfalls.betterList", []);
   const closeBullets = translations(lang, "whatIsNps.closeLoop.bullets", []);
 
+  const productsPath = localizePath("/products", lang);
+  const homeWithContactHash = `${localizePath("/", lang)}#contact`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/what-is-nps"
+        path={location.pathname}
         title={tr("whatIsNps.seoTitle")}
         description={tr("whatIsNps.seoDescription")}
       />
@@ -212,17 +217,18 @@ export default function WhatIsNps() {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              to="/products"
+              to={productsPath}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               {tr("whatIsNps.cta.explore")}
             </Link>
-            <a
-              href="/#contact"
+
+            <Link
+              to={homeWithContactHash}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {tr("whatIsNps.cta.book")}
-            </a>
+            </Link>
           </div>
 
           <p className="mt-8 text-[11px] leading-relaxed text-slate-500">

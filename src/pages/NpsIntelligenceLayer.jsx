@@ -1,6 +1,7 @@
+// src/pages/NpsIntelligenceLayer.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { Layers, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
@@ -9,6 +10,7 @@ import { TRANSLATIONS, translations } from "../i18n/translations.js";
 import { localizePath } from "../i18n/pathHelpers.js";
 
 export default function NpsIntelligenceLayer() {
+  const location = useLocation();
   const { lang } = useLanguage();
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
@@ -17,12 +19,10 @@ export default function NpsIntelligenceLayer() {
   const bulletsDeliver = dict?.npsIntelligenceLayer?.sections?.deliver?.bullets || [];
   const bulletsFit = dict?.npsIntelligenceLayer?.sections?.fit?.bullets || [];
 
-  const pagePath = localizePath("/nps-intelligence-layer", lang);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path={pagePath}
+        path={location.pathname}
         lang={lang}
         title={translations(
           lang,
@@ -37,7 +37,11 @@ export default function NpsIntelligenceLayer() {
       />
 
       <PageHeader
-        iconLabel={translations(lang, "npsIntelligenceLayer.header.iconLabel", "NPS Me / CX Intelligence")}
+        iconLabel={translations(
+          lang,
+          "npsIntelligenceLayer.header.iconLabel",
+          "NPS Me / CX Intelligence"
+        )}
         tag={translations(lang, "npsIntelligenceLayer.header.tag", "NPS Me / Strategy")}
         accent={translations(lang, "npsIntelligenceLayer.header.accent", "Intelligence layer")}
         title={translations(lang, "npsIntelligenceLayer.header.title", "your CX tools don’t provide")}
@@ -52,7 +56,11 @@ export default function NpsIntelligenceLayer() {
         {/* Hero card */}
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.hero.title", "The CX intelligence layer your tools don’t provide")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.hero.title",
+              "The CX intelligence layer your tools don’t provide"
+            )}
           </h2>
 
           <p className="mt-4 text-slate-300 leading-relaxed">
@@ -84,7 +92,11 @@ export default function NpsIntelligenceLayer() {
               to={localizePath("/cx-pulse-sample", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              {translations(lang, "npsIntelligenceLayer.hero.ctaSecondary", "See a sample CX Pulse")}
+              {translations(
+                lang,
+                "npsIntelligenceLayer.hero.ctaSecondary",
+                "See a sample CX Pulse"
+              )}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -93,7 +105,11 @@ export default function NpsIntelligenceLayer() {
         {/* Section: Pain */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.sections.pain.title", "Why teams still feel stuck with Intercom or Medallia")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.sections.pain.title",
+              "Why teams still feel stuck with Intercom or Medallia"
+            )}
           </h3>
 
           <p className="mt-3 text-slate-300 leading-relaxed">
@@ -125,7 +141,11 @@ export default function NpsIntelligenceLayer() {
         {/* Section: Layer */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.sections.layer.title", "Introducing the NPS Me Intelligence Layer")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.sections.layer.title",
+              "Introducing the NPS Me Intelligence Layer"
+            )}
           </h3>
 
           <p className="mt-3 text-slate-300 leading-relaxed">
@@ -138,7 +158,10 @@ export default function NpsIntelligenceLayer() {
 
           <ul className="mt-5 grid gap-3 md:grid-cols-2 text-sm text-slate-300">
             {bulletsLayer.map((item) => (
-              <li key={item} className="flex gap-2 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <li
+                key={item}
+                className="flex gap-2 rounded-2xl border border-white/10 bg-white/5 p-4"
+              >
                 <CheckCircle2 className="h-4 w-4 mt-0.5 text-white/70" />
                 <span>{item}</span>
               </li>
@@ -159,7 +182,7 @@ export default function NpsIntelligenceLayer() {
               "Intercom can tell you who responded, what score they gave, and what they wrote. NPS Me adds the strategic layer that turns that into priorities."
             )}
           </p>
-          {/* Diagram: Intercom + NPS Me loop */}
+
           <figure className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4 md:p-6">
             <img
               src="/npsme_intercom_diagram.png"
@@ -179,25 +202,34 @@ export default function NpsIntelligenceLayer() {
               )}
             </figcaption>
           </figure>
+
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="text-sm font-semibold text-white">
-                {translations(lang, "npsIntelligenceLayer.sections.intercom.boxLeftTitle", "Intercom gives you")}
+                {translations(
+                  lang,
+                  "npsIntelligenceLayer.sections.intercom.boxLeftTitle",
+                  "Intercom gives you"
+                )}
               </div>
               <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                {(dict?.npsIntelligenceLayer?.sections?.intercom?.left || []).map((t) => (
-                  <li key={t}>{t}</li>
+                {(dict?.npsIntelligenceLayer?.sections?.intercom?.left || []).map((x) => (
+                  <li key={x}>{x}</li>
                 ))}
               </ul>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="text-sm font-semibold text-white">
-                {translations(lang, "npsIntelligenceLayer.sections.intercom.boxRightTitle", "NPS Me adds")}
+                {translations(
+                  lang,
+                  "npsIntelligenceLayer.sections.intercom.boxRightTitle",
+                  "NPS Me adds"
+                )}
               </div>
               <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                {(dict?.npsIntelligenceLayer?.sections?.intercom?.right || []).map((t) => (
-                  <li key={t}>{t}</li>
+                {(dict?.npsIntelligenceLayer?.sections?.intercom?.right || []).map((x) => (
+                  <li key={x}>{x}</li>
                 ))}
               </ul>
             </div>
@@ -238,7 +270,11 @@ export default function NpsIntelligenceLayer() {
         {/* Section: Deliver */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.sections.deliver.title", "What the intelligence layer delivers")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.sections.deliver.title",
+              "What the intelligence layer delivers"
+            )}
           </h3>
 
           <ul className="mt-5 space-y-2 text-sm text-slate-300">
@@ -308,7 +344,11 @@ export default function NpsIntelligenceLayer() {
           </div>
 
           <p className="mt-4 text-xs text-slate-400">
-            {translations(lang, "npsIntelligenceLayer.cta.note", "No platform switch required. No survey rebuild required.")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.cta.note",
+              "No platform switch required. No survey rebuild required."
+            )}
           </p>
         </div>
       </section>

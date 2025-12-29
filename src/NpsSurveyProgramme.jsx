@@ -1,24 +1,31 @@
 // src/NpsSurveyProgramme.jsx
 import React from "react";
 import { motion } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
+import { localizePath } from "./i18n/pathHelpers";
 
 export default function NpsSurveyProgramme() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
 
   const steps = translations(lang, "surveyProgramme.howItWorks.steps", []);
   const pulseBullets = translations(lang, "surveyProgramme.pulseBox.bullets", []);
   const leftBullets = translations(lang, "surveyProgramme.twoCol.left.bullets", []);
   const rightBullets = translations(lang, "surveyProgramme.twoCol.right.bullets", []);
 
+  // Localised destinations (avoid bouncing FR users back to EN)
+  const homeWithContactHash = `${localizePath("/", lang)}#contact`;
+  const demoSurveyPagePath = localizePath("/demo-survey-page", lang);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/nps-survey-programme"
+        path={location.pathname}
         title={tr("surveyProgramme.seoTitle")}
         description={tr("surveyProgramme.seoDescription")}
       />
@@ -106,13 +113,14 @@ export default function NpsSurveyProgramme() {
           <p className="text-slate-400 mb-6">
             {tr("surveyProgramme.cta.body")}
           </p>
-          {/* keep anchors stable */}
-          <a
-            href="/#contact"
+
+          {/* Keep anchor behaviour, but localise the base path */}
+          <Link
+            to={homeWithContactHash}
             className="inline-block rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#22C55E] px-6 py-3 font-medium text-white hover:opacity-90 transition"
           >
             {tr("surveyProgramme.cta.button")}
-          </a>
+          </Link>
         </div>
 
         {/* Demo CTA */}
@@ -128,12 +136,12 @@ export default function NpsSurveyProgramme() {
             </div>
 
             <div className="flex flex-col items-start gap-2 shrink-0">
-              <a
-                href="/demo-survey-page"
+              <Link
+                to={demoSurveyPagePath}
                 className="inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition"
               >
                 {tr("surveyProgramme.demo.button")}
-              </a>
+              </Link>
               <p className="text-[11px] text-slate-400 max-w-[200px]">
                 {tr("surveyProgramme.demo.note")}
               </p>

@@ -1,6 +1,7 @@
 // src/components/Seo.jsx
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const BASE_URL = "https://www.npsme.com";
 
@@ -27,7 +28,8 @@ function computeLangUrls(path, lang) {
     };
   }
 
-  const frPath = p === "/" ? "/fr" : `/fr${p}`;
+  const frPath =
+    p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
   return {
     enUrl: `${BASE_URL}${p}`,
     frUrl: `${BASE_URL}${frPath}`,
@@ -42,12 +44,14 @@ export default function Seo({
   title,
   description,
   image = `${BASE_URL}/og-image.jpg?v=3`,
-  lang = "en",
+  lang,
   // keep alternates optional: if provided we’ll use it, otherwise auto
   alternates = null,
   noindex = false,
 }) {
-  const { enUrl, frUrl, xDefaultUrl, canonicalUrl } = computeLangUrls(path, lang);
+  const { lang: ctxLang } = useLanguage();
+  const effectiveLang = lang || ctxLang || "en";
+  const { enUrl, frUrl, xDefaultUrl, canonicalUrl } = computeLangUrls(path, effectiveLang);
 
   // If caller passes alternates explicitly, use them; otherwise auto-generate EN/FR.
   const finalAlternates =
@@ -60,7 +64,7 @@ export default function Seo({
         ];
 
   return (
-    <Helmet htmlAttributes={{ lang }}>
+    <Helmet htmlAttributes={{ lang: effectiveLang }}>
       {title ? <title>{title}</title> : null}
       <link rel="canonical" href={canonicalUrl} />
 

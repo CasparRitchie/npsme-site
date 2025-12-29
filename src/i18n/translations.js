@@ -1319,31 +1319,31 @@ export const TRANSLATIONS = {
     },
     landing: {
       seo: {
-        title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
+        title: "NPS® Analytics and Customer Insight for Intercom/HubSpot | NPS Me",
         description:
-          "Pragmatic CX consulting to diagnose friction, prioritise fixes, and ship measurable gains - lift NPS®, reduce churn, increase repeat purchase.",
+          "NPS® intelligence layer for SMEs and startups. Connect Intercom, HubSpot, Zendesk or CSV and turn comments into decision-grade insight: clear priorities, follow-up workflows, measurable retention impact.",
       },
 
       hero: {
         h1: {
-          lead: "Customer Experience (CX) consulting to improve",
-          nps: "Net Promoter Score (NPS)®",
-          tail: "retention, and revenue.",
-          accent: "Turn feedback into growth.",
+          lead: "The",
+          nps: "NPS® intelligence layer",
+          tail: "on top of your existing tools.",
+          accent: "Turn feedback into decisions.",
         },
         body:
-          "NPS Me helps teams run NPS and milestone feedback through their existing stack (Intercom, HubSpot, helpdesks, product tools, or CSV). We add the missing layer: survey governance, unbiased sampling, and decision-grade insight so feedback turns into measurable retention and revenue.",
+          "Already sending surveys through Intercom, HubSpot, Zendesk or CSV? NPS Me ingests responses and comments, checks programme reliability (sampling, bias, comparability), then turns feedback into clear priorities and actions: themes, drivers, close-the-loop workflows, and measurable impact on churn and retention.",
         ctaPrimary: "Book a free discovery",
-        ctaMethod: "See the 4-stage method",
-        ctaDemo: "Try the NPS®-style demo",
+        ctaMethod: "See the method",
+        ctaDemo: "Try the demo",
         proof: {
-          mining: "Review mining",
-          enablement: "Hands-on enablement",
-          lift: "Measurable lift",
+          mining: "Comment analysis",
+          enablement: "Workflows and enablement",
+          lift: "Measurable impact",
         },
         chips: ["Intercom", "HubSpot", "Zendesk", "Product events", "CSV upload"],
         chipsNote:
-          "Use NPS Me alongside your existing tools. We focus on governance, analysis and action, not replacing your CS platform.",
+          "Use NPS Me alongside your survey tools. We focus on governance, analysis, prioritisation and action.",
       },
 
       method: {
@@ -1380,7 +1380,7 @@ export const TRANSLATIONS = {
       },
 
       platform: {
-        title: "Not another survey tool",
+        title: "Analytics on top of your surveys",
         body:
           "Most teams already have ways to send surveys. NPS Me helps you run a fair, consistent, decision-grade programme across whatever tools you use.",
         cards: [
@@ -3508,32 +3508,32 @@ export const TRANSLATIONS = {
       },
     },
     landing: {
-      seo: {
-        title: "Conseil CX & amélioration du NPS® | NPS Me",
-        description:
-          "Conseil CX pragmatique pour diagnostiquer les frictions, prioriser les actions et livrer des gains mesurables : hausse du NPS®, baisse du churn, hausse de la rétention.",
-      },
+        seo: {
+          title: "Analyse NPS® & insights clients via Intercom/HubSpot | NPS Me",
+          description:
+            "Couche d’intelligence NPS® pour PME et startups. Connectez Intercom, HubSpot, Zendesk ou CSV et transformez le verbatim en insights actionnables: priorités, workflows, impact sur rétention et churn.",
+        },
 
       hero: {
         h1: {
-          lead: "Conseil en expérience client (CX) pour améliorer le",
-          nps: "Net Promoter Score (NPS)®",
-          tail: "la rétention et la croissance.",
-          accent: "Transformer le feedback en décisions.",
+          lead: "La couche d’intelligence",
+          nps: "NPS®",
+          tail: "au-dessus de vos outils existants.",
+          accent: "Du feedback aux décisions.",
         },
         body:
-          "NPS Me aide les équipes à piloter le NPS et les feedbacks « par étape » via leur stack existante (Intercom, HubSpot, helpdesk, événements produit ou CSV). Nous apportons la couche qui manque souvent : gouvernance d’enquête, échantillonnage robuste et insights actionnables pour relier le verbatim aux priorités business.",
+          "Vous envoyez déjà des enquêtes via Intercom, HubSpot, Zendesk ou un CSV. NPS Me ingère réponses et verbatim, contrôle la fiabilité (échantillonnage, biais, comparabilité), puis transforme tout en priorités claires et actions concrètes: thèmes, drivers, close-the-loop, mesure d’impact sur churn et rétention.",
         ctaPrimary: "Réserver un échange",
-        ctaMethod: "Voir la méthode en 4 étapes",
-        ctaDemo: "Tester la démo NPS®",
+        ctaMethod: "Voir la méthode",
+        ctaDemo: "Tester la démo",
         proof: {
-          mining: "Analyse d’avis",
-          enablement: "Mise en œuvre terrain",
-          lift: "Gains mesurables",
+          mining: "Analyse de verbatim",
+          enablement: "Workflows & enablement",
+          lift: "Impact mesurable",
         },
         chips: ["Intercom", "HubSpot", "Zendesk", "Événements produit", "Import CSV"],
         chipsNote:
-          "NPS Me complète vos outils existants. Notre focus : gouvernance, analyse et mise en action — pas le remplacement de votre plateforme CS.",
+          "NPS Me complète vos outils d’envoi. Notre force: gouvernance, analyse, priorisation et mise en action.",
       },
 
       method: {
@@ -3570,7 +3570,7 @@ export const TRANSLATIONS = {
       },
 
       platform: {
-        title: "Pas un énième outil d’enquête",
+        title: "Une couche d’analyse au-dessus de vos enquêtes",
         body:
           "La plupart des équipes ont déjà un outil d’envoi. NPS Me vous aide à opérer un programme fiable, comparable dans le temps et utile pour décider — quel que soit votre stack.",
         cards: [

@@ -1,6 +1,6 @@
 // src/NpsMeLanding.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
 import Seo from "./components/Seo";
@@ -8,6 +8,7 @@ import { computeNpsStats } from "../utils/nps";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
+
 
 // --- NPS explainer ---
 function NpsExplainer() {
@@ -165,6 +166,7 @@ function DemoSummaryStrip() {
 export default function NpsMeLanding() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
 
   const methodCards = translations(lang, "landing.method.cards", []);
   const platformCards = translations(lang, "landing.platform.cards", []);
@@ -174,7 +176,7 @@ export default function NpsMeLanding() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/"
+        path={location.pathname}
         title={tr("landing.seo.title")}
         description={tr("landing.seo.description")}
       />
@@ -190,7 +192,7 @@ export default function NpsMeLanding() {
             >
               {tr("landing.hero.h1.lead")}{" "}
               <span className="md:whitespace-nowrap">
-                {tr("landing.hero.h1.nps")},
+                {tr("landing.hero.h1.nps")}
               </span>{" "}
               {tr("landing.hero.h1.tail")}{" "}
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">

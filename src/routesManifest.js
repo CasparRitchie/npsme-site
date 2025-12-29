@@ -26,6 +26,9 @@ export const ROUTES_MANIFEST = [
   { path: "/nps-intelligence-layer",     label: "NPS Intelligence Layer",          labelKey: "routes.npsIntelligenceLayer", enabled: true,  inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/nps-intelligence-layer",  label: "Couche d’intelligence NPS",       labelKey: "routes.npsIntelligenceLayer", enabled: true,  inHeader: true,  inFooter: true,  lang: "fr" },
 
+  { path: "/intercom-nps-analytics",   label: "Intercom NPS Analytics",   labelKey: "routes.intercomNpsAnalytics", enabled: true, inHeader: true, inFooter: true, lang: "en" },
+  { path: "/fr/analyse-nps-intercom",  label: "Analyse NPS Intercom",     labelKey: "routes.intercomNpsAnalytics", enabled: true, inHeader: true, inFooter: true, lang: "fr" },
+
   { path: "/data-automation",     label: "Data & Automation", labelKey: "routes.dataAutomation", enabled: true, inHeader: true, inFooter: true, lang: "en" },
   { path: "/fr/data-automation",  label: "Data & Automatisation", labelKey: "routes.dataAutomation", enabled: true, inHeader: true, inFooter: true, lang: "fr" },
 

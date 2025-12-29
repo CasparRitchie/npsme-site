@@ -1845,6 +1845,16 @@ export const TRANSLATIONS = {
         note: "No platform switch required. No survey rebuild required.",
       },
     },
+    intercomNps: {
+      seo: {
+        title: "Intercom NPS analytics: turn feedback into actions | NPS Me",
+        description: "Connect Intercom NPS and turn comments into decision-grade insight: themes, drivers, prioritised actions and measurable retention impact.",
+      },
+      h1: "Intercom NPS analytics that turns comments into actions",
+      intro: "Intercom helps you collect NPS. NPS Me adds the intelligence layer: sampling checks, theme and driver analysis, prioritisation, close-the-loop workflows and impact tracking.",
+      cta: "Book a free discovery",
+      secondaryCta: "See the intelligence layer",
+    },
 
     socialListeningIndex: {
       seoTitle: "Social Listening Reports (Anonymised) | NPS Me",
@@ -4039,6 +4049,16 @@ export const TRANSLATIONS = {
         secondary: "Voir un exemple de CX Pulse",
         note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
       },
+    },
+    intercomNps: {
+      seo: {
+        title: "Analyse NPS Intercom: du feedback aux actions | NPS Me",
+        description: "Connectez Intercom NPS et transformez le verbatim en insights actionnables: thèmes, drivers, priorisation, close-the-loop et impact sur la rétention.",
+      },
+      h1: "Analyse NPS Intercom: transformer le verbatim en actions",
+      intro: "Intercom aide à collecter le NPS. NPS Me ajoute la couche d’intelligence: contrôles d’échantillonnage, analyse des thèmes et drivers, priorisation, workflows de suivi et mesure d’impact.",
+      cta: "Réserver un échange",
+      secondaryCta: "Voir la couche d’intelligence",
     },
 
     socialListeningIndex: {

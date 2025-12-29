@@ -2144,25 +2144,68 @@ app.get("*", (req, res, next) => {
       "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue—diagnose friction, prioritise fixes, ship measurable gains.",
   };
 
-  const ROUTE_META = {
-    "/": DEFAULT_META,
-    "/fr": {
-      title: "Conseil CX & Amélioration du NPS | NPS Me",
-      description:
-        "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance — diagnostiquer les frictions, prioriser, déployer et mesurer.",
-    },
-    // add more routes here as you go
-  };
+const ROUTE_META = {
+  "/": {
+    title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
+    description:
+      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue—diagnose friction, prioritise fixes, ship measurable gains.",
+  },
+
+  "/fr": {
+    title: "Conseil CX & Amélioration du NPS | NPS Me",
+    description:
+      "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance — diagnostiquer les frictions, prioriser, déployer et mesurer.",
+  },
+
+  "/book": {
+    title: "Book CX & NPS Consulting | NPS Me",
+    description:
+      "Book a call with NPS Me to diagnose customer friction, prioritise improvements, and increase NPS®, retention, and revenue.",
+  },
+
+  "/fr/book": {
+    title: "Réserver un appel Conseil CX & NPS | NPS Me",
+    description:
+      "Réservez un échange avec NPS Me pour diagnostiquer les frictions clients, prioriser les actions et améliorer le NPS®, la rétention et la croissance.",
+  },
+
+  "/what-is-nps": {
+    title: "What Is Net Promoter Score (NPS)? | NPS Me",
+    description:
+      "Learn what Net Promoter Score (NPS)® is, how it works, and how to use it to improve customer experience and retention.",
+  },
+
+  "/fr/what-is-nps": {
+    title: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
+    description:
+      "Découvrez ce qu’est le Net Promoter Score (NPS)®, comment il fonctionne et comment l’utiliser pour améliorer l’expérience client.",
+  },
+
+  "/milestone-nps": {
+    title: "Milestone NPS: Measuring CX at Key Moments | NPS Me",
+    description:
+      "Understand Milestone NPS and how measuring customer sentiment at key moments improves insight beyond overall NPS.",
+  },
+
+  "/fr/milestone-nps": {
+    title: "NPS par étape : mesurer l’expérience aux moments clés | NPS Me",
+    description:
+      "Comprenez le NPS par étape et comment mesurer la satisfaction aux moments clés améliore l’analyse de l’expérience client.",
+  },
+};
 
   const meta = ROUTE_META[pathOnly] || DEFAULT_META;
 
   // --- Hreflang ---
   // You can add more languages later; keep this simple for now.
+  const enPath = isFr ? pathOnly.replace(/^\/fr/, "") || "/" : pathOnly;
+  const frPath = isFr ? pathOnly : `/fr${pathOnly === "/" ? "" : pathOnly}`;
+
   const hreflang = `
-<link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="en-GB" />
-<link rel="alternate" href="https://${CANONICAL_HOST}/fr" hreflang="fr-FR" />
-<link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
-`.trim();
+  <link rel="alternate" href="https://${CANONICAL_HOST}${enPath}" hreflang="en-GB" />
+  <link rel="alternate" href="https://${CANONICAL_HOST}${frPath}" hreflang="fr-FR" />
+  <link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
+  `.trim();
 
   let html = baseIndexHtml;
 

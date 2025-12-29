@@ -19,8 +19,8 @@ function AppShell() {
   const isBare = bareRoutes.includes(location.pathname);
 
   const rootClass = isBare
-    ? "min-h-screen bg-[#F5F7FF] text-slate-900"
-    : "min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200";
+  ? "min-h-screen overflow-x-hidden bg-[#F5F7FF] text-slate-900"
+  : "min-h-screen overflow-x-hidden bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200";
 
   return (
     <HelmetProvider>

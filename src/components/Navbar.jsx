@@ -49,7 +49,7 @@ export default function NavBar() {
         </Link>
 
         {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
+        <header className="sticky top-0 z-30 overflow-x-hidden backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
           {headerLinks.map(({ path, label, labelKey }) => (
             <NavItem key={path} to={localizePath(path, lang)}>
               {translations(lang, labelKey, label)}
@@ -133,6 +133,7 @@ function NavItem({ to, children, mobile = false }) {
       className={({ isActive }) =>
         [
           "px-2 py-1 rounded-lg transition",
++         "min-w-0 whitespace-nowrap",
           mobile ? "text-base" : "text-sm",
           isActive ? "text-white" : "text-slate-300 hover:text-white",
         ].join(" ")

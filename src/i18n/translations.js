@@ -1898,11 +1898,11 @@ export const TRANSLATIONS = {
         },
 
         medallia: {
-          title: "A note on Medallia",
+          title: "A note on enterprise CX platforms",
           body1:
-            "Medallia is powerful. In large organisations it can also become over-configured and under-interpreted.",
+            "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that’s harder to translate into everyday decisions.",
           body2:
-            "Having access to everything does not guarantee clarity. NPS Me is built to make decisions easier, without adding complexity.",
+            "Access to more data doesn’t automatically create clarity. NPS Me is designed to help teams focus on what matters most — turning feedback into clear priorities and practical action, without adding unnecessary complexity.",
         },
 
         deliver: {
@@ -1936,6 +1936,14 @@ export const TRANSLATIONS = {
         primary: "Book a CX review",
         secondary: "See a sample CX Pulse",
         note: "No platform switch required. No survey rebuild required.",
+      },
+      related: {
+        title: "Related insights",
+        links: {
+          intercom: "Intercom NPS: what it shows, what it misses, and how to act",
+          milestone: "Milestone NPS: measure friction across the journey",
+          pulse: "See a sample CX Pulse (what leaders actually read)",
+        },
       },
     },
     intercomNps: {
@@ -4234,15 +4242,13 @@ export const TRANSLATIONS = {
             "Exemple de boucle : Intercom capte le feedback → NPS Me ajoute l’intelligence → décisions → actions de retour dans Intercom.",
           footer: "Au lieu d’un dashboard de plus, vous obtenez clarté, récit et priorités.",
         },
-
         medallia: {
-          title: "À propos de Medallia",
+          title: "À propos des plateformes CX enterprise",
           body1:
-            "Medallia est puissant. Dans les grandes organisations, cela peut aussi devenir très configuré et peu interprété.",
+            "Les plateformes CX enterprise sont puissantes et très riches. Dans les grandes organisations, cette flexibilité peut parfois entraîner des configurations complexes et des insights plus difficiles à traduire en décisions quotidiennes.",
           body2:
-            "Avoir accès à tout ne garantit pas la clarté. NPS Me est conçu pour faciliter la décision, sans ajouter de complexité.",
+            "Avoir accès à plus de données ne garantit pas la clarté. NPS Me aide les équipes à se concentrer sur l’essentiel : transformer le feedback en priorités claires et actions concrètes, sans complexité inutile.",
         },
-
         deliver: {
           title: "Ce que délivre la couche d’intelligence",
           bullets: [
@@ -4274,6 +4280,14 @@ export const TRANSLATIONS = {
         primary: "Réserver une revue CX",
         secondary: "Voir un exemple de CX Pulse",
         note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
+      },
+      related: {
+        title: "À lire ensuite",
+        links: {
+          intercom: "NPS Intercom : ce que vous voyez, ce qui manque, et comment agir",
+          milestone: "NPS par étapes : mesurer les frictions du parcours",
+          pulse: "Voir un exemple de CX Pulse (lisible par la direction)",
+        },
       },
     },
     intercomNps: {

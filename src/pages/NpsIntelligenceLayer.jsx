@@ -243,7 +243,53 @@ export default function NpsIntelligenceLayer() {
             )}
           </p>
         </div>
+        {/* Related insights */}
+        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h3 className="text-sm font-semibold text-slate-300">
+            {translations(lang, "npsIntelligenceLayer.related.title", "Related insights")}
+          </h3>
 
+          <ul className="mt-4 space-y-2 text-sm">
+            <li>
+              <Link
+                to={localizePath("/intercom-nps-analytics", lang)}
+                className="text-slate-200 hover:text-white hover:underline"
+              >
+                {translations(
+                  lang,
+                  "npsIntelligenceLayer.related.links.intercom",
+                  "Intercom NPS: what it shows, what it misses, and how to act"
+                )}
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to={localizePath("/milestone-nps", lang)}
+                className="text-slate-200 hover:text-white hover:underline"
+              >
+                {translations(
+                  lang,
+                  "npsIntelligenceLayer.related.links.milestone",
+                  "Milestone NPS: measure friction across the journey"
+                )}
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to={localizePath("/cx-pulse-sample", lang)}
+                className="text-slate-200 hover:text-white hover:underline"
+              >
+                {translations(
+                  lang,
+                  "npsIntelligenceLayer.related.links.pulse",
+                  "See a sample CX Pulse (what leaders actually read)"
+                )}
+              </Link>
+            </li>
+          </ul>
+        </div>
         {/* Section: Medallia note */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">

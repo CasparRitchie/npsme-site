@@ -80,8 +80,7 @@ export default function Seo({
         />
       ))}
 
-      {noindex ? <meta name="robots" content="noindex, nofollow" /> : null}
-
+      {noindex ? <meta name="robots" content="noindex, follow" /> : null}
       {/* Open Graph */}
       <meta property="og:type" content="website" />
       <meta property="og:url" content={canonicalUrl} />

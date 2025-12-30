@@ -312,7 +312,7 @@ export default function LiveSurveyAdminPage() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
-      <Seo path={location.pathname} title={title} description={description} />
+      <Seo path={location.pathname} title={title} description={description} noindex/>
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 space-y-6">
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

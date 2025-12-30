@@ -15,22 +15,23 @@ const BASE_URL = process.env.SITEMAP_BASE_URL || "https://www.npsme.com";
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
 // --- Base pages from manifest (enabled, absolute path, not hash, not dynamic ":") ---
-const basePages = ROUTES_MANIFEST
-  .filter(
-    (r) =>
-      r.enabled &&
-      r.path.startsWith("/") &&
-      !r.isHash &&
-      !r.path.includes(":")
-  )
-  .map((r) => r.path);
+// --- Base pages from manifest (enabled, inSitemap !== false, absolute path, not hash, not dynamic ":") ---
+const basePages = ROUTES_MANIFEST.filter(
+  (r) =>
+    r.enabled &&
+    r.indexable !== false &&
+    r.path.startsWith("/") &&
+    !r.isHash &&
+    !r.path.includes(":")
+).map((r) => r.path);
 
 // --- Social Listening: index + each report page ---
 const socialIndex = "/social-listening";
 const socialReports = REPORTS.map((r) => `${socialIndex}/${r.slug}`);
+const socialReportsFr = REPORTS.map((r) => `/fr/social-listening/${r.slug}`);
 
 // Deduplicate and keep stable order: Home, Products, Impact, Social index, others…
-const allPaths = Array.from(new Set([...basePages, socialIndex, ...socialReports]));
+const allPaths = Array.from(new Set([...basePages, socialIndex, ...socialReports, ...socialReportsFr]));
 
 // --- Priority / changefreq rules ---
 function priorityFor(path) {
@@ -70,4 +71,6 @@ mkdirSync(outDir, { recursive: true });
 const outFile = resolve(outDir, "sitemap.xml");
 writeFileSync(outFile, xml, "utf8");
 console.log(`✓ Wrote sitemap: ${outFile}`);
-console.log(`✓ Included ${allPaths.length} URLs (routes + ${socialReports.length} reports)`);
+console.log(
+  `✓ Included ${allPaths.length} URLs (routes + ${socialReports.length + socialReportsFr.length} reports)`
+);

@@ -1300,6 +1300,9 @@ export const TRANSLATIONS = {
             desc: "Track NPS/CSAT/CES & review velocity. Iterate monthly. Celebrate and scale wins.",
           },
         ],
+        linkPrefix: "If you want the bigger picture, start with the",
+        linkText: "NPS intelligence layer",
+        linkSuffix: ", then apply it here to milestone surveys.",
       },
 
       fit: {
@@ -1321,6 +1324,9 @@ export const TRANSLATIONS = {
             why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX.",
           },
         ],
+        linkPrefix: "If you run NPS in a tool like Intercom, see",
+        linkText: "how we turn Intercom comments into prioritised actions",
+        linkSuffix: ".",
       },
 
       checklist: {
@@ -3657,6 +3663,9 @@ export const TRANSLATIONS = {
             desc: "Suivi NPS/CSAT/CES & dynamique des avis. Itérations mensuelles. On consolide et on scale ce qui marche.",
           },
         ],
+        linkPrefix: "Pour la vue d’ensemble, commencez par la",
+        linkText: "couche d’intelligence NPS",
+        linkSuffix: ", puis appliquez-la ici aux enquêtes par étapes.",
       },
 
       fit: {
@@ -3678,6 +3687,9 @@ export const TRANSLATIONS = {
             why: "Révéler la vitesse/précision, la maturité produit et la qualité de la première expérience.",
           },
         ],
+      linkPrefix: "Si vous faites du NPS via un outil comme Intercom, voyez",
+      linkText: "comment nous transformons les verbatims Intercom en actions priorisées",
+      linkSuffix: ".",
       },
 
       checklist: {

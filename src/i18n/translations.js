@@ -1987,7 +1987,18 @@ export const TRANSLATIONS = {
             "Ongoing tracking to connect actions to retention and revenue",
           ],
         },
-      }
+      },
+      related: {
+        title: "Related insights",
+        subtitle:
+          "If you’re improving NPS in Intercom, these pages help you move from scores to decisions.",
+        links: {
+          layer: "The NPS Intelligence Layer: add priorities on top of Intercom",
+          milestone: "Milestone NPS: find where the journey is breaking",
+          whatIsNps: "What is NPS? The bits most teams miss",
+          book: "Book a CX review",
+        },
+      },
     },
 
     socialListeningIndex: {
@@ -4331,7 +4342,18 @@ export const TRANSLATIONS = {
             "Suivi dans le temps pour relier actions, rétention et performance",
           ],
         },
-      }
+      },
+      related: {
+        title: "À lire ensuite",
+        subtitle:
+          "Si vous améliorez le NPS dans Intercom, ces pages vous aident à passer des scores aux décisions.",
+        links: {
+          layer: "La couche d’intelligence NPS : ajouter des priorités au-dessus d’Intercom",
+          milestone: "Milestone NPS : repérer où le parcours se grippe",
+          whatIsNps: "Qu’est-ce que le NPS ? Les points que beaucoup ratent",
+          book: "Réserver une revue CX",
+        },
+      },
     },
 
     socialListeningIndex: {

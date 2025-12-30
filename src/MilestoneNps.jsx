@@ -153,7 +153,7 @@ export default function MilestoneNps() {
             {translations(lang, "milestonePage.method.linkPrefix", "If you want the bigger picture, start with the")}{" "}
             <Link
               to={localizePath("/nps-intelligence-layer", lang)}
-              className="underline decoration-white/30 underline-offset-4 hover:text-white"
+              className="text-link"
             >
               {translations(lang, "milestonePage.method.linkText", "NPS intelligence layer")}
             </Link>
@@ -191,7 +191,7 @@ export default function MilestoneNps() {
             {translations(lang, "milestonePage.fit.linkPrefix", "If you run NPS in a tool like Intercom, see")}{" "}
             <Link
               to={localizePath("/intercom-nps-analytics", lang)}
-              className="underline decoration-white/30 underline-offset-4 hover:text-white"
+              className="text-link"
             >
               {translations(lang, "milestonePage.fit.linkText", "how we turn Intercom comments into prioritised actions")}
             </Link>

@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* globals.css */
+.text-link {
+  @apply font-medium underline underline-offset-4
+         decoration-[#22C55E]/80
+         hover:decoration-[#22C55E]
+         hover:text-white;
+}
+
 /* -------------------------------------------------
    Envola live survey theme
    Applied only when .envola-theme is on survey-page

@@ -1343,6 +1343,17 @@ export const TRANSLATIONS = {
           "Downstream effects (repeat tickets, churn risk, review velocity).",
         ],
       },
+      related: {
+        title: "Related insights",
+        intro: "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action.",
+        links: {
+          intelligenceLayer: "NPS intelligence layer",
+          intercomNpsAnalytics: "Intercom NPS analytics",
+          whatIsNps: "What is NPS?",
+          npsSurveyProgramme: "NPS survey programme",
+          socialListening: "Social listening",
+        },
+      },
     },
     landing: {
       seo: {
@@ -3689,6 +3700,18 @@ export const TRANSLATIONS = {
           "Effets aval (répétition des tickets, risque de churn, dynamique des avis).",
         ],
       },
+        related: {
+          title: "À lire ensuite",
+          intro: "Si vous mettez en place un NPS par étapes, ces pages vous aident à relier la mesure à l’interprétation, la priorisation et l’action.",
+          links: {
+            intelligenceLayer: "Couche d’intelligence NPS",
+            intercomNpsAnalytics: "Analyse NPS Intercom",
+            whatIsNps: "Qu’est-ce que le NPS ?",
+            npsSurveyProgramme: "Programme NPS",
+            socialListening: "Écoute sociale",
+          },
+        },
+
     },
     landing: {
         seo: {

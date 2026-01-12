@@ -568,16 +568,13 @@ const withCount = (label, n) => `${label} (${n})`;
           </div>
         )}
 
-        <section className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <section className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           <KpiCard label={tr("liveAdmin.kpi.total", "Total")} value={total} sub={tr("liveAdmin.kpi.totalSub", "All invitations in file")} />
           <KpiCard label={tr("liveAdmin.kpi.pending", "Pending")} value={pending.length} sub={tr("liveAdmin.kpi.pendingSub", "Not yet sent")} />
           <KpiCard label={tr("liveAdmin.kpi.sent", "Sent")} value={sent.length} sub={tr("liveAdmin.kpi.sentSub", "Delivered or queued")} />
           <KpiCard label={tr("liveAdmin.kpi.started", "Started")} value={started.length} sub={tr("liveAdmin.kpi.startedSub", "Opened survey link")} />
-          <KpiCard
-            label={tr("liveAdmin.kpi.completed", "Completed")}
-            value={completed.length}
-            sub={nps === null ? tr("liveAdmin.kpi.npsNA", "NPS: n/a") : `${tr("liveAdmin.nps", "NPS")}: ${nps}`}
-          />
+          <KpiCard label={tr("liveAdmin.kpi.completed", "Completed")} value={completed.length} sub={nps === null ? tr("liveAdmin.kpi.npsNA", "NPS: n/a") : `${tr("liveAdmin.nps", "NPS")}: ${nps}`}/>
+          <KpiCard label={tr("liveAdmin.kpi.cancelled", "Cancelled")} value={cancelledCount} sub={tr("liveAdmin.kpi.cancelledSub", "Will not be sent")} />
         </section>
 
         {/* Pending */}

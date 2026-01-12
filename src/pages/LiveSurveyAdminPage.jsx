@@ -212,6 +212,36 @@ export default function LiveSurveyAdminPage() {
     }
     return map;
   }, [responses]);
+  const filteredRows = React.useMemo(() => {
+    const stage = filters.stage.trim();
+    const device = filters.device.trim();
+    const am = filters.am.trim();
+    const status = filters.status.trim();
+    const q = filters.q.trim().toLowerCase();
+
+    return (invites || []).filter((r) => {
+      if (stage && String(r.stage || "").trim() !== stage) return false;
+      if (device && String(r.typeOfDevice || "").trim() !== device) return false;
+      if (am && String(r.assistanteMaternelle || "").trim() !== am) return false;
+      if (status && normaliseStatus(r.status) !== status) return false;
+
+      if (q) {
+        const hay = [
+          r.invitationId,
+          r.customerName,
+          r.businessName,
+          r.email,
+          r.stage,
+          r.typeOfDevice,
+          r.assistanteMaternelle,
+          r.comment,      // merged flattened
+        ].map(x => String(x || "").toLowerCase()).join(" | ");
+        if (!hay.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [invites, filters]);
 
   const pending = [];
   const sent = [];
@@ -371,36 +401,7 @@ export default function LiveSurveyAdminPage() {
   const canRunInsights = completed.length > 0;
   const disabledReason = !canRunInsights ? "No completed responses yet" : undefined;
 
-  const filteredRows = React.useMemo(() => {
-  const stage = filters.stage.trim();
-  const device = filters.device.trim();
-  const am = filters.am.trim();
-  const status = filters.status.trim();
-  const q = filters.q.trim().toLowerCase();
 
-  return (invites || []).filter((r) => {
-    if (stage && String(r.stage || "").trim() !== stage) return false;
-    if (device && String(r.typeOfDevice || "").trim() !== device) return false;
-    if (am && String(r.assistanteMaternelle || "").trim() !== am) return false;
-    if (status && normaliseStatus(r.status) !== status) return false;
-
-    if (q) {
-      const hay = [
-        r.invitationId,
-        r.customerName,
-        r.businessName,
-        r.email,
-        r.stage,
-        r.typeOfDevice,
-        r.assistanteMaternelle,
-        r.comment,      // merged flattened
-      ].map(x => String(x || "").toLowerCase()).join(" | ");
-      if (!hay.includes(q)) return false;
-    }
-
-    return true;
-  });
-}, [invites, filters]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -719,17 +720,6 @@ export default function LiveSurveyAdminPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                title={disabledReason}
-                type="button"
-                onClick={() => loadInsights({ limit: 200 })}
-                disabled={insightsLoading || !canRunInsights}
-                className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
-              >
-                {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
-              </button>
-
-              <div className="flex flex-wrap items-center gap-2">
                 <button
                   title={disabledReason}
                   type="button"
@@ -786,7 +776,6 @@ export default function LiveSurveyAdminPage() {
                 </button>
               </div>
             </div>
-          </div>
 
           {insightsError ? (
             <div className="rounded-2xl border border-rose-500/70 bg-rose-950/50 px-3 py-2 text-xs text-rose-100">

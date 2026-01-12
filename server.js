@@ -2001,6 +2001,164 @@ app.post("/api/live-survey/submit", async (req, res) => {
   }
 });
 
+// --- LIVE merged view (Invitations + latest Response) ---
+app.get("/api/live-merged", async (req, res) => {
+  try {
+    const [invites, responses] = await Promise.all([
+      loadLiveInvitations(),
+      loadLiveResponses(),
+    ]);
+
+    // Build latest-response-per-invitationId map
+    const latestByInvId = new Map();
+
+    for (const r of responses || []) {
+      const invId = (r.invitationId || "").trim();
+      if (!invId) continue;
+
+      const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
+      const prev = latestByInvId.get(invId);
+      const prevT = prev?.createdAt ? new Date(prev.createdAt).getTime() : 0;
+
+      if (!prev || t >= prevT) latestByInvId.set(invId, r);
+    }
+
+    const rows = (invites || []).map((inv) => {
+      const invId = (inv.invitationId || "").trim();
+      const r = invId ? latestByInvId.get(invId) : null;
+
+      return {
+        ...inv,                 // ✅ all invite fields
+        response: r || null,    // ✅ all response fields (nested)
+        // convenience flat fields (optional but very handy)
+        responseId: r?.responseId ?? "",
+        score: r?.score ?? "",
+        comment: r?.comment ?? "",
+        createdAt: r?.createdAt ?? "",
+        hasResponse: !!r,
+      };
+    });
+
+    res.json({
+      ok: true,
+      totalInvitations: invites?.length || 0,
+      totalResponses: responses?.length || 0,
+      rows,
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-merged", err);
+    res.status(500).json({ ok: false, error: "Failed to build merged dataset" });
+  }
+});
+
+app.get("/api/live-insights", async (req, res) => {
+  try {
+    const stage = (req.query.stage || "").trim();
+    const limit = Math.min(Number(req.query.limit || 200), 500);
+
+    const [invites, responses] = await Promise.all([
+      loadLiveInvitations(),
+      loadLiveResponses(),
+    ]);
+
+    // latest response per invitationId
+    const latestByInvId = new Map();
+    for (const r of responses || []) {
+      const invId = (r.invitationId || "").trim();
+      if (!invId) continue;
+
+      const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
+      const prev = latestByInvId.get(invId);
+      const prevT = prev?.createdAt ? new Date(prev.createdAt).getTime() : 0;
+
+      if (!prev || t >= prevT) latestByInvId.set(invId, r);
+    }
+
+    let merged = (invites || []).map((inv) => {
+      const invId = (inv.invitationId || "").trim();
+      const r = invId ? latestByInvId.get(invId) : null;
+      return { ...inv, response: r || null };
+    });
+
+    if (stage) merged = merged.filter((x) => String(x.stage || "").trim() === stage);
+
+    const responded = merged
+      .filter((x) => x.response && x.response.score !== undefined && x.response.score !== null)
+      .slice(0, limit);
+
+    if (!responded.length) {
+      return res.json({
+        ok: true,
+        stage: stage || null,
+        insights: {
+          summary: "No responses yet for this filter.",
+          themes: [],
+          actions: [],
+          close_the_loop_templates: [],
+        },
+      });
+    }
+
+    const compact = responded.map((x) => ({
+      invitationId: x.invitationId,
+      stage: x.stage || "",
+      typeOfDevice: x.typeOfDevice || "",
+      assistanteMaternelle: x.assistanteMaternelle || "",
+      email: x.email || "",
+      score: Number(x.response.score),
+      comment: String(x.response.comment || "").slice(0, 500),
+      createdAt: x.response.createdAt || "",
+    }));
+
+    const prompt = `
+You are a CX intelligence analyst. You will receive NPS survey responses.
+Produce a practical "intelligence layer" output.
+
+Return VALID JSON only:
+{
+  "n": number,
+  "nps": number | null,
+  "response_themes": [{"theme": string, "evidence_count": number, "example_quotes": [string]}],
+  "delighters": [{"theme": string, "evidence_count": number, "example_quotes": [string]}],
+  "top_actions": [{"action": string, "why": string, "impact": "high|medium|low", "effort": "high|medium|low"}],
+  "risk_flags": [{"flag": string, "who": string, "detail": string}],
+  "close_the_loop_templates": [{"segment": string, "subject": string, "email": string}]
+}
+
+Rules:
+- Use specific, concrete language.
+- Quotes must be short excerpts (max ~15 words).
+- Keep it honest: only claim what the data supports.
+`.trim();
+
+    const r = await openai.responses.create({
+      model: "gpt-4o-mini",
+      input: [
+        { role: "system", content: prompt },
+        { role: "user", content: JSON.stringify(compact) },
+      ],
+    });
+
+    let text = (r.output_text || "").trim();
+    if (text.startsWith("```")) text = text.replace(/```json|```/gi, "").trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) text = jsonMatch[0];
+
+    const parsed = JSON.parse(text);
+
+    res.json({
+      ok: true,
+      stage: stage || null,
+      insights: parsed,
+      generated_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-insights", err);
+    res.status(500).json({ ok: false, error: "Failed to generate insights" });
+  }
+});
+
+
 /* -----------------------------
    Static assets & caching
 ------------------------------ */

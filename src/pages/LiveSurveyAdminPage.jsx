@@ -18,6 +18,64 @@ function computeNps(scores) {
   return Math.round(((promoters - detractors) / clean.length) * 100);
 }
 
+function scoreToSegment(score) {
+  if (!Number.isFinite(score)) return null;
+  if (score <= 6) return "detractor";
+  if (score <= 8) return "passive";
+  return "promoter";
+}
+
+function MultiSelect({ label, options, values, onChange, disabled }) {
+  return (
+    <label className="text-xs text-slate-300 flex flex-col gap-1">
+      <span className="text-[11px] text-slate-400">{label}</span>
+      <select
+        multiple
+        value={values}
+        disabled={disabled}
+        onChange={(e) => {
+          const next = Array.from(e.target.selectedOptions).map(o => o.value);
+          onChange(next);
+        }}
+        className="min-w-[170px] rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-slate-200"
+      >
+        {options.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function matchesMulti(value, selected) {
+  // selected = [] => no filter
+  if (!selected || selected.length === 0) return true;
+
+  const v = String(value ?? "").trim();
+  if (!v) return false;
+
+  return selected.includes(v);
+}
+
+function matchesScore(scoreRaw, selectedScores) {
+  if (!selectedScores || selectedScores.length === 0) return true;
+
+  const n = Number(scoreRaw);
+  if (!Number.isFinite(n)) return false;
+
+  return selectedScores.includes(String(n)); // we’ll store scores as strings "0".."10"
+}
+
+function matchesSegment(scoreRaw, selectedSegs) {
+  if (!selectedSegs || selectedSegs.length === 0) return true;
+
+  const n = Number(scoreRaw);
+  if (!Number.isFinite(n)) return false;
+
+  const seg = scoreToSegment(n);
+  return seg ? selectedSegs.includes(seg) : false;
+}
+
 function toInt(v, fallback = 0) {
   const n = Number(v);
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
@@ -147,16 +205,34 @@ export default function LiveSurveyAdminPage() {
   const [insightsLoading, setInsightsLoading] = React.useState(false);
   const [insightsError, setInsightsError] = React.useState("");
   const [filters, setFilters] = React.useState({
-    stage: "",
-    device: "",
-    am: "",
-    status: "",
-    q: "", // free text search
+    stage: [],               // multi
+    device: [],              // multi
+    am: [],                  // multi
+    status: [],              // multi
+    businessName: [],        // multi (optional)
+    customerName: [],        // multi (optional)
+    score: [],               // multi (0..10)
+    segment: [],             // multi ("detractor"|"passive"|"promoter")
+    q: "",                   // text search
   });
 
   function uniqSorted(values) {
-    return Array.from(new Set(values.map(v => String(v || "").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+    return Array.from(
+      new Set(values.map(v => String(v ?? "").trim()).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b));
   }
+
+  const stageOptions = React.useMemo(() => uniqSorted(invites.map(r => r.stage)), [invites]);
+  const deviceOptions = React.useMemo(() => uniqSorted(invites.map(r => r.typeOfDevice)), [invites]);
+  const amOptions = React.useMemo(() => uniqSorted(invites.map(r => r.assistanteMaternelle)), [invites]);
+  const statusOptions = React.useMemo(() => uniqSorted(invites.map(r => normaliseStatus(r.status))), [invites]);
+
+  // Optional (these are powerful)
+  const businessOptions = React.useMemo(() => uniqSorted(invites.map(r => r.businessName)), [invites]);
+  const customerOptions = React.useMemo(() => uniqSorted(invites.map(r => r.customerName)), [invites]);
+
+  // Score options (fixed list is safest)
+  const scoreOptions = React.useMemo(() => Array.from({ length: 11 }, (_, i) => String(i)), []);
   const title = tr("liveAdmin.seoTitle", "Live Survey Admin | NPS Me");
   const description = tr(
     "liveAdmin.seoDescription",
@@ -213,52 +289,52 @@ export default function LiveSurveyAdminPage() {
     return map;
   }, [responses]);
   const filteredRows = React.useMemo(() => {
-    const stage = filters.stage.trim();
-    const device = filters.device.trim();
-    const am = filters.am.trim();
-    const status = filters.status.trim();
-    const q = filters.q.trim().toLowerCase();
+  const q = (filters.q || "").trim().toLowerCase();
 
-    return (invites || []).filter((r) => {
-      if (stage && String(r.stage || "").trim() !== stage) return false;
-      if (device && String(r.typeOfDevice || "").trim() !== device) return false;
-      if (am && String(r.assistanteMaternelle || "").trim() !== am) return false;
-      if (status && normaliseStatus(r.status) !== status) return false;
+  return (invites || []).filter((r) => {
+    // invitations fields
+    if (!matchesMulti(String(r.stage ?? "").trim(), filters.stage)) return false;
+    if (!matchesMulti(String(r.typeOfDevice ?? "").trim(), filters.device)) return false;
+    if (!matchesMulti(String(r.assistanteMaternelle ?? "").trim(), filters.am)) return false;
+    if (!matchesMulti(normaliseStatus(r.status), filters.status)) return false;
 
-      if (q) {
-        const hay = [
-          r.invitationId,
-          r.customerName,
-          r.businessName,
-          r.email,
-          r.stage,
-          r.typeOfDevice,
-          r.assistanteMaternelle,
-          r.comment,      // merged flattened
-        ].map(x => String(x || "").toLowerCase()).join(" | ");
-        if (!hay.includes(q)) return false;
-      }
+    // optional
+    if (!matchesMulti(String(r.businessName ?? "").trim(), filters.businessName)) return false;
+    if (!matchesMulti(String(r.customerName ?? "").trim(), filters.customerName)) return false;
 
-      return true;
-    });
-  }, [invites, filters]);
+    // response fields (merged)
+    if (!matchesScore(r.score, filters.score)) return false;
+    if (!matchesSegment(r.score, filters.segment)) return false;
+
+    // free text search across invitation + response columns
+    if (q) {
+      const hay = [
+        r.invitationId,
+        r.customerId,
+        r.customerName,
+        r.businessName,
+        r.email,
+        r.stage,
+        r.typeOfDevice,
+        r.assistanteMaternelle,
+        r.status,
+        r.score,
+        r.comment,
+      ]
+        .map(x => String(x ?? "").toLowerCase())
+        .join(" | ");
+
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
+  });
+}, [invites, filters]);
 
   const pending = [];
   const sent = [];
   const started = [];
   const completed = [];
-  const stageOptions = React.useMemo(
-    () => uniqSorted(invites.map(r => r.stage)),
-    [invites]
-  );
-  const deviceOptions = React.useMemo(
-    () => uniqSorted(invites.map(r => r.typeOfDevice)),
-    [invites]
-  );
-  const amOptions = React.useMemo(
-    () => uniqSorted(invites.map(r => r.assistanteMaternelle)),
-    [invites]
-  );
 
   for (const inv of filteredRows) {
     const s = normaliseStatus(inv.status);
@@ -706,76 +782,106 @@ export default function LiveSurveyAdminPage() {
         </section>
         {/* Insights (AI) */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
-              </h2>
-              <p className="text-xs text-slate-400">
-                {tr(
-                  "liveAdmin.sections.insightsHelp",
-                  "AI summary of completed responses. Filterable by stage or device."
-                )}
-              </p>
+          <div className="flex flex-col gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-50">
+                  {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
+                </h2>
+                <p className="text-xs text-slate-400">
+                  {tr(
+                    "liveAdmin.sections.insightsHelp",
+                    "AI summary of completed responses. Filterable by stage or device."
+                  )}
+                </p>
+              </div>
+
+              <button
+                title={disabledReason}
+                type="button"
+                onClick={() => loadInsights({ limit: 200 })}
+                disabled={insightsLoading || !canRunInsights}
+                className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
+              >
+                {insightsLoading
+                  ? tr("liveAdmin.actions.loading", "Loading…")
+                  : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
+              </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-                <button
-                  title={disabledReason}
-                  type="button"
-                  onClick={() => loadInsights({ limit: 200 })}
-                  disabled={insightsLoading || !canRunInsights}
-                  className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
-                >
-                  {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
-                </button>
+            {/* Filters row */}
+            <div className="flex flex-wrap items-end gap-3">
+              <MultiSelect
+                label="Stage"
+                options={stageOptions}
+                values={filters.stage}
+                disabled={loading}
+                onChange={(next) => setFilters((p) => ({ ...p, stage: next }))}
+              />
 
-                <select
-                  value={filters.stage}
-                  onChange={(e) => setFilters((p) => ({ ...p, stage: e.target.value }))}
-                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
-                  disabled={loading}
-                >
-                  <option value="">All stages</option>
-                  {stageOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+              <MultiSelect
+                label="Device"
+                options={deviceOptions}
+                values={filters.device}
+                disabled={loading}
+                onChange={(next) => setFilters((p) => ({ ...p, device: next }))}
+              />
 
-                <select
-                  value={filters.device}
-                  onChange={(e) => setFilters((p) => ({ ...p, device: e.target.value }))}
-                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
-                  disabled={loading}
-                >
-                  <option value="">All devices</option>
-                  {deviceOptions.map((d) => <option key={d} value={d}>{d}</option>)}
-                </select>
+              <MultiSelect
+                label="AM"
+                options={amOptions}
+                values={filters.am}
+                disabled={loading}
+                onChange={(next) => setFilters((p) => ({ ...p, am: next }))}
+              />
 
-                <select
-                  value={filters.am}
-                  onChange={(e) => setFilters((p) => ({ ...p, am: e.target.value }))}
-                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
-                  disabled={loading}
-                >
-                  <option value="">All AMs</option>
-                  {amOptions.map((a) => <option key={a} value={a}>{a}</option>)}
-                </select>
+              <MultiSelect
+                label="Score"
+                options={scoreOptions}
+                values={filters.score}
+                disabled={loading}
+                onChange={(next) => setFilters((p) => ({ ...p, score: next }))}
+              />
 
+              <MultiSelect
+                label="Segment"
+                options={["detractor", "passive", "promoter"]}
+                values={filters.segment}
+                disabled={loading}
+                onChange={(next) => setFilters((p) => ({ ...p, segment: next }))}
+              />
+
+              <label className="text-xs text-slate-300 flex flex-col gap-1">
+                <span className="text-[11px] text-slate-400">Search</span>
                 <input
                   value={filters.q}
                   onChange={(e) => setFilters((p) => ({ ...p, q: e.target.value }))}
                   placeholder="Search…"
-                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200 placeholder:text-slate-500"
+                  className="min-w-[170px] rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-slate-200 placeholder:text-slate-500"
                 />
+              </label>
 
-                <button
-                  type="button"
-                  onClick={() => setFilters({ stage:"", device:"", am:"", status:"", q:"" })}
-                  className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800"
-                >
-                  Clear
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setFilters({
+                    stage: [],
+                    device: [],
+                    am: [],
+                    status: [],
+                    businessName: [],
+                    customerName: [],
+                    score: [],
+                    segment: [],
+                    q: "",
+                  })
+                }
+                className="text-xs rounded-full border border-slate-700 px-4 py-2 hover:bg-slate-800"
+              >
+                Clear filters
+              </button>
             </div>
+          </div>
 
           {insightsError ? (
             <div className="rounded-2xl border border-rose-500/70 bg-rose-950/50 px-3 py-2 text-xs text-rose-100">
@@ -785,7 +891,10 @@ export default function LiveSurveyAdminPage() {
 
           {!insights ? (
             <div className="text-sm text-slate-400">
-              {tr("liveAdmin.insights.empty", "Click “Refresh insights” to generate an intelligence summary from completed responses.")}
+              {tr(
+                "liveAdmin.insights.empty",
+                'Click “Refresh insights” to generate an intelligence summary from completed responses.'
+              )}
             </div>
           ) : (
             <div className="space-y-4">

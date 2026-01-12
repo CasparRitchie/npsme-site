@@ -16,13 +16,13 @@ export default function IntercomNpsAnalytics() {
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path={location.pathname}
+        lang={lang}
         title={tr("intercomNps.seo.title")}
         description={tr("intercomNps.seo.description")}
-        alternates={[
-          { lang: "en", href: "https://www.npsme.com/intercom-nps-analytics" },
-          { lang: "fr", href: "https://www.npsme.com/fr/analyse-nps-intercom" },
-          { lang: "x-default", href: "https://www.npsme.com/intercom-nps-analytics" },
-        ]}
+        altPaths={{
+          en: "/intercom-nps-analytics",
+          fr: "/fr/analyse-nps-intercom",
+        }}
       />
 
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Intercom NPS">

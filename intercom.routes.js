@@ -9,6 +9,94 @@ import crypto from "crypto";
 const INTERCOM_EXPORT_VERSION = process.env.INTERCOM_EXPORT_VERSION || "2.7";
 const INTERCOM_EXPORT_DEBUG = process.env.INTERCOM_EXPORT_DEBUG === "1";
 
+// --- Dropbox helpers (minimal, local to this file) ---
+const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
+const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
+const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
+const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
+
+const INTERCOM_SURVEY_EVENTS_PATH =
+  process.env.DROPBOX_INTERCOM_SURVEY_EVENTS_PATH || "/npsme/intercom/survey-events.jsonl";
+
+let cachedDropboxToken = null;
+let cachedDropboxExpiry = 0; // seconds
+
+async function getDropboxAccessToken() {
+  if (!DROPBOX_REFRESH_TOKEN) return LEGACY_DROPBOX_TOKEN || null;
+
+  const now = Date.now() / 1000;
+  if (cachedDropboxToken && now < cachedDropboxExpiry - 60) return cachedDropboxToken;
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "refresh_token");
+  params.append("refresh_token", DROPBOX_REFRESH_TOKEN);
+  params.append("client_id", DROPBOX_APP_KEY);
+  params.append("client_secret", DROPBOX_APP_SECRET);
+
+  const resp = await fetch("https://api.dropbox.com/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`Dropbox token refresh failed (${resp.status}): ${text}`);
+  }
+
+  const data = await resp.json();
+  cachedDropboxToken = data.access_token;
+  cachedDropboxExpiry = now + (typeof data.expires_in === "number" ? data.expires_in : 4 * 60 * 60);
+  return cachedDropboxToken;
+}
+
+async function readDropboxFile(path) {
+  const token = await getDropboxAccessToken();
+  if (!token) return null;
+
+  const res = await fetch("https://content.dropboxapi.com/2/files/download", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Dropbox-API-Arg": JSON.stringify({ path }),
+    },
+  });
+
+  if (res.status === 409) return null; // not found
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Dropbox download failed (${res.status}): ${text}`);
+  }
+  return res.text();
+}
+
+async function writeDropboxFile(path, contents) {
+  const token = await getDropboxAccessToken();
+  if (!token) return;
+
+  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/octet-stream",
+      "Dropbox-API-Arg": JSON.stringify({ path, mode: "overwrite", mute: true }),
+    },
+    body: contents,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Dropbox upload failed (${res.status}): ${text}`);
+  }
+}
+
+async function appendDropboxJsonl(path, obj) {
+  const existing = await readDropboxFile(path).catch(() => null);
+  const line = JSON.stringify(obj) + "\n";
+  const next = existing ? (existing.replace(/\n*$/, "") + "\n" + line) : line;
+  await writeDropboxFile(path, next);
+}
+
 function verifyIntercomSignature({ rawBody, signatureHeader, clientSecret }) {
   if (!clientSecret) return { ok: false, reason: "Missing INTERCOM_CLIENT_SECRET" };
   if (!signatureHeader) return { ok: false, reason: "Missing X-Body-Signature" };
@@ -193,7 +281,7 @@ export function createIntercomRouter() {
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
     // Webhook receiver for Intercom (survey answers etc.)
-  const webhookHandler = (req, res) => {
+  const webhookHandler = async (req, res) => {
   try {
     const secret = process.env.INTERCOM_WEBHOOK_SECRET;
     if (!secret) {
@@ -202,7 +290,6 @@ export function createIntercomRouter() {
         .json({ ok: false, error: "INTERCOM_WEBHOOK_SECRET not configured" });
     }
 
-    // Intercom signs with SHA1 in X-Hub-Signature (sha1=...)  [oai_citation:1‡Intercom Developers](https://developers.intercom.com/docs/references/2.11/webhooks/webhook-models.md)
     const sigSha1 = (req.get("X-Hub-Signature") || "").trim();
     const sigSha256 = (req.get("X-Hub-Signature-256") || "").trim(); // usually absent for Intercom
 
@@ -238,6 +325,7 @@ export function createIntercomRouter() {
       return res.status(401).json({ ok: false, error: "Invalid signature" });
     }
 
+    // ✅ parse after signature verification
     const event = JSON.parse(raw.toString("utf8"));
     const item = event?.data?.item;
     const cs = item?.content_stat;
@@ -247,43 +335,61 @@ export function createIntercomRouter() {
     const record = {
       received_at: new Date().toISOString(),
       topic: event?.topic,
-      content_id: cs?.content_id,          // survey id
-      receipt_id: cs?.receipt_id,          // useful unique per submission
-      stat_type: cs?.stat_type,            // "completion"
+      content_id: cs?.content_id,      // survey id
+      receipt_id: cs?.receipt_id,      // unique-ish per submission
+      stat_type: cs?.stat_type,        // receipt / answer / completion
       content_title: cs?.content_title,
       contact_id: contact?.id,
       external_id: contact?.external_id,
       email: contact?.email,
       name: contact?.name,
-      score: answers.find(a => String(a.question_text || "").toLowerCase().includes("how likely"))?.response ?? null,
-      comment: answers.find(a => String(a.question_text || "").toLowerCase().includes("what could we have done"))?.response ?? null,
+      score:
+        answers.find((a) =>
+          String(a.question_text || "").toLowerCase().includes("how likely")
+        )?.response ?? null,
+      comment:
+        answers.find((a) =>
+          String(a.question_text || "")
+            .toLowerCase()
+            .includes("what could we have done")
+        )?.response ?? null,
       answers_json: JSON.stringify(answers),
     };
-    console.log(
-  "[intercom webhook] survey summary",
-  JSON.stringify({
-    topic: record.topic,
-    receipt_id: record.receipt_id,
-    content_id: record.content_id,
-    email: record.email,
-    score: record.score,
-    comment_preview: (record.comment || "").slice(0, 120),
-    answers_count: JSON.parse(record.answers_json || "[]").length,
-  })
-);
 
-    console.log("[intercom webhook] survey record:", JSON.stringify(record));
+    console.log(
+      "[intercom webhook] survey summary",
+      JSON.stringify({
+        topic: record.topic,
+        receipt_id: record.receipt_id,
+        content_id: record.content_id,
+        email: record.email,
+        score: record.score,
+        comment_preview: (record.comment || "").slice(0, 120),
+        answers_count: answers.length,
+      })
+    );
+
     console.log("[intercom webhook] received meta", {
       type: event?.type,
       topic: event?.topic,
-      item_type: event?.data?.item?.type,
-      item_id: event?.data?.item?.id,
+      item_type: item?.type,
+      content_stat_type: cs?.stat_type,
     });
 
-    // Dump the full payload in a grep-friendly way (each line prefixed)
+    // ✅ Only persist COMPLETION events (the one that actually contains answers)
+    const isCompletion = String(record.stat_type || "").toLowerCase() === "completion";
+    if (isCompletion) {
+      await appendDropboxJsonl(INTERCOM_SURVEY_EVENTS_PATH, record);
+      console.log("[intercom webhook] saved to dropbox", {
+        path: INTERCOM_SURVEY_EVENTS_PATH,
+        receipt_id: record.receipt_id,
+      });
+    }
+
+    // Optional raw dump, clipped
     if (process.env.INTERCOM_WEBHOOK_DEBUG === "1") {
       const dump = raw.toString("utf8");
-      const max = 4000; // keep logs sane
+      const max = 4000;
       const clipped = dump.length > max ? dump.slice(0, max) + "…(truncated)" : dump;
       console.log("[intercom webhook] raw event (clipped):", clipped);
     }

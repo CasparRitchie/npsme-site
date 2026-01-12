@@ -12,10 +12,25 @@ function normalisePath(path) {
   return p;
 }
 
-// For a given current path + lang, compute the EN and FR equivalents
-function computeLangUrls(path, lang) {
+function computeLangUrls({ path, lang, enPathOverride, frPathOverride }) {
   const p = normalisePath(path);
 
+  // If overrides provided, use them directly
+  if (enPathOverride || frPathOverride) {
+    const enPath = normalisePath(enPathOverride || (p.startsWith("/fr") ? p.replace(/^\/fr/, "") || "/" : p));
+    const frPath = normalisePath(frPathOverride || (enPath === "/" ? "/fr" : `/fr${enPath}`));
+
+    const canonicalUrl = lang === "fr" ? `${BASE_URL}${frPath}` : `${BASE_URL}${enPath}`;
+
+    return {
+      enUrl: `${BASE_URL}${enPath}`,
+      frUrl: `${BASE_URL}${frPath}`,
+      xDefaultUrl: `${BASE_URL}${enPath}`,
+      canonicalUrl,
+    };
+  }
+
+  // Default behaviour (your existing logic)
   if (lang === "fr") {
     const frPath = p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
     const enPath = frPath === "/fr" ? "/" : frPath.replace(/^\/fr/, "") || "/";
@@ -28,8 +43,7 @@ function computeLangUrls(path, lang) {
     };
   }
 
-  const frPath =
-    p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
+  const frPath = p === "/" ? "/fr" : (p.startsWith("/fr") ? p : `/fr${p}`);
   return {
     enUrl: `${BASE_URL}${p}`,
     frUrl: `${BASE_URL}${frPath}`,
@@ -38,39 +52,39 @@ function computeLangUrls(path, lang) {
   };
 }
 
-
 export default function Seo({
   path = "/",
   title,
   description,
   image = `${BASE_URL}/og-image.jpg?v=3`,
   lang,
-  // keep alternates optional: if provided we’ll use it, otherwise auto
-  alternates = null,
+  // NEW: optional overrides for pages where FR slug isn't "/fr" + EN slug
+  altPaths = null, // { en: "/intercom-nps-analytics", fr: "/fr/analyse-nps-intercom" }
   noindex = false,
 }) {
   const { lang: ctxLang } = useLanguage();
   const effectiveLang = lang || ctxLang || "en";
-  const { enUrl, frUrl, xDefaultUrl, canonicalUrl } = computeLangUrls(path, effectiveLang);
 
-  // If caller passes alternates explicitly, use them; otherwise auto-generate EN/FR.
-  const finalAlternates =
-    Array.isArray(alternates) && alternates.length > 0
-      ? alternates
-      : [
-          { lang: "en-GB", href: enUrl },
-          { lang: "fr-FR", href: frUrl },
-          { lang: "x-default", href: xDefaultUrl },
-        ];
+  const { enUrl, frUrl, xDefaultUrl, canonicalUrl } = computeLangUrls({
+    path,
+    lang: effectiveLang,
+    enPathOverride: altPaths?.en,
+    frPathOverride: altPaths?.fr,
+  });
+
+  // Keep hreflang consistent
+  const finalAlternates = [
+    { lang: "en", href: enUrl },
+    { lang: "fr", href: frUrl },
+    { lang: "x-default", href: xDefaultUrl },
+  ];
 
   return (
     <Helmet htmlAttributes={{ lang: effectiveLang }}>
       {title ? <title>{title}</title> : null}
       <link rel="canonical" href={canonicalUrl} />
-
       {description ? <meta name="description" content={description} /> : null}
 
-      {/* hreflang */}
       {finalAlternates.map((alt) => (
         <link
           key={`${alt.lang}-${alt.href}`}
@@ -81,7 +95,7 @@ export default function Seo({
       ))}
 
       {noindex ? <meta name="robots" content="noindex, follow" /> : null}
-      {/* Open Graph */}
+
       <meta property="og:type" content="website" />
       <meta property="og:url" content={canonicalUrl} />
       {title ? <meta property="og:title" content={title} /> : null}
@@ -89,7 +103,6 @@ export default function Seo({
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content="NPS Me" />
 
-      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       {title ? <meta name="twitter:title" content={title} /> : null}
       {description ? <meta name="twitter:description" content={description} /> : null}

@@ -153,10 +153,21 @@ export default function LiveSurveyAdminPage() {
     setLoading(true);
     setError("");
     try {
-      const [invRes, respRes] = await Promise.all([
-        fetch("/api/live-invitations?all=1"),
-        fetch("/api/live-responses"),
-      ]);
+      const mergedRes = await fetch("/api/live-merged");
+      const mergedData = await mergedRes.json();
+      if (!mergedRes.ok || !mergedData.ok) throw new Error(mergedData.error || "Failed to load merged data");
+
+      // invites drive the funnel/status buckets
+      setInvites(mergedData.rows || []);
+
+      // optional: if you still want responseByInvitationId to work unchanged,
+      // you can also derive responses from merged rows:
+      setResponses(
+        (mergedData.rows || [])
+          .filter(r => r.response)
+          .map(r => r.response)
+      );
+      setSelectedIds(new Set());
 
       const invData = await invRes.json();
       const respData = await respRes.json();

@@ -153,41 +153,25 @@ export default function LiveSurveyAdminPage() {
   );
 
   async function loadAll() {
-    setLoading(true);
-    setError("");
-    try {
-      const mergedRes = await fetch("/api/live-merged");
-      const mergedData = await mergedRes.json();
-      if (!mergedRes.ok || !mergedData.ok) throw new Error(mergedData.error || "Failed to load merged data");
-
-      // invites drive the funnel/status buckets
-      setInvites(mergedData.rows || []);
-
-      // optional: if you still want responseByInvitationId to work unchanged,
-      // you can also derive responses from merged rows:
-      setResponses(
-        (mergedData.rows || [])
-          .filter(r => r.response)
-          .map(r => r.response)
-      );
-      setSelectedIds(new Set());
-
-      const invData = await invRes.json();
-      const respData = await respRes.json();
-
-      if (!invRes.ok) throw new Error(invData.error || tr("liveAdmin.errors.loadInvFail", "Failed to load invitations"));
-      if (!respRes.ok) throw new Error(respData.error || tr("liveAdmin.errors.loadRespFail", "Failed to load responses"));
-
-      setInvites(invData.rows || []);
-      setResponses(respData.rows || []);
-      setSelectedIds(new Set());
-    } catch (e) {
-      console.error("loadAll error", e);
-      setError(e.message || tr("liveAdmin.errors.loadUnable", "Unable to load data."));
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setError("");
+  try {
+    const mergedRes = await fetch("/api/live-merged");
+    const mergedData = await mergedRes.json();
+    if (!mergedRes.ok || !mergedData.ok) {
+      throw new Error(mergedData.error || "Failed to load merged data");
     }
+
+    setInvites(mergedData.rows || []);
+    setResponses((mergedData.rows || []).filter((r) => r.response).map((r) => r.response));
+    setSelectedIds(new Set());
+  } catch (e) {
+    console.error("loadAll error", e);
+    setError(e?.message || tr("liveAdmin.errors.loadUnable", "Unable to load data."));
+  } finally {
+    setLoading(false);
   }
+}
 
   React.useEffect(() => {
     loadAll();

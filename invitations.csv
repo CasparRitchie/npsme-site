@@ -1,0 +1,14 @@
+invitationId,customerId,customerName,businessName,email,stage,surveyId,typeOfDevice,assistanteMaternelle,sentAt,resentCount,lastSentAt,status,responseId
+INV-A1B2C3D4,CUST-001,Caspar Ritchie,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Sophie Martin,2025-12-12T09:00:00.000Z,2,2025-12-12T10:04:03.785Z,responded,R-MJ2SPY7F-KDCG
+INV-E5F6G7H8,CUST-002,Caspar Ritchie,Envola,casparritchie@gmail.com,Overall,FR-NPS-2024,Piou Piou v2,Julie Laurent,2025-12-12T09:05:00.000Z,2,2025-12-12T11:43:00.777Z,responded,R-MJ2TY9R7-MO78
+INV-J9K0L1M2,CUST-003,Caspar Ritchie,Envola,caspar.ritchie@lapiscine.pro,Overall,FR-NPS-2024,Piou Piou v1,Léa Dupuis,2025-12-12T09:10:00.000Z,1,2025-12-12T10:04:11.907Z,sent,
+INV-N1C2H3O4,CUST-101,Amélie Bernard,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Sophie Martin,,0,,pending,
+INV-N5I6C7H8,CUST-102,Thomas Dubois,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v2,Julie Laurent,2025-12-12T16:46:25.179Z,0,2025-12-12T16:46:25.179Z,responded,R-MJ33OG11-PTMW
+INV-N9I0C1H2,CUST-103,Claire Moreau,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Léa Dupuis,,0,,pending,
+INV-N3I4C5H6,CUST-104,Julien Lefèvre,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,iPad,Nadia Petit,,0,,pending,
+INV-N7I8C9H0,CUST-105,Manon Rousseau,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v2,Julie Laurent,,0,,pending,
+INV-N2I3C4H5,CUST-106,Lucas Fournier,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Julie Laurent,,0,,pending,
+INV-N6I7C8H9,CUST-107,Élodie Garnier,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Sophie Martin,,0,,pending,
+INV-N0I1C2H3,CUST-108,Antoine Faure,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v2,Chloé Bonnet,,0,,pending,
+INV-N4I5C6H7,CUST-109,Lina Mercier,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Emma Lambert,,0,,pending,
+INV-N8I9C0H1,CUST-110,Nathan Blanchard,Envola,casparr@hotmail.com,Overall,FR-NPS-2024,Piou Piou v1,Sophie Martin,,0,,pending,

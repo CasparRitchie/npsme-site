@@ -24,11 +24,14 @@ function toInt(v, fallback = 0) {
 }
 
 function computeResendsFromRow(row) {
-  const explicitResends = row?.resends ?? row?.resendCount;
-  if (Number.isFinite(Number(explicitResends))) return Math.max(0, toInt(explicitResends));
+  // LIVE: server uses "resentCount" = number of resends
+  const raw = row?.resentCount ?? row?.resendCount ?? row?.resends;
 
-  const sends = toInt(row?.sendCount ?? row?.sentCount ?? row?.resentCount ?? row?.sendsCount, 0);
-  return Math.max(0, sends - 1);
+  const n = Number(raw);
+  if (Number.isFinite(n)) return Math.max(0, Math.trunc(n));
+// TEMP debug
+console.log("RESEND FIELDS", row.invitationId, { resentCount: row.resentCount, resendCount: row.resendCount, resends: row.resends });
+  return 0;
 }
 
 function formatMaybeIso(s) {

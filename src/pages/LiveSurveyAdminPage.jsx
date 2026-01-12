@@ -357,6 +357,7 @@ export default function LiveSurveyAdminPage() {
     else if (s === "cancelled") cancelled.push(inv);
     else pending.push(inv);
   }
+  const cancelledCount = cancelled.length;
 
   const pendingIds = pending.map((r) => r.invitationId);
   const allSelected = pending.length > 0 && pending.every((r) => selectedIds.has(r.invitationId));
@@ -497,7 +498,6 @@ export default function LiveSurveyAdminPage() {
   const total = invites.length;
   const sentOrMore = sent.length + started.length + completed.length;
   const responseRate = sentOrMore ? Math.round((completed.length / sentOrMore) * 100) : 0;
-
   const completedScores = completed
     .map((inv) => responseByInvitationId.get((inv.invitationId || "").trim()))
     .map((r) => (r && r.score !== undefined ? Number(r.score) : NaN))
@@ -576,7 +576,6 @@ const withCount = (label, n) => `${label} (${n})`;
           <KpiCard label={tr("liveAdmin.kpi.completed", "Completed")} value={completed.length} sub={nps === null ? tr("liveAdmin.kpi.npsNA", "NPS: n/a") : `${tr("liveAdmin.nps", "NPS")}: ${nps}`}/>
           <KpiCard label={tr("liveAdmin.kpi.cancelled", "Cancelled")} value={cancelledCount} sub={tr("liveAdmin.kpi.cancelledSub", "Will not be sent")} />
         </section>
-
         {/* Pending */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
           <div className="mb-4 flex items-start justify-between gap-3">
@@ -705,7 +704,6 @@ const withCount = (label, n) => `${label} (${n})`;
             )
           ) : null}
         </section>
-
         {/* Sent */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
           <div className="mb-4 flex items-start justify-between gap-3">
@@ -847,7 +845,6 @@ const withCount = (label, n) => `${label} (${n})`;
             )
           ) : null}
         </section>
-
         {/* Completed */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
           <div className="mb-4 flex items-start justify-between gap-3">

@@ -29,8 +29,6 @@ function computeResendsFromRow(row) {
 
   const n = Number(raw);
   if (Number.isFinite(n)) return Math.max(0, Math.trunc(n));
-// TEMP debug
-console.log("RESEND FIELDS", row.invitationId, { resentCount: row.resentCount, resendCount: row.resendCount, resends: row.resends });
   return 0;
 }
 
@@ -148,7 +146,17 @@ export default function LiveSurveyAdminPage() {
   const [insights, setInsights] = React.useState(null);
   const [insightsLoading, setInsightsLoading] = React.useState(false);
   const [insightsError, setInsightsError] = React.useState("");
+  const [filters, setFilters] = React.useState({
+    stage: "",
+    device: "",
+    am: "",
+    status: "",
+    q: "", // free text search
+  });
 
+  function uniqSorted(values) {
+    return Array.from(new Set(values.map(v => String(v || "").trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+  }
   const title = tr("liveAdmin.seoTitle", "Live Survey Admin | NPS Me");
   const description = tr(
     "liveAdmin.seoDescription",
@@ -209,8 +217,20 @@ export default function LiveSurveyAdminPage() {
   const sent = [];
   const started = [];
   const completed = [];
+  const stageOptions = React.useMemo(
+    () => uniqSorted(invites.map(r => r.stage)),
+    [invites]
+  );
+  const deviceOptions = React.useMemo(
+    () => uniqSorted(invites.map(r => r.typeOfDevice)),
+    [invites]
+  );
+  const amOptions = React.useMemo(
+    () => uniqSorted(invites.map(r => r.assistanteMaternelle)),
+    [invites]
+  );
 
-  for (const inv of invites) {
+  for (const inv of filteredRows) {
     const s = normaliseStatus(inv.status);
     if (s === "responded") completed.push(inv);
     else if (s === "started") started.push(inv);
@@ -295,27 +315,42 @@ export default function LiveSurveyAdminPage() {
   }
 
   async function loadInsights(params = {}) {
-    setInsightsLoading(true);
-    setInsightsError("");
-    try {
-      const qs = new URLSearchParams();
-      if (params.stage) qs.set("stage", params.stage);
-      if (params.device) qs.set("device", params.device);
-      qs.set("limit", String(params.limit ?? 200));
+  setInsightsLoading(true);
+  setInsightsError("");
 
-      const res = await fetch(`/api/live-insights?${qs.toString()}`);
-      const data = await res.json();
+  try {
+    const limit = params.limit ?? 200;
 
-      if (!res.ok || !data.ok) throw new Error(data.error || "Failed to load insights");
-      setInsights(data);
-    } catch (e) {
-      console.error("loadInsights error", e);
-      setInsightsError(e.message || "Failed to load insights");
-      setInsights(null);
-    } finally {
-      setInsightsLoading(false);
-    }
+    // Only include rows that actually have a response score
+    // Use merged flattened score first (server normalised), fallback to response map
+    const ids = completed
+      .map((row) => {
+        const resp = responseByInvitationId.get(String(row.invitationId || "").trim());
+        const scoreRaw = row?.score ?? resp?.score;
+        const score = Number.isFinite(Number(scoreRaw)) ? Number(scoreRaw) : null;
+        return score == null ? null : String(row.invitationId || "").trim();
+      })
+      .filter(Boolean)
+      .slice(0, 500);
+
+    const res = await fetch("/api/live-insights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ invitationIds: ids, limit }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || "Failed to load insights");
+
+    setInsights(data);
+  } catch (e) {
+    console.error("loadInsights error", e);
+    setInsightsError(e.message || "Failed to load insights");
+    setInsights(null);
+  } finally {
+    setInsightsLoading(false);
   }
+}
 
   const total = invites.length;
   const sentOrMore = sent.length + started.length + completed.length;
@@ -335,6 +370,37 @@ export default function LiveSurveyAdminPage() {
   };
   const canRunInsights = completed.length > 0;
   const disabledReason = !canRunInsights ? "No completed responses yet" : undefined;
+
+  const filteredRows = React.useMemo(() => {
+  const stage = filters.stage.trim();
+  const device = filters.device.trim();
+  const am = filters.am.trim();
+  const status = filters.status.trim();
+  const q = filters.q.trim().toLowerCase();
+
+  return (invites || []).filter((r) => {
+    if (stage && String(r.stage || "").trim() !== stage) return false;
+    if (device && String(r.typeOfDevice || "").trim() !== device) return false;
+    if (am && String(r.assistanteMaternelle || "").trim() !== am) return false;
+    if (status && normaliseStatus(r.status) !== status) return false;
+
+    if (q) {
+      const hay = [
+        r.invitationId,
+        r.customerName,
+        r.businessName,
+        r.email,
+        r.stage,
+        r.typeOfDevice,
+        r.assistanteMaternelle,
+        r.comment,      // merged flattened
+      ].map(x => String(x || "").toLowerCase()).join(" | ");
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
+  });
+}, [invites, filters]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -663,25 +729,62 @@ export default function LiveSurveyAdminPage() {
                 {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
               </button>
 
-              <button
-                title={disabledReason}
-                type="button"
-                onClick={() => loadInsights({ stage: "Overall", limit: 200 })}
-                disabled={insightsLoading || !canRunInsights}
-                className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
-              >
-                {tr("liveAdmin.actions.filterOverall", "Overall")}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  title={disabledReason}
+                  type="button"
+                  onClick={() => loadInsights({ limit: 200 })}
+                  disabled={insightsLoading || !canRunInsights}
+                  className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
+                >
+                  {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
+                </button>
 
-              <button
-                title={disabledReason}
-                type="button"
-                onClick={() => loadInsights({ device: "Piou Piou v1", limit: 200 })}
-                disabled={insightsLoading || !canRunInsights}
-                className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
-              >
-                {tr("liveAdmin.actions.filterDeviceV1", "Piou Piou v1")}
-              </button>
+                <select
+                  value={filters.stage}
+                  onChange={(e) => setFilters((p) => ({ ...p, stage: e.target.value }))}
+                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
+                  disabled={loading}
+                >
+                  <option value="">All stages</option>
+                  {stageOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+
+                <select
+                  value={filters.device}
+                  onChange={(e) => setFilters((p) => ({ ...p, device: e.target.value }))}
+                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
+                  disabled={loading}
+                >
+                  <option value="">All devices</option>
+                  {deviceOptions.map((d) => <option key={d} value={d}>{d}</option>)}
+                </select>
+
+                <select
+                  value={filters.am}
+                  onChange={(e) => setFilters((p) => ({ ...p, am: e.target.value }))}
+                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200"
+                  disabled={loading}
+                >
+                  <option value="">All AMs</option>
+                  {amOptions.map((a) => <option key={a} value={a}>{a}</option>)}
+                </select>
+
+                <input
+                  value={filters.q}
+                  onChange={(e) => setFilters((p) => ({ ...p, q: e.target.value }))}
+                  placeholder="Search…"
+                  className="text-xs rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-slate-200 placeholder:text-slate-500"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setFilters({ stage:"", device:"", am:"", status:"", q:"" })}
+                  className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
 

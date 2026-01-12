@@ -142,6 +142,9 @@ export default function LiveSurveyAdminPage() {
   const [error, setError] = React.useState("");
   const [statusMsg, setStatusMsg] = React.useState("");
   const [resendingId, setResendingId] = React.useState("");
+  const [insights, setInsights] = React.useState(null);
+  const [insightsLoading, setInsightsLoading] = React.useState(false);
+  const [insightsError, setInsightsError] = React.useState("");
 
   const title = tr("liveAdmin.seoTitle", "Live Survey Admin | NPS Me");
   const description = tr(
@@ -301,6 +304,29 @@ export default function LiveSurveyAdminPage() {
       setError(e.message || tr("liveAdmin.errors.resendUnable", "We couldn’t resend that invitation."));
     } finally {
       setResendingId("");
+    }
+  }
+
+  async function loadInsights(params = {}) {
+    setInsightsLoading(true);
+    setInsightsError("");
+    try {
+      const qs = new URLSearchParams();
+      if (params.stage) qs.set("stage", params.stage);
+      if (params.device) qs.set("device", params.device);
+      qs.set("limit", String(params.limit ?? 200));
+
+      const res = await fetch(`/api/live-insights?${qs.toString()}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) throw new Error(data.error || "Failed to load insights");
+      setInsights(data);
+    } catch (e) {
+      console.error("loadInsights error", e);
+      setInsightsError(e.message || "Failed to load insights");
+      setInsights(null);
+    } finally {
+      setInsightsLoading(false);
     }
   }
 
@@ -616,6 +642,166 @@ export default function LiveSurveyAdminPage() {
                   })}
                 </tbody>
               </table>
+            </div>
+          )}
+        </section>
+        {/* Insights (AI) */}
+        <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr(
+                  "liveAdmin.sections.insightsHelp",
+                  "AI summary of completed responses. Filterable by stage or device."
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => loadInsights({ limit: 200 })}
+                disabled={insightsLoading}
+                className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
+              >
+                {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => loadInsights({ stage: "Overall", limit: 200 })}
+                disabled={insightsLoading}
+                className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
+              >
+                {tr("liveAdmin.actions.filterOverall", "Overall")}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => loadInsights({ device: "Piou Piou v1", limit: 200 })}
+                disabled={insightsLoading}
+                className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
+              >
+                {tr("liveAdmin.actions.filterDeviceV1", "Piou Piou v1")}
+              </button>
+            </div>
+          </div>
+
+          {insightsError ? (
+            <div className="rounded-2xl border border-rose-500/70 bg-rose-950/50 px-3 py-2 text-xs text-rose-100">
+              {insightsError}
+            </div>
+          ) : null}
+
+          {!insights ? (
+            <div className="text-sm text-slate-400">
+              {tr("liveAdmin.insights.empty", "Click “Refresh insights” to generate an intelligence summary from completed responses.")}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <KpiCard label={tr("liveAdmin.insights.kpi.n", "Responses analysed")} value={insights?.insights?.n ?? 0} />
+                <KpiCard label={tr("liveAdmin.insights.kpi.nps", "NPS")} value={insights?.insights?.nps ?? "—"} />
+                <KpiCard label={tr("liveAdmin.insights.kpi.stage", "Stage")} value={insights?.stage ?? "All"} />
+                <KpiCard label={tr("liveAdmin.insights.kpi.generated", "Generated")} value={insights?.generated_at ? new Date(insights.generated_at).toISOString() : "—"} />
+              </div>
+
+              {/* Top actions */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                  {tr("liveAdmin.insights.topActions", "Top actions")}
+                </div>
+
+                {(insights?.insights?.top_actions || []).length === 0 ? (
+                  <div className="text-sm text-slate-400">—</div>
+                ) : (
+                  <ul className="space-y-2">
+                    {insights.insights.top_actions.map((a, i) => (
+                      <li key={i} className="text-sm text-slate-200">
+                        <div className="font-semibold text-slate-50">{a.action}</div>
+                        <div className="text-xs text-slate-400">{a.why}</div>
+                        <div className="mt-1 text-[11px] text-slate-400">
+                          Impact: <span className="text-slate-200">{a.impact}</span> · Effort:{" "}
+                          <span className="text-slate-200">{a.effort}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Themes */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                  <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                    {tr("liveAdmin.insights.painThemes", "Pain themes")}
+                  </div>
+                  <ul className="space-y-2">
+                    {(insights?.insights?.response_themes || []).map((t, i) => (
+                      <li key={i} className="text-sm text-slate-200">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-slate-50">{t.theme}</span>
+                          <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
+                        </div>
+                        {(t.example_quotes || []).slice(0, 2).map((q, j) => (
+                          <div key={j} className="text-xs text-slate-400">“{q}”</div>
+                        ))}
+                      </li>
+                    ))}
+                    {(insights?.insights?.response_themes || []).length === 0 ? (
+                      <li className="text-sm text-slate-400">—</li>
+                    ) : null}
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                  <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                    {tr("liveAdmin.insights.delighters", "Delighters")}
+                  </div>
+                  <ul className="space-y-2">
+                    {(insights?.insights?.delighters || []).map((t, i) => (
+                      <li key={i} className="text-sm text-slate-200">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-slate-50">{t.theme}</span>
+                          <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
+                        </div>
+                        {(t.example_quotes || []).slice(0, 2).map((q, j) => (
+                          <div key={j} className="text-xs text-slate-400">“{q}”</div>
+                        ))}
+                      </li>
+                    ))}
+                    {(insights?.insights?.delighters || []).length === 0 ? (
+                      <li className="text-sm text-slate-400">—</li>
+                    ) : null}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Close the loop templates */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                  {tr("liveAdmin.insights.closeLoop", "Close the loop templates")}
+                </div>
+
+                <div className="space-y-3">
+                  {(insights?.insights?.close_the_loop_templates || []).map((tpl, i) => (
+                    <div key={i} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                      <div className="text-xs text-slate-400">{tpl.segment}</div>
+                      <div className="text-sm font-semibold text-slate-50">{tpl.subject}</div>
+                      <div className="mt-1 text-xs text-slate-300 whitespace-pre-wrap">
+                        {tpl.body}
+                      </div>
+                    </div>
+                  ))}
+
+                  {(insights?.insights?.close_the_loop_templates || []).length === 0 ? (
+                    <div className="text-sm text-slate-400">—</div>
+                  ) : null}
+                </div>
+              </div>
             </div>
           )}
         </section>

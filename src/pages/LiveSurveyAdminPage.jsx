@@ -513,7 +513,9 @@ export default function LiveSurveyAdminPage() {
   const canRunInsights = completed.length > 0;
   const disabledReason = !canRunInsights ? "No completed responses yet" : undefined;
 
+const sectionLabel = (key, fallback) => tr(`liveAdmin.sections.${key}`, fallback);
 
+const withCount = (label, n) => `${label} (${n})`;
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -587,10 +589,8 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.pending", "Pending")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.pending ? "▲" : "▼"}
-                </span>
+                {withCount(sectionLabel("pending", "Pending"), pending.length)}
+                <span className="ml-2 text-xs text-slate-400">{openSections.pending ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.pendingHelp", "Select and send invitations.")}
@@ -718,10 +718,8 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.sent", "Sent")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.sent ? "▲" : "▼"}
-                </span>
+                {withCount(sectionLabel("sent", "Sent"), sent.length)}
+                <span className="ml-2 text-xs text-slate-400">{openSections.sent ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.sentHelp", "Resend if someone cannot find the email.")}
@@ -809,10 +807,8 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.started", "Started")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.started ? "▲" : "▼"}
-                </span>
+                {withCount(sectionLabel("started", "Started"), started.length)}
+                <span className="ml-2 text-xs text-slate-400">{openSections.started ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.startedHelp", "These recipients opened the survey link.")}
@@ -864,10 +860,8 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.completed", "Completed")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.completed ? "▲" : "▼"}
-                </span>
+                {withCount(sectionLabel("completed", "Completed"), completed.length)}
+                <span className="ml-2 text-xs text-slate-400">{openSections.completed ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.completedHelp", "Scores are shown when a response exists in /npsme/live/responses.csv.")}
@@ -937,10 +931,8 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.cancelled", "Cancelled")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.cancelled ? "▲" : "▼"}
-                </span>
+                {withCount(sectionLabel("cancelled", "Cancelled"), cancelled.length)}
+                <span className="ml-2 text-xs text-slate-400">{openSections.cancelled ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.cancelledHelp", "These invitations will not be sent.")}
@@ -1003,10 +995,11 @@ export default function LiveSurveyAdminPage() {
               className="text-left"
             >
               <h2 className="text-lg font-semibold text-slate-50">
-                {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
-                <span className="ml-2 text-xs text-slate-400">
-                  {openSections.insights ? "▲" : "▼"}
-                </span>
+                {withCount(
+                  sectionLabel("insights", "Insights (CX Intelligence Layer)"),
+                  insights?.insights?.n ?? 0
+                )}
+                <span className="ml-2 text-xs text-slate-400">{openSections.insights ? "▲" : "▼"}</span>
               </h2>
               <p className="text-xs text-slate-400">
                 {tr("liveAdmin.sections.insightsHelp", "AI summary of completed responses. Filterable by stage or device.")}

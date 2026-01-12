@@ -330,6 +330,8 @@ export default function LiveSurveyAdminPage() {
     // Optional: add liveAdmin.status.pending/sent/... later in TRANSLATIONS
     return tr(`liveAdmin.status.${s}`, s);
   };
+  const canRunInsights = completed.length > 0;
+  const disabledReason = !canRunInsights ? "No completed responses yet" : undefined;
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100">
@@ -599,7 +601,10 @@ export default function LiveSurveyAdminPage() {
                   {completed.map((row, idx) => {
                     const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
                     const resp = responseByInvitationId.get((row.invitationId || "").trim());
-                    const score = resp?.score != null ? Number(resp.score) : null;
+
+                    // Prefer the merged row’s flattened score (server normalises it), fallback to resp.score
+                    const scoreRaw = row?.score ?? resp?.score;
+                    const score = Number.isFinite(Number(scoreRaw)) ? Number(scoreRaw) : null;
 
                     return (
                       <tr key={row.invitationId} className={stripe}>
@@ -646,27 +651,30 @@ export default function LiveSurveyAdminPage() {
 
             <div className="flex flex-wrap items-center gap-2">
               <button
+                title={disabledReason}
                 type="button"
                 onClick={() => loadInsights({ limit: 200 })}
-                disabled={insightsLoading}
+                disabled={insightsLoading || !canRunInsights}
                 className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
               >
                 {insightsLoading ? tr("liveAdmin.actions.loading", "Loading…") : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
               </button>
 
               <button
+                title={disabledReason}
                 type="button"
                 onClick={() => loadInsights({ stage: "Overall", limit: 200 })}
-                disabled={insightsLoading}
+                disabled={insightsLoading || !canRunInsights}
                 className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
               >
                 {tr("liveAdmin.actions.filterOverall", "Overall")}
               </button>
 
               <button
+                title={disabledReason}
                 type="button"
                 onClick={() => loadInsights({ device: "Piou Piou v1", limit: 200 })}
-                disabled={insightsLoading}
+                disabled={insightsLoading || !canRunInsights}
                 className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
               >
                 {tr("liveAdmin.actions.filterDeviceV1", "Piou Piou v1")}

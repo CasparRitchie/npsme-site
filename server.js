@@ -1139,6 +1139,36 @@ async function markLiveInvitationSent(invitationId, sentAtIso) {
   await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
 }
 
+async function markLiveInvitationCancelled(invitationId) {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
+  if (!csv) return;
+
+  const lines = csv.trim().split("\n");
+  if (lines.length < 2) return;
+
+  const header = lines[0].split(",");
+  const updatedLines = [lines[0]];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    const rowObj = {};
+    header.forEach((h, idx) => {
+      rowObj[h] = cols[idx] ?? "";
+    });
+
+    if ((rowObj.invitationId || "").trim() === (invitationId || "").trim()) {
+      rowObj.status = "cancelled";
+      // optional: keep lastSentAt unchanged; do NOT touch resentCount
+    }
+
+    const updatedCols = header.map((h) => escapeCsv(rowObj[h] ?? ""));
+    updatedLines.push(updatedCols.join(","));
+  }
+
+  const updatedCsv = updatedLines.join("\n") + "\n";
+  await writeDropboxFile(LIVE_INVITATIONS_PATH, updatedCsv);
+}
+
 async function markLiveInvitationResponded(invitationId, responseId) {
   const csv = await readDropboxFile(LIVE_INVITATIONS_PATH);
   if (!csv) return;
@@ -1948,6 +1978,28 @@ app.post("/api/live-invitations/resend", async (req, res) => {
   } catch (err) {
     console.error("[npsme] Error in /api/live-invitations/resend", err);
     res.status(500).json({ error: "Failed to resend invitation" });
+  }
+});
+
+app.post("/api/live-invitations/cancel", async (req, res) => {
+  try {
+    const { invitationId } = req.body || {};
+    const id = (invitationId || "").trim();
+    if (!id) return res.status(400).json({ ok: false, error: "invitationId is required" });
+
+    const inv = await findLiveInvitationById(id);
+    if (!inv) return res.status(404).json({ ok: false, error: "Invitation not found" });
+
+    const status = (inv.status || "").toLowerCase().trim() || "pending";
+    if (status === "responded") {
+      return res.status(409).json({ ok: false, error: "Cannot cancel: already responded" });
+    }
+
+    await markLiveInvitationCancelled(id);
+    return res.json({ ok: true, invitationId: id });
+  } catch (err) {
+    console.error("[npsme] Error in /api/live-invitations/cancel", err);
+    res.status(500).json({ ok: false, error: "Failed to cancel invitation" });
   }
 });
 

@@ -182,6 +182,7 @@ function StatusPill({ status, label }) {
     sent: "border-sky-400/40 text-sky-200",
     started: "border-amber-400/40 text-amber-200",
     responded: "border-emerald-400/40 text-emerald-200",
+    cancelled: "border-rose-400/40 text-rose-200",
   };
   return <span className={`${base} ${map[s] || map.pending}`}>{label}</span>;
 }
@@ -215,6 +216,17 @@ export default function LiveSurveyAdminPage() {
     segment: [],             // multi ("detractor"|"passive"|"promoter")
     q: "",                   // text search
   });
+  const [openSections, setOpenSections] = React.useState({
+  pending: true,
+  sent: true,
+  started: true,
+  completed: true,
+  cancelled: true,
+  insights: true,
+});
+
+  const toggleSection = (key) =>
+    setOpenSections((p) => ({ ...p, [key]: !p[key] }));
 
   function uniqSorted(values) {
     return Array.from(
@@ -335,12 +347,14 @@ export default function LiveSurveyAdminPage() {
   const sent = [];
   const started = [];
   const completed = [];
+  const cancelled = [];
 
   for (const inv of filteredRows) {
     const s = normaliseStatus(inv.status);
     if (s === "responded") completed.push(inv);
     else if (s === "started") started.push(inv);
     else if (s === "sent") sent.push(inv);
+    else if (s === "cancelled") cancelled.push(inv);
     else pending.push(inv);
   }
 
@@ -417,6 +431,28 @@ export default function LiveSurveyAdminPage() {
       setError(e.message || tr("liveAdmin.errors.resendUnable", "We couldn’t resend that invitation."));
     } finally {
       setResendingId("");
+    }
+  }
+
+  async function handleCancel(invitationId) {
+    setError("");
+    setStatusMsg("");
+
+    try {
+      const res = await fetch("/api/live-invitations/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invitationId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Cancel failed");
+
+      setStatusMsg(`Cancelled invitation ${invitationId}.`);
+      await loadAll();
+    } catch (e) {
+      console.error("cancel error", e);
+      setError(e.message || "We couldn’t cancel that invitation.");
     }
   }
 
@@ -544,11 +580,22 @@ export default function LiveSurveyAdminPage() {
 
         {/* Pending */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-50">{tr("liveAdmin.sections.pending", "Pending")}</h2>
-              <p className="text-xs text-slate-400">{tr("liveAdmin.sections.pendingHelp", "Select and send invitations.")}</p>
-            </div>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("pending")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.pending", "Pending")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.pending ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.pendingHelp", "Select and send invitations.")}
+              </p>
+            </button>
 
             <div className="flex items-center gap-2">
               <button
@@ -557,7 +604,9 @@ export default function LiveSurveyAdminPage() {
                 disabled={loading || pending.length === 0}
                 className="text-xs rounded-full border border-slate-700 px-3 py-1 hover:bg-slate-800 disabled:opacity-50"
               >
-                {allSelected ? tr("liveAdmin.actions.deselectAll", "Deselect all") : tr("liveAdmin.actions.selectAll", "Select all")}
+                {allSelected
+                  ? tr("liveAdmin.actions.deselectAll", "Deselect all")
+                  : tr("liveAdmin.actions.selectAll", "Select all")}
               </button>
 
               <button
@@ -570,436 +619,607 @@ export default function LiveSurveyAdminPage() {
                     : "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
                 }`}
               >
-                {sending ? tr("liveAdmin.actions.sending", "Sending…") : tr("liveAdmin.actions.sendSelected", "Send selected")}
+                {sending
+                  ? tr("liveAdmin.actions.sending", "Sending…")
+                  : tr("liveAdmin.actions.sendSelected", "Send selected")}
               </button>
             </div>
           </div>
 
-          {loading ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.loading", "Loading…")}</p>
-          ) : pending.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noPending", "No pending invitations.")}</p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-900/70">
-                  <tr>
-                    <th className="px-3 py-2 text-left">
-                      <input type="checkbox" checked={allSelected} onChange={toggleAllPending} />
-                    </th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.device", "Device")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.am", "AM")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.status", "Status")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pending.map((row, idx) => {
-                    const selected = selectedIds.has(row.invitationId);
-                    const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
-                    return (
-                      <tr key={row.invitationId} className={stripe}>
-                        <td className="px-3 py-2">
-                          <input type="checkbox" checked={selected} onChange={() => toggleOne(row.invitationId)} />
-                        </td>
-                        <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
-                        <td className="px-3 py-2">{row.customerName}</td>
-                        <td className="px-3 py-2 text-slate-300">{row.email}</td>
-                        <td className="px-3 py-2">{row.typeOfDevice || <span className="text-slate-500">-</span>}</td>
-                        <td className="px-3 py-2">{row.assistanteMaternelle || <span className="text-slate-500">-</span>}</td>
-                        <td className="px-3 py-2">
-                          <StatusPill status={row.status} label={statusLabel(row.status)} />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {openSections.pending ? (
+            loading ? (
+              <p className="text-sm text-slate-400">{tr("liveAdmin.empty.loading", "Loading…")}</p>
+            ) : pending.length === 0 ? (
+              <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noPending", "No pending invitations.")}</p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-slate-900/70">
+                    <tr>
+                      <th className="px-3 py-2 text-left">
+                        <input type="checkbox" checked={allSelected} onChange={toggleAllPending} />
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.invitationId", "Invitation ID")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.name", "Name")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.email", "Email")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.device", "Device")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.am", "AM")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.status", "Status")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.action", "Action")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pending.map((row, idx) => {
+                      const selected = selectedIds.has(row.invitationId);
+                      const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
+
+                      return (
+                        <tr key={row.invitationId} className={stripe}>
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() => toggleOne(row.invitationId)}
+                            />
+                          </td>
+                          <td className="px-3 py-2 font-mono text-[11px] text-slate-300">
+                            {row.invitationId}
+                          </td>
+                          <td className="px-3 py-2">{row.customerName}</td>
+                          <td className="px-3 py-2 text-slate-300">{row.email}</td>
+                          <td className="px-3 py-2">
+                            {row.typeOfDevice || <span className="text-slate-500">-</span>}
+                          </td>
+                          <td className="px-3 py-2">
+                            {row.assistanteMaternelle || <span className="text-slate-500">-</span>}
+                          </td>
+                          <td className="px-3 py-2">
+                            <StatusPill status={row.status} label={statusLabel(row.status)} />
+                          </td>
+                          <td className="px-3 py-2">
+                            <button
+                              type="button"
+                              onClick={() => handleCancel(row.invitationId)}
+                              className="text-xs rounded-full px-3 py-1 border border-rose-400/40 text-rose-200 hover:bg-rose-950/40"
+                            >
+                              {tr("liveAdmin.actions.cancel", "Cancel")}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
         </section>
 
         {/* Sent */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-50">{tr("liveAdmin.sections.sent", "Sent")}</h2>
-            <p className="text-xs text-slate-400">{tr("liveAdmin.sections.sentHelp", "Resend if someone cannot find the email.")}</p>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("sent")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.sent", "Sent")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.sent ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.sentHelp", "Resend if someone cannot find the email.")}
+              </p>
+            </button>
           </div>
 
-          {sent.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noSent", "No sent invitations.")}</p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-900/70">
-                  <tr>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.lastSent", "Last sent")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.resends", "Resends")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.action", "Action")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sent.map((row, idx) => {
-                    const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
-                    const lastSent = row.lastSentAt || row.sentAt || row.lastSent || row.last_sent_at;
-                    const resends = computeResendsFromRow(row);
+          {openSections.sent ? (
+            sent.length === 0 ? (
+              <p className="text-sm text-slate-400">
+                {tr("liveAdmin.empty.noSent", "No sent invitations.")}
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-slate-900/70">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.invitationId", "Invitation ID")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.name", "Name")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.email", "Email")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.lastSent", "Last sent")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.resends", "Resends")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.action", "Action")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sent.map((row, idx) => {
+                      const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
+                      const lastSent = row.lastSentAt || row.sentAt || row.lastSent || row.last_sent_at;
+                      const resends = computeResendsFromRow(row);
 
-                    return (
-                      <tr key={row.invitationId} className={stripe}>
-                        <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
-                        <td className="px-3 py-2">{row.customerName}</td>
-                        <td className="px-3 py-2 text-slate-300">{row.email}</td>
-                        <td className="px-3 py-2 text-slate-300">{formatMaybeIso(lastSent)}</td>
-                        <td className="px-3 py-2 text-slate-300">{resends}</td>
-                        <td className="px-3 py-2">
-                          <button
-                            type="button"
-                            onClick={() => handleResend(row.invitationId)}
-                            disabled={resendingId === row.invitationId}
-                            className={`text-xs rounded-full px-3 py-1 border ${
-                              resendingId === row.invitationId
-                                ? "border-slate-700 text-slate-400 cursor-not-allowed"
-                                : "border-sky-400/40 text-sky-200 hover:bg-slate-900/60"
-                            }`}
-                          >
-                            {resendingId === row.invitationId
-                              ? tr("liveAdmin.actions.resending", "Resending…")
-                              : tr("liveAdmin.actions.resend", "Resend")}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                      return (
+                        <tr key={row.invitationId} className={stripe}>
+                          <td className="px-3 py-2 font-mono text-[11px] text-slate-300">
+                            {row.invitationId}
+                          </td>
+                          <td className="px-3 py-2">{row.customerName}</td>
+                          <td className="px-3 py-2 text-slate-300">{row.email}</td>
+                          <td className="px-3 py-2 text-slate-300">{formatMaybeIso(lastSent)}</td>
+                          <td className="px-3 py-2 text-slate-300">{resends}</td>
+                          <td className="px-3 py-2">
+                            <button
+                              type="button"
+                              onClick={() => handleResend(row.invitationId)}
+                              disabled={resendingId === row.invitationId}
+                              className={`text-xs rounded-full px-3 py-1 border ${
+                                resendingId === row.invitationId
+                                  ? "border-slate-700 text-slate-400 cursor-not-allowed"
+                                  : "border-sky-400/40 text-sky-200 hover:bg-slate-900/60"
+                              }`}
+                            >
+                              {resendingId === row.invitationId
+                                ? tr("liveAdmin.actions.resending", "Resending…")
+                                : tr("liveAdmin.actions.resend", "Resend")}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
         </section>
 
         {/* Started */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-50">{tr("liveAdmin.sections.started", "Started")}</h2>
-            <p className="text-xs text-slate-400">{tr("liveAdmin.sections.startedHelp", "These recipients opened the survey link.")}</p>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("started")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.started", "Started")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.started ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.startedHelp", "These recipients opened the survey link.")}
+              </p>
+            </button>
           </div>
 
-          {started.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noStarted", "No started invitations.")}</p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-900/70">
-                  <tr>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.status", "Status")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {started.map((row, idx) => {
-                    const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
-                    return (
-                      <tr key={row.invitationId} className={stripe}>
-                        <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
-                        <td className="px-3 py-2">{row.customerName}</td>
-                        <td className="px-3 py-2 text-slate-300">{row.email}</td>
-                        <td className="px-3 py-2">
-                          <StatusPill status={row.status} label={statusLabel(row.status)} />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {openSections.started ? (
+            started.length === 0 ? (
+              <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noStarted", "No started invitations.")}</p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-slate-900/70">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.status", "Status")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {started.map((row, idx) => {
+                      const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
+                      return (
+                        <tr key={row.invitationId} className={stripe}>
+                          <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
+                          <td className="px-3 py-2">{row.customerName}</td>
+                          <td className="px-3 py-2 text-slate-300">{row.email}</td>
+                          <td className="px-3 py-2">
+                            <StatusPill status={row.status} label={statusLabel(row.status)} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
         </section>
 
         {/* Completed */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-50">{tr("liveAdmin.sections.completed", "Completed")}</h2>
-            <p className="text-xs text-slate-400">{tr("liveAdmin.sections.completedHelp", "Scores are shown when a response exists in /npsme/live/responses.csv.")}</p>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("completed")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.completed", "Completed")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.completed ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.completedHelp", "Scores are shown when a response exists in /npsme/live/responses.csv.")}
+              </p>
+            </button>
           </div>
 
-          {completed.length === 0 ? (
-            <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noCompleted", "No completed invitations.")}</p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-900/70">
-                  <tr>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.score", "Score")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.comment", "Comment")}</th>
-                    <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.created", "Created")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {completed.map((row, idx) => {
-                    const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
-                    const resp = responseByInvitationId.get((row.invitationId || "").trim());
+          {openSections.completed ? (
+            completed.length === 0 ? (
+              <p className="text-sm text-slate-400">{tr("liveAdmin.empty.noCompleted", "No completed invitations.")}</p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-slate-900/70">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.invitationId", "Invitation ID")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.name", "Name")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.email", "Email")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.score", "Score")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.comment", "Comment")}</th>
+                      <th className="px-3 py-2 text-left text-slate-300">{tr("liveAdmin.table.created", "Created")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {completed.map((row, idx) => {
+                      const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
+                      const resp = responseByInvitationId.get((row.invitationId || "").trim());
 
-                    // Prefer the merged row’s flattened score (server normalises it), fallback to resp.score
-                    const scoreRaw = row?.score ?? resp?.score;
-                    const score = Number.isFinite(Number(scoreRaw)) ? Number(scoreRaw) : null;
+                      const scoreRaw = row?.score ?? resp?.score;
+                      const score = Number.isFinite(Number(scoreRaw)) ? Number(scoreRaw) : null;
 
-                    return (
-                      <tr key={row.invitationId} className={stripe}>
-                        <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
-                        <td className="px-3 py-2">{row.customerName}</td>
-                        <td className="px-3 py-2 text-slate-300">{row.email}</td>
-                        <td className="px-3 py-2">
-                          {Number.isFinite(score) ? (
-                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] border border-emerald-400/40 text-emerald-200">
-                              {score}/10
-                            </span>
-                          ) : (
-                            <span className="text-slate-500">-</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2 text-slate-300">
-                          {resp?.comment ? String(resp.comment).slice(0, 140) : <span className="text-slate-500">-</span>}
-                        </td>
-                        <td className="px-3 py-2 text-slate-300">
-                          {resp?.createdAt ? resp.createdAt : <span className="text-slate-500">-</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                      return (
+                        <tr key={row.invitationId} className={stripe}>
+                          <td className="px-3 py-2 font-mono text-[11px] text-slate-300">{row.invitationId}</td>
+                          <td className="px-3 py-2">{row.customerName}</td>
+                          <td className="px-3 py-2 text-slate-300">{row.email}</td>
+                          <td className="px-3 py-2">
+                            {Number.isFinite(score) ? (
+                              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] border border-emerald-400/40 text-emerald-200">
+                                {score}/10
+                              </span>
+                            ) : (
+                              <span className="text-slate-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-slate-300">
+                            {resp?.comment ? String(resp.comment).slice(0, 140) : <span className="text-slate-500">-</span>}
+                          </td>
+                          <td className="px-3 py-2 text-slate-300">
+                            {resp?.createdAt ? resp.createdAt : <span className="text-slate-500">-</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
+        </section>
+        {/* Cancelled */}
+        <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("cancelled")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.cancelled", "Cancelled")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.cancelled ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.cancelledHelp", "These invitations will not be sent.")}
+              </p>
+            </button>
+          </div>
+
+          {openSections.cancelled ? (
+            cancelled.length === 0 ? (
+              <p className="text-sm text-slate-400">
+                {tr("liveAdmin.empty.noCancelled", "No cancelled invitations.")}
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-slate-900/70">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.invitationId", "Invitation ID")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.name", "Name")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.email", "Email")}
+                      </th>
+                      <th className="px-3 py-2 text-left text-slate-300">
+                        {tr("liveAdmin.table.status", "Status")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cancelled.map((row, idx) => {
+                      const stripe = idx % 2 === 0 ? "bg-slate-950/40" : "bg-slate-950/10";
+                      return (
+                        <tr key={row.invitationId} className={stripe}>
+                          <td className="px-3 py-2 font-mono text-[11px] text-slate-300">
+                            {row.invitationId}
+                          </td>
+                          <td className="px-3 py-2">{row.customerName}</td>
+                          <td className="px-3 py-2 text-slate-300">{row.email}</td>
+                          <td className="px-3 py-2">
+                            <StatusPill status={row.status} label={statusLabel(row.status)} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
         </section>
         {/* Insights (AI) */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
-          <div className="flex flex-col gap-3 mb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-50">
-                  {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
-                </h2>
-                <p className="text-xs text-slate-400">
-                  {tr(
-                    "liveAdmin.sections.insightsHelp",
-                    "AI summary of completed responses. Filterable by stage or device."
-                  )}
-                </p>
-              </div>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => toggleSection("insights")}
+              className="text-left"
+            >
+              <h2 className="text-lg font-semibold text-slate-50">
+                {tr("liveAdmin.sections.insights", "Insights (CX Intelligence Layer)")}
+                <span className="ml-2 text-xs text-slate-400">
+                  {openSections.insights ? "▲" : "▼"}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                {tr("liveAdmin.sections.insightsHelp", "AI summary of completed responses. Filterable by stage or device.")}
+              </p>
+            </button>
 
-              <button
-                title={disabledReason}
-                type="button"
-                onClick={() => loadInsights({ limit: 200 })}
-                disabled={insightsLoading || !canRunInsights}
-                className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
-              >
-                {insightsLoading
-                  ? tr("liveAdmin.actions.loading", "Loading…")
-                  : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
-              </button>
-            </div>
-
-            {/* Filters row */}
-            <div className="flex flex-wrap items-end gap-3">
-              <MultiSelect
-                label="Stage"
-                options={stageOptions}
-                values={filters.stage}
-                disabled={loading}
-                onChange={(next) => setFilters((p) => ({ ...p, stage: next }))}
-              />
-
-              <MultiSelect
-                label="Device"
-                options={deviceOptions}
-                values={filters.device}
-                disabled={loading}
-                onChange={(next) => setFilters((p) => ({ ...p, device: next }))}
-              />
-
-              <MultiSelect
-                label="AM"
-                options={amOptions}
-                values={filters.am}
-                disabled={loading}
-                onChange={(next) => setFilters((p) => ({ ...p, am: next }))}
-              />
-
-              <MultiSelect
-                label="Score"
-                options={scoreOptions}
-                values={filters.score}
-                disabled={loading}
-                onChange={(next) => setFilters((p) => ({ ...p, score: next }))}
-              />
-
-              <MultiSelect
-                label="Segment"
-                options={["detractor", "passive", "promoter"]}
-                values={filters.segment}
-                disabled={loading}
-                onChange={(next) => setFilters((p) => ({ ...p, segment: next }))}
-              />
-
-              <label className="text-xs text-slate-300 flex flex-col gap-1">
-                <span className="text-[11px] text-slate-400">Search</span>
-                <input
-                  value={filters.q}
-                  onChange={(e) => setFilters((p) => ({ ...p, q: e.target.value }))}
-                  placeholder="Search…"
-                  className="min-w-[170px] rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-slate-200 placeholder:text-slate-500"
-                />
-              </label>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setFilters({
-                    stage: [],
-                    device: [],
-                    am: [],
-                    status: [],
-                    businessName: [],
-                    customerName: [],
-                    score: [],
-                    segment: [],
-                    q: "",
-                  })
-                }
-                className="text-xs rounded-full border border-slate-700 px-4 py-2 hover:bg-slate-800"
-              >
-                Clear filters
-              </button>
-            </div>
+            <button
+              title={disabledReason}
+              type="button"
+              onClick={() => loadInsights({ limit: 200 })}
+              disabled={insightsLoading || !canRunInsights}
+              className="text-xs rounded-full px-4 py-1.5 font-semibold bg-indigo-400 text-slate-950 hover:bg-indigo-300 disabled:opacity-50"
+            >
+              {insightsLoading
+                ? tr("liveAdmin.actions.loading", "Loading…")
+                : tr("liveAdmin.actions.refreshInsights", "Refresh insights")}
+            </button>
           </div>
 
-          {insightsError ? (
-            <div className="rounded-2xl border border-rose-500/70 bg-rose-950/50 px-3 py-2 text-xs text-rose-100">
-              {insightsError}
-            </div>
-          ) : null}
+          {openSections.insights ? (
+            <>
+              {/* Filters row */}
+              <div className="flex flex-wrap items-end gap-3 mb-4">
+                <MultiSelect
+                  label={tr("liveAdmin.filters.stage", "Stage")}
+                  options={stageOptions}
+                  values={filters.stage}
+                  disabled={loading}
+                  onChange={(next) => setFilters((p) => ({ ...p, stage: next }))}
+                />
 
-          {!insights ? (
-            <div className="text-sm text-slate-400">
-              {tr(
-                "liveAdmin.insights.empty",
-                'Click “Refresh insights” to generate an intelligence summary from completed responses.'
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <KpiCard label={tr("liveAdmin.insights.kpi.n", "Responses analysed")} value={insights?.insights?.n ?? 0} />
-                <KpiCard label={tr("liveAdmin.insights.kpi.nps", "NPS")} value={insights?.insights?.nps ?? "—"} />
-                <KpiCard label={tr("liveAdmin.insights.kpi.stage", "Stage")} value={insights?.stage ?? "All"} />
-                <KpiCard label={tr("liveAdmin.insights.kpi.generated", "Generated")} value={insights?.generated_at ? new Date(insights.generated_at).toISOString() : "—"} />
+                <MultiSelect
+                  label={tr("liveAdmin.filters.device", "Device")}
+                  options={deviceOptions}
+                  values={filters.device}
+                  disabled={loading}
+                  onChange={(next) => setFilters((p) => ({ ...p, device: next }))}
+                />
+
+                <MultiSelect
+                  label={tr("liveAdmin.filters.am", "AM")}
+                  options={amOptions}
+                  values={filters.am}
+                  disabled={loading}
+                  onChange={(next) => setFilters((p) => ({ ...p, am: next }))}
+                />
+
+                <MultiSelect
+                  label={tr("liveAdmin.filters.score", "Score")}
+                  options={scoreOptions}
+                  values={filters.score}
+                  disabled={loading}
+                  onChange={(next) => setFilters((p) => ({ ...p, score: next }))}
+                />
+
+                <MultiSelect
+                  label={tr("liveAdmin.filters.segment", "Segment")}
+                  options={["detractor", "passive", "promoter"]}
+                  values={filters.segment}
+                  disabled={loading}
+                  onChange={(next) => setFilters((p) => ({ ...p, segment: next }))}
+                />
+
+                <label className="text-xs text-slate-300 flex flex-col gap-1">
+                  <span className="text-[11px] text-slate-400">{tr("liveAdmin.filters.search", "Search")}</span>
+                  <input
+                    value={filters.q}
+                    onChange={(e) => setFilters((p) => ({ ...p, q: e.target.value }))}
+                    placeholder={tr("liveAdmin.filters.searchPlaceholder", "Search…")}
+                    className="min-w-[170px] rounded-xl border border-slate-700 bg-slate-950/40 px-3 py-2 text-slate-200 placeholder:text-slate-500"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFilters({
+                      stage: [],
+                      device: [],
+                      am: [],
+                      status: [],
+                      businessName: [],
+                      customerName: [],
+                      score: [],
+                      segment: [],
+                      q: "",
+                    })
+                  }
+                  className="text-xs rounded-full border border-slate-700 px-4 py-2 hover:bg-slate-800"
+                >
+                  {tr("liveAdmin.actions.clearFilters", "Clear filters")}
+                </button>
               </div>
 
-              {/* Top actions */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
-                  {tr("liveAdmin.insights.topActions", "Top actions")}
+              {insightsError ? (
+                <div className="rounded-2xl border border-rose-500/70 bg-rose-950/50 px-3 py-2 text-xs text-rose-100 mb-3">
+                  {insightsError}
                 </div>
+              ) : null}
 
-                {(insights?.insights?.top_actions || []).length === 0 ? (
-                  <div className="text-sm text-slate-400">—</div>
-                ) : (
-                  <ul className="space-y-2">
-                    {insights.insights.top_actions.map((a, i) => (
-                      <li key={i} className="text-sm text-slate-200">
-                        <div className="font-semibold text-slate-50">{a.action}</div>
-                        <div className="text-xs text-slate-400">{a.why}</div>
-                        <div className="mt-1 text-[11px] text-slate-400">
-                          Impact: <span className="text-slate-200">{a.impact}</span> · Effort:{" "}
-                          <span className="text-slate-200">{a.effort}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              {/* Themes */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                  <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
-                    {tr("liveAdmin.insights.painThemes", "Pain themes")}
+              {!insights ? (
+                <div className="text-sm text-slate-400">
+                  {tr("liveAdmin.insights.empty", 'Click “Refresh insights” to generate an intelligence summary from completed responses.')}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <KpiCard label={tr("liveAdmin.insights.kpi.n", "Responses analysed")} value={insights?.insights?.n ?? 0} />
+                    <KpiCard label={tr("liveAdmin.insights.kpi.nps", "NPS")} value={insights?.insights?.nps ?? "—"} />
+                    <KpiCard label={tr("liveAdmin.insights.kpi.stage", "Stage")} value={insights?.stage ?? "All"} />
+                    <KpiCard
+                      label={tr("liveAdmin.insights.kpi.generated", "Generated")}
+                      value={insights?.generated_at ? new Date(insights.generated_at).toISOString() : "—"}
+                    />
                   </div>
-                  <ul className="space-y-2">
-                    {(insights?.insights?.response_themes || []).map((t, i) => (
-                      <li key={i} className="text-sm text-slate-200">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-slate-50">{t.theme}</span>
-                          <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
-                        </div>
-                        {(t.example_quotes || []).slice(0, 2).map((q, j) => (
-                          <div key={j} className="text-xs text-slate-400">“{q}”</div>
-                        ))}
-                      </li>
-                    ))}
-                    {(insights?.insights?.response_themes || []).length === 0 ? (
-                      <li className="text-sm text-slate-400">—</li>
-                    ) : null}
-                  </ul>
-                </div>
 
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                  <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
-                    {tr("liveAdmin.insights.delighters", "Delighters")}
-                  </div>
-                  <ul className="space-y-2">
-                    {(insights?.insights?.delighters || []).map((t, i) => (
-                      <li key={i} className="text-sm text-slate-200">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-slate-50">{t.theme}</span>
-                          <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
-                        </div>
-                        {(t.example_quotes || []).slice(0, 2).map((q, j) => (
-                          <div key={j} className="text-xs text-slate-400">“{q}”</div>
-                        ))}
-                      </li>
-                    ))}
-                    {(insights?.insights?.delighters || []).length === 0 ? (
-                      <li className="text-sm text-slate-400">—</li>
-                    ) : null}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Close the loop templates */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
-                  {tr("liveAdmin.insights.closeLoop", "Close the loop templates")}
-                </div>
-
-                <div className="space-y-3">
-                  {(insights?.insights?.close_the_loop_templates || []).map((tpl, i) => (
-                    <div key={i} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
-                      <div className="text-xs text-slate-400">{tpl.segment}</div>
-                      <div className="text-sm font-semibold text-slate-50">{tpl.subject}</div>
-                      <div className="mt-1 text-xs text-slate-300 whitespace-pre-wrap">
-                        {tpl.body}
-                      </div>
+                  {/* Top actions */}
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                    <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                      {tr("liveAdmin.insights.topActions", "Top actions")}
                     </div>
-                  ))}
 
-                  {(insights?.insights?.close_the_loop_templates || []).length === 0 ? (
-                    <div className="text-sm text-slate-400">—</div>
-                  ) : null}
+                    {(insights?.insights?.top_actions || []).length === 0 ? (
+                      <div className="text-sm text-slate-400">—</div>
+                    ) : (
+                      <ul className="space-y-2">
+                        {insights.insights.top_actions.map((a, i) => (
+                          <li key={i} className="text-sm text-slate-200">
+                            <div className="font-semibold text-slate-50">{a.action}</div>
+                            <div className="text-xs text-slate-400">{a.why}</div>
+                            <div className="mt-1 text-[11px] text-slate-400">
+                              Impact: <span className="text-slate-200">{a.impact}</span> · Effort:{" "}
+                              <span className="text-slate-200">{a.effort}</span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Themes */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                      <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                        {tr("liveAdmin.insights.painThemes", "Pain themes")}
+                      </div>
+                      <ul className="space-y-2">
+                        {(insights?.insights?.response_themes || []).map((t, i) => (
+                          <li key={i} className="text-sm text-slate-200">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-slate-50">{t.theme}</span>
+                              <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
+                            </div>
+                            {(t.example_quotes || []).slice(0, 2).map((q, j) => (
+                              <div key={j} className="text-xs text-slate-400">“{q}”</div>
+                            ))}
+                          </li>
+                        ))}
+                        {(insights?.insights?.response_themes || []).length === 0 ? (
+                          <li className="text-sm text-slate-400">—</li>
+                        ) : null}
+                      </ul>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                      <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                        {tr("liveAdmin.insights.delighters", "Delighters")}
+                      </div>
+                      <ul className="space-y-2">
+                        {(insights?.insights?.delighters || []).map((t, i) => (
+                          <li key={i} className="text-sm text-slate-200">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-slate-50">{t.theme}</span>
+                              <span className="text-[11px] text-slate-400">{t.evidence_count}</span>
+                            </div>
+                            {(t.example_quotes || []).slice(0, 2).map((q, j) => (
+                              <div key={j} className="text-xs text-slate-400">“{q}”</div>
+                            ))}
+                          </li>
+                        ))}
+                        {(insights?.insights?.delighters || []).length === 0 ? (
+                          <li className="text-sm text-slate-400">—</li>
+                        ) : null}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Close the loop templates */}
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                    <div className="text-xs tracking-widest text-slate-400 uppercase mb-2">
+                      {tr("liveAdmin.insights.closeLoop", "Close the loop templates")}
+                    </div>
+
+                    <div className="space-y-3">
+                      {(insights?.insights?.close_the_loop_templates || []).map((tpl, i) => (
+                        <div key={i} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                          <div className="text-xs text-slate-400">{tpl.segment}</div>
+                          <div className="text-sm font-semibold text-slate-50">{tpl.subject}</div>
+                          <div className="mt-1 text-xs text-slate-300 whitespace-pre-wrap">
+                            {tpl.body}
+                          </div>
+                        </div>
+                      ))}
+
+                      {(insights?.insights?.close_the_loop_templates || []).length === 0 ? (
+                        <div className="text-sm text-slate-400">—</div>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
+            </>
+          ) : null}
         </section>
       </main>
     </div>

@@ -2004,16 +2004,20 @@ app.post("/api/live-survey/submit", async (req, res) => {
 // --- LIVE merged view (Invitations + latest Response) ---
 app.get("/api/live-merged", async (req, res) => {
   try {
+    const stage = String(req.query.stage || "").trim();
+    const device = String(req.query.device || "").trim();
+    const am = String(req.query.am || "").trim();
+
     const [invites, responses] = await Promise.all([
       loadLiveInvitations(),
       loadLiveResponses(),
     ]);
 
-    // Build latest-response-per-invitationId map
+    // Latest response per invitationId
     const latestByInvId = new Map();
 
     for (const r of responses || []) {
-      const invId = (r.invitationId || "").trim();
+      const invId = String(r.invitationId || "").trim();
       if (!invId) continue;
 
       const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
@@ -2023,21 +2027,38 @@ app.get("/api/live-merged", async (req, res) => {
       if (!prev || t >= prevT) latestByInvId.set(invId, r);
     }
 
-    const rows = (invites || []).map((inv) => {
-      const invId = (inv.invitationId || "").trim();
+    let rows = (invites || []).map((inv) => {
+      const invId = String(inv.invitationId || "").trim();
       const r = invId ? latestByInvId.get(invId) : null;
 
+      // Normalise types
+      const resentCount = Number.isFinite(Number(inv.resentCount)) ? Number(inv.resentCount) : 0;
+
+      const scoreNum =
+        r && r.score !== undefined && r.score !== null && String(r.score).trim() !== ""
+          ? Number(r.score)
+          : null;
+
+      const responseCreatedAt = r?.createdAt ? String(r.createdAt) : "";
+
       return {
-        ...inv,                 // ✅ all invite fields
-        response: r || null,    // ✅ all response fields (nested)
-        // convenience flat fields (optional but very handy)
+        ...inv,
+        resentCount,
+        response: r || null,
+
+        // convenience flat fields
         responseId: r?.responseId ?? "",
-        score: r?.score ?? "",
+        score: scoreNum, // ✅ number|null
         comment: r?.comment ?? "",
-        createdAt: r?.createdAt ?? "",
+        createdAt: responseCreatedAt,
         hasResponse: !!r,
       };
     });
+
+    // Optional filters (same ones as insights)
+    if (stage) rows = rows.filter((x) => String(x.stage || "").trim() === stage);
+    if (device) rows = rows.filter((x) => String(x.typeOfDevice || "").trim() === device);
+    if (am) rows = rows.filter((x) => String(x.assistanteMaternelle || "").trim() === am);
 
     res.json({
       ok: true,
@@ -2051,9 +2072,12 @@ app.get("/api/live-merged", async (req, res) => {
   }
 });
 
+// --- LIVE insights (server computes n + nps; model does themes/actions/templates) ---
 app.get("/api/live-insights", async (req, res) => {
   try {
-    const stage = (req.query.stage || "").trim();
+    const stage = String(req.query.stage || "").trim();
+    const device = String(req.query.device || "").trim();
+    const am = String(req.query.am || "").trim();
     const limit = Math.min(Number(req.query.limit || 200), 500);
 
     const [invites, responses] = await Promise.all([
@@ -2061,10 +2085,10 @@ app.get("/api/live-insights", async (req, res) => {
       loadLiveResponses(),
     ]);
 
-    // latest response per invitationId
+    // Latest response per invitationId
     const latestByInvId = new Map();
     for (const r of responses || []) {
-      const invId = (r.invitationId || "").trim();
+      const invId = String(r.invitationId || "").trim();
       if (!invId) continue;
 
       const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
@@ -2075,82 +2099,119 @@ app.get("/api/live-insights", async (req, res) => {
     }
 
     let merged = (invites || []).map((inv) => {
-      const invId = (inv.invitationId || "").trim();
+      const invId = String(inv.invitationId || "").trim();
       const r = invId ? latestByInvId.get(invId) : null;
-      return { ...inv, response: r || null };
+
+      const scoreNum =
+        r && r.score !== undefined && r.score !== null && String(r.score).trim() !== ""
+          ? Number(r.score)
+          : null;
+
+      return {
+        ...inv,
+        response: r ? { ...r, score: scoreNum } : null,
+      };
     });
 
     if (stage) merged = merged.filter((x) => String(x.stage || "").trim() === stage);
+    if (device) merged = merged.filter((x) => String(x.typeOfDevice || "").trim() === device);
+    if (am) merged = merged.filter((x) => String(x.assistanteMaternelle || "").trim() === am);
 
+    // Keep only rows with a valid numeric score
     const responded = merged
-      .filter((x) => x.response && x.response.score !== undefined && x.response.score !== null)
+      .filter((x) => x.response && Number.isFinite(x.response.score))
       .slice(0, limit);
+
+    // Server-side NPS (so it can’t “drift”)
+    const scores = responded.map((x) => x.response.score);
+    const n = scores.length;
+
+    const promoters = scores.filter((s) => s >= 9).length;
+    const detractors = scores.filter((s) => s <= 6).length;
+    const nps = n ? Math.round(((promoters - detractors) / n) * 100) : null;
 
     if (!responded.length) {
       return res.json({
         ok: true,
         stage: stage || null,
+        device: device || null,
+        am: am || null,
+        generated_at: new Date().toISOString(),
         insights: {
-          summary: "No responses yet for this filter.",
-          themes: [],
-          actions: [],
+          n: 0,
+          nps: null,
+          response_themes: [],
+          delighters: [],
+          top_actions: [],
+          risk_flags: [],
           close_the_loop_templates: [],
         },
       });
     }
 
+    // Compact payload for the model (no emails; keep it small)
     const compact = responded.map((x) => ({
       invitationId: x.invitationId,
       stage: x.stage || "",
       typeOfDevice: x.typeOfDevice || "",
       assistanteMaternelle: x.assistanteMaternelle || "",
-      email: x.email || "",
-      score: Number(x.response.score),
+      score: x.response.score,
       comment: String(x.response.comment || "").slice(0, 500),
       createdAt: x.response.createdAt || "",
     }));
 
     const prompt = `
 You are a CX intelligence analyst. You will receive NPS survey responses.
-Produce a practical "intelligence layer" output.
 
-Return VALID JSON only:
+Your job:
+- Extract themes, delighters, actions, and risks grounded in the data.
+- Draft "close the loop" templates by SEGMENT (do NOT include real emails).
+
+Return VALID JSON only in this schema:
 {
-  "n": number,
-  "nps": number | null,
   "response_themes": [{"theme": string, "evidence_count": number, "example_quotes": [string]}],
   "delighters": [{"theme": string, "evidence_count": number, "example_quotes": [string]}],
   "top_actions": [{"action": string, "why": string, "impact": "high|medium|low", "effort": "high|medium|low"}],
   "risk_flags": [{"flag": string, "who": string, "detail": string}],
-  "close_the_loop_templates": [{"segment": string, "subject": string, "email": string}]
+  "close_the_loop_templates": [{"segment": string, "subject": string, "body": string}]
 }
 
 Rules:
 - Use specific, concrete language.
 - Quotes must be short excerpts (max ~15 words).
-- Keep it honest: only claim what the data supports.
+- Keep it honest: only claim what the comments/scores support.
+- Segments should be like: "Detractors (0–6)", "Passives (7–8)", "Promoters (9–10)".
 `.trim();
 
     const r = await openai.responses.create({
       model: "gpt-4o-mini",
       input: [
         { role: "system", content: prompt },
-        { role: "user", content: JSON.stringify(compact) },
+        { role: "user", content: JSON.stringify({ n, nps, rows: compact }) },
       ],
     });
 
-    let text = (r.output_text || "").trim();
+    let text = String(r.output_text || "").trim();
     if (text.startsWith("```")) text = text.replace(/```json|```/gi, "").trim();
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) text = jsonMatch[0];
 
     const parsed = JSON.parse(text);
 
+    // Inject server-truth values
+    const insights = {
+      n,
+      nps,
+      ...parsed,
+    };
+
     res.json({
       ok: true,
       stage: stage || null,
-      insights: parsed,
+      device: device || null,
+      am: am || null,
       generated_at: new Date().toISOString(),
+      insights,
     });
   } catch (err) {
     console.error("[npsme] Error in /api/live-insights", err);

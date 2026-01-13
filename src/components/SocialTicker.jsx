@@ -26,48 +26,40 @@ function cleanLLMText(text) {
 function parseSummary(raw) {
   const cleaned = cleanLLMText(raw);
 
-  // High-level = first sentence
-  const highLevel = cleaned.split(/(?<=\.)\s/)[0] || cleaned;
-
   const delightersLabel = "CX Delighters:";
   const redFlagsLabel = "CX Red Flags:";
 
   const delightersIndex = cleaned.indexOf(delightersLabel);
   const redFlagsIndex = cleaned.indexOf(redFlagsLabel);
 
+  const extractBullets = (block) => {
+    const lines = block.split("\n").map((l) => l.trim());
+    return lines
+      .filter((l) => l.startsWith("- "))
+      .map((l) => l.slice(2).trim())
+      .filter((item) => /[\p{L}\p{N}]/u.test(item));
+  };
+
   let positives = [];
   let negatives = [];
-
-  // Utility: filter out junk bullets (e.g. "**")
-  const normaliseBulletList = (block) =>
-    block
-      .split("-")
-      .map((s) => s.trim())
-      .filter((item) => {
-        if (!item) return false;
-        // Drop items with no letters (e.g. "**", "•")
-        return /[A-Za-z]/.test(item);
-      });
 
   if (delightersIndex !== -1) {
     const start = delightersIndex + delightersLabel.length;
     const end = redFlagsIndex !== -1 ? redFlagsIndex : undefined;
-    const block = cleaned.slice(start, end);
-    positives = normaliseBulletList(block);
+    positives = extractBullets(cleaned.slice(start, end));
   }
 
   if (redFlagsIndex !== -1) {
     const start = redFlagsIndex + redFlagsLabel.length;
-    const block = cleaned.slice(start);
-    negatives = normaliseBulletList(block);
+    negatives = extractBullets(cleaned.slice(start));
   }
 
-  return {
-    highLevel,
-    positives,
-    negatives,
-    raw: cleaned,
-  };
+  // High-level: take everything before "CX Delighters:" if present, else first line.
+  const pre = delightersIndex !== -1 ? cleaned.slice(0, delightersIndex) : cleaned;
+  const firstLine = pre.split("\n").map(s => s.trim()).find(Boolean) || cleaned;
+  const highLevel = firstLine.slice(0, 260).trim();
+
+  return { highLevel, positives, negatives, raw: cleaned };
 }
 
 export default function SocialTicker() {
@@ -113,7 +105,7 @@ export default function SocialTicker() {
     <section className="mt-16 rounded-3xl border border-white/10 bg-black/40 p-8 shadow-lg shadow-black/40">
       {/* Title + intro */}
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
+        <h2 className="text-2xl font-semixbold text-white flex items-center gap-2">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-[#7C3AED] to-[#22C55E] text-xs font-bold uppercase tracking-wide">
             CX
           </span>

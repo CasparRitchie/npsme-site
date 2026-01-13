@@ -8,7 +8,44 @@ import fs from "fs";
 import nodemailer from "nodemailer";
 import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
+import rateLimit from "express-rate-limit";
+import { LRUCache } from "lru-cache";
 
+// If you're on Heroku / behind a proxy:
+app.set("trust proxy", 1);
+
+// Rate limit: tune as you like
+const socialSummaryLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,             // 10 req/min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Rate limit exceeded. Please try again shortly." },
+});
+
+// Cache results to reduce cost
+const socialCache = new LRUCache({
+  max: 500,                 // store up to 500 companies
+  ttl: 1000 * 60 * 60 * 6,  // 6 hours
+});
+
+function normaliseCompany(raw) {
+  const company = String(raw || "").trim();
+
+  // basic caps
+  if (!company) return "";
+  if (company.length > 120) return "";
+
+  // Optional allowlist to reduce prompt-injection/junk.
+  // Adjust if you need to support more characters.
+  if (!/^[\p{L}\p{N} .&'’\-(),/]+$/u.test(company)) return "";
+
+  return company;
+}
+
+function cacheKey(company) {
+  return company.toLowerCase();
+}
 
 /* -----------------------------
    External clients (OpenAI / SMTP)
@@ -2309,16 +2346,24 @@ app.use(
    Social summary endpoint for npsme.com
 ------------------------------ */
 
-app.get("/api/social-summary", async (req, res) => {
+app.get("/api/social-summary", socialSummaryLimiter, async (req, res) => {
   try {
-    const company = (req.query.company || "").trim();
+    const company = normaliseCompany(req.query.company);
     if (!company) {
-      return res.status(400).json({ error: "company query parameter is required" });
+      return res.status(400).json({ error: "Valid company query parameter is required" });
+    }
+
+    // ✅ cache
+    const key = cacheKey(company);
+    const cached = socialCache.get(key);
+    if (cached) {
+      return res.json({ ...cached, cached: true });
     }
 
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
       tools: [{ type: "web_search_preview" }],
+      max_output_tokens: 650, // ✅ hard cap to control cost/output size
       input: [
         {
           role: "system",
@@ -2358,40 +2403,40 @@ app.get("/api/social-summary", async (req, res) => {
     // Raw model text
     let jsonText = response.output_text?.trim() || "";
 
-    // 🧹 1) If the model *still* insists on code fences, strip them
+    // 🧹 1) strip code fences
     if (jsonText.startsWith("```")) {
       jsonText = jsonText.replace(/```json|```/gi, "").trim();
     }
 
-    // 🧹 2) If there is extra text around the JSON, try to extract the { ... } block
+    // 🧹 2) try to extract JSON block (still imperfect, but kept for drop-in compatibility)
     const match = jsonText.match(/\{[\s\S]*\}/);
-    if (match) {
-      jsonText = match[0];
-    }
+    if (match) jsonText = match[0];
 
     let parsed;
     try {
       parsed = JSON.parse(jsonText);
     } catch (e) {
-      console.error("Failed to parse JSON from /api/social-summary:", e, jsonText);
-      // Fallback: treat everything as a plain summary
+      console.error("Failed to parse JSON from /api/social-summary:", e);
       parsed = { summary: jsonText, competitor_summary: "" };
     }
 
-    // 🧼 Normalise strings: unescape '\n' and trim
     const normalise = (value) =>
       typeof value === "string" ? value.replace(/\\n/g, "\n").trim() : "";
 
-    const summary =
-      normalise(parsed.summary) || "No summary available for this company.";
+    const summary = normalise(parsed.summary) || "No summary available for this company.";
     const competitorSummary = normalise(parsed.competitor_summary);
 
-    res.json({
+    const payload = {
       company,
       summary,
       competitor_summary: competitorSummary,
       generated_at: new Date().toISOString(),
-    });
+    };
+
+    // ✅ cache result
+    socialCache.set(key, payload);
+
+    res.json(payload);
   } catch (err) {
     console.error("Error in /api/social-summary:", err);
     res.status(500).json({ error: "Internal error generating social summary" });

@@ -11,8 +11,6 @@ import { createIntercomRouter } from "./intercom.routes.js";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 
-// If you're on Heroku / behind a proxy:
-app.set("trust proxy", 1);
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -2292,6 +2290,7 @@ Rules:
 
     const r = await openai.responses.create({
       model: "gpt-4o-mini",
+      max_output_tokens: 900, // tune
       input: [
         { role: "system", content: prompt },
         { role: "user", content: JSON.stringify({ n, nps, rows: compact }) },

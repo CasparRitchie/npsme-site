@@ -87,13 +87,13 @@ async function sendInvitationEmail({
     invitationId
   )}`;
 
-  const subject = "We’d love your feedback (1–2 minutes)";
+  const subject = "We’d love your feedback (1-2 minutes)";
 
   const plainText = [
     `${name}`,
     "",
     "We’re running a short customer feedback survey to help improve our experience.",
-    "It should take around 1–2 minutes.",
+    "It should take around 1-2 minutes.",
     "",
     `Take the survey: ${surveyUrl}`,
     "",
@@ -105,7 +105,7 @@ async function sendInvitationEmail({
     <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#0f172a">
       <p>${name}</p>
       <p>We’re running a short customer feedback survey to help improve our experience.</p>
-      <p>It should take around <strong>1–2 minutes</strong>.</p>
+      <p>It should take around <strong>1-2 minutes</strong>.</p>
       <p>
         <a href="${surveyUrl}"
            style="display:inline-block;padding:10px 18px;border-radius:999px;
@@ -132,7 +132,7 @@ async function sendLiveInvitationEmail({
   surveyId,
   fromName,
   fromEmail,
-  invitationId: explicitInvitationId, // <– allow override
+  invitationId: explicitInvitationId, // <- allow override
 }) {
   const politeName = customerName ? `Bonjour ${customerName},` : "Bonjour,";
 
@@ -149,7 +149,7 @@ async function sendLiveInvitationEmail({
   const plainTextLines = [
     politeName,
     "",
-    `Nous vous invitons à répondre à un court questionnaire de satisfaction (1–2 minutes) pour nous aider à améliorer l'expérience proposée par ${_businessName}.`,
+    `Nous vous invitons à répondre à un court questionnaire de satisfaction (1-2 minutes) pour nous aider à améliorer l'expérience proposée par ${_businessName}.`,
     "",
     `Répondre au questionnaire : ${surveyUrl}`,
     "",
@@ -173,7 +173,7 @@ async function sendLiveInvitationEmail({
 
         <p style="margin:0 0 12px 0;">${politeName}</p>
         <p style="margin:0 0 8px 0;">
-          Nous vous invitons à répondre à un court questionnaire de satisfaction (1–2 minutes)
+          Nous vous invitons à répondre à un court questionnaire de satisfaction (1-2 minutes)
           pour nous aider à améliorer l'expérience proposée par <strong>${_businessName}</strong>.
         </p>
         <p style="margin:16px 0;">
@@ -307,7 +307,7 @@ const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
 const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
 const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
 
-// Legacy fallback (short-lived token) – used only if no refresh token is configured
+// Legacy fallback (short-lived token) - used only if no refresh token is configured
 const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
 
 const INVITATIONS_PATH =
@@ -986,7 +986,7 @@ function buildDemoFunnelFromInvites(invitations, demoResponses) {
    LIVE CSV (Dropbox) helpers
 ------------------------------ */
 
-// PSEUDO PATHS – adjust to your actual Dropbox paths
+// PSEUDO PATHS - adjust to your actual Dropbox paths
 const LIVE_INVITATIONS_PATH = "/npsme/live/invitations.csv";
 const LIVE_RESPONSES_PATH = "/npsme/live/responses.csv";
 
@@ -2285,7 +2285,7 @@ Rules:
 - Use specific, concrete language.
 - Quotes must be short excerpts (max ~15 words).
 - Keep it honest: only claim what the comments/scores support.
-- Segments: "Detractors (0–6)", "Passives (7–8)", "Promoters (9–10)".
+- Segments: "Detractors (0-6)", "Passives (7-8)", "Promoters (9-10)".
 `.trim();
 
     const r = await openai.responses.create({
@@ -2388,9 +2388,9 @@ app.get("/api/social-summary", socialSummaryLimiter, async (req, res) => {
                 `- "summary" (<= 180 words) includes:\n` +
                 `  • Overall tone (positive / neutral / negative, with nuance)\n` +
                 `  • Explicit sections labelled "CX Delighters:" and "CX Red Flags:" on their own lines,\n` +
-                `    each followed by 2–4 bullet points using "- " at the start of each bullet.\n` +
+                `    each followed by 2-4 bullet points using "- " at the start of each bullet.\n` +
                 `- "competitor_summary" (<= 80 words) briefly compares ${company}'s\n` +
-                `  sentiment and key CX themes with 2–3 named competitors in the same category.\n\n` +
+                `  sentiment and key CX themes with 2-3 named competitors in the same category.\n\n` +
                 `If you find very little data, say so explicitly in BOTH fields.\n` +
                 `Return ONLY the JSON object, no extra text, no backticks, no code fences.`,
             },
@@ -2441,10 +2441,6 @@ app.get("/api/social-summary", socialSummaryLimiter, async (req, res) => {
     res.status(500).json({ error: "Internal error generating social summary" });
   }
 });
-
-/* -----------------------------
-   SPA HTML: inject canonical + og:url for SEO
------------------------------- */
 
 /* -----------------------------
    SPA HTML: inject canonical + og:url + per-route meta + hreflang

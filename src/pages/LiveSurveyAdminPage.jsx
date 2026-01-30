@@ -285,7 +285,6 @@ export default function LiveSurveyAdminPage() {
       return next;
     });
   };
-
   const responseByInvitationId = React.useMemo(() => {
     const map = new Map();
     for (const r of responses || []) {
@@ -342,7 +341,6 @@ export default function LiveSurveyAdminPage() {
     return true;
   });
 }, [invites, filters]);
-
   const pending = [];
   const sent = [];
   const started = [];
@@ -358,7 +356,6 @@ export default function LiveSurveyAdminPage() {
     else pending.push(inv);
   }
   const cancelledCount = cancelled.length;
-
   const pendingIds = pending.map((r) => r.invitationId);
   const allSelected = pending.length > 0 && pending.every((r) => selectedIds.has(r.invitationId));
   const anySelected = selectedIds.size > 0;
@@ -514,7 +511,6 @@ export default function LiveSurveyAdminPage() {
   const disabledReason = !canRunInsights ? "No completed responses yet" : undefined;
 
 const sectionLabel = (key, fallback) => tr(`liveAdmin.sections.${key}`, fallback);
-
 const withCount = (label, n) => `${label} (${n})`;
 
   return (
@@ -792,7 +788,6 @@ const withCount = (label, n) => `${label} (${n})`;
             )
           ) : null}
         </section>
-
         {/* Started */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/60 p-5 sm:p-6 shadow-xl shadow-black/40">
           <div className="mb-4 flex items-start justify-between gap-3">

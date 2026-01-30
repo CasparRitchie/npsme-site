@@ -17,6 +17,8 @@ const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
 
 const INTERCOM_SURVEY_EVENTS_PATH =
   process.env.DROPBOX_INTERCOM_SURVEY_EVENTS_PATH || "/npsme/intercom/survey-events.jsonl";
+const INTERCOM_NPS_RESPONSES_PATH =
+  process.env.DROPBOX_INTERCOM_NPS_RESPONSES_PATH || "/npsme/intercom/nps-responses.jsonl";
 
 let cachedDropboxToken = null;
 let cachedDropboxExpiry = 0; // seconds
@@ -112,6 +114,129 @@ function verifyIntercomSignature({ rawBody, signatureHeader, clientSecret }) {
 
   const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
   return ok ? { ok: true } : { ok: false, reason: "Invalid signature" };
+}
+
+function toNumberIfNumeric(x) {
+  if (x === null || x === undefined) return null;
+  const n = Number(String(x).trim());
+  return Number.isFinite(n) ? n : null;
+}
+
+function pickNpsScore(answers) {
+  for (const a of answers || []) {
+    const n = toNumberIfNumeric(a?.response);
+    if (n !== null && n >= 0 && n <= 10) return n;
+  }
+  return null;
+}
+
+function pickFreeTextComment(answers) {
+  const texts = (answers || [])
+    .map((a) => (a?.response == null ? "" : String(a.response).trim()))
+    .filter((t) => t.length > 0)
+    .filter((t) => toNumberIfNumeric(t) === null); // exclude pure numbers
+  if (!texts.length) return null;
+  return texts.sort((a, b) => b.length - a.length)[0];
+}
+
+function parseJsonl(text) {
+  if (!text) return [];
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      try { return JSON.parse(l); } catch { return null; }
+    })
+    .filter(Boolean);
+}
+
+function jsonlStringify(rows) {
+  return rows.map((r) => JSON.stringify(r)).join("\n") + (rows.length ? "\n" : "");
+}
+
+function makeResponseId(e) {
+  const contentId = String(e.content_id || "");
+  const receiptId = String(e.receipt_id || "");
+  return contentId && receiptId ? `${contentId}:${receiptId}` : null;
+}
+
+function normalizeCompletionEvent(e) {
+  // answers_json is stored as a string currently
+  let answers = [];
+  try {
+    answers = e.answers_json ? JSON.parse(e.answers_json) : [];
+  } catch {
+    answers = [];
+  }
+
+  const score = pickNpsScore(answers);
+  const comment = pickFreeTextComment(answers);
+
+  const response_id = makeResponseId(e);
+  if (!response_id) return null;
+
+  return {
+    response_id,
+    source: "intercom",
+    content_id: String(e.content_id || ""),
+    content_title: e.content_title || null,
+    receipt_id: String(e.receipt_id || ""),
+
+    submitted_at: e.received_at || new Date().toISOString(), // webhook received time (good enough v1)
+
+    // Core NPS payload
+    score_0_10: score,
+    comment: comment,
+
+    // Identity (keep for now; later you can move/limit this if needed)
+    email: e.email || null,
+    name: e.name || null,
+    contact_id: e.contact_id || null,
+    external_id: e.external_id || null,
+
+    // Keep raw answers if useful for future NLP (optional)
+    answers: Array.isArray(answers) ? answers : [],
+
+    // lineage
+    raw: {
+      stat_type: e.stat_type || null,
+      topic: e.topic || null,
+    },
+  };
+}
+
+async function ingestSurveyCompletionsToCleanStore() {
+  const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+  const rawEvents = parseJsonl(rawText);
+
+  // only completions (you already only persist completions, but safe)
+  const completions = rawEvents.filter(
+    (e) => String(e.stat_type || "").toLowerCase() === "completion"
+  );
+
+  // normalize
+  const normalized = completions
+    .map(normalizeCompletionEvent)
+    .filter(Boolean);
+
+  // Load existing clean store to dedupe/upsert
+  const existingText = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+  const existing = parseJsonl(existingText);
+
+  const byId = new Map(existing.map((r) => [r.response_id, r]));
+  for (const r of normalized) {
+    // Upsert (newer wins if you want, here we just overwrite)
+    byId.set(r.response_id, r);
+  }
+
+  const merged = Array.from(byId.values());
+
+  // Sort newest first (string ISO sorts correctly)
+  merged.sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")));
+
+  await writeDropboxFile(INTERCOM_NPS_RESPONSES_PATH, jsonlStringify(merged));
+  return { ingested: normalized.length, total: merged.length, path: INTERCOM_NPS_RESPONSES_PATH };
 }
 
 function hex16(buf) {
@@ -277,7 +402,26 @@ async function downloadExportCsv(downloadUrl, { token }) {
 export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
+  function requireIngestToken(req, res, next) {
+  const ingestToken = process.env.NPSME_INGEST_TOKEN;
+  if (!ingestToken) return res.status(500).json({ ok: false, error: "NPSME_INGEST_TOKEN not configured" });
 
+  // Use header to avoid leaking tokens in URLs
+  const provided = (req.get("X-Ingest-Token") || "").trim();
+  if (provided !== ingestToken) return res.status(401).json({ ok: false, error: "Unauthorized" });
+
+  next();
+}
+
+router.post("/ingest/nps", requireIngestToken, async (_req, res) => {
+  try {
+    const out = await ingestSurveyCompletionsToCleanStore();
+    res.json({ ok: true, ...out });
+  } catch (err) {
+    console.error("[intercom] ingest error", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
   // ✅ Support BOTH endpoints so Intercom config can't 404 you again
   // IMPORTANT: use express.raw so we can verify the signature against the exact raw bytes.
     // Webhook receiver for Intercom (survey answers etc.)
@@ -332,27 +476,22 @@ export function createIntercomRouter() {
     const contact = item?.contact;
     const answers = Array.isArray(item?.answers) ? item.answers : [];
 
+    const score = pickNpsScore(answers);
+    const comment = pickFreeTextComment(answers);
+
     const record = {
       received_at: new Date().toISOString(),
       topic: event?.topic,
-      content_id: cs?.content_id,      // survey id
-      receipt_id: cs?.receipt_id,      // unique-ish per submission
-      stat_type: cs?.stat_type,        // receipt / answer / completion
+      content_id: cs?.content_id,
+      receipt_id: cs?.receipt_id,
+      stat_type: cs?.stat_type,
       content_title: cs?.content_title,
       contact_id: contact?.id,
       external_id: contact?.external_id,
       email: contact?.email,
       name: contact?.name,
-      score:
-        answers.find((a) =>
-          String(a.question_text || "").toLowerCase().includes("how likely")
-        )?.response ?? null,
-      comment:
-        answers.find((a) =>
-          String(a.question_text || "")
-            .toLowerCase()
-            .includes("what could we have done")
-        )?.response ?? null,
+      score,
+      comment,
       answers_json: JSON.stringify(answers),
     };
 
@@ -448,8 +587,7 @@ export function createIntercomRouter() {
   }
 
   function isLikelySurveyRow(row) {
-    const blob = JSON.stringify(row).toLowerCase();
-    return blob.includes("survey") || blob.includes("nps");
+    return String(row.content_type || "").toLowerCase() === "survey";
   }
 
   router.get("/ping", async (_req, res) => {

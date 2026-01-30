@@ -25,6 +25,7 @@ export default function IntercomNpsAnalytics() {
         }}
       />
 
+
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Intercom NPS">
         <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-8">

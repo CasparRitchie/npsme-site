@@ -19,9 +19,29 @@ const INTERCOM_SURVEY_EVENTS_PATH =
   process.env.DROPBOX_INTERCOM_SURVEY_EVENTS_PATH || "/npsme/intercom/survey-events.jsonl";
 const INTERCOM_NPS_RESPONSES_PATH =
   process.env.DROPBOX_INTERCOM_NPS_RESPONSES_PATH || "/npsme/intercom/nps-responses.jsonl";
+const INTERCOM_SURVEY_STATS_PATH =
+  process.env.DROPBOX_INTERCOM_SURVEY_STATS_PATH || "/npsme/intercom/survey-stats.jsonl";
 
 let cachedDropboxToken = null;
 let cachedDropboxExpiry = 0; // seconds
+
+const THEME_RULES = [
+  { key: "onboarding", en: "Onboarding", fr: "Onboarding", patterns: [/onboard/i, /mise en (route|place)/i, /démarr/i, /installation/i] },
+  { key: "wifi", en: "Connectivity / WiFi", fr: "Connexion / WiFi", patterns: [/wifi/i, /connexion/i, /internet/i, /réseau/i] },
+  { key: "support", en: "Support speed", fr: "Support", patterns: [/support/i, /réponse/i, /lenteur/i, /ticket/i] },
+  { key: "billing", en: "Billing", fr: "Facturation", patterns: [/factur/i, /paiement/i, /prix/i, /tarif/i] },
+  { key: "reliability", en: "Reliability", fr: "Fiabilité", patterns: [/bug/i, /plante/i, /crash/i, /marche pas/i, /fiab/i] },
+];
+
+function detectThemes(comment = "") {
+  const text = String(comment || "").trim();
+  if (!text) return [];
+  const hits = [];
+  for (const rule of THEME_RULES) {
+    if (rule.patterns.some((re) => re.test(text))) hits.push(rule.key);
+  }
+  return hits;
+}
 
 async function getDropboxAccessToken() {
   if (!DROPBOX_REFRESH_TOKEN) return LEGACY_DROPBOX_TOKEN || null;
@@ -413,6 +433,103 @@ export function createIntercomRouter() {
   next();
 }
 
+  async function createExportJob({ created_at_after, created_at_before }) {
+    const r = await fetch("https://api.intercom.io/export/content/data", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Intercom-Version": INTERCOM_EXPORT_VERSION,
+      },
+      body: JSON.stringify({ created_at_after, created_at_before }),
+    });
+
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
+    return data;
+  }
+
+  async function getExportJob(jobId) {
+    const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Intercom-Version": INTERCOM_EXPORT_VERSION,
+      },
+    });
+
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
+    return data;
+  }
+
+router.post("/ingest/export-stats", requireIngestToken, async (req, res) => {
+  try {
+    const hours = Math.min(Math.max(Number(req.query.hours || 72), 1), 720); // up to 30 days
+    const now = Math.floor(Date.now() / 1000);
+
+    const job = await createExportJob({
+      created_at_after: now - hours * 3600,
+      created_at_before: now,
+    });
+
+    const jobId = job.job_identifier || job.job_identfier || job.id;
+    if (!jobId) return res.status(500).json({ ok: false, error: "Missing job_identifier", job });
+
+    // poll a few times (simple v1; we can improve later)
+    let status = null;
+    for (let i = 0; i < 12; i++) {
+      status = await getExportJob(jobId);
+      const st = String(status.status || "").toLowerCase();
+      if (["complete", "completed"].includes(st) && status.download_url) break;
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+
+    const st = String(status?.status || "").toLowerCase();
+    if (!(["complete", "completed"].includes(st) && status.download_url)) {
+      return res.json({ ok: true, job_identifier: jobId, status: status?.status || "pending" });
+    }
+
+    const csvText = await downloadExportCsv(status.download_url, { token });
+    const records = parse(csvText, { columns: true, skip_empty_lines: true });
+
+    const surveyRows = records.filter((row) => String(row.content_type || "").toLowerCase() === "survey");
+
+    // store as jsonl (append & dedupe by content_id:receipt_id)
+    const existingText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
+    const existing = parseJsonl(existingText);
+
+    const key = (r) => {
+      const cid = String(r.content_id || "");
+      const rid = String(r.receipt_id || "");
+      const email = String(r.email || "");
+      const received = String(r.received_at || "");
+      return rid ? `${cid}:${rid}` : `${cid}:${email}:${received}`;
+    };
+    const map = new Map(existing.map((r) => [key(r), r]));
+    for (const r of surveyRows) map.set(key(r), r);
+
+    const merged = Array.from(map.values());
+    // sort newest first (received_at is ISO in export)
+    merged.sort((a, b) => String(b.received_at || "").localeCompare(String(a.received_at || "")));
+
+    await writeDropboxFile(INTERCOM_SURVEY_STATS_PATH, jsonlStringify(merged));
+
+    return res.json({
+      ok: true,
+      job_identifier: jobId,
+      export_rows_total: records.length,
+      export_survey_rows: surveyRows.length,
+      total_stored: merged.length,
+      path: INTERCOM_SURVEY_STATS_PATH,
+    });
+  } catch (err) {
+    console.error("[intercom] ingest export-stats error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 router.post("/ingest/nps", requireIngestToken, async (_req, res) => {
   try {
     const out = await ingestSurveyCompletionsToCleanStore();
@@ -606,41 +723,142 @@ router.post("/ingest/nps", requireIngestToken, async (_req, res) => {
     }
   });
 
+  function msBetween(aIso, bIso) {
+  const a = Date.parse(aIso || "");
+  const b = Date.parse(bIso || "");
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+  return b - a;
+}
+
+function median(values) {
+  const nums = values.filter((x) => typeof x === "number" && Number.isFinite(x)).sort((a, b) => a - b);
+  if (!nums.length) return null;
+  const mid = Math.floor(nums.length / 2);
+  return nums.length % 2 ? nums[mid] : Math.round((nums[mid - 1] + nums[mid]) / 2);
+}
+
+function formatDurationMs(ms) {
+  if (ms == null) return null;
+  const s = Math.round(ms / 1000);
+  const m = Math.round(s / 60);
+  if (m < 1) return `${s}s`;
+  const h = Math.round(m / 60);
+  if (h < 1) return `${m}m`;
+  return `${h}h`;
+}
+
+router.get("/public/nps-response-rate", async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+    const text = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
+    const rows = parseJsonl(text);
+
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+    const items = rows
+      .filter((r) => String(r.content_id || "") === contentId)
+      .filter((r) => {
+        const t = Date.parse(r.received_at || "");
+        return Number.isFinite(t) && t >= cutoff;
+      });
+
+    const shown = items.length; // proxy: row exists => shown/received
+    const completed = items.filter((r) => String(r.first_completion || "").trim().length > 0).length;
+
+    const responseRate = shown ? Math.round((completed / shown) * 1000) / 10 : null;
+
+    const toFirstAnswerMs = items
+      .map((r) => msBetween(r.received_at, r.first_answer))
+      .filter((x) => x != null);
+
+    const toCompletionMs = items
+      .map((r) => msBetween(r.received_at, r.first_completion))
+      .filter((x) => x != null);
+
+    const medAnswer = median(toFirstAnswerMs);
+    const medCompletion = median(toCompletionMs);
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      window_days: days,
+      shown,
+      completed,
+      response_rate_pct: responseRate,
+      median_time_to_first_answer: formatDurationMs(medAnswer),
+      median_time_to_completion: formatDurationMs(medCompletion),
+    });
+  } catch (err) {
+    console.error("[intercom] public nps-response-rate error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+router.get("/public/nps-themes", async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+    const rows = parseJsonl(text);
+
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+    const items = rows
+      .filter((r) => String(r.content_id || "") === contentId)
+      .filter((r) => {
+        const t = Date.parse(r.submitted_at || "");
+        return Number.isFinite(t) && t >= cutoff;
+      })
+      .filter((r) => typeof r.score_0_10 === "number");
+
+    // theme stats
+    const themeMap = new Map(); // key -> {count, detractors, totalScore}
+    for (const r of items) {
+      const themes = detectThemes(r.comment || "");
+      const isDetractor = r.score_0_10 <= 6;
+
+      for (const t of themes) {
+        const cur = themeMap.get(t) || { theme: t, count: 0, detractors: 0, totalScore: 0 };
+        cur.count += 1;
+        cur.totalScore += r.score_0_10;
+        if (isDetractor) cur.detractors += 1;
+        themeMap.set(t, cur);
+      }
+    }
+
+    const themes = Array.from(themeMap.values()).map((x) => ({
+      theme: x.theme,
+      mentions: x.count,
+      avg_score: x.count ? Math.round((x.totalScore / x.count) * 10) / 10 : null,
+      share_of_detractor_mentions: x.count ? Math.round((x.detractors / x.count) * 1000) / 10 : 0,
+    }));
+
+    themes.sort((a, b) => b.mentions - a.mentions);
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      window_days: days,
+      responses: items.length,
+      themes,
+    });
+  } catch (err) {
+    console.error("[intercom] public nps-themes error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
   router.use((_req, res, next) => {
     if (!token) return res.status(500).json({ ok: false, error: "INTERCOM_ACCESS_TOKEN not configured" });
     next();
   });
 
-  async function createExportJob({ created_at_after, created_at_before }) {
-    const r = await fetch("https://api.intercom.io/export/content/data", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "Intercom-Version": INTERCOM_EXPORT_VERSION,
-      },
-      body: JSON.stringify({ created_at_after, created_at_before }),
-    });
 
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`Export job create failed: ${r.status} ${JSON.stringify(data)}`);
-    return data;
-  }
-
-  async function getExportJob(jobId) {
-    const r = await fetch(`https://api.intercom.io/export/content/data/${jobId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Intercom-Version": INTERCOM_EXPORT_VERSION,
-      },
-    });
-
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`Export job status failed: ${r.status} ${JSON.stringify(data)}`);
-    return data;
-  }
 
   function isLikelySurveyRow(row) {
     return String(row.content_type || "").toLowerCase() === "survey";

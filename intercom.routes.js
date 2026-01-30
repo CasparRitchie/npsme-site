@@ -46,6 +46,59 @@ function detectThemes(comment = "") {
   return hits;
 }
 
+function redactText(input) {
+  let text = String(input || "").trim();
+  if (!text) return "";
+
+  // Emails
+  text = text.replace(
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
+    "[redacted email]"
+  );
+
+  // Phone numbers (broad, but practical)
+  text = text.replace(
+    /(\+?\d[\d\s().-]{7,}\d)/g,
+    "[redacted phone]"
+  );
+
+  // URLs
+  text = text.replace(
+    /\bhttps?:\/\/[^\s]+/gi,
+    "[redacted link]"
+  );
+
+  // Postcodes (UK + FR examples; safe-ish)
+  text = text.replace(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/gi, "[redacted postcode]");
+  text = text.replace(/\b\d{5}\b/g, "[redacted code]"); // FR 5-digit postcode
+
+  // Long digit sequences (order numbers, IDs)
+  text = text.replace(/\b\d{8,}\b/g, "[redacted id]");
+
+  // Collapse whitespace
+  text = text.replace(/\s+/g, " ").trim();
+  return text;
+}
+
+function truncate(text, max = 240) {
+  const t = String(text || "");
+  if (t.length <= max) return t;
+  return t.slice(0, max - 1).trimEnd() + "…";
+}
+
+function wordCount(text) {
+  const t = String(text || "").trim();
+  if (!t) return 0;
+  return t.split(/\s+/).filter(Boolean).length;
+}
+
+function scoreBucket(score) {
+  if (typeof score !== "number") return "unknown";
+  if (score >= 9) return "promoter";
+  if (score >= 7) return "passive";
+  return "detractor";
+}
+
 async function getDropboxAccessToken() {
   if (!DROPBOX_REFRESH_TOKEN) return LEGACY_DROPBOX_TOKEN || null;
 
@@ -858,6 +911,62 @@ export function createIntercomRouter() {
       });
     } catch (err) {
       console.error("[intercom] public nps-themes error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get("/public/nps-comments", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+      const limit = Math.min(Math.max(Number(req.query.limit || 10), 1), 50);
+
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      const items = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .filter((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return Number.isFinite(t) && t >= cutoff;
+        })
+        .filter((r) => typeof r.score_0_10 === "number")
+        .map((r) => {
+          const raw = String(r.comment || "").trim();
+          const redacted = redactText(raw);
+          const wc = wordCount(redacted);
+
+          return {
+            submitted_at: r.submitted_at || null,
+            score_0_10: r.score_0_10,
+            bucket: scoreBucket(r.score_0_10),
+            word_count: wc,
+            comment: truncate(redacted, 280),
+            // a light signal you can use in UI
+            is_substantive: wc >= 8,
+          };
+        })
+        .filter((r) => r.comment.length > 0)
+        .sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")))
+        .slice(0, limit);
+
+      const totalWithComments = items.length;
+      const substantive = items.filter((x) => x.is_substantive).length;
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        window_days: days,
+        returned: totalWithComments,
+        substantive,
+        comments: items,
+      });
+    } catch (err) {
+      console.error("[intercom] public nps-comments error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }
   });

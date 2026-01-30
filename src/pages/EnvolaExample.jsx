@@ -45,6 +45,8 @@ export default function EnvolaExample() {
   const [live, setLive] = useState({ loading: true, data: null, error: null });
   const [rate, setRate] = useState({ loading: true, data: null, error: null });
   const [themes, setThemes] = useState({ loading: true, data: null, error: null });
+  const [comments, setComments] = useState({ loading: true, data: null, error: null });
+
   useEffect(() => {
     let cancelled = false;
 
@@ -99,6 +101,21 @@ export default function EnvolaExample() {
     run();
     return () => { cancelled = true; };
   }, []);
+  useEffect(() => {
+  let cancelled = false;
+  async function run() {
+    try {
+      const url = "/api/intercom/public/nps-comments?content_id=189616&days=30&limit=12";
+      const r = await fetch(url);
+      const j = await r.json();
+      if (!cancelled) setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+    } catch (e) {
+      if (!cancelled) setComments({ loading: false, data: null, error: e.message });
+    }
+  }
+  run();
+  return () => { cancelled = true; };
+}, []);
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
@@ -337,6 +354,61 @@ export default function EnvolaExample() {
               </div>
             </>
           )}
+        </div>
+      </section>
+
+      {/* Comments */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-white">
+            {tr("envola.comments.title", "What customers are saying")}
+          </h2>
+          <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+            {tr("envola.comments.subtitle", "Real comments from the last 30 days (redacted for privacy).")}
+          </p>
+
+          {comments.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
+          {!comments.loading && comments.error && <p className="mt-6 text-sm text-red-300">Error: {comments.error}</p>}
+
+          {!comments.loading && comments.data?.ok && (
+            <>
+              <div className="mt-4 text-xs text-slate-400">
+                {comments.data.substantive} of {comments.data.returned} comments are “substantive” (8+ words).
+              </div>
+
+              {comments.data.comments?.length ? (
+                <div className="mt-6 space-y-3">
+                  {comments.data.comments.map((c, idx) => (
+                    <div key={`${c.submitted_at}-${idx}`} className="rounded-2xl border border-white/10 bg-black/10 p-5">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                          {c.bucket} • {c.score_0_10}/10
+                        </span>
+                        <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+                        {c.is_substantive && (
+                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                            Took time to write
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="mt-3 text-sm text-slate-200 leading-relaxed">
+                        “{c.comment}”
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  No comments returned yet.
+                </div>
+              )}
+            </>
+          )}
+
+          <div className="mt-6 text-xs text-slate-400">
+            Comments are redacted automatically (emails, phone numbers, links, IDs).
+          </div>
         </div>
       </section>
     </div>

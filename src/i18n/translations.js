@@ -2017,7 +2017,45 @@ export const TRANSLATIONS = {
         },
       },
     },
+    envola: {
+      seo: {
+        title: "Envola — Intercom NPS Analytics (Live Example) | NPS Me",
+        description:
+          "A live, anonymised example showing how NPS Me layers analytics on top of Intercom NPS.",
+      },
+      tag: "Client example / Envola",
+      h1: "Envola — Intercom NPS Analytics",
+      intro:
+        "This is a live, anonymised example. It shows what NPS Me can surface once an NPS survey is running in Intercom — starting with score + distribution, and soon drivers, themes, and recommendations.",
+      ctaPrimary: "See how it works",
+      ctaSecondary: "Book a CX review",
 
+      live: {
+        title: "Live snapshot (last 30 days)",
+        subtitle:
+          "Aggregated only — no personal data. Data source: Intercom survey completions → NPS Me clean store.",
+        noData:
+          "No completions yet in the last 30 days. Once responses arrive, this panel updates automatically.",
+        kpiNps: "NPS (last 30 days)",
+        promoters: "Promoters",
+        promotersSub: "Scores 9–10",
+        passives: "Passives",
+        passivesSub: "Scores 7–8",
+        detractors: "Detractors",
+        detractorsSub: "Scores 0–6",
+        lastResponse: "Last response:",
+        meta: "Survey ID: 189616",
+        earlyNote: "Note: early sample. NPS will stabilise as response volume increases.",
+      },
+
+      next: {
+        title: "Coming next on this page",
+        a: "Response rate (shown vs completed) and completion time from export reconciliation",
+        b: "Theme detection on comments (onboarding, WiFi, billing, support, reliability…)",
+        c: "Driver analysis: what correlates most with detractors vs promoters",
+        d: "AI-assisted recommendations (cached, evidence-based, configurable)",
+      },
+    },
     socialListeningIndex: {
       seoTitle: "Social Listening Reports (Anonymised) | NPS Me",
       seoDescription:
@@ -4390,7 +4428,46 @@ export const TRANSLATIONS = {
         },
       },
     },
+    envola: {
+      seo: {
+        title: "Envola — Analyse NPS Intercom (exemple live) | NPS Me",
+        description:
+          "Un exemple live et anonymisé montrant comment NPS Me ajoute une couche d’analyse au-dessus du NPS Intercom.",
+      },
+      tag: "Exemple client / Envola",
+      h1: "Envola — Analyse NPS Intercom",
+      intro:
+        "Ceci est un exemple live et anonymisé. Il illustre ce que NPS Me peut révéler lorsqu’une enquête NPS tourne dans Intercom — d’abord score + répartition, puis drivers, thèmes et recommandations.",
+      ctaPrimary: "Voir comment ça marche",
+      ctaSecondary: "Prendre un rendez-vous CX",
 
+      live: {
+        title: "Instantané live (30 derniers jours)",
+        subtitle:
+          "Données agrégées uniquement — aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
+        noData:
+          "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
+        kpiNps: "NPS (30 derniers jours)",
+        promoters: "Promoteurs",
+        promotersSub: "Notes 9–10",
+        passives: "Passifs",
+        passivesSub: "Notes 7–8",
+        detractors: "Détracteurs",
+        detractorsSub: "Notes 0–6",
+        lastResponse: "Dernière réponse :",
+        meta: "ID enquête : 189616",
+        earlyNote:
+          "Note : échantillon précoce. Le NPS se stabilise à mesure que le volume de réponses augmente.",
+      },
+
+      next: {
+        title: "Prochaines étapes sur cette page",
+        a: "Taux de réponse (affiché vs complété) et temps de complétion via la réconciliation export",
+        b: "Détection de thèmes dans les commentaires (onboarding, WiFi, facturation, support, fiabilité…)",
+        c: "Analyse des drivers : ce qui corrèle le plus avec détracteurs vs promoteurs",
+        d: "Recommandations assistées par IA (cachées, sourcées, configurables)",
+      },
+    },
     socialListeningIndex: {
       seoTitle: "Rapports Social Listening (anonymisés) | NPS Me",
       seoDescription:

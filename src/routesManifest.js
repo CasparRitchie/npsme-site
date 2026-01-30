@@ -29,6 +29,10 @@ export const ROUTES_MANIFEST = [
   { path: "/intercom-nps-analytics",   label: "Intercom NPS Analytics", labelKey: "routes.intercomNpsAnalytics", enabled: true, indexable: true, inHeader: true, inFooter: true, lang: "en" },
   { path: "/fr/analyse-nps-intercom",  label: "Analyse NPS Intercom",   labelKey: "routes.intercomNpsAnalytics", enabled: true, indexable: true, inHeader: true, inFooter: true, lang: "fr" },
 
+  // Client example (public)
+  { path: "/envola",              label: "Envola (example)",         labelKey: "routes.envola", enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "en" },
+  { path: "/fr/exemple-envola",   label: "Envola (exemple)",         labelKey: "routes.envola", enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "fr" },
+
   { path: "/data-automation",     label: "Data & Automation",        labelKey: "routes.dataAutomation", enabled: true, indexable: true, inHeader: true, inFooter: true, lang: "en" },
   { path: "/fr/data-automation",  label: "Data & Automatisation",    labelKey: "routes.dataAutomation", enabled: true, indexable: true, inHeader: true, inFooter: true, lang: "fr" },
 

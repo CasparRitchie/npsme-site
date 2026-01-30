@@ -12,6 +12,14 @@ const OVERRIDES = {
     fr: "/fr/analyse-nps-intercom",
     en: "/intercom-nps-analytics",
   },
+    "/envola": {
+    fr: "/fr/exemple-envola",
+    en: "/envola",
+  },
+  "/exemple-envola": {
+    fr: "/fr/exemple-envola",
+    en: "/envola",
+  },
 };
 
 export function stripLangPrefix(pathname = "") {

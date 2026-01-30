@@ -11,6 +11,7 @@ import MilestoneNps from "./MilestoneNps";
 import NpsSurveyProgramme from "./NpsSurveyProgramme";
 import NpsIntelligenceLayer from "./pages/NpsIntelligenceLayer";
 import IntercomNpsAnalytics from "./pages/IntercomNpsAnalytics";
+import EnvolaExample from "./pages/EnvolaExample";
 import Book from "./Book";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
@@ -70,6 +71,9 @@ const COMPONENTS = {
 
   "/intercom-nps-analytics": IntercomNpsAnalytics,
   "/fr/analyse-nps-intercom": IntercomNpsAnalytics,
+
+  "/envola": EnvolaExample,
+  "/fr/exemple-envola": EnvolaExample,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

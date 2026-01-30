@@ -17,6 +17,14 @@ function StatCard({ label, value, sub }) {
   );
 }
 
+function Pill({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-200">
+      {children}
+    </span>
+  );
+}
+
 function prettyDate(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -35,7 +43,8 @@ export default function EnvolaExample() {
   const location = useLocation();
 
   const [live, setLive] = useState({ loading: true, data: null, error: null });
-
+  const [rate, setRate] = useState({ loading: true, data: null, error: null });
+  const [themes, setThemes] = useState({ loading: true, data: null, error: null });
   useEffect(() => {
     let cancelled = false;
 
@@ -55,7 +64,41 @@ export default function EnvolaExample() {
     run();
     return () => { cancelled = true; };
   }, []);
+  useEffect(() => {
+    let cancelled = false;
 
+    async function run() {
+      try {
+        const url = "/api/intercom/public/nps-response-rate?content_id=189616&days=30";
+        const r = await fetch(url);
+        const j = await r.json();
+        if (!cancelled) setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+      } catch (e) {
+        if (!cancelled) setRate({ loading: false, data: null, error: e.message });
+      }
+    }
+
+    run();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      try {
+        const url = "/api/intercom/public/nps-themes?content_id=189616&days=30";
+        const r = await fetch(url);
+        const j = await r.json();
+        if (!cancelled) setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+      } catch (e) {
+        if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
+      }
+    }
+
+    run();
+    return () => { cancelled = true; };
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
@@ -164,17 +207,136 @@ export default function EnvolaExample() {
         </div>
       </section>
 
+      {/* Response rate + completion time */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">
-            {tr("envola.next.title", "Coming next on this page")}
-          </h2>
-          <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
-            <li>{tr("envola.next.a", "Response rate (shown vs completed) and completion time from export reconciliation")}</li>
-            <li>{tr("envola.next.b", "Theme detection on comments (onboarding, WiFi, billing, support, reliability…)")}</li>
-            <li>{tr("envola.next.c", "Driver analysis: what correlates most with detractors vs promoters")}</li>
-            <li>{tr("envola.next.d", "AI-assisted recommendations (cached, evidence-based, configurable)")}</li>
-          </ul>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.metrics.title", "Response funnel & timing")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr(
+                  "envola.metrics.subtitle",
+                  "Pulled from Intercom content stats export (shown → completed) and summarised for fast reporting."
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
+              <Pill>{tr("envola.meta.window", "Window: 30 days")}</Pill>
+            </div>
+          </div>
+
+          {rate.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
+          {!rate.loading && rate.error && <p className="mt-6 text-sm text-red-300">Error: {rate.error}</p>}
+
+          {!rate.loading && rate.data?.ok && (
+            <div className="mt-6 grid gap-4 md:grid-cols-4">
+              <StatCard
+                label={tr("envola.metrics.shown", "Shown")}
+                value={rate.data.shown ?? "—"}
+                sub={tr("envola.metrics.shownSub", "Survey displayed to users")}
+              />
+              <StatCard
+                label={tr("envola.metrics.completed", "Completed")}
+                value={rate.data.completed ?? "—"}
+                sub={tr("envola.metrics.completedSub", "Survey fully completed")}
+              />
+              <StatCard
+                label={tr("envola.metrics.responseRate", "Response rate")}
+                value={rate.data.response_rate_pct == null ? "—" : `${rate.data.response_rate_pct}%`}
+                sub={tr("envola.metrics.responseRateSub", "Completed ÷ shown")}
+              />
+              <StatCard
+                label={tr("envola.metrics.medianCompletion", "Median completion time")}
+                value={rate.data.median_time_to_completion || "—"}
+                sub={
+                  rate.data.median_time_to_first_answer
+                    ? tr("envola.metrics.medianAnswerSub", `Median time to first answer: ${rate.data.median_time_to_first_answer}`)
+                    : tr("envola.metrics.medianAnswerSubFallback", "Median time to first answer: —")
+                }
+              />
+            </div>
+          )}
+
+          <div className="mt-6 text-xs text-slate-400">
+            {tr(
+              "envola.metrics.note",
+              "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date."
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Themes */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.themes.title", "Themes in comments (early view)")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr(
+                  "envola.themes.subtitle",
+                  "Simple theme detection for now. This will evolve into driver analysis and richer NLP over time."
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
+              <Pill>{tr("envola.meta.window", "Window: 30 days")}</Pill>
+            </div>
+          </div>
+
+          {themes.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
+          {!themes.loading && themes.error && <p className="mt-6 text-sm text-red-300">Error: {themes.error}</p>}
+
+          {!themes.loading && themes.data?.ok && (
+            <>
+              {(!themes.data.themes || themes.data.themes.length === 0) ? (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  {tr(
+                    "envola.themes.noThemes",
+                    "No themes detected yet (this is normal with a small sample). As comments grow, this table will populate."
+                  )}
+                </div>
+              ) : (
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-white/5">
+                      <tr className="text-left text-xs text-slate-300">
+                        <th className="px-4 py-3">{tr("envola.themes.cols.theme", "Theme")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.mentions", "Mentions")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.avgScore", "Avg score")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.detrShare", "Detractor share")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                      {themes.data.themes.slice(0, 8).map((t) => (
+                        <tr key={t.theme} className="border-t border-white/10">
+                          <td className="px-4 py-3 text-white">{t.theme}</td>
+                          <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
+                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "—"}</td>
+                          <td className="px-4 py-3 text-slate-200">
+                            {t.share_of_detractor_mentions == null ? "—" : `${t.share_of_detractor_mentions}%`}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="mt-6 text-xs text-slate-400">
+                {tr(
+                  "envola.themes.note",
+                  "Next: upgrade this into “drivers” (what correlates with detractors), and generate AI-assisted recommendations based on evidence."
+                )}
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>

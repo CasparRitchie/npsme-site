@@ -763,6 +763,27 @@ export function createIntercomRouter() {
         .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
 
       const total = items.length;
+
+      // Optional reconciliation against export stats (completion count)
+      let completed_export = null;
+      try {
+        const statsText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
+        const statsRows = parseJsonl(statsText);
+
+        const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+        const relevant = statsRows
+          .filter((r) => String(r.content_id || "") === contentId)
+          .filter((r) => {
+            const t = Date.parse(r.received_at || "");
+            return Number.isFinite(t) && t >= cutoff;
+          });
+
+        completed_export = relevant.filter((r) => String(r.first_completion || "").trim().length > 0).length;
+      } catch {
+        completed_export = null;
+      }
+
       const promoters = items.filter((r) => r.score_0_10 >= 9).length;
       const passives = items.filter((r) => r.score_0_10 >= 7 && r.score_0_10 <= 8).length;
       const detractors = items.filter((r) => r.score_0_10 <= 6).length;
@@ -780,6 +801,7 @@ export function createIntercomRouter() {
         content_id: contentId,
         window_days: days,
         responses: total,
+        completed_export,
         promoters,
         passives,
         detractors,

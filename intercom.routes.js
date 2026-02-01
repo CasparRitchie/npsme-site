@@ -1078,6 +1078,50 @@ export function createIntercomRouter() {
     }
   });
 
+  router.get("/debug/nps-missing-score", requireIngestToken, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      const inWindow = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .filter((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return Number.isFinite(t) && t >= cutoff;
+        });
+
+      const scored = inWindow.filter(
+        (r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10
+      );
+
+      const missingScore = inWindow.filter(
+        (r) => !(typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10)
+      );
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        window_days: days,
+        in_window_total: inWindow.length,
+        scored_total: scored.length,
+        missing_score_total: missingScore.length,
+        missing_score_samples: missingScore.slice(0, 10).map((r) => ({
+          response_id: r.response_id,
+          submitted_at: r.submitted_at,
+          score_0_10: r.score_0_10,
+          comment_preview: String(r.comment || "").slice(0, 120),
+        })),
+      });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   return router;
 }

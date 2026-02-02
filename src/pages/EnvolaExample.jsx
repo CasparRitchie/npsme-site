@@ -152,6 +152,31 @@ export default function EnvolaExample() {
   useEffect(() => {
   let cancelled = false;
 
+  useEffect(() => {
+  let cancelled = false;
+
+  async function run() {
+    try {
+      const url = "/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50";
+      const r = await fetch(url);
+
+      // If the server returns HTML (proxy/404), r.json() will throw.
+      const j = await r.json();
+
+      if (!cancelled) {
+        setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+      }
+    } catch (e) {
+      if (!cancelled) setComments({ loading: false, data: null, error: e.message });
+    }
+  }
+
+  setComments((s) => ({ ...s, loading: true }));
+  run();
+
+  return () => { cancelled = true; };
+}, []);
+
   async function run() {
     try {
       // If user turns everything off, we treat it as "show all" (same logic as comments)

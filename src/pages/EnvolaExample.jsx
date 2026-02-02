@@ -403,7 +403,10 @@ export default function EnvolaExample() {
                         "envola.metrics.medianAnswerSub",
                         `Median time to first answer: ${rate.data.median_time_to_first_answer}`
                       )
-                    : tr("envola.metrics.medianAnswerSubFallback", "Median time to first answer: —")
+                    : tr(
+                        "envola.metrics.medianAnswerSubFallback",
+                        "Median time to first answer: —"
+                      )
                 }
               />
             </div>

@@ -34,7 +34,34 @@ const THEME_RULES = [
   { key: "support", en: "Support speed", fr: "Support", patterns: [/support/i, /réponse/i, /lenteur/i, /ticket/i] },
   { key: "billing", en: "Billing", fr: "Facturation", patterns: [/factur/i, /paiement/i, /prix/i, /tarif/i] },
   { key: "reliability", en: "Reliability", fr: "Fiabilité", patterns: [/bug/i, /plante/i, /crash/i, /marche pas/i, /fiab/i] },
+  { key: "attendance_sheet", en: "Attendance sheet", fr: "Fiche de présence", patterns: [/fiche de pr[eé]sence/i, /feuilles? de pr[eé]sence/i] },
+  { key: "time_tracking", en: "Hours & tracking", fr: "Heures & pointage", patterns: [/horaires?/i, /heures?/i, /pointage/i, /\bpointer\b/i, /heures suppl[eé]mentaires/i] },
+  { key: "lateness", en: "Lateness / punctuality", fr: "Retards / ponctualité", patterns: [/retards?/i, /[aà]\s*l['’]?heure/i, /ponctual/i] },
+  { key: "parents", en: "Parents relationship", fr: "Relation parents", patterns: [/parents?/i, /employeurs?/i, /rapport(s)? avec les parents/i] },
+  { key: "setup", en: "Setup & onboarding", fr: "Installation & prise en main", patterns: [/installation/i, /prise en main/i, /d[eé]marr/i, /onboard/i] },
+  { key: "reliability", en: "Reliability / bugs", fr: "Fiabilité / bugs", patterns: [/ne fonctionne pas/i, /fonctionne pas/i, /marche pas/i, /bug/i, /fait parfois des siennes/i] },
+  { key: "feature_requests", en: "Feature requests", fr: "Demandes d’ajouts", patterns: [/ajouter/i, /ce serait bien/i, /am[eé]lior/i, /repas/i, /sieste/i, /changes?/i, /carnet de liaison/i, /brochures?/i] },
+  { key: "support_speed", en: "Support responsiveness", fr: "Réactivité support", patterns: [/r[eé]actif/i, /support/i, /disponibil/i, /[eé]coute/i] },
+
 ];
+
+const ENVOLA_BENEFIT_OPTIONS = [
+  "Gain de temps",
+  "Moins d’oublis ou d’erreurs d’horaires",
+  "Relation plus fluide avec les parents",
+  "Plus de clarté et de transparence",
+  "Allègement de la charge mentale",
+  "Les heures supplémentaires sont payées",
+  "Plus de retards",
+  "Professionnalisation de mon lieu d'accueil",
+  "Other",
+];
+
+// Detect “Step 3 benefits” by question text (most reliable)
+function isBenefitsMultiSelectAnswer(answer) {
+  const qt = String(answer?.question_text || "").toLowerCase();
+  return qt.includes("quels bénéfices") || qt.includes("bénéfices principaux");
+}
 
 function detectThemes(comment = "") {
   const text = String(comment || "").trim();
@@ -198,6 +225,58 @@ function toNumberIfNumeric(x) {
   return Number.isFinite(n) ? n : null;
 }
 
+function splitMultiSelect(text) {
+  return String(text || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function looksLikeBenefitMultiSelect(text) {
+  const parts = splitMultiSelect(text);
+  if (parts.length < 2) return false;
+
+  // If many parts match known options, it’s multi-select
+  const hits = parts.filter((p) => ENVOLA_BENEFIT_OPTIONS.includes(p)).length;
+  return hits >= 2 || hits === parts.length; // strong signal
+}
+
+function extractCommentsAndOptions(answers) {
+  const out = {
+    verbatims: [],        // [{ question_text, text }]
+    selected_options: [], // ["Gain de temps", ...]
+  };
+
+  for (const a of answers || []) {
+    const resp = a?.response;
+    if (resp == null) continue;
+
+    const s = String(resp).trim();
+    if (!s) continue;
+
+    // Skip numeric-only answers (ratings)
+    const n = Number(s);
+    if (Number.isFinite(n) && /^\d+(\.\d+)?$/.test(s)) continue;
+
+    // Step 3 benefits: always treat as options
+    if (isBenefitsMultiSelectAnswer(a) || looksLikeBenefitMultiSelect(s)) {
+      out.selected_options.push(...splitMultiSelect(s));
+      continue;
+    }
+
+    // Otherwise this is a real verbatim
+    out.verbatims.push({
+      question_text: String(a?.question_text || "").trim() || null,
+      text: s,
+    });
+  }
+
+  // Deduplicate options
+  out.selected_options = Array.from(new Set(out.selected_options));
+
+  return out;
+}
+
 function pickNpsScore(answers) {
   for (const a of answers || []) {
     const n = toNumberIfNumeric(a?.response);
@@ -247,39 +326,43 @@ function normalizeCompletionEvent(e) {
   }
 
   const score = pickNpsScore(answers);
-  const comment = pickFreeTextComment(answers);
 
   const response_id = makeResponseId(e);
   if (!response_id) return null;
 
-  return {
-    response_id,
-    source: "intercom",
-    content_id: String(e.content_id || ""),
-    content_title: e.content_title || null,
-    receipt_id: String(e.receipt_id || ""),
+  const extracted = extractCommentsAndOptions(answers);
 
-    submitted_at: e.received_at || new Date().toISOString(), // webhook received time (good enough v1)
+// keep a "primary" comment for legacy UI, but also store all verbatims
+const primary = extracted.verbatims
+  .map((v) => v.text)
+  .sort((a, b) => b.length - a.length)[0] || null;
 
-    // Core NPS payload
-    score_0_10: score,
-    comment: comment,
+return {
+  response_id,
+  source: "intercom",
+  content_id: String(e.content_id || ""),
+  content_title: e.content_title || null,
+  receipt_id: String(e.receipt_id || ""),
+  submitted_at: e.received_at || new Date().toISOString(),
 
-    // Identity (keep for now; later you can move/limit this if needed)
-    email: e.email || null,
-    name: e.name || null,
-    contact_id: e.contact_id || null,
-    external_id: e.external_id || null,
+  score_0_10: score,
 
-    // Keep raw answers if useful for future NLP (optional)
-    answers: Array.isArray(answers) ? answers : [],
+  // ✅ Primary (keeps older code working)
+  comment: primary,
 
-    // lineage
-    raw: {
-      stat_type: e.stat_type || null,
-      topic: e.topic || null,
-    },
-  };
+  // ✅ New structured fields
+  verbatims: extracted.verbatims,          // array of {question_text, text}
+  selected_options: extracted.selected_options, // array of options
+
+  email: e.email || null,
+  name: e.name || null,
+  contact_id: e.contact_id || null,
+  external_id: e.external_id || null,
+
+  answers: Array.isArray(answers) ? answers : [],
+
+  raw: { stat_type: e.stat_type || null, topic: e.topic || null },
+};
 }
 
 async function ingestSurveyCompletionsToCleanStore() {
@@ -740,80 +823,67 @@ export function createIntercomRouter() {
   // -----------------------
   // Public endpoints (aggregated, safe)
   // -----------------------
-  router.get("/public/nps-summary", async (req, res) => {
-    try {
-      const contentId = String(req.query.content_id || "").trim();
-      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
-      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+  router.get("/public/nps-comments", async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+    const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 200);
 
-      const ingestInfo = await autoIngestIfStale().catch(() => null);
-      res.set("X-NPSme-Auto-Ingest", ingestInfo?.ran ? ingestInfo.reason : "no");
+    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
 
-      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-      const rows = parseJsonl(text);
+    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+    const rows = parseJsonl(text);
 
-      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      const items = rows
-        .filter((r) => String(r.content_id || "") === contentId)
-        .filter((r) => {
-          const t = Date.parse(r.submitted_at || "");
-          return Number.isFinite(t) && t >= cutoff;
-        })
-        .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
+    const responses = rows
+      .filter((r) => String(r.content_id || "") === contentId)
+      .filter((r) => {
+        const t = Date.parse(r.submitted_at || "");
+        return Number.isFinite(t) && t >= cutoff;
+      })
+      .filter((r) => typeof r.score_0_10 === "number");
 
-      const total = items.length;
+    const flat = [];
+    for (const r of responses) {
+      const vs = Array.isArray(r.verbatims) ? r.verbatims : [];
+      for (const v of vs) {
+        const raw = String(v?.text || "").trim();
+        if (!raw) continue;
 
-      // Optional reconciliation against export stats (completion count)
-      let completed_export = null;
-      try {
-        const statsText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
-        const statsRows = parseJsonl(statsText);
+        const red = truncate(redactText(raw), 320);
+        const wc = wordCount(red);
 
-        const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-
-        const relevant = statsRows
-          .filter((r) => String(r.content_id || "") === contentId)
-          .filter((r) => {
-            const t = Date.parse(r.received_at || "");
-            return Number.isFinite(t) && t >= cutoff;
-          });
-
-        completed_export = relevant.filter((r) => String(r.first_completion || "").trim().length > 0).length;
-      } catch {
-        completed_export = null;
+        flat.push({
+          submitted_at: r.submitted_at || null,
+          score_0_10: r.score_0_10,
+          bucket: scoreBucket(r.score_0_10),
+          question_text: v?.question_text || null,
+          word_count: wc,
+          is_substantive: wc >= 8,
+          comment: red,
+        });
       }
-
-      const promoters = items.filter((r) => r.score_0_10 >= 9).length;
-      const passives = items.filter((r) => r.score_0_10 >= 7 && r.score_0_10 <= 8).length;
-      const detractors = items.filter((r) => r.score_0_10 <= 6).length;
-
-      const nps = total ? Math.round(((promoters - detractors) / total) * 100) : null;
-
-      const newest =
-        items.map((r) => r.submitted_at).filter(Boolean).sort().slice(-1)[0] || null;
-
-      const confidence =
-        total >= 200 ? "high" : total >= 50 ? "medium" : total >= 10 ? "low" : "very_low";
-
-      return res.json({
-        ok: true,
-        content_id: contentId,
-        window_days: days,
-        responses: total,
-        completed_export,
-        promoters,
-        passives,
-        detractors,
-        nps,
-        confidence,
-        newest_response_at: newest,
-      });
-    } catch (err) {
-      console.error("[intercom] public nps-summary error", err);
-      return res.status(500).json({ ok: false, error: err.message });
     }
-  });
+
+    flat.sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")));
+
+    const returned = flat.slice(0, limit);
+    const substantive = returned.filter((x) => x.is_substantive).length;
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      window_days: days,
+      returned: returned.length,
+      substantive,
+      comments: returned,
+    });
+  } catch (err) {
+    console.error("[intercom] public nps-comments error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
 
   function msBetween(aIso, bIso) {
     const a = Date.parse(aIso || "");
@@ -903,15 +973,21 @@ export function createIntercomRouter() {
 
       const themeMap = new Map();
       for (const r of items) {
-        const ts = detectThemes(r.comment || "");
         const isDetractor = r.score_0_10 <= 6;
 
-        for (const t of ts) {
-          const cur = themeMap.get(t) || { theme: t, count: 0, detractors: 0, totalScore: 0 };
-          cur.count += 1;
-          cur.totalScore += r.score_0_10;
-          if (isDetractor) cur.detractors += 1;
-          themeMap.set(t, cur);
+        const vs = Array.isArray(r.verbatims) ? r.verbatims : [];
+        for (const v of vs) {
+          const text = String(v?.text || "").trim();
+          if (!text) continue;
+
+          const ts = detectThemes(text);
+          for (const t of ts) {
+            const cur = themeMap.get(t) || { theme: t, count: 0, detractors: 0, totalScore: 0 };
+            cur.count += 1;
+            cur.totalScore += r.score_0_10;
+            if (isDetractor) cur.detractors += 1;
+            themeMap.set(t, cur);
+          }
         }
       }
 
@@ -937,61 +1013,6 @@ export function createIntercomRouter() {
     }
   });
 
-  router.get("/public/nps-comments", async (req, res) => {
-    try {
-      const contentId = String(req.query.content_id || "").trim();
-      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
-      const limit = Math.min(Math.max(Number(req.query.limit || 10), 1), 50);
-
-      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
-
-      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-      const rows = parseJsonl(text);
-
-      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-
-      const items = rows
-        .filter((r) => String(r.content_id || "") === contentId)
-        .filter((r) => {
-          const t = Date.parse(r.submitted_at || "");
-          return Number.isFinite(t) && t >= cutoff;
-        })
-        .filter((r) => typeof r.score_0_10 === "number")
-        .map((r) => {
-          const raw = String(r.comment || "").trim();
-          const redacted = redactText(raw);
-          const wc = wordCount(redacted);
-
-          return {
-            submitted_at: r.submitted_at || null,
-            score_0_10: r.score_0_10,
-            bucket: scoreBucket(r.score_0_10),
-            word_count: wc,
-            comment: truncate(redacted, 280),
-            // a light signal you can use in UI
-            is_substantive: wc >= 8,
-          };
-        })
-        .filter((r) => r.comment.length > 0)
-        .sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")))
-        .slice(0, limit);
-
-      const totalWithComments = items.length;
-      const substantive = items.filter((x) => x.is_substantive).length;
-
-      return res.json({
-        ok: true,
-        content_id: contentId,
-        window_days: days,
-        returned: totalWithComments,
-        substantive,
-        comments: items,
-      });
-    } catch (err) {
-      console.error("[intercom] public nps-comments error", err);
-      return res.status(500).json({ ok: false, error: err.message });
-    }
-  });
 
   // -----------------------
   // Everything below requires an Intercom access token

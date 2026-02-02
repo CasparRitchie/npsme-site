@@ -65,105 +65,168 @@ export default function EnvolaExample() {
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
 
-    const [live, setLive] = useState({ loading: true, data: null, error: null });
-    const [rate, setRate] = useState({ loading: true, data: null, error: null });
-    const [themes, setThemes] = useState({ loading: true, data: null, error: null });
-    const [comments, setComments] = useState({ loading: true, data: null, error: null });
+  const [live, setLive] = useState({ loading: true, data: null, error: null });
+  const [rate, setRate] = useState({ loading: true, data: null, error: null });
+  const [themes, setThemes] = useState({ loading: true, data: null, error: null });
+  const [comments, setComments] = useState({ loading: true, data: null, error: null });
 
-    const [bucketFilter, setBucketFilter] = useState({
-      promoters: true,
-      passives: true,
-      detractors: true,
-    });
+  const [bucketFilter, setBucketFilter] = useState({
+    promoters: true,
+    passives: true,
+    detractors: true,
+  });
 
-    const isAllOff =
-      !bucketFilter.promoters && !bucketFilter.passives && !bucketFilter.detractors;
+  const isAllOff =
+    !bucketFilter.promoters && !bucketFilter.passives && !bucketFilter.detractors;
 
-    function bucketAllowed(bucket) {
-      if (isAllOff) return true;
-      if (bucket === "promoter") return bucketFilter.promoters;
-      if (bucket === "passive") return bucketFilter.passives;
-      if (bucket === "detractor") return bucketFilter.detractors;
-      return true;
-    }
+  function bucketAllowed(bucket) {
+    if (isAllOff) return true;
+    if (bucket === "promoter") return bucketFilter.promoters;
+    if (bucket === "passive") return bucketFilter.passives;
+    if (bucket === "detractor") return bucketFilter.detractors;
+    return true;
+  }
 
-    // LIVE
-    useEffect(() => {
-      let cancelled = false;
-      (async () => {
-        try {
-          const r = await fetch("/api/intercom/public/nps-summary?content_id=189616&days=30");
-          const j = await r.json();
-          if (!cancelled) setLive({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-        } catch (e) {
-          if (!cancelled) setLive({ loading: false, data: null, error: e.message });
+  function labelBucket(bucket) {
+    if (bucket === "promoter") return tr("envola.filters.promoters", "Promoters");
+    if (bucket === "passive") return tr("envola.filters.passives", "Passives");
+    if (bucket === "detractor") return tr("envola.filters.detractors", "Detractors");
+    return bucket || tr("common.unknown", "Unknown");
+  }
+
+  function labelTheme(themeKey) {
+    // If you later add theme label translations, this will pick them up.
+    return tr(`envola.themeLabels.${themeKey}`, themeKey);
+  }
+
+  // LIVE
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(
+          "/api/intercom/public/nps-summary?content_id=189616&days=30"
+        );
+        const j = await r.json();
+        if (!cancelled) {
+          setLive({
+            loading: false,
+            data: j,
+            error: r.ok ? null : j?.error || "Error",
+          });
         }
-      })();
-      return () => { cancelled = true; };
-    }, []);
+      } catch (e) {
+        if (!cancelled)
+          setLive({ loading: false, data: null, error: e.message });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    // RATE
-    useEffect(() => {
-      let cancelled = false;
-      (async () => {
-        try {
-          const r = await fetch("/api/intercom/public/nps-response-rate?content_id=189616&days=30");
-          const j = await r.json();
-          if (!cancelled) setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-        } catch (e) {
-          if (!cancelled) setRate({ loading: false, data: null, error: e.message });
+  // RATE
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(
+          "/api/intercom/public/nps-response-rate?content_id=189616&days=30"
+        );
+        const j = await r.json();
+        if (!cancelled) {
+          setRate({
+            loading: false,
+            data: j,
+            error: r.ok ? null : j?.error || "Error",
+          });
         }
-      })();
-      return () => { cancelled = true; };
-    }, []);
+      } catch (e) {
+        if (!cancelled)
+          setRate({ loading: false, data: null, error: e.message });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    // THEMES (refetches when toggles change)
-    useEffect(() => {
-      let cancelled = false;
-      (async () => {
-        try {
-          const selected = [];
-          if (bucketFilter.promoters) selected.push("promoter");
-          if (bucketFilter.passives) selected.push("passive");
-          if (bucketFilter.detractors) selected.push("detractor");
+  // THEMES (refetches when toggles change)
+  useEffect(() => {
+    let cancelled = false;
 
-          const bucketsParam =
-            selected.length === 0 ? "" : `&buckets=${encodeURIComponent(selected.join(","))}`;
+    setThemes((s) => ({ ...s, loading: true }));
 
-          const r = await fetch(`/api/intercom/public/nps-themes?content_id=189616&days=30${bucketsParam}`);
-          const j = await r.json();
+    (async () => {
+      try {
+        const selected = [];
+        if (bucketFilter.promoters) selected.push("promoter");
+        if (bucketFilter.passives) selected.push("passive");
+        if (bucketFilter.detractors) selected.push("detractor");
 
-          if (!cancelled) setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-        } catch (e) {
-          if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
+        const bucketsParam =
+          selected.length === 0
+            ? ""
+            : `&buckets=${encodeURIComponent(selected.join(","))}`;
+
+        const r = await fetch(
+          `/api/intercom/public/nps-themes?content_id=189616&days=30${bucketsParam}`
+        );
+        const j = await r.json();
+
+        if (!cancelled) {
+          setThemes({
+            loading: false,
+            data: j,
+            error: r.ok ? null : j?.error || "Error",
+          });
         }
-      })();
+      } catch (e) {
+        if (!cancelled)
+          setThemes({ loading: false, data: null, error: e.message });
+      }
+    })();
 
-      setThemes((s) => ({ ...s, loading: true }));
-      return () => { cancelled = true; };
-    }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
+    return () => {
+      cancelled = true;
+    };
+  }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
-    // COMMENTS (fetch once; filter client-side)
-    useEffect(() => {
-      let cancelled = false;
-      (async () => {
-        try {
-          const r = await fetch("/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50");
-          const j = await r.json();
-          if (!cancelled) setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-        } catch (e) {
-          if (!cancelled) setComments({ loading: false, data: null, error: e.message });
+  // COMMENTS (fetch once; filter client-side)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(
+          "/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50"
+        );
+        const j = await r.json();
+        if (!cancelled) {
+          setComments({
+            loading: false,
+            data: j,
+            error: r.ok ? null : j?.error || "Error",
+          });
         }
-      })();
-      return () => { cancelled = true; };
-    }, []);
+      } catch (e) {
+        if (!cancelled)
+          setComments({ loading: false, data: null, error: e.message });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr("envola.seo.title", "Envola — Intercom NPS Analytics (Live Example) | NPSme")}
+        title={tr(
+          "envola.seo.title",
+          "Envola — Intercom NPS Analytics (Live Example) | NPSme"
+        )}
         description={tr(
           "envola.seo.description",
           "A live, anonymised example showing how NPSme layers analytics on top of Intercom NPS."
@@ -208,6 +271,7 @@ export default function EnvolaExample() {
         </div>
       </PageHeader>
 
+      {/* Live snapshot */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
@@ -220,8 +284,12 @@ export default function EnvolaExample() {
             )}
           </p>
 
-          {live.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
-          {!live.loading && live.error && <p className="mt-6 text-sm text-red-300">Error: {live.error}</p>}
+          {live.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!live.loading && live.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {live.error}</p>
+          )}
 
           {!live.loading && live.data?.ok && (
             <>
@@ -242,14 +310,27 @@ export default function EnvolaExample() {
                       `${live.data.responses} responses • confidence: ${live.data.confidence}`
                     )}
                   />
-                  <StatCard label={tr("envola.live.promoters", "Promoters")} value={live.data.promoters} sub={tr("envola.live.promotersSub", "Scores 9–10")} />
-                  <StatCard label={tr("envola.live.passives", "Passives")} value={live.data.passives} sub={tr("envola.live.passivesSub", "Scores 7–8")} />
-                  <StatCard label={tr("envola.live.detractors", "Detractors")} value={live.data.detractors} sub={tr("envola.live.detractorsSub", "Scores 0–6")} />
+                  <StatCard
+                    label={tr("envola.live.promoters", "Promoters")}
+                    value={live.data.promoters}
+                    sub={tr("envola.live.promotersSub", "Scores 9–10")}
+                  />
+                  <StatCard
+                    label={tr("envola.live.passives", "Passives")}
+                    value={live.data.passives}
+                    sub={tr("envola.live.passivesSub", "Scores 7–8")}
+                  />
+                  <StatCard
+                    label={tr("envola.live.detractors", "Detractors")}
+                    value={live.data.detractors}
+                    sub={tr("envola.live.detractorsSub", "Scores 0–6")}
+                  />
                 </div>
               )}
 
               <div className="mt-6 text-xs text-slate-400">
-                {tr("envola.live.meta", "Survey ID: 189616")} • {tr("envola.live.lastResponse", "Last response")}{" "}
+                {tr("envola.live.meta", "Survey ID: 189616")} •{" "}
+                {tr("envola.live.lastResponse", "Last response")}{" "}
                 {prettyDate(live.data.newest_response_at)}
               </div>
 
@@ -287,8 +368,12 @@ export default function EnvolaExample() {
             </div>
           </div>
 
-          {rate.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
-          {!rate.loading && rate.error && <p className="mt-6 text-sm text-red-300">Error: {rate.error}</p>}
+          {rate.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!rate.loading && rate.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {rate.error}</p>
+          )}
 
           {!rate.loading && rate.data?.ok && (
             <div className="mt-6 grid gap-4 md:grid-cols-4">
@@ -304,7 +389,9 @@ export default function EnvolaExample() {
               />
               <StatCard
                 label={tr("envola.metrics.responseRate", "Response rate")}
-                value={rate.data.response_rate_pct == null ? "—" : `${rate.data.response_rate_pct}%`}
+                value={
+                  rate.data.response_rate_pct == null ? "—" : `${rate.data.response_rate_pct}%`
+                }
                 sub={tr("envola.metrics.responseRateSub", "Completed ÷ shown")}
               />
               <StatCard
@@ -312,7 +399,10 @@ export default function EnvolaExample() {
                 value={rate.data.median_time_to_completion || "—"}
                 sub={
                   rate.data.median_time_to_first_answer
-                    ? tr("envola.metrics.medianAnswerSub", `Median time to first answer: ${rate.data.median_time_to_first_answer}`)
+                    ? tr(
+                        "envola.metrics.medianAnswerSub",
+                        `Median time to first answer: ${rate.data.median_time_to_first_answer}`
+                      )
                     : tr("envola.metrics.medianAnswerSubFallback", "Median time to first answer: —")
                 }
               />
@@ -347,111 +437,9 @@ export default function EnvolaExample() {
               <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
               <Pill>{tr("envola.meta.window", "Window: 30 days")}</Pill>
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-400">
-                {tr("envola.filters.label", "Filter:")}
-              </span>
-
-              <TogglePill
-                color="green"
-                active={bucketFilter.promoters}
-                onClick={() => setBucketFilter((s) => ({ ...s, promoters: !s.promoters }))}
-              >
-                {tr("envola.filters.promoters", "Promoters")}
-              </TogglePill>
-
-              <TogglePill
-                color="amber"
-                active={bucketFilter.passives}
-                onClick={() => setBucketFilter((s) => ({ ...s, passives: !s.passives }))}
-              >
-                {tr("envola.filters.passives", "Passives")}
-              </TogglePill>
-
-              <TogglePill
-                color="red"
-                active={bucketFilter.detractors}
-                onClick={() => setBucketFilter((s) => ({ ...s, detractors: !s.detractors }))}
-              >
-                {tr("envola.filters.detractors", "Detractors")}
-              </TogglePill>
-
-              {isAllOff && (
-                <span className="text-xs text-slate-400">
-                  {tr("envola.filters.noneSelected", "No filter selected — showing all")}
-                </span>
-              )}
-            </div>
           </div>
 
-          {themes.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
-          {!themes.loading && themes.error && <p className="mt-6 text-sm text-red-300">Error: {themes.error}</p>}
-
-          {!themes.loading && themes.data?.ok && (
-            <>
-              {(!themes.data.themes || themes.data.themes.length === 0) ? (
-                <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
-                  {tr(
-                    "envola.themes.noThemes",
-                    "No themes detected yet (this is normal with a small sample). As comments grow, this table will populate."
-                  )}
-                </div>
-              ) : (
-                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-white/5">
-                      <tr className="text-left text-xs text-slate-300">
-                        <th className="px-4 py-3">{tr("envola.themes.cols.theme", "Theme")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.mentions", "Mentions")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.avgScore", "Avg score")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.detrShare", "Detractor share")}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                      {themes.data.themes
-                        .filter((t) => {
-                          // Keep it simple: show themes that appear in the currently selected buckets.
-                          // This assumes your /public/nps-themes endpoint is already computed from verbatims per response.
-                          // We can only filter accurately if the API returns breakdown by bucket (next step).
-                          // For now: we leave table unfiltered unless you want to do it properly server-side.
-                          return true;
-                        })
-                        .slice(0, 8)
-                        .map((t) => (
-                        <tr key={t.theme} className="border-t border-white/10">
-                          <td className="px-4 py-3 text-white">{labelTheme(t.theme)}</td>
-                          <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
-                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "—"}</td>
-                          <td className="px-4 py-3 text-slate-200">
-                            {t.share_of_detractor_mentions == null ? "—" : `${t.share_of_detractor_mentions}%`}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              <div className="mt-6 text-xs text-slate-400">
-                {tr(
-                  "envola.themes.note",
-                  "Next: upgrade this into “drivers” (what correlates with detractors), and generate AI-assisted recommendations based on evidence."
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Comments */}
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">
-            {tr("envola.comments.title", "What customers are saying")}
-          </h2>
-          <p className="mt-2 text-sm text-slate-300 max-w-3xl">
-            {tr("envola.comments.subtitle", "Real comments from the last 30 days (redacted for privacy).")}
-          </p>
+          {/* Filter toggles */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-400">
               {tr("envola.filters.label", "Filter:")}
@@ -487,44 +475,161 @@ export default function EnvolaExample() {
               </span>
             )}
           </div>
-          {comments.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
-          {!comments.loading && comments.error && <p className="mt-6 text-sm text-red-300">Error: {comments.error}</p>}
+
+          {themes.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!themes.loading && themes.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {themes.error}</p>
+          )}
+
+          {!themes.loading && themes.data?.ok && (
+            <>
+              {(!themes.data.themes || themes.data.themes.length === 0) ? (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  {tr(
+                    "envola.themes.noThemes",
+                    "No themes detected yet (this is normal with a small sample). As comments grow, this table will populate."
+                  )}
+                </div>
+              ) : (
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-white/5">
+                      <tr className="text-left text-xs text-slate-300">
+                        <th className="px-4 py-3">{tr("envola.themes.cols.theme", "Theme")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.mentions", "Mentions")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.avgScore", "Avg score")}</th>
+                        <th className="px-4 py-3">{tr("envola.themes.cols.detrShare", "Detractor share")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                      {themes.data.themes.slice(0, 8).map((t) => (
+                        <tr key={t.theme} className="border-t border-white/10">
+                          <td className="px-4 py-3 text-white">{labelTheme(t.theme)}</td>
+                          <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
+                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "—"}</td>
+                          <td className="px-4 py-3 text-slate-200">
+                            {t.share_of_detractor_mentions == null ? "—" : `${t.share_of_detractor_mentions}%`}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="mt-6 text-xs text-slate-400">
+                {tr(
+                  "envola.themes.note",
+                  "Next: upgrade this into “drivers” (what correlates with detractors), and generate AI-assisted recommendations based on evidence."
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Comments */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-white">
+            {tr("envola.comments.title", "What customers are saying")}
+          </h2>
+          <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+            {tr("envola.comments.subtitle", "Real comments from the last 30 days (redacted for privacy).")}
+          </p>
+
+          {/* Filter toggles */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400">
+              {tr("envola.filters.label", "Filter:")}
+            </span>
+
+            <TogglePill
+              color="green"
+              active={bucketFilter.promoters}
+              onClick={() => setBucketFilter((s) => ({ ...s, promoters: !s.promoters }))}
+            >
+              {tr("envola.filters.promoters", "Promoters")}
+            </TogglePill>
+
+            <TogglePill
+              color="amber"
+              active={bucketFilter.passives}
+              onClick={() => setBucketFilter((s) => ({ ...s, passives: !s.passives }))}
+            >
+              {tr("envola.filters.passives", "Passives")}
+            </TogglePill>
+
+            <TogglePill
+              color="red"
+              active={bucketFilter.detractors}
+              onClick={() => setBucketFilter((s) => ({ ...s, detractors: !s.detractors }))}
+            >
+              {tr("envola.filters.detractors", "Detractors")}
+            </TogglePill>
+
+            {isAllOff && (
+              <span className="text-xs text-slate-400">
+                {tr("envola.filters.noneSelected", "No filter selected — showing all")}
+              </span>
+            )}
+          </div>
+
+          {comments.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!comments.loading && comments.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {comments.error}</p>
+          )}
 
           {!comments.loading && comments.data?.ok && (
             <>
               <div className="mt-4 text-xs text-slate-400">
                 {(() => {
-                  const filtered = (comments.data.comments || []).filter((c) => bucketAllowed(c.bucket));
+                  const filtered = (comments.data.comments || []).filter((c) =>
+                    bucketAllowed(c.bucket)
+                  );
                   const substantive = filtered.filter((c) => c.is_substantive).length;
                   return (
                     <>
                       {substantive} of {filtered.length}{" "}
-                      {tr("envola.comments.substantiveLabel", "comments are “substantive” (8+ words).")}
+                      {tr(
+                        "envola.comments.substantiveLabel",
+                        "comments are “substantive” (8+ words)."
+                      )}
                     </>
                   );
                 })()}
               </div>
 
-              {comments.data.comments?.length ? (
+              {(comments.data.comments || []).filter((c) => bucketAllowed(c.bucket)).length ? (
                 <div className="mt-6 space-y-3">
-                  {comments.data.comments.filter((c) => bucketAllowed(c.bucket)).map((c, idx) => (                    <div key={`${c.submitted_at}-${idx}`} className="rounded-2xl border border-white/10 bg-black/10 p-5">
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                          {labelBucket(c.bucket)} • {c.score_0_10}/10
-                        </span>
-                        <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
-                        {c.is_substantive && (
+                  {comments.data.comments
+                    .filter((c) => bucketAllowed(c.bucket))
+                    .map((c, idx) => (
+                      <div
+                        key={`${c.submitted_at}-${idx}`}
+                        className="rounded-2xl border border-white/10 bg-black/10 p-5"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                            {tr("envola.comments.tookTime", "Took time to write")}
+                            {labelBucket(c.bucket)} • {c.score_0_10}/10
                           </span>
-                        )}
-                      </div>
+                          <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+                          {c.is_substantive && (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                              {tr("envola.comments.tookTime", "Took time to write")}
+                            </span>
+                          )}
+                        </div>
 
-                      <p className="mt-3 text-sm text-slate-200 leading-relaxed">
-                        “{c.comment}”
-                      </p>
-                    </div>
-                  ))}
+                        <p className="mt-3 text-sm text-slate-200 leading-relaxed">
+                          “{c.comment}”
+                        </p>
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">

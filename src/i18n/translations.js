@@ -1673,6 +1673,18 @@ export const TRANSLATIONS = {
           cta: "See sample report",
           footnote: "Starts manual, scales with automation. Cancel anytime.",
         },
+        intercom: {
+          title: "CX Intelligence Layer (Intercom NPS)",
+          price: "from £290/mo",
+          bullets: [
+            "Live NPS insights from Intercom (auto-updated)",
+            "Themes, delighters & risk flags grounded in real comments",
+            "Segmented actions for Detractors, Passives & Promoters",
+            "Ready-to-send “close the loop” response templates",
+          ],
+          cta: "View Intercom example",
+          footnote: "Optional: expert-led Intercom NPS survey design & setup (£450 one-off).",
+        },
       },
 
       pulseExplainer: {
@@ -4152,6 +4164,18 @@ export const TRANSLATIONS = {
           cta: "Voir un exemple",
           footnote:
             "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
+        },
+        intercom: {
+          title: "Couche d’intelligence CX (Intercom NPS)",
+          price: "à partir de 290 £/mois",
+          bullets: [
+            "Insights NPS en continu depuis Intercom (mise à jour auto)",
+            "Thèmes, leviers & signaux de risque basés sur les verbatims",
+            "Actions par segment : Détracteurs, Passifs, Promoteurs",
+            "Modèles de réponses “close the loop” prêts à envoyer",
+          ],
+          cta: "Voir l’exemple Intercom",
+          footnote: "Option : atelier expert pour concevoir et paramétrer le NPS Intercom (450 £, ponctuel).",
         },
       },
 

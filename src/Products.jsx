@@ -1,7 +1,7 @@
 // src/Products.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, LineChart, Search, Newspaper } from "lucide-react";
+import { ArrowRight, LineChart, Search, Newspaper, Layers } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
@@ -12,7 +12,6 @@ export default function Products() {
   const { lang } = useLanguage();
   const location = useLocation();
 
-  // Use "dict" for grabbing arrays/objects (bullets etc.)
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const pulseLeft = dict?.products?.pulseExplainer?.left || [];
@@ -40,7 +39,8 @@ export default function Products() {
       />
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* ✅ Updated grid for 4 cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <ProductCard
             icon={<Search className="h-5 w-5 text-white" />}
             title={translations(lang, "products.cards.foundations.title", "Feedback Foundations")}
@@ -61,6 +61,20 @@ export default function Products() {
               label: translations(lang, "products.cards.momentum.cta", "Book discovery"),
               href: localizePath("/book", lang),
             }}
+          />
+
+          {/* ✅ New Intercom Intelligence card */}
+          <ProductCard
+            featured
+            icon={<Layers className="h-5 w-5 text-white" />}
+            title={translations(lang, "products.cards.intercom.title", "CX Intelligence Layer (Intercom NPS)")}
+            price={translations(lang, "products.cards.intercom.price", "from £290/mo")}
+            bullets={dict?.products?.cards?.intercom?.bullets || []}
+            cta={{
+              label: translations(lang, "products.cards.intercom.cta", "View Intercom example"),
+              href: localizePath("/intercom-nps-analytics", lang), // adjust route if different
+            }}
+            footnote={translations(lang, "products.cards.intercom.footnote", "")}
           />
 
           <ProductCard

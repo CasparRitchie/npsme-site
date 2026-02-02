@@ -2079,6 +2079,20 @@ export const TRANSLATIONS = {
           "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
       },
 
+      themeLabels: {
+        time_tracking: "Hours & tracking",
+        parents: "Parents relationship",
+        feature_requests: "Feature requests",
+        attendance_sheet: "Attendance sheet",
+        lateness: "Lateness / punctuality",
+        support_speed: "Support responsiveness",
+        reliability: "Reliability / bugs",
+        setup: "Setup & onboarding",
+        billing: "Billing",
+        wifi: "Connectivity / WiFi",
+        onboarding: "Onboarding",
+      },
+
       themes: {
         title: "Themes in comments (early view)",
         subtitle:
@@ -4561,6 +4575,20 @@ export const TRANSLATIONS = {
         },
         note:
           "Prochaine étape : passer aux “drivers” (ce qui corrèle avec les détracteurs), puis générer des recommandations assistées par IA et fondées sur des preuves.",
+      },
+
+      themeLabels: {
+        time_tracking: "Heures & pointage",
+        parents: "Relation parents",
+        feature_requests: "Demandes d’ajouts",
+        attendance_sheet: "Fiche de présence",
+        lateness: "Retards / ponctualité",
+        support_speed: "Réactivité support",
+        reliability: "Fiabilité / bugs",
+        setup: "Installation & prise en main",
+        billing: "Facturation",
+        wifi: "Connexion / WiFi",
+        onboarding: "Onboarding",
       },
 
       comments: {

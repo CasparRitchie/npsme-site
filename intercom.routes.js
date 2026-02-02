@@ -877,7 +877,7 @@ export function createIntercomRouter() {
       return res.status(500).json({ ok: false, error: err.message });
     }
   });
-  
+
   router.get("/public/nps-comments", async (req, res) => {
   try {
     const contentId = String(req.query.content_id || "").trim();
@@ -1011,7 +1011,20 @@ export function createIntercomRouter() {
     try {
       const contentId = String(req.query.content_id || "").trim();
       const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+      const bucketsRaw = String(req.query.buckets || "").trim(); // e.g. "promoter,passive"
+
       if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+      const allowedBuckets = new Set(
+        ["promoter", "passive", "detractor"].filter((b) => {
+          if (!bucketsRaw) return true; // if not provided, include all
+          return bucketsRaw
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
+            .includes(b);
+        })
+      );
 
       const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
       const rows = parseJsonl(text);
@@ -1024,35 +1037,55 @@ export function createIntercomRouter() {
           const t = Date.parse(r.submitted_at || "");
           return Number.isFinite(t) && t >= cutoff;
         })
-        .filter((r) => typeof r.score_0_10 === "number");
+        .filter((r) => typeof r.score_0_10 === "number")
+        .filter((r) => allowedBuckets.has(scoreBucket(r.score_0_10)));
 
       const themeMap = new Map();
       for (const r of items) {
-        const isDetractor = r.score_0_10 <= 6;
+        const bucket = scoreBucket(r.score_0_10);
+        const isDetractor = bucket === "detractor";
 
         const vs = Array.isArray(r.verbatims) ? r.verbatims : [];
         for (const v of vs) {
-          const text = String(v?.text || "").trim();
-          if (!text) continue;
+          const txt = String(v?.text || "").trim();
+          if (!txt) continue;
 
-          const ts = detectThemes(text);
-          for (const t of ts) {
-            const cur = themeMap.get(t) || { theme: t, count: 0, detractors: 0, totalScore: 0 };
-            cur.count += 1;
+          const ts = detectThemes(txt);
+          for (const key of ts) {
+            const cur =
+              themeMap.get(key) || {
+                theme: key,
+                mentions: 0,
+                totalScore: 0,
+                detractorMentions: 0,
+              };
+
+            cur.mentions += 1;
             cur.totalScore += r.score_0_10;
-            if (isDetractor) cur.detractors += 1;
-            themeMap.set(t, cur);
+            if (isDetractor) cur.detractorMentions += 1;
+
+            themeMap.set(key, cur);
           }
         }
       }
 
       const themes = Array.from(themeMap.values())
-        .map((x) => ({
-          theme: x.theme,
-          mentions: x.count,
-          avg_score: x.count ? Math.round((x.totalScore / x.count) * 10) / 10 : null,
-          share_of_detractor_mentions: x.count ? Math.round((x.detractors / x.count) * 1000) / 10 : 0,
-        }))
+        .map((x) => {
+          const avg = x.mentions ? Math.round((x.totalScore / x.mentions) * 10) / 10 : null;
+
+          // If detractors are not included, detractor share becomes meaningless -> null
+          const detractorShare =
+            allowedBuckets.has("detractor") && x.mentions
+              ? Math.round((x.detractorMentions / x.mentions) * 1000) / 10
+              : null;
+
+          return {
+            theme: x.theme,
+            mentions: x.mentions,
+            avg_score: avg,
+            share_of_detractor_mentions: detractorShare,
+          };
+        })
         .sort((a, b) => b.mentions - a.mentions);
 
       return res.json({
@@ -1060,6 +1093,7 @@ export function createIntercomRouter() {
         content_id: contentId,
         window_days: days,
         responses: items.length,
+        buckets: Array.from(allowedBuckets),
         themes,
       });
     } catch (err) {

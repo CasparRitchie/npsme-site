@@ -1654,7 +1654,7 @@ export const TRANSLATIONS = {
         },
         momentum: {
           title: "Momentum Program",
-          price: "from £850/mo",
+          price: "from £850/mo (implementation)",
           bullets: [
             "Hands-on implementation & enablement",
             "Monthly review cycles & dashboards",
@@ -4145,7 +4145,7 @@ export const TRANSLATIONS = {
         },
         momentum: {
           title: "Momentum Program",
-          price: "à partir de 850 £/mois",
+          price: "à partir de 850 £/mois (accompagnement)",
           bullets: [
             "Mise en œuvre & accompagnement",
             "Cycles mensuels & dashboards",

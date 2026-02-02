@@ -12,7 +12,7 @@ const OVERRIDES = {
     fr: "/fr/analyse-nps-intercom",
     en: "/intercom-nps-analytics",
   },
-    "/envola": {
+  "/envola": {
     fr: "/fr/exemple-envola",
     en: "/envola",
   },

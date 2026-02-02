@@ -41,6 +41,7 @@ export default function Products() {
       <section className="mx-auto max-w-7xl px-6 pb-20">
         {/* ✅ Updated grid for 4 cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {/* 1) Foundations */}
           <ProductCard
             icon={<Search className="h-5 w-5 text-white" />}
             title={translations(lang, "products.cards.foundations.title", "Feedback Foundations")}
@@ -52,18 +53,20 @@ export default function Products() {
             }}
           />
 
+          {/* 2) Pulse */}
           <ProductCard
-            icon={<LineChart className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.momentum.title", "Momentum Program")}
-            price={translations(lang, "products.cards.momentum.price", "from £850/mo")}
-            bullets={dict?.products?.cards?.momentum?.bullets || []}
+            icon={<Newspaper className="h-5 w-5 text-white" />}
+            title={translations(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
+            price={translations(lang, "products.cards.pulse.price", "from £190/mo")}
+            bullets={dict?.products?.cards?.pulse?.bullets || []}
             cta={{
-              label: translations(lang, "products.cards.momentum.cta", "Book discovery"),
-              href: localizePath("/book", lang),
+              label: translations(lang, "products.cards.pulse.cta", "See sample report"),
+              href: localizePath("/cx-pulse-sample", lang),
             }}
+            footnote={translations(lang, "products.cards.pulse.footnote", "")}
           />
 
-          {/* ✅ New Intercom Intelligence card */}
+          {/* 3) Intercom Intelligence */}
           <ProductCard
             featured
             icon={<Layers className="h-5 w-5 text-white" />}
@@ -77,19 +80,20 @@ export default function Products() {
             footnote={translations(lang, "products.cards.intercom.footnote", "")}
           />
 
+          {/* 4) Momentum */}
           <ProductCard
-            featured
-            icon={<Newspaper className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
-            price={translations(lang, "products.cards.pulse.price", "from £190/mo")}
-            bullets={dict?.products?.cards?.pulse?.bullets || []}
+            icon={<LineChart className="h-5 w-5 text-white" />}
+            title={translations(lang, "products.cards.momentum.title", "Momentum Program")}
+            price={translations(lang, "products.cards.momentum.price", "from £850/mo")}
+            bullets={dict?.products?.cards?.momentum?.bullets || []}
             cta={{
-              label: translations(lang, "products.cards.pulse.cta", "See sample report"),
-              href: localizePath("/cx-pulse-sample", lang),
+              label: translations(lang, "products.cards.momentum.cta", "Book discovery"),
+              href: localizePath("/book", lang),
             }}
-            footnote={translations(lang, "products.cards.pulse.footnote", "")}
           />
+
         </div>
+
 
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
           <h2 className="text-xl md:text-2xl font-semibold text-white">

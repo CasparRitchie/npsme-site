@@ -25,6 +25,29 @@ function Pill({ children }) {
   );
 }
 
+function TogglePill({ active, onClick, color, children }) {
+  // color: "green" | "amber" | "red"
+  const base =
+    "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition select-none";
+  const inactive = "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10";
+  const activeMap = {
+    green: "bg-green-400 text-black border-green-400",
+    amber: "bg-amber-400 text-black border-amber-400",
+    red: "bg-red-400 text-black border-red-400",
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${base} ${active ? activeMap[color] : inactive}`}
+      aria-pressed={active}
+    >
+      {children}
+    </button>
+  );
+}
+
 function prettyDate(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -46,7 +69,28 @@ export default function EnvolaExample() {
   const [rate, setRate] = useState({ loading: true, data: null, error: null });
   const [themes, setThemes] = useState({ loading: true, data: null, error: null });
   const [comments, setComments] = useState({ loading: true, data: null, error: null });
+    const [bucketFilter, setBucketFilter] = useState({
+    promoters: true,
+    passives: true,
+    detractors: true,
+  });
 
+  const isAllOff =
+    !bucketFilter.promoters && !bucketFilter.passives && !bucketFilter.detractors;
+  function labelBucket(bucket) {
+  if (bucket === "promoter") return tr("envola.filters.promoters", "Promoters");
+  if (bucket === "passive") return tr("envola.filters.passives", "Passives");
+  if (bucket === "detractor") return tr("envola.filters.detractors", "Detractors");
+  return bucket || tr("common.unknown", "Unknown");
+}
+
+  function bucketAllowed(bucket) {
+    if (isAllOff) return true; // if user turns everything off, show all (less confusing)
+    if (bucket === "promoter") return bucketFilter.promoters;
+    if (bucket === "passive") return bucketFilter.passives;
+    if (bucket === "detractor") return bucketFilter.detractors;
+    return true; // unknown buckets still show
+  }
   useEffect(() => {
     let cancelled = false;
 
@@ -305,6 +349,41 @@ export default function EnvolaExample() {
               <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
               <Pill>{tr("envola.meta.window", "Window: 30 days")}</Pill>
             </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-slate-400">
+                {tr("envola.filters.label", "Filter:")}
+              </span>
+
+              <TogglePill
+                color="green"
+                active={bucketFilter.promoters}
+                onClick={() => setBucketFilter((s) => ({ ...s, promoters: !s.promoters }))}
+              >
+                {tr("envola.filters.promoters", "Promoters")}
+              </TogglePill>
+
+              <TogglePill
+                color="amber"
+                active={bucketFilter.passives}
+                onClick={() => setBucketFilter((s) => ({ ...s, passives: !s.passives }))}
+              >
+                {tr("envola.filters.passives", "Passives")}
+              </TogglePill>
+
+              <TogglePill
+                color="red"
+                active={bucketFilter.detractors}
+                onClick={() => setBucketFilter((s) => ({ ...s, detractors: !s.detractors }))}
+              >
+                {tr("envola.filters.detractors", "Detractors")}
+              </TogglePill>
+
+              {isAllOff && (
+                <span className="text-xs text-slate-400">
+                  {tr("envola.filters.noneSelected", "No filter selected — showing all")}
+                </span>
+              )}
+            </div>
           </div>
 
           {themes.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
@@ -331,7 +410,16 @@ export default function EnvolaExample() {
                       </tr>
                     </thead>
                     <tbody className="text-sm">
-                      {themes.data.themes.slice(0, 8).map((t) => (
+                      {themes.data.themes
+                        .filter((t) => {
+                          // Keep it simple: show themes that appear in the currently selected buckets.
+                          // This assumes your /public/nps-themes endpoint is already computed from verbatims per response.
+                          // We can only filter accurately if the API returns breakdown by bucket (next step).
+                          // For now: we leave table unfiltered unless you want to do it properly server-side.
+                          return true;
+                        })
+                        .slice(0, 8)
+                        .map((t) => (
                         <tr key={t.theme} className="border-t border-white/10">
                           <td className="px-4 py-3 text-white">{t.theme}</td>
                           <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
@@ -366,28 +454,70 @@ export default function EnvolaExample() {
           <p className="mt-2 text-sm text-slate-300 max-w-3xl">
             {tr("envola.comments.subtitle", "Real comments from the last 30 days (redacted for privacy).")}
           </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400">
+              {tr("envola.filters.label", "Filter:")}
+            </span>
 
+            <TogglePill
+              color="green"
+              active={bucketFilter.promoters}
+              onClick={() => setBucketFilter((s) => ({ ...s, promoters: !s.promoters }))}
+            >
+              {tr("envola.filters.promoters", "Promoters")}
+            </TogglePill>
+
+            <TogglePill
+              color="amber"
+              active={bucketFilter.passives}
+              onClick={() => setBucketFilter((s) => ({ ...s, passives: !s.passives }))}
+            >
+              {tr("envola.filters.passives", "Passives")}
+            </TogglePill>
+
+            <TogglePill
+              color="red"
+              active={bucketFilter.detractors}
+              onClick={() => setBucketFilter((s) => ({ ...s, detractors: !s.detractors }))}
+            >
+              {tr("envola.filters.detractors", "Detractors")}
+            </TogglePill>
+
+            {isAllOff && (
+              <span className="text-xs text-slate-400">
+                {tr("envola.filters.noneSelected", "No filter selected — showing all")}
+              </span>
+            )}
+          </div>
           {comments.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
           {!comments.loading && comments.error && <p className="mt-6 text-sm text-red-300">Error: {comments.error}</p>}
 
           {!comments.loading && comments.data?.ok && (
             <>
               <div className="mt-4 text-xs text-slate-400">
-                {comments.data.substantive} of {comments.data.returned} comments are “substantive” (8+ words).
+                {(() => {
+                  const filtered = (comments.data.comments || []).filter((c) => bucketAllowed(c.bucket));
+                  const substantive = filtered.filter((c) => c.is_substantive).length;
+                  return (
+                    <>
+                      {substantive} of {filtered.length}{" "}
+                      {tr("envola.comments.substantiveLabel", "comments are “substantive” (8+ words).")}
+                    </>
+                  );
+                })()}
               </div>
 
               {comments.data.comments?.length ? (
                 <div className="mt-6 space-y-3">
-                  {comments.data.comments.map((c, idx) => (
-                    <div key={`${c.submitted_at}-${idx}`} className="rounded-2xl border border-white/10 bg-black/10 p-5">
+                  {comments.data.comments.filter((c) => bucketAllowed(c.bucket)).map((c, idx) => (                    <div key={`${c.submitted_at}-${idx}`} className="rounded-2xl border border-white/10 bg-black/10 p-5">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                         <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                          {c.bucket} • {c.score_0_10}/10
+                          {labelBucket(c.bucket)} • {c.score_0_10}/10
                         </span>
                         <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
                         {c.is_substantive && (
                           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                            Took time to write
+                            {tr("envola.comments.tookTime", "Took time to write")}
                           </span>
                         )}
                       </div>
@@ -400,14 +530,17 @@ export default function EnvolaExample() {
                 </div>
               ) : (
                 <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
-                  No comments returned yet.
+                  {tr("envola.comments.none", "No comments returned for this filter yet.")}
                 </div>
               )}
             </>
           )}
 
           <div className="mt-6 text-xs text-slate-400">
-            Comments are redacted automatically (emails, phone numbers, links, IDs).
+            {tr(
+              "envola.comments.redactionNote",
+              "Comments are redacted automatically (emails, phone numbers, links, IDs)."
+            )}
           </div>
         </div>
       </section>

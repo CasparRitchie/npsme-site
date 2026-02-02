@@ -2030,6 +2030,20 @@ export const TRANSLATIONS = {
       ctaPrimary: "See how it works",
       ctaSecondary: "Book a CX review",
 
+      // Used across multiple sections
+      meta: {
+        publicSafe: "Public-safe (aggregated)",
+        window: "Window: 30 days",
+      },
+
+      filters: {
+        label: "Filter:",
+        promoters: "Promoters",
+        passives: "Passives",
+        detractors: "Detractors",
+        noneSelected: "No filter selected — showing all",
+      },
+
       live: {
         title: "Live snapshot (last 30 days)",
         subtitle:
@@ -2045,7 +2059,50 @@ export const TRANSLATIONS = {
         detractorsSub: "Scores 0–6",
         lastResponse: "Last response:",
         meta: "Survey ID: 189616",
-        earlyNote: "Note: early sample. NPS will stabilise as response volume increases.",
+        earlyNote:
+          "Note: early sample. NPS will stabilise as response volume increases.",
+      },
+
+      metrics: {
+        title: "Response funnel & timing",
+        subtitle:
+          "Pulled from Intercom content stats export (shown → completed) and summarised for fast reporting.",
+        shown: "Shown",
+        shownSub: "Survey displayed to users",
+        completed: "Completed",
+        completedSub: "Survey fully completed",
+        responseRate: "Response rate",
+        responseRateSub: "Completed ÷ shown",
+        medianCompletion: "Median completion time",
+        medianAnswerSub: "Median time to first answer:",
+        note:
+          "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
+      },
+
+      themes: {
+        title: "Themes in comments (early view)",
+        subtitle:
+          "Simple theme detection for now. This will evolve into driver analysis and richer NLP over time.",
+        noThemes:
+          "No themes detected yet (this is normal with a small sample). As comments grow, this table will populate.",
+        cols: {
+          theme: "Theme",
+          mentions: "Mentions",
+          avgScore: "Avg score",
+          detrShare: "Detractor share",
+        },
+        note:
+          "Next: upgrade this into “drivers” (what correlates with detractors), and generate AI-assisted recommendations based on evidence.",
+      },
+
+      comments: {
+        title: "What customers are saying",
+        subtitle: "Real comments from the last 30 days (redacted for privacy).",
+        substantiveLabel: "comments are “substantive” (8+ words).",
+        none: "No comments returned for this filter yet.",
+        redactionNote:
+          "Comments are redacted automatically (emails, phone numbers, links, IDs).",
+        tookTime: "Took time to write",
       },
 
       next: {
@@ -4441,6 +4498,20 @@ export const TRANSLATIONS = {
       ctaPrimary: "Voir comment ça marche",
       ctaSecondary: "Prendre un rendez-vous CX",
 
+      // Used across multiple sections
+      meta: {
+        publicSafe: "Public-safe (agrégé)",
+        window: "Période : 30 jours",
+      },
+
+      filters: {
+        label: "Filtrer :",
+        promoters: "Promoteurs",
+        passives: "Passifs",
+        detractors: "Détracteurs",
+        noneSelected: "Aucun filtre sélectionné — affichage de tout",
+      },
+
       live: {
         title: "Instantané live (30 derniers jours)",
         subtitle:
@@ -4458,6 +4529,49 @@ export const TRANSLATIONS = {
         meta: "ID enquête : 189616",
         earlyNote:
           "Note : échantillon précoce. Le NPS se stabilise à mesure que le volume de réponses augmente.",
+      },
+
+      metrics: {
+        title: "Entonnoir & temps de complétion",
+        subtitle:
+          "Dérivé de l’export des stats Intercom (affiché → complété), puis synthétisé pour un reporting rapide.",
+        shown: "Affiché",
+        shownSub: "Enquête affichée aux utilisateurs",
+        completed: "Complété",
+        completedSub: "Enquête complétée entièrement",
+        responseRate: "Taux de réponse",
+        responseRateSub: "Complété ÷ affiché",
+        medianCompletion: "Temps médian de complétion",
+        medianAnswerSub: "Temps médian avant première réponse :",
+        note:
+          "Astuce : lancez l’ingest export-stats régulièrement pour garder le taux de réponse et les temps à jour.",
+      },
+
+      themes: {
+        title: "Thèmes dans les commentaires (vue précoce)",
+        subtitle:
+          "Détection simple pour l’instant. Cela évoluera vers une analyse de drivers et un NLP plus riche.",
+        noThemes:
+          "Aucun thème détecté pour l’instant (normal avec un petit échantillon). À mesure que les commentaires augmentent, ce tableau se remplira.",
+        cols: {
+          theme: "Thème",
+          mentions: "Mentions",
+          avgScore: "Note moyenne",
+          detrShare: "Part détracteurs",
+        },
+        note:
+          "Prochaine étape : passer aux “drivers” (ce qui corrèle avec les détracteurs), puis générer des recommandations assistées par IA et fondées sur des preuves.",
+      },
+
+      comments: {
+        title: "Ce que disent les clients",
+        subtitle:
+          "Commentaires réels des 30 derniers jours (anonymisés pour la confidentialité).",
+        substantiveLabel: "commentaires sont “substantifs” (8+ mots).",
+        none: "Aucun commentaire pour ce filtre pour l’instant.",
+        redactionNote:
+          "Les commentaires sont anonymisés automatiquement (emails, téléphones, liens, identifiants).",
+        tookTime: "A pris le temps d’écrire",
       },
 
       next: {

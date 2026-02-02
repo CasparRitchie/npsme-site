@@ -65,144 +65,99 @@ export default function EnvolaExample() {
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
 
-  const [live, setLive] = useState({ loading: true, data: null, error: null });
-  const [rate, setRate] = useState({ loading: true, data: null, error: null });
-  const [themes, setThemes] = useState({ loading: true, data: null, error: null });
-  const [comments, setComments] = useState({ loading: true, data: null, error: null });
-  const [bucketFilter, setBucketFilter] = useState({
-    promoters: true,
-    passives: true,
-    detractors: true,
-  });
+    const [live, setLive] = useState({ loading: true, data: null, error: null });
+    const [rate, setRate] = useState({ loading: true, data: null, error: null });
+    const [themes, setThemes] = useState({ loading: true, data: null, error: null });
+    const [comments, setComments] = useState({ loading: true, data: null, error: null });
 
-  const isAllOff =
-    !bucketFilter.promoters && !bucketFilter.passives && !bucketFilter.detractors;
-  function labelBucket(bucket) {
-  if (bucket === "promoter") return tr("envola.filters.promoters", "Promoters");
-  if (bucket === "passive") return tr("envola.filters.passives", "Passives");
-  if (bucket === "detractor") return tr("envola.filters.detractors", "Detractors");
-  return bucket || tr("common.unknown", "Unknown");
-  }
-  function labelTheme(themeKey) {
-  return tr(`envola.themeLabels.${themeKey}`, themeKey);
-  }
-  function bucketAllowed(bucket) {
-    if (isAllOff) return true; // if user turns everything off, show all (less confusing)
-    if (bucket === "promoter") return bucketFilter.promoters;
-    if (bucket === "passive") return bucketFilter.passives;
-    if (bucket === "detractor") return bucketFilter.detractors;
-    return true; // unknown buckets still show
-  }
-  useEffect(() => {
-    let cancelled = false;
+    const [bucketFilter, setBucketFilter] = useState({
+      promoters: true,
+      passives: true,
+      detractors: true,
+    });
 
-    async function run() {
-      try {
-        const url = "/api/intercom/public/nps-summary?content_id=189616&days=30";
-        const r = await fetch(url);
-        const j = await r.json();
-        if (!cancelled) {
-          setLive({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+    const isAllOff =
+      !bucketFilter.promoters && !bucketFilter.passives && !bucketFilter.detractors;
+
+    function bucketAllowed(bucket) {
+      if (isAllOff) return true;
+      if (bucket === "promoter") return bucketFilter.promoters;
+      if (bucket === "passive") return bucketFilter.passives;
+      if (bucket === "detractor") return bucketFilter.detractors;
+      return true;
+    }
+
+    // LIVE
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const r = await fetch("/api/intercom/public/nps-summary?content_id=189616&days=30");
+          const j = await r.json();
+          if (!cancelled) setLive({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+        } catch (e) {
+          if (!cancelled) setLive({ loading: false, data: null, error: e.message });
         }
-      } catch (e) {
-        if (!cancelled) setLive({ loading: false, data: null, error: e.message });
-      }
-    }
+      })();
+      return () => { cancelled = true; };
+    }, []);
 
-    run();
-    return () => { cancelled = true; };
-  }, []);
+    // RATE
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const r = await fetch("/api/intercom/public/nps-response-rate?content_id=189616&days=30");
+          const j = await r.json();
+          if (!cancelled) setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+        } catch (e) {
+          if (!cancelled) setRate({ loading: false, data: null, error: e.message });
+        }
+      })();
+      return () => { cancelled = true; };
+    }, []);
 
-  useEffect(() => {
-    let cancelled = false;
+    // THEMES (refetches when toggles change)
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const selected = [];
+          if (bucketFilter.promoters) selected.push("promoter");
+          if (bucketFilter.passives) selected.push("passive");
+          if (bucketFilter.detractors) selected.push("detractor");
 
-    async function run() {
-      try {
-        const url = "/api/intercom/public/nps-response-rate?content_id=189616&days=30";
-        const r = await fetch(url);
-        const j = await r.json();
-        if (!cancelled) setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-      } catch (e) {
-        if (!cancelled) setRate({ loading: false, data: null, error: e.message });
-      }
-    }
+          const bucketsParam =
+            selected.length === 0 ? "" : `&buckets=${encodeURIComponent(selected.join(","))}`;
 
-    run();
-    return () => { cancelled = true; };
-  }, []);
+          const r = await fetch(`/api/intercom/public/nps-themes?content_id=189616&days=30${bucketsParam}`);
+          const j = await r.json();
 
-  useEffect(() => {
-    let cancelled = false;
+          if (!cancelled) setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+        } catch (e) {
+          if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
+        }
+      })();
 
-    async function run() {
-      try {
-        const url = "/api/intercom/public/nps-themes?content_id=189616&days=30";
-        const r = await fetch(url);
-        const j = await r.json();
-        if (!cancelled) setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-      } catch (e) {
-        if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
-      }
-    }
+      setThemes((s) => ({ ...s, loading: true }));
+      return () => { cancelled = true; };
+    }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
-    run();
-    return () => { cancelled = true; };
-  }, []);
+    // COMMENTS (fetch once; filter client-side)
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const r = await fetch("/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50");
+          const j = await r.json();
+          if (!cancelled) setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+        } catch (e) {
+          if (!cancelled) setComments({ loading: false, data: null, error: e.message });
+        }
+      })();
+      return () => { cancelled = true; };
+    }, []);
 
-  useEffect(() => {
-  let cancelled = false;
-
-  useEffect(() => {
-  let cancelled = false;
-
-  async function run() {
-    try {
-      const url = "/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50";
-      const r = await fetch(url);
-
-      // If the server returns HTML (proxy/404), r.json() will throw.
-      const j = await r.json();
-
-      if (!cancelled) {
-        setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-      }
-    } catch (e) {
-      if (!cancelled) setComments({ loading: false, data: null, error: e.message });
-    }
-  }
-
-  setComments((s) => ({ ...s, loading: true }));
-  run();
-
-  return () => { cancelled = true; };
-}, []);
-
-  async function run() {
-    try {
-      // If user turns everything off, we treat it as "show all" (same logic as comments)
-      const selected = [];
-      if (bucketFilter.promoters) selected.push("promoter");
-      if (bucketFilter.passives) selected.push("passive");
-      if (bucketFilter.detractors) selected.push("detractor");
-
-      const bucketsParam =
-        selected.length === 0 ? "" : `&buckets=${encodeURIComponent(selected.join(","))}`;
-
-      const url = `/api/intercom/public/nps-themes?content_id=189616&days=30${bucketsParam}`;
-      const r = await fetch(url);
-      const j = await r.json();
-      if (!cancelled) {
-        setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
-      }
-    } catch (e) {
-      if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
-    }
-  }
-
-  setThemes((s) => ({ ...s, loading: true })); // optional: show Loading... on toggle
-  run();
-  return () => { cancelled = true; };
-}, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo

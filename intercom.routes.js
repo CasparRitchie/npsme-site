@@ -823,6 +823,61 @@ export function createIntercomRouter() {
   // -----------------------
   // Public endpoints (aggregated, safe)
   // -----------------------
+
+  router.get("/public/nps-summary", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+      // Optional: keep your auto refresh behaviour (safe for public pages)
+      const ingestInfo = await autoIngestIfStale().catch(() => null);
+      res.set("X-NPSme-Auto-Ingest", ingestInfo?.ran ? ingestInfo.reason : "no");
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      const items = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .filter((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return Number.isFinite(t) && t >= cutoff;
+        })
+        .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
+
+      const total = items.length;
+      const promoters = items.filter((r) => r.score_0_10 >= 9).length;
+      const passives = items.filter((r) => r.score_0_10 >= 7 && r.score_0_10 <= 8).length;
+      const detractors = items.filter((r) => r.score_0_10 <= 6).length;
+
+      const nps = total ? Math.round(((promoters - detractors) / total) * 100) : null;
+
+      const newest =
+        items.map((r) => r.submitted_at).filter(Boolean).sort().slice(-1)[0] || null;
+
+      const confidence =
+        total >= 200 ? "high" : total >= 50 ? "medium" : total >= 10 ? "low" : "very_low";
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        window_days: days,
+        responses: total,
+        promoters,
+        passives,
+        detractors,
+        nps,
+        confidence,
+        newest_response_at: newest,
+      });
+    } catch (err) {
+      console.error("[intercom] public nps-summary error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+  
   router.get("/public/nps-comments", async (req, res) => {
   try {
     const contentId = String(req.query.content_id || "").trim();

@@ -233,11 +233,23 @@ const baseIndexHtml = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 // Needed behind Heroku/Cloudflare so req.ip / x-forwarded-proto work
 app.set("trust proxy", 1);
 
+// Always compress (including HTML)
+app.use(
+  compression({
+    threshold: 0,
+  })
+);
+
+// Ensure proper caching variation
+app.use((req, res, next) => {
+  res.setHeader("Vary", "Accept-Encoding");
+  next();
+});
+
 // Mount Intercom router ONCE, before express.json()
 app.use("/api/intercom", createIntercomRouter());
 
 app.use(express.json());
-app.use(compression());
 
 // Security headers (CSP off so we don’t break your current inline styles/scripts)
 app.use(

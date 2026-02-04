@@ -121,10 +121,36 @@ function DemoSummaryStrip() {
   const tr = (p, f) => translations(lang, p, f);
 
   const [stats, setStats] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [shouldLoad, setShouldLoad] = React.useState(false);
+  const ref = React.useRef(null);
 
+  // 1) Only trigger once the component is near the viewport
   React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          obs.disconnect();
+        }
+      },
+      { root: null, rootMargin: "300px", threshold: 0.01 } // start loading a bit before it appears
+    );
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // 2) Fetch only after it becomes visible-ish
+  React.useEffect(() => {
+    if (!shouldLoad) return;
+
+    let cancelled = false;
+
     async function load() {
       try {
         setLoading(true);
@@ -132,32 +158,44 @@ function DemoSummaryStrip() {
         const res = await fetch("/api/demo-responses");
         if (!res.ok) throw new Error("Failed to load demo responses");
         const data = await res.json();
-        setStats(computeNpsStats(data.rows || []));
+        if (!cancelled) setStats(computeNpsStats(data.rows || []));
       } catch (err) {
         console.error("Error loading demo summary", err);
-        setError("err");
+        if (!cancelled) setError("err");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    load();
-  }, []);
 
-  if (loading) return <p className="text-sm text-slate-400">{tr("landing.demo.loading")}</p>;
-  if (error) return <p className="text-sm text-slate-400">{tr("landing.demo.error")}</p>;
-  if (!stats) return <p className="text-sm text-slate-400">{tr("landing.demo.empty")}</p>;
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldLoad]);
 
   return (
-    <div className="text-sm text-slate-300">
-      <div className="text-xs uppercase tracking-widest text-slate-400">
-        {tr("landing.demo.label")}
-      </div>
-      <div className="mt-1 text-2xl font-semibold text-white">
-        {stats.nps ?? "-"}
-      </div>
-      <p className="mt-1 text-[11px] text-slate-500">
-        {tr("landing.demo.basedOn").replace("{count}", String(stats.total))}
-      </p>
+    <div ref={ref}>
+      {!shouldLoad ? (
+        <p className="text-sm text-slate-400">{tr("landing.demo.loading")}</p>
+      ) : loading ? (
+        <p className="text-sm text-slate-400">{tr("landing.demo.loading")}</p>
+      ) : error ? (
+        <p className="text-sm text-slate-400">{tr("landing.demo.error")}</p>
+      ) : !stats ? (
+        <p className="text-sm text-slate-400">{tr("landing.demo.empty")}</p>
+      ) : (
+        <div className="text-sm text-slate-300">
+          <div className="text-xs uppercase tracking-widest text-slate-400">
+            {tr("landing.demo.label")}
+          </div>
+          <div className="mt-1 text-2xl font-semibold text-white">
+            {stats.nps ?? "-"}
+          </div>
+          <p className="mt-1 text-[11px] text-slate-500">
+            {tr("landing.demo.basedOn").replace("{count}", String(stats.total))}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

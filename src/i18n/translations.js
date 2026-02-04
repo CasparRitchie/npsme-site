@@ -1473,8 +1473,7 @@ export const TRANSLATIONS = {
             tail: "and enablement for teams using your existing tools.",
             accent: "Turn feedback into measurable growth.",
           },
-          body:
-            "Already sending surveys through Intercom, HubSpot, Zendesk or CSV? I help you design a reliable programme, analyse comments, prioritise fixes, and embed close-the-loop workflows that improve retention and revenue.",
+          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). I help you run a reliable NPS programme, extract insight from comments, prioritise the few fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
           ctaPrimary: "Book a free discovery",
           ctaMethod: "See the method",
           ctaDemo: "View example insights",
@@ -1547,16 +1546,17 @@ export const TRANSLATIONS = {
       },
 
       about: {
-        title: "Who’s behind NPS Me?",
+        title: "About Caspar",
         body:
-          "I’m Caspar — a CX & NPS specialist combining rigorous measurement with practical enablement. If you want NPS to drive action (not noise), I can help.",
+          "Practical CX. Measurable outcomes. Less theatre, more progress. I help teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
         bullets: [
-          "Programme reliability: sampling, bias, comparability",
-          "Comment analysis → themes, drivers, priorities",
+          "Decision-grade programmes: sampling, bias, comparability (so the score means something)",
+          "Verbatim → themes, drivers, and clear priorities",
           "Roadmaps with owners and effort/impact scoring",
           "Enablement: playbooks, scripts, templates, training",
-          "Measurement: NPS/CSAT/CES + review velocity and outcomes",
+          "Close-the-loop workflows that actually change outcomes",
         ],
+        cta: "Read more about me",
       },
 
       contact: {
@@ -1628,29 +1628,45 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "How I can help",
+        title: "Three ways to work together",
         body:
-          "Pick the support level that fits: hands-on implementation, team workshops, keynote speaking, or ongoing insight you can act on.",
+          "Pick the format that matches your team’s stage — hands-on delivery, enablement, or inspiration at scale.",
         cards: [
           {
             title: "Consulting",
-            desc: "Design and run an NPS programme that’s comparable, honest and decision-grade.",
-            bullets: ["Survey design & governance", "Review mining & driver analysis", "Prioritised roadmap + owners"],
-          },
-          {
-            title: "Implementation",
-            desc: "Hands-on setup and enablement to embed actions into day-to-day team workflows.",
-            bullets: ["Close-the-loop workflows", "Templates, scripts, automation", "Dashboards + monthly reviews"],
+            desc: "Most consultants advise. I implement — diagnose → prioritise → ship.",
+            bullets: [
+              "NPS programme design (no survey spam, no bad data)",
+              "Theme/driver analysis from real comments",
+              "Roadmap + owners + monthly review cycles",
+            ],
           },
           {
             title: "Workshops & training",
-            desc: "Practical sessions to align teams and accelerate capability—no theory-only decks.",
-            bullets: ["NPS fundamentals & pitfalls", "Theme/driver analysis training", "Action planning facilitation"],
+            desc: "Practical training to help teams run NPS well — not theory-only decks.",
+            bullets: [
+              "Survey design, sampling, comparability",
+              "Close-the-loop workflows and templates",
+              "Action planning facilitation",
+            ],
           },
           {
             title: "Speaking",
-            desc: "Keynotes and CX talks: how to make NPS useful, ethical, and growth-driving.",
-            bullets: ["Leadership sessions", "Team offsites", "Events & conferences"],
+            desc: "Keynotes and talks on practical CX: what actually moves NPS and how to build momentum.",
+            bullets: [
+              "Leadership sessions and offsites",
+              "Company events and conferences",
+              "CX strategy meets delivery reality",
+            ],
+          },
+          {
+            title: "Ongoing insight",
+            desc: "A lightweight intelligence feed (Pulse / Intercom analytics) you can act on week by week.",
+            bullets: [
+              "Themes, delighters, risk flags",
+              "Competitor & sentiment pulse (optional)",
+              "Clear next steps (not dashboards for dashboards’ sake)",
+            ],
           },
         ],
         ctas: {
@@ -2508,7 +2524,7 @@ export const TRANSLATIONS = {
         intro:
           "NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it into fewer churn events, more repeat revenue, and less firefighting in support. We help you do that, quickly, without a huge consulting army on your payroll.",
         ctaBook: "Book a discovery call",
-        ctaDemo: "Try the NPS style demo",
+        ctaDemo: "See example outputs",
       },
 
       whatYouGet: {
@@ -4093,11 +4109,10 @@ export const TRANSLATIONS = {
               tail: "et enablement au-dessus de vos outils existants.",
               accent: "Du feedback à la croissance mesurable.",
             },
-            body:
-              "Vous envoyez déjà des enquêtes via Intercom, HubSpot, Zendesk ou un CSV ? Je vous aide à concevoir un programme fiable, analyser les verbatims, prioriser les actions et déployer des workflows de close-the-loop qui améliorent rétention et revenus.",
+            body: "Gardez votre outil d’envoi (Intercom, HubSpot, Zendesk ou CSV). Je vous aide à opérer un programme NPS fiable, extraire des insights des verbatims, prioriser les actions utiles, et déployer des workflows de close-the-loop qui améliorent rétention et revenus.",
             ctaPrimary: "Réserver un échange",
             ctaMethod: "Voir la méthode",
-            ctaDemo: "Voir des exemples d’insights",
+            ctaDemo: "Voir des exemples",
             proof: {
               mining: "Insights à partir des verbatims",
               enablement: "Enablement & workflows",
@@ -4167,16 +4182,17 @@ export const TRANSLATIONS = {
       },
 
       about: {
-        title: "Qui est derrière NPS Me ?",
+        title: "À propos de Caspar",
         body:
-          "Je suis Caspar — spécialiste CX & NPS. J’allie mesure rigoureuse et accompagnement opérationnel pour transformer le feedback en actions concrètes.",
+          "CX pragmatique. Impact mesurable. Moins de théâtre, plus d’actions. J’aide les équipes à faire du NPS correctement et à transformer le feedback en actions qui améliorent rétention, recommandation et CA.",
         bullets: [
-          "Fiabilité du programme : échantillonnage, biais, comparabilité",
-          "Analyse des verbatims → thèmes, drivers, priorités",
+          "Programmes “decision-grade” : échantillonnage, biais, comparabilité (pour que le score soit interprétable)",
+          "Verbatims → thèmes, drivers, priorités claires",
           "Roadmaps avec responsables + impact/effort",
           "Enablement : playbooks, scripts, templates, formation",
-          "Mesure : NPS/CSAT/CES + vélocité d’avis et résultats",
+          "Workflows de close-the-loop qui changent les résultats",
         ],
+        cta: "En savoir plus",
       },
 
       contact: {
@@ -4254,29 +4270,45 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Comment je peux vous aider",
+        title: "Trois façons de travailler ensemble",
         body:
-          "Choisissez le bon niveau : accompagnement opérationnel, ateliers d’équipe, conférences, ou insights récurrents actionnables.",
+          "Choisissez le format adapté : accompagnement opérationnel, montée en compétence, ou inspiration à grande échelle.",
         cards: [
           {
-            title: "Conseil",
-            desc: "Concevoir et opérer un programme NPS fiable, comparable et utile pour décider.",
-            bullets: ["Design d’enquête & gouvernance", "Analyse d’avis & drivers", "Roadmap priorisée + responsables"],
-          },
-          {
-            title: "Mise en œuvre",
-            desc: "Mise en place et enablement pour intégrer l’action au quotidien des équipes.",
-            bullets: ["Workflows de close-the-loop", "Scripts, templates, automatisations", "Dashboards + revues mensuelles"],
+            title: "Conseil / accompagnement",
+            desc: "Beaucoup conseillent. Moi, j’implémente : diagnostiquer → prioriser → déployer.",
+            bullets: [
+              "Design de programme NPS (sans spam ni mauvaise donnée)",
+              "Analyse thèmes/drivers à partir des verbatims",
+              "Roadmap + responsables + revues mensuelles",
+            ],
           },
           {
             title: "Ateliers & formation",
-            desc: "Sessions pratiques pour aligner les équipes et accélérer la montée en compétence.",
-            bullets: ["Fondamentaux NPS & pièges", "Formation à l’analyse thèmes/drivers", "Facilitation plan d’actions"],
+            desc: "Formation pratique pour bien faire du NPS — pas des slides pour faire joli.",
+            bullets: [
+              "Design d’enquête, échantillonnage, comparabilité",
+              "Close-the-loop + templates",
+              "Facilitation plan d’actions",
+            ],
           },
           {
             title: "Conférences",
-            desc: "Keynotes et talks CX : rendre le NPS utile, éthique et orienté croissance.",
-            bullets: ["Sessions leadership", "Offsites d’équipe", "Événements & conférences"],
+            desc: "Interventions sur une CX pragmatique : ce qui fait bouger le NPS et comment créer une dynamique.",
+            bullets: [
+              "Sessions leadership et offsites",
+              "Événements et conférences",
+              "Stratégie + réalité terrain",
+            ],
+          },
+          {
+            title: "Insights récurrents",
+            desc: "Un flux léger d’intelligence (Pulse / analytics Intercom) actionnable chaque semaine.",
+            bullets: [
+              "Thèmes, delighters, signaux de risque",
+              "Pouls concurrentiel & sentiment (option)",
+              "Prochaines actions claires",
+            ],
           },
         ],
         ctas: {

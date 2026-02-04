@@ -41,11 +41,16 @@ export default function Products() {
       <section className="mx-auto max-w-7xl px-6 pb-20">
         {/* ✅ Updated grid for 4 cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* 1) Foundations */}
+          {/* 1) Foundations (Start here) */}
           <ProductCard
             icon={<Search className="h-5 w-5 text-white" />}
             title={translations(lang, "products.cards.foundations.title", "Feedback Foundations")}
             price={translations(lang, "products.cards.foundations.price", "from £450")}
+            hint={translations(
+              lang,
+              "products.cards.foundations.hint",
+              "Best for: teams starting (or restarting) NPS"
+            )}
             bullets={dict?.products?.cards?.foundations?.bullets || []}
             cta={{
               label: translations(lang, "products.cards.foundations.cta", "Request audit"),
@@ -53,38 +58,17 @@ export default function Products() {
             }}
           />
 
-          {/* 2) Pulse */}
-          <ProductCard
-            icon={<Newspaper className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
-            price={translations(lang, "products.cards.pulse.price", "from £190/mo")}
-            bullets={dict?.products?.cards?.pulse?.bullets || []}
-            cta={{
-              label: translations(lang, "products.cards.pulse.cta", "See sample report"),
-              href: localizePath("/cx-pulse-sample", lang),
-            }}
-            footnote={translations(lang, "products.cards.pulse.footnote", "")}
-          />
-
-          {/* 3) Intercom Intelligence */}
+          {/* 2) Momentum (Featured / Primary offer) */}
           <ProductCard
             featured
-            icon={<Layers className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.intercom.title", "CX Intelligence Layer (Intercom NPS)")}
-            price={translations(lang, "products.cards.intercom.price", "from £290/mo")}
-            bullets={dict?.products?.cards?.intercom?.bullets || []}
-            cta={{
-              label: translations(lang, "products.cards.intercom.cta", "View Intercom example"),
-              href: localizePath("/intercom-nps-analytics", lang), // adjust route if different
-            }}
-            footnote={translations(lang, "products.cards.intercom.footnote", "")}
-          />
-
-          {/* 4) Momentum */}
-          <ProductCard
             icon={<LineChart className="h-5 w-5 text-white" />}
             title={translations(lang, "products.cards.momentum.title", "Momentum Program")}
             price={translations(lang, "products.cards.momentum.price", "from £850/mo")}
+            hint={translations(
+              lang,
+              "products.cards.momentum.hint",
+              "Best for: teams who want results, not dashboards"
+            )}
             bullets={dict?.products?.cards?.momentum?.bullets || []}
             cta={{
               label: translations(lang, "products.cards.momentum.cta", "Book discovery"),
@@ -92,6 +76,41 @@ export default function Products() {
             }}
           />
 
+          {/* 3) Intercom Intelligence (Subscription) */}
+          <ProductCard
+            icon={<Layers className="h-5 w-5 text-white" />}
+            title={translations(lang, "products.cards.intercom.title", "CX Intelligence Layer (Intercom NPS)")}
+            price={translations(lang, "products.cards.intercom.price", "from £290/mo")}
+            hint={translations(
+              lang,
+              "products.cards.intercom.hint",
+              "Best for: teams already using Intercom NPS"
+            )}
+            bullets={dict?.products?.cards?.intercom?.bullets || []}
+            cta={{
+              label: translations(lang, "products.cards.intercom.cta", "View Intercom example"),
+              href: localizePath("/intercom-nps-analytics", lang),
+            }}
+            footnote={translations(lang, "products.cards.intercom.footnote", "")}
+          />
+
+          {/* 4) Pulse (Weekly external signal) */}
+          <ProductCard
+            icon={<Newspaper className="h-5 w-5 text-white" />}
+            title={translations(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
+            price={translations(lang, "products.cards.pulse.price", "from £190/mo")}
+            hint={translations(
+              lang,
+              "products.cards.pulse.hint",
+              "Best for: a weekly external signal you can act on"
+            )}
+            bullets={dict?.products?.cards?.pulse?.bullets || []}
+            cta={{
+              label: translations(lang, "products.cards.pulse.cta", "See sample report"),
+              href: localizePath("/cx-pulse-sample", lang),
+            }}
+            footnote={translations(lang, "products.cards.pulse.footnote", "")}
+          />
         </div>
 
 
@@ -149,7 +168,7 @@ export default function Products() {
   );
 }
 
-function ProductCard({ icon, title, price, bullets, cta, featured = false, footnote }) {
+function ProductCard({ icon, title, price, bullets, cta, featured = false, footnote, hint }) {
   const isInternal = cta?.href && cta.href.startsWith("/") && !cta.href.startsWith("//");
   const CTA = isInternal ? Link : "a";
   const ctaProps = isInternal
@@ -177,6 +196,7 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
       </div>
 
       <div className="mt-2 text-sm text-slate-400">{price}</div>
+      {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}
 
       <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
         {(bullets || []).map((b) => (

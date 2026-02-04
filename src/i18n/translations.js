@@ -1651,6 +1651,7 @@ export const TRANSLATIONS = {
             "Prioritised roadmap (effort/impact)",
           ],
           cta: "Request audit",
+          hint: "Best for: teams starting (or restarting) NPS",
         },
         momentum: {
           title: "Momentum Program",
@@ -1661,18 +1662,9 @@ export const TRANSLATIONS = {
             "Measured lift on key outcomes",
           ],
           cta: "Book discovery",
+          hint: "Best for: teams who want results, not dashboards",
         },
-        pulse: {
-          title: "CX Pulse Report (weekly)",
-          price: "from £190/mo",
-          bullets: [
-            "Social listening across X/LinkedIn/Reddit/Reviews",
-            "Top themes, sentiment & competitor pulse",
-            "1-page actionable summary + next steps",
-          ],
-          cta: "See sample report",
-          footnote: "Starts manual, scales with automation. Cancel anytime.",
-        },
+
         intercom: {
           title: "CX Intelligence Layer (Intercom NPS)",
           price: "from £290/mo",
@@ -1684,6 +1676,19 @@ export const TRANSLATIONS = {
           ],
           cta: "View Intercom example",
           footnote: "Optional: expert-led Intercom NPS survey design & setup (£450 one-off).",
+          hint: "Best for: teams already using Intercom NPS",
+        },
+        pulse: {
+          title: "CX Pulse Report (weekly)",
+          price: "from £190/mo",
+          bullets: [
+            "Social listening across X/LinkedIn/Reddit/Reviews",
+            "Top themes, sentiment & competitor pulse",
+            "1-page actionable summary + next steps",
+          ],
+          cta: "See sample report",
+          footnote: "Starts manual, scales with automation. Cancel anytime.",
+          hint: "Best for: a weekly external signal you can act on",
         },
       },
 
@@ -4142,6 +4147,7 @@ export const TRANSLATIONS = {
             "Roadmap priorisée (effort/impact)",
           ],
           cta: "Demander un audit",
+          hint: "Idéal pour : démarrer (ou relancer) un programme NPS",
         },
         momentum: {
           title: "Momentum Program",
@@ -4152,19 +4158,9 @@ export const TRANSLATIONS = {
             "Amélioration mesurée des résultats",
           ],
           cta: "Prendre rendez-vous",
+          hint: "Idéal pour : obtenir des résultats, pas juste des dashboards",
         },
-        pulse: {
-          title: "Rapport CX Pulse (hebdo)",
-          price: "à partir de 190 £/mois",
-          bullets: [
-            "Social listening (X/LinkedIn/Reddit/Avis)",
-            "Thèmes clés, sentiment & pouls concurrentiel",
-            "Synthèse actionnable (1 page) + prochaines étapes",
-          ],
-          cta: "Voir un exemple",
-          footnote:
-            "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
-        },
+
         intercom: {
           title: "Couche d’intelligence CX (Intercom NPS)",
           price: "à partir de 290 £/mois",
@@ -4176,6 +4172,19 @@ export const TRANSLATIONS = {
           ],
           cta: "Voir l’exemple Intercom",
           footnote: "Option : atelier expert pour concevoir et paramétrer le NPS Intercom (450 £, ponctuel).",
+          hint: "Idéal pour : les équipes déjà sur Intercom NPS",
+        },
+        pulse: {
+          title: "Rapport CX Pulse (hebdo)",
+          price: "à partir de 190 £/mois",
+          bullets: [
+            "Social listening (X/LinkedIn/Reddit/Avis)",
+            "Thèmes clés, sentiment & pouls concurrentiel",
+            "Synthèse actionnable (1 page) + prochaines étapes",
+          ],
+          cta: "Voir un exemple",
+          footnote: "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
+          hint: "Idéal pour : un signal externe hebdo, actionnable",
         },
       },
 

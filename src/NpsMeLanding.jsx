@@ -8,8 +8,61 @@ import { computeNpsStats } from "../utils/nps";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
+import { localizePath } from "./i18n/pathHelpers";
 
+function ServicesSection() {
+  const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+  const cards = translations(lang, "landing.services.cards", []);
+  const ctas = translations(lang, "landing.services.ctas", {});
 
+  return (
+    <section id="services" className="mx-auto max-w-7xl px-6 pb-20">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+        <div className="max-w-3xl">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("landing.services.title")}
+          </h2>
+          <p className="mt-3 text-slate-300">
+            {tr("landing.services.body")}
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {cards.map((c) => (
+            <div key={c.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div className="text-white font-semibold">{c.title}</div>
+              <div className="mt-2 text-sm text-slate-300">{c.desc}</div>
+              {c.bullets?.length ? (
+                <ul className="mt-3 space-y-2 list-disc pl-5 text-sm text-slate-300">
+                  {c.bullets.map((b) => <li key={b}>{b}</li>)}
+                </ul>
+              ) : null}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <Link
+            to={localizePath("/products", lang)}
+            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
+          >
+            {ctas.products}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+
+          <Link
+            to={localizePath("/about", lang)}
+            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
+          >
+            {ctas.about}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 // --- NPS explainer ---
 function NpsExplainer() {
   const { lang } = useLanguage();
@@ -248,8 +301,7 @@ export default function NpsMeLanding() {
             </motion.p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <Link
-                to="/book"
+              <Link to={localizePath("/book", lang)}
                 className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
               >
                 {tr("landing.hero.ctaPrimary")}
@@ -341,10 +393,9 @@ export default function NpsMeLanding() {
           </div>
 
           <div className="mt-4 md:mt-0 flex flex-col items-start gap-3">
-            <Link
-              to="/demo-survey-page"
+            <Link to={localizePath("/demo-survey-page", lang)}
               className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white"
-            >
+              >
               {tr("landing.demoBlock.cta")}
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -382,6 +433,7 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
+      <ServicesSection />
       <NpsExplainer />
       <MilestoneNpsSection />
 
@@ -423,10 +475,9 @@ export default function NpsMeLanding() {
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </a>
 
-            <Link
-              to="/book"
+            <Link to={localizePath("/book", lang)}
               className="group inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
-            >
+              >
               {tr("landing.contact.bookCta")}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>

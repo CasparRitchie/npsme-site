@@ -25,16 +25,26 @@ function AppShell() {
   return (
     <HelmetProvider>
       <div className={rootClass}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+        >
+          Skip to content
+        </a>
         {!isBare && <NavBar />}
         <ScrollToTop />
-        <Routes>
-          {ROUTES.filter((r) => r.enabled && r.component).map(
-            ({ path, component: C }) => (
-              <Route key={path} path={path} element={<C />} />
-            )
-          )}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+
+        <main id="main-content">
+          <Routes>
+            {ROUTES.filter((r) => r.enabled && r.component).map(
+              ({ path, component: C }) => (
+                <Route key={path} path={path} element={<C />} />
+              )
+            )}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+
         {!isBare && <SiteFooter />}
       </div>
     </HelmetProvider>

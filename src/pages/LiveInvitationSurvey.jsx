@@ -1,6 +1,7 @@
 // LiveInvitationSurvey.jsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import EnvolaLayout from "../components/EnvolaLayout";
 
 function useQuery() {
   const { search } = useLocation();
@@ -71,83 +72,89 @@ export default function LiveInvitationSurvey() {
 
   if (loading) {
     return (
-      <div className="survey-page envola-theme">
-        <div className="survey-card envola-card">
-          <div className="envola-brand-bar">
-            <div className="envola-logo-wrap">
-              <img
-                src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
-                alt="Envola"
-                className="envola-logo-img"
-              />
+      <EnvolaLayout>
+        <div className="survey-page envola-theme">
+          <div className="survey-card envola-card">
+            <div className="envola-brand-bar">
+              <div className="envola-logo-wrap">
+                <img
+                  src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
+                  alt="Envola"
+                  className="envola-logo-img"
+                />
+              </div>
+              <span className="envola-badge">Questionnaire de satisfaction</span>
             </div>
-            <span className="envola-badge">Questionnaire de satisfaction</span>
+            <p>Chargement du questionnaire…</p>
+            <p className="envola-powered">
+              Propulsé par{" "}
+              <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+                NPS Me
+              </a>
+            </p>
           </div>
-          <p>Chargement du questionnaire…</p>
-          <p className="envola-powered">
-            Propulsé par{" "}
-            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
-              NPS Me
-            </a>
-          </p>
         </div>
-      </div>
+      </EnvolaLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="survey-page envola-theme">
-        <div className="survey-card envola-card">
-          <div className="envola-brand-bar">
-            <div className="envola-logo-wrap">
-              <img
-                src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
-                alt="Envola"
-                className="envola-logo-img"
-              />
+      <EnvolaLayout>
+        <div className="survey-page envola-theme">
+          <div className="survey-card envola-card">
+            <div className="envola-brand-bar">
+              <div className="envola-logo-wrap">
+                <img
+                  src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
+                  alt="Envola"
+                  className="envola-logo-img"
+                />
+              </div>
+              <span className="envola-badge">Questionnaire de satisfaction</span>
             </div>
-            <span className="envola-badge">Questionnaire de satisfaction</span>
+            <h1>Oups…</h1>
+            <p>{error}</p>
+            <p className="envola-powered">
+              Propulsé par{" "}
+              <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+                NPS Me
+              </a>
+            </p>
           </div>
-          <h1>Oups…</h1>
-          <p>{error}</p>
-          <p className="envola-powered">
-            Propulsé par{" "}
-            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
-              NPS Me
-            </a>
-          </p>
         </div>
-      </div>
+      </EnvolaLayout>
     );
   }
 
   if (!invitation) {
     return (
-      <div className="survey-page envola-theme">
-        <div className="survey-card envola-card">
-          <div className="envola-brand-bar">
-            <div className="envola-logo-wrap">
-              <img
-                src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
-                alt="Envola"
-                className="envola-logo-img"
-              />
+      <EnvolaLayout>
+        <div className="survey-page envola-theme">
+          <div className="survey-card envola-card">
+            <div className="envola-brand-bar">
+              <div className="envola-logo-wrap">
+                <img
+                  src="https://envola.fr/wp-content/uploads/2025/02/logo-envola.png"
+                  alt="Envola"
+                  className="envola-logo-img"
+                />
+              </div>
+              <span className="envola-badge">Questionnaire de satisfaction</span>
             </div>
-            <span className="envola-badge">Questionnaire de satisfaction</span>
+            <h1>Oups…</h1>
+            <p>
+              Une erreur inattendue s'est produite. Merci de réessayer plus tard.
+            </p>
+            <p className="envola-powered">
+              Propulsé par{" "}
+              <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
+                NPS Me
+              </a>
+            </p>
           </div>
-          <h1>Oups…</h1>
-          <p>
-            Une erreur inattendue s'est produite. Merci de réessayer plus tard.
-          </p>
-          <p className="envola-powered">
-            Propulsé par{" "}
-            <a href="https://www.npsme.com" target="_blank" rel="noreferrer">
-              NPS Me
-            </a>
-          </p>
         </div>
-      </div>
+      </EnvolaLayout>
     );
   }
 

@@ -11,6 +11,9 @@ export const ROUTES_MANIFEST = [
   { path: "/impact",      label: "Impact",               labelKey: "routes.impact",               enabled: true,  indexable: true,  inHeader: false, inFooter: true,  lang: "en" },
   { path: "/fr/impact",   label: "Impact",               labelKey: "routes.impact",               enabled: true,  indexable: true,  inHeader: false, inFooter: true,  lang: "fr" },
 
+  { path: "/about",     label: "About",     labelKey: "routes.about", enabled: true, indexable: true, inHeader: true,  inFooter: true, lang: "en" },
+  { path: "/fr/about",  label: "À propos",  labelKey: "routes.about", enabled: true, indexable: true, inHeader: true,  inFooter: true, lang: "fr" },
+
   { path: "/why-nps-me",      label: "Why NPS Me",       labelKey: "routes.whyNpsMe",             enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/why-nps-me",   label: "Pourquoi NPS Me",  labelKey: "routes.whyNpsMe",             enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "fr" },
 

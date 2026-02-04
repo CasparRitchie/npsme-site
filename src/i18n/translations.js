@@ -10,6 +10,7 @@ export const TRANSLATIONS = {
     routes: {
       products: "Products",
       whyNpsMe: "Why NPS Me",
+      about: "About",
       milestoneNps: "Milestone NPS",
       npsSurveyProgramme: "NPS Survey Programme",
       whatIsNps: "What is NPS?",
@@ -18,6 +19,103 @@ export const TRANSLATIONS = {
       socialListening: "Social Listening",
       blog: "Blog",
       cxCockpit: "CX Cockpit",
+    },
+    about: {
+      seoTitle: "About Caspar Ritchie | NPS Me",
+      seoDescription:
+        "Meet Caspar Ritchie. CX & NPS specialist helping teams turn feedback into measurable growth.",
+
+      header: {
+        iconLabel: "About",
+        tag: "NPS Me / About",
+        accent: "About",
+        title: "the person behind NPS Me",
+        subtitle: "Practical CX. Measurable outcomes. Less theatre, more progress.",
+      },
+
+      hero: {
+        photoHint: "Add a friendly headshot here",
+        photoSub: "People buy people. This matters.",
+        kicker: "Caspar Ritchie",
+        headline: "Turn customer feedback into measurable growth",
+        body:
+          "I help teams implement NPS®, uncover what really frustrates customers, and ship improvements that increase retention, referrals, and revenue.",
+        ctaPrimary: "Book a call",
+        ctaSecondary: "See services",
+      },
+
+      why: {
+        title: "Why work with me?",
+        subtitle: "Most consultants advise. I implement.",
+        bullets: [
+          "Less slides, more action: diagnose → prioritise → ship",
+          "Feedback programmes that are statistically sound (and usable)",
+          "Close-the-loop systems that actually change outcomes",
+        ],
+      },
+
+      unfair: {
+        title: "A rare mix of skills",
+        subtitle: "Strategy + data + delivery + technical execution.",
+        bullets: [
+          "CX strategy & NPS programme design",
+          "Insight extraction from verbatims + behavioural data",
+          "Hands-on delivery inside real teams",
+          "Technical capability to build / integrate the tooling when needed",
+        ],
+      },
+
+      proof: {
+        title: "What teams bring me in for",
+        subtitle: "Concrete problems → practical outcomes.",
+        bullets: [
+          "Launching a first NPS programme (without survey spam or bad data)",
+          "Fixing flat/declining NPS with a focused action plan",
+          "Turning support, reviews and Intercom comments into themes & priorities",
+          "Aligning leadership, product and ops around customer outcomes",
+        ],
+      },
+
+      work: {
+        title: "Three ways to work together",
+        subtitle:
+          "Pick the format that matches your team’s stage — hands-on delivery, enablement, or inspiration at scale.",
+        consulting: {
+          title: "Consulting",
+          body:
+            "Hands-on NPS & CX programme design + implementation. We diagnose friction, prioritise fixes, and ship improvements.",
+          cta: "Explore consulting",
+        },
+        training: {
+          title: "Workshops & training",
+          body:
+            "Practical training to help teams run NPS well: survey design, sampling, analysis, close-the-loop, and action planning.",
+          cta: "View training",
+        },
+        speaking: {
+          title: "Speaking",
+          body:
+            "Keynotes and talks on practical customer experience: what actually moves NPS, and how to build momentum across teams.",
+          cta: "View speaking",
+        },
+      },
+
+      human: {
+        title: "A bit about me",
+        p1:
+          "I’ve always been obsessed with why customers behave the way they do — and what teams can realistically change to improve outcomes.",
+        p2:
+          "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms.",
+        p3:
+          "I now help teams cut through dashboards and focus on the few actions that genuinely improve customers’ lives (and business results).",
+      },
+
+      cta: {
+        title: "Want to improve CX without the theatre?",
+        body: "If you want clearer insight, faster action, and measurable impact — let’s talk.",
+        primary: "Book a call",
+        secondary: "Email hello@npsme.com",
+      },
     },
     cxCockpit: {
       seoTitle: "CX Cockpit (Demo) | NPS Me",
@@ -1646,9 +1744,10 @@ export const TRANSLATIONS = {
           title: "Feedback Foundations",
           price: "from £450",
           bullets: [
-            "Review mining & journey audit",
-            "Baseline NPS®/CSAT/CES & quick wins",
-            "Prioritised roadmap (effort/impact)",
+            "Customer journey & review analysis (support tickets, reviews, NPS)",
+            "Baseline NPS®, CSAT & friction map",
+            "Prioritised 90-day action roadmap",
+            "Executive summary PDF + live walkthrough",
           ],
           cta: "Request audit",
           hint: "Best for: teams starting (or restarting) NPS",
@@ -2463,6 +2562,7 @@ export const TRANSLATIONS = {
     routes: {
       products: "Produits",
       whyNpsMe: "Pourquoi NPS Me",
+      about: "À propos",
       milestoneNps: "Parcours NPS",
       npsSurveyProgramme: "Programme d’enquête NPS",
       whatIsNps: "Qu’est-ce que le NPS ?",
@@ -2471,6 +2571,103 @@ export const TRANSLATIONS = {
       socialListening: "Social listening",
       blog: "Blog",
       cxCockpit: "Cockpit CX",
+    },
+    about: {
+      seoTitle: "À propos — Caspar Ritchie | NPS Me",
+      seoDescription:
+        "Découvrez Caspar Ritchie. Spécialiste CX & NPS : transformer le feedback en croissance mesurable.",
+
+      header: {
+        iconLabel: "À propos",
+        tag: "NPS Me / À propos",
+        accent: "À propos",
+        title: "la personne derrière NPS Me",
+        subtitle: "CX pragmatique. Impact mesurable. Moins de blabla, plus d’actions.",
+      },
+
+      hero: {
+        photoHint: "Ajoutez une photo portrait ici",
+        photoSub: "On achète une personne, pas un logo.",
+        kicker: "Caspar Ritchie",
+        headline: "Transformer le feedback client en croissance mesurable",
+        body:
+          "J’aide les équipes à mettre en place le NPS®, comprendre les vraies frictions, et déployer des améliorations qui augmentent la rétention, la recommandation et le chiffre d’affaires.",
+        ctaPrimary: "Prendre rendez-vous",
+        ctaSecondary: "Voir les offres",
+      },
+
+      why: {
+        title: "Pourquoi travailler avec moi ?",
+        subtitle: "Beaucoup conseillent. Moi, j’implémente.",
+        bullets: [
+          "Moins de slides, plus d’action : diagnostiquer → prioriser → déployer",
+          "Des programmes de feedback solides (et réellement utilisables)",
+          "Un close-the-loop qui change les résultats, pas juste les dashboards",
+        ],
+      },
+
+      unfair: {
+        title: "Un mix rare de compétences",
+        subtitle: "Stratégie + data + delivery + exécution technique.",
+        bullets: [
+          "Stratégie CX & conception de programmes NPS",
+          "Extraction d’insights à partir des verbatims + données comportementales",
+          "Mise en œuvre concrète avec les équipes",
+          "Capacité technique pour construire / intégrer les outils si nécessaire",
+        ],
+      },
+
+      proof: {
+        title: "Pourquoi on me sollicite",
+        subtitle: "Problèmes concrets → résultats concrets.",
+        bullets: [
+          "Lancer un programme NPS (sans spam ni mauvaise donnée)",
+          "Relancer un NPS stable/en baisse avec un plan d’action focalisé",
+          "Transformer support, avis et commentaires Intercom en priorités",
+          "Aligner direction, produit et ops sur les résultats clients",
+        ],
+      },
+
+      work: {
+        title: "Trois façons de travailler ensemble",
+        subtitle:
+          "Choisissez le format adapté : accompagnement, montée en compétence, ou inspiration à grande échelle.",
+        consulting: {
+          title: "Conseil / accompagnement",
+          body:
+            "Conception + mise en œuvre d’un programme NPS & CX. On diagnostique, priorise, puis on déploie des améliorations.",
+          cta: "Voir le conseil",
+        },
+        training: {
+          title: "Ateliers & formation",
+          body:
+            "Formation pratique pour bien faire du NPS : design du survey, échantillonnage, analyse, close-the-loop, plan d’actions.",
+          cta: "Voir la formation",
+        },
+        speaking: {
+          title: "Conférences",
+          body:
+            "Keynotes et interventions sur une CX pragmatique : ce qui fait bouger le NPS, et comment créer une dynamique cross-équipes.",
+          cta: "Voir les conférences",
+        },
+      },
+
+      human: {
+        title: "Quelques mots sur moi",
+        p1:
+          "Je suis obsédé par une question : pourquoi les clients agissent comme ils le font — et ce que les équipes peuvent réellement changer pour améliorer les résultats.",
+        p2:
+          "J’ai travaillé entre produit, data, opérations et engineering. Résultat : une approche simple — mesurer correctement, puis traiter les causes racines.",
+        p3:
+          "Aujourd’hui, j’aide les équipes à sortir du “dashboard theatre” pour se concentrer sur les actions qui améliorent vraiment la vie des clients (et la performance business).",
+      },
+
+      cta: {
+        title: "Envie d’améliorer la CX sans théâtre ?",
+        body: "Si vous voulez des insights clairs, des actions rapides et un impact mesurable — parlons-en.",
+        primary: "Prendre rendez-vous",
+        secondary: "Écrire à hello@npsme.com",
+      },
     },
     blog: {
       seo: {
@@ -4142,9 +4339,10 @@ export const TRANSLATIONS = {
           title: "Feedback Foundations",
           price: "à partir de 450 £",
           bullets: [
-            "Analyse des avis & audit du parcours",
-            "NPS®/CSAT/CES de référence & quick wins",
-            "Roadmap priorisée (effort/impact)",
+            "Analyse du parcours client & des avis (support, reviews, NPS)",
+            "NPS®, CSAT & cartographie des frictions",
+            "Roadmap priorisée sur 90 jours",
+            "Synthèse exécutive + restitution en visio",
           ],
           cta: "Demander un audit",
           hint: "Idéal pour : démarrer (ou relancer) un programme NPS",

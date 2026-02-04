@@ -6,6 +6,7 @@ import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
 import WhatIsNps from "./pages/WhatIsNps";
 import ImpactPage from "./ImpactPage";
+import About from "./About";
 import WhyNpsMe from "./pages/WhyNpsMe";
 import MilestoneNps from "./MilestoneNps";
 import NpsSurveyProgramme from "./NpsSurveyProgramme";
@@ -56,6 +57,9 @@ const COMPONENTS = {
 
   "/impact": ImpactPage,
   "/fr/impact": ImpactPage,
+
+  "/about": About,
+  "/fr/about": About,
 
   "/why-nps-me": WhyNpsMe,
   "/fr/why-nps-me": WhyNpsMe,

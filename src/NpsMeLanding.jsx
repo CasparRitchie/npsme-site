@@ -14,8 +14,10 @@ function ServicesSection() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const cards = translations(lang, "landing.services.cards", []);
-  const ctas = translations(lang, "landing.services.ctas", {});
-
+  const ctas = translations(lang, "landing.services.ctas", {
+    products: lang === "fr" ? "Voir les offres" : "See services",
+    about: lang === "fr" ? "Pourquoi moi" : "Why me",
+  });
   return (
     <section id="services" className="mx-auto max-w-7xl px-6 pb-20">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -47,7 +49,7 @@ function ServicesSection() {
             to={localizePath("/products", lang)}
             className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
           >
-            {ctas.products}
+            {ctas.products || (lang === "fr" ? "Voir les offres" : "See services")}
             <ArrowRight className="h-4 w-4" />
           </Link>
 
@@ -312,9 +314,12 @@ export default function NpsMeLanding() {
                 {tr("landing.hero.ctaMethod")}
               </a>
 
-              <a href="#demo" className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white">
-                {tr("landing.hero.ctaDemo")}
-              </a>
+              <Link
+                to={localizePath("/products", lang)}
+                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+              >
+                {lang === "fr" ? "Voir les offres" : "See services"}
+              </Link>
             </div>
 
             <div className="mt-10 flex items-center gap-6 text-sm text-slate-400">
@@ -415,7 +420,7 @@ export default function NpsMeLanding() {
           <p className="mt-3 text-slate-300 max-w-3xl">
             {tr("landing.platform.body")}{" "}
             <Link
-              to={lang === "fr" ? "/fr/analyse-nps-intercom" : "/intercom-nps-analytics"}
+              to={localizePath("/intercom-nps-analytics", lang)}
               className="underline decoration-white/30 underline-offset-4 hover:text-white"
             >
               {tr("landing.platform.linkIntercomText")}

@@ -76,24 +76,11 @@ export default function About() {
                     "I help teams implement NPS®, uncover what really frustrates customers, and ship improvements that increase retention, referrals, and revenue."
                   )}
                 </p>
-
-                <div className="mt-5 flex flex-col sm:flex-row gap-3">
-                  <Link
-                    to={localizePath("/book", lang)}
-                    className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
-                  >
-                    {translations(lang, "about.hero.ctaPrimary", "Book a call")}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-
-                  <Link
-                    to={localizePath("/products", lang)}
-                    className="rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
-                  >
-                    {translations(lang, "about.hero.ctaSecondary", "See services")}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
+                <p className="mt-4 text-xs text-slate-500">
+                  {lang === "fr"
+                    ? "Faites défiler pour voir comment je peux vous aider →"
+                    : "Scroll to see how we can work together →"}
+                </p>
               </div>
             </div>
           </div>

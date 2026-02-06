@@ -77,9 +77,8 @@ export const TRANSLATIONS = {
       },
 
       work: {
-        title: "Three ways to work together",
-        subtitle:
-          "Pick the format that matches your team’s stage — hands-on delivery, enablement, or inspiration at scale.",
+        title: "Four ways to work together",
+        subtitle: "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
         consulting: {
           title: "Consulting",
           body:
@@ -2676,9 +2675,8 @@ export const TRANSLATIONS = {
       },
 
       work: {
-        title: "Trois façons de travailler ensemble",
-        subtitle:
-          "Choisissez le format adapté : accompagnement, montée en compétence, ou inspiration à grande échelle.",
+        title: "Quatre façons de travailler ensemble",
+        subtitle:  "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
         consulting: {
           title: "Conseil / accompagnement",
           body:

@@ -167,7 +167,7 @@ export default function DemoInvitationSurvey() {
                     Just one question about your experience
                   </h1>
                   <p className="text-sm text-slate-300 mb-3">
-                    This is the same NPS flow we use with clients — simple, quick, and focused.
+                    This is the same NPS flow we use with clients - simple, quick, and focused.
                   </p>
 
                   {/* Context about who / what */}

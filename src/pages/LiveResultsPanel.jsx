@@ -140,7 +140,7 @@ export default function LiveResultsPanel() {
                 }}
               >
                 <span>
-                  {value} — {items.length} réponse
+                  {value} - {items.length} réponse
                   {items.length > 1 ? "s" : ""}
                 </span>
                 <span>
@@ -175,7 +175,7 @@ export default function LiveResultsPanel() {
                 }}
               >
                 <span>
-                  {value} — {items.length} réponse
+                  {value} - {items.length} réponse
                   {items.length > 1 ? "s" : ""}
                 </span>
                 <span>

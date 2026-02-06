@@ -174,7 +174,7 @@ export default function Book() {
           )}
           {status === "error" && (
             <p className="mt-2 text-sm text-red-400">
-              {tr("book.form.errorPrefix", "Sorry—something went wrong. Please email")}{" "}
+              {tr("book.form.errorPrefix", "Sorry-something went wrong. Please email")}{" "}
               <a href="mailto:hello@npsme.com" className="underline">
                 hello@npsme.com
               </a>

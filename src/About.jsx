@@ -130,7 +130,7 @@ export default function About() {
             {translations(
               lang,
               "about.work.subtitle",
-              "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight."
+              "Choose the format that fits your stage - hands-on delivery, enablement, inspiration, or ongoing insight."
             )}
           </p>
 
@@ -183,7 +183,7 @@ export default function About() {
               body={translations(
                 lang,
                 "about.work.insight.body",
-                "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week — themes, risk flags, and clear next steps."
+                "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week - themes, risk flags, and clear next steps."
               )}
               ctaLabel={translations(lang, "about.work.insight.cta", "View insight products")}
               ctaHref={localizePath("/products", lang)}
@@ -199,7 +199,7 @@ export default function About() {
           </h3>
 
           <div className="mt-4 space-y-4 text-sm text-slate-300 leading-relaxed max-w-4xl">
-            <p>{translations(lang, "about.human.p1", "I’ve always been obsessed with why customers behave the way they do — and what teams can realistically change to improve outcomes.")}</p>
+            <p>{translations(lang, "about.human.p1", "I’ve always been obsessed with why customers behave the way they do - and what teams can realistically change to improve outcomes.")}</p>
             <p>{translations(lang, "about.human.p2", "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms.")}</p>
             <p>{translations(lang, "about.human.p3", "I now help teams cut through dashboards and focus on the few actions that genuinely improve customers’ lives (and business results).")}</p>
           </div>
@@ -214,7 +214,7 @@ export default function About() {
             {translations(
               lang,
               "about.cta.body",
-              "If you want clearer insight, faster action, and measurable impact — let’s talk."
+              "If you want clearer insight, faster action, and measurable impact - let’s talk."
             )}
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">

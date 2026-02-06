@@ -130,7 +130,7 @@ export default function IntercomNpsAnalytics() {
           </ul>
         </div>
       </section>
-      
+
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
@@ -157,7 +157,7 @@ export default function IntercomNpsAnalytics() {
               <div className="rounded-2xl border border-white/10 bg-black/10 p-5">
                 <div className="text-xs text-slate-400">NPS (last {live.data.window_days} days)</div>
                 <div className="mt-2 text-3xl font-semibold text-white">
-                  {live.data.nps === null ? "—" : live.data.nps}
+                  {live.data.nps === null ? "-" : live.data.nps}
                 </div>
                 <div className="mt-2 text-sm text-slate-300">
                   {live.data.responses} responses • confidence: {live.data.confidence}

@@ -49,7 +49,7 @@ function TogglePill({ active, onClick, color, children }) {
 }
 
 function prettyDate(iso) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const d = new Date(iso);
   return d.toLocaleString(undefined, {
     year: "numeric",
@@ -225,7 +225,7 @@ export default function EnvolaExample() {
         lang={lang}
         title={tr(
           "envola.seo.title",
-          "Envola — Intercom NPS Analytics (Live Example) | NPSme"
+          "Envola - Intercom NPS Analytics (Live Example) | NPSme"
         )}
         description={tr(
           "envola.seo.description",
@@ -241,13 +241,13 @@ export default function EnvolaExample() {
         <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
-              {tr("envola.h1", "Envola — Intercom NPS Analytics")}
+              {tr("envola.h1", "Envola - Intercom NPS Analytics")}
             </h1>
 
             <p className="mt-5 text-slate-300 max-w-2xl">
               {tr(
                 "envola.intro",
-                "This is a live, anonymised example. It shows what NPSme can surface once an NPS survey is running in Intercom — starting with score + distribution, and soon drivers, themes, and recommendations."
+                "This is a live, anonymised example. It shows what NPSme can surface once an NPS survey is running in Intercom - starting with score + distribution, and soon drivers, themes, and recommendations."
               )}
             </p>
 
@@ -280,7 +280,7 @@ export default function EnvolaExample() {
           <p className="mt-3 text-slate-300 max-w-3xl">
             {tr(
               "envola.live.subtitle",
-              "Aggregated only — no personal data. Data source: Intercom survey completions → NPSme clean store."
+              "Aggregated only - no personal data. Data source: Intercom survey completions → NPSme clean store."
             )}
           </p>
 
@@ -304,7 +304,7 @@ export default function EnvolaExample() {
                 <div className="mt-6 grid gap-4 md:grid-cols-4">
                   <StatCard
                     label={tr("envola.live.kpiNps", `NPS (last ${live.data.window_days} days)`)}
-                    value={live.data.nps === null ? "—" : live.data.nps}
+                    value={live.data.nps === null ? "-" : live.data.nps}
                     sub={tr(
                       "envola.live.kpiSub",
                       `${live.data.responses} responses • confidence: ${live.data.confidence}`
@@ -379,24 +379,24 @@ export default function EnvolaExample() {
             <div className="mt-6 grid gap-4 md:grid-cols-4">
               <StatCard
                 label={tr("envola.metrics.shown", "Shown")}
-                value={rate.data.shown ?? "—"}
+                value={rate.data.shown ?? "-"}
                 sub={tr("envola.metrics.shownSub", "Survey displayed to users")}
               />
               <StatCard
                 label={tr("envola.metrics.completed", "Completed")}
-                value={rate.data.completed ?? "—"}
+                value={rate.data.completed ?? "-"}
                 sub={tr("envola.metrics.completedSub", "Survey fully completed")}
               />
               <StatCard
                 label={tr("envola.metrics.responseRate", "Response rate")}
                 value={
-                  rate.data.response_rate_pct == null ? "—" : `${rate.data.response_rate_pct}%`
+                  rate.data.response_rate_pct == null ? "-" : `${rate.data.response_rate_pct}%`
                 }
                 sub={tr("envola.metrics.responseRateSub", "Completed ÷ shown")}
               />
               <StatCard
                 label={tr("envola.metrics.medianCompletion", "Median completion time")}
-                value={rate.data.median_time_to_completion || "—"}
+                value={rate.data.median_time_to_completion || "-"}
                 sub={
                   rate.data.median_time_to_first_answer
                     ? tr(
@@ -405,7 +405,7 @@ export default function EnvolaExample() {
                       )
                     : tr(
                         "envola.metrics.medianAnswerSubFallback",
-                        "Median time to first answer: —"
+                        "Median time to first answer: -"
                       )
                 }
               />
@@ -474,7 +474,7 @@ export default function EnvolaExample() {
 
             {isAllOff && (
               <span className="text-xs text-slate-400">
-                {tr("envola.filters.noneSelected", "No filter selected — showing all")}
+                {tr("envola.filters.noneSelected", "No filter selected - showing all")}
               </span>
             )}
           </div>
@@ -511,9 +511,9 @@ export default function EnvolaExample() {
                         <tr key={t.theme} className="border-t border-white/10">
                           <td className="px-4 py-3 text-white">{labelTheme(t.theme)}</td>
                           <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
-                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "—"}</td>
+                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "-"}</td>
                           <td className="px-4 py-3 text-slate-200">
-                            {t.share_of_detractor_mentions == null ? "—" : `${t.share_of_detractor_mentions}%`}
+                            {t.share_of_detractor_mentions == null ? "-" : `${t.share_of_detractor_mentions}%`}
                           </td>
                         </tr>
                       ))}
@@ -575,7 +575,7 @@ export default function EnvolaExample() {
 
             {isAllOff && (
               <span className="text-xs text-slate-400">
-                {tr("envola.filters.noneSelected", "No filter selected — showing all")}
+                {tr("envola.filters.noneSelected", "No filter selected - showing all")}
               </span>
             )}
           </div>

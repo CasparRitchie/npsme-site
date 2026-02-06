@@ -79,7 +79,7 @@ export const TRANSLATIONS = {
       work: {
         title: "Four ways to work together",
         subtitle:
-          "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
+          "Choose the format that fits your stage - hands-on delivery, enablement, inspiration, or ongoing insight.",
         consulting: {
           title: "Consulting",
           body:
@@ -101,7 +101,7 @@ export const TRANSLATIONS = {
         insight: {
           title: "Ongoing insight",
           body:
-            "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week — themes, risk flags, and clear next steps.",
+            "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week - themes, risk flags, and clear next steps.",
           cta: "View insight products",
         },
       },
@@ -109,7 +109,7 @@ export const TRANSLATIONS = {
       human: {
         title: "A bit about me",
         p1:
-          "I’ve always been obsessed with why customers behave the way they do — and what teams can realistically change to improve outcomes.",
+          "I’ve always been obsessed with why customers behave the way they do - and what teams can realistically change to improve outcomes.",
         p2:
           "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms.",
         p3:
@@ -118,7 +118,7 @@ export const TRANSLATIONS = {
 
       cta: {
         title: "Want to improve CX without the theatre?",
-        body: "If you want clearer insight, faster action, and measurable impact — let’s talk.",
+        body: "If you want clearer insight, faster action, and measurable impact - let’s talk.",
         primary: "Book a call",
         secondary: "Email hello@npsme.com",
       },
@@ -174,7 +174,7 @@ export const TRANSLATIONS = {
         submit: "Request booking",
         sending: "Sending…",
         success: "Thanks! I’ll confirm shortly and send a calendar invite.",
-        errorPrefix: "Sorry—something went wrong. Please email",
+        errorPrefix: "Sorry-something went wrong. Please email",
         dateAria: "Preferred date",
         timeAria: "Preferred time",
       },
@@ -203,7 +203,7 @@ export const TRANSLATIONS = {
         ethicalSurveys: {
           title: "When Feedback Fatigue Sets In: The ethics of customer experience surveys",
           excerpt:
-            "How contact selection, DNS flags, and response-pressure can quietly distort NPS — and what to do instead.",
+            "How contact selection, DNS flags, and response-pressure can quietly distort NPS - and what to do instead.",
         },
         closingTheLoop: {
           title: "Beyond the Score: Why Closing the Loop Builds Trust",
@@ -218,10 +218,10 @@ export const TRANSLATIONS = {
         sendingBeforeChristmas: {
           title: "Sending an NPS survey before Christmas (without annoying your customers)",
           excerpt:
-            "How to run a respectful, effective pre-Christmas NPS pulse — and what to do with the insights.",
+            "How to run a respectful, effective pre-Christmas NPS pulse - and what to do with the insights.",
         },
         whyNpsIsntImproving: {
-          title: "Why your NPS isn't improving — even when your CX looks better",
+          title: "Why your NPS isn't improving - even when your CX looks better",
           excerpt:
             "When your CX feels better but your NPS refuses to move, it's usually not the score that's broken. It's sampling, expectations, or where the fixes are landing.",
         },
@@ -497,7 +497,7 @@ export const TRANSLATIONS = {
           "Every company wants to be customer-centric, but few stop to ask whether their feedback processes are",
         p1b: "ethically customer-centric",
         p1c:
-          ". It's one thing to measure Net Promoter Score (NPS) — it's another to ensure that the way you collect that feedback actually reflects reality.",
+          ". It's one thing to measure Net Promoter Score (NPS) - it's another to ensure that the way you collect that feedback actually reflects reality.",
         p1d:
           "",
       },
@@ -511,18 +511,18 @@ export const TRANSLATIONS = {
           p1d: "“Not Suitable for Survey.”",
           p1e: "",
           p2:
-            "On paper, it looked fair. In practice, unhappy contacts could be quietly excluded — or whole accounts marked as DNS (Do Not Survey) with no oversight.",
+            "On paper, it looked fair. In practice, unhappy contacts could be quietly excluded - or whole accounts marked as DNS (Do Not Survey) with no oversight.",
           p3:
-            "We later introduced VP-level approval for DNS flags, but the problem remained: when the people being measured can choose who speaks, NPS stops measuring customer advocacy — and starts measuring survey ethics.",
+            "We later introduced VP-level approval for DNS flags, but the problem remained: when the people being measured can choose who speaks, NPS stops measuring customer advocacy - and starts measuring survey ethics.",
         },
         2: {
           title: "Response rates vs authenticity",
           p1:
-            "Once the survey window opened, Account Managers were encouraged to “nudge” customers — often too hard.",
+            "Once the survey window opened, Account Managers were encouraged to “nudge” customers - often too hard.",
           quote: "“Please give us a 9 or 10, otherwise it's seen as bad.”",
           quoteNote: "A real poster once found in a Mercure hotel lift.",
           p2:
-            "Coaching or pressuring customers damages data integrity. The programme becomes performance theatre — chasing numbers instead of truth.",
+            "Coaching or pressuring customers damages data integrity. The programme becomes performance theatre - chasing numbers instead of truth.",
         },
         3: {
           title: "How to rebuild trust in feedback",
@@ -552,7 +552,7 @@ export const TRANSLATIONS = {
         4: {
           title: "Final thoughts",
           p1:
-            "Ethical feedback systems aren't about dodging criticism — they're about earning credibility. A healthy CX programme measures itself not just by the height of the NPS bar, but by the integrity behind it.",
+            "Ethical feedback systems aren't about dodging criticism - they're about earning credibility. A healthy CX programme measures itself not just by the height of the NPS bar, but by the integrity behind it.",
           p2a: "True improvement comes from facing uncomfortable truths…",
           p2b: " and creating a space where customers feel safe enough to voice them.",
         },
@@ -585,7 +585,7 @@ export const TRANSLATIONS = {
           "In CX, data integrity is everything. One of the easiest ways to distort customer truth is deciding",
         p1b: "who",
         p1c:
-          "gets surveyed. If sampling can be steered — intentionally or not — the resulting Net Promoter Score (NPS)® becomes a measure of survey design, not advocacy.",
+          "gets surveyed. If sampling can be steered - intentionally or not - the resulting Net Promoter Score (NPS)® becomes a measure of survey design, not advocacy.",
         p1d: "",
       },
       sections: {
@@ -597,11 +597,11 @@ export const TRANSLATIONS = {
           p1c: "or account-level",
           p1d: "“Do Not Survey” (DNS)",
           p1e:
-            ". These are useful controls — legal, contractual or truly unsuitable contacts do exist — but they also create a slippery slope.",
+            ". These are useful controls - legal, contractual or truly unsuitable contacts do exist - but they also create a slippery slope.",
           p2:
             "It becomes tempting to exclude unhappy voices to protect a quarterly metric.",
           p3:
-            "Over time this looks like improvement on paper, while real friction persists. Leadership allocates investment based on biased data; customers notice they aren’t being asked — or worse, that their voices don’t count.",
+            "Over time this looks like improvement on paper, while real friction persists. Leadership allocates investment based on biased data; customers notice they aren’t being asked - or worse, that their voices don’t count.",
         },
         2: {
           title: "Response rates vs authenticity",
@@ -614,7 +614,7 @@ export const TRANSLATIONS = {
             "(“Please give us 9-10”). The latter erodes trust and undermines the very purpose of feedback.",
           p1e: "",
           quoteLine1:
-            "“If you’re happy, give us a 9 or 10 — anything else counts as bad.”",
+            "“If you’re happy, give us a 9 or 10 - anything else counts as bad.”",
           quoteLine2:
             "This common message may lift the number, but it destroys credibility.",
           p2:
@@ -662,7 +662,7 @@ export const TRANSLATIONS = {
             2: "Response rates climb without coaching language.",
             3: "The distribution of scores is stable and believable.",
             4:
-              "Leaders celebrate problems found and fixed — not just a single number on a slide.",
+              "Leaders celebrate problems found and fixed - not just a single number on a slide.",
           },
         },
         5: {
@@ -680,7 +680,7 @@ export const TRANSLATIONS = {
       cta: {
         p1: "Want help tightening sampling rules and boosting trustworthy response rates?",
         p2:
-          "NPS Me can design ethical sampling logic, DNS governance and communication frameworks that protect the integrity — and credibility — of your NPS programme.",
+          "NPS Me can design ethical sampling logic, DNS governance and communication frameworks that protect the integrity - and credibility - of your NPS programme.",
         btnServices: "Explore NPS Me services",
         btnBook: "Book a discovery call",
       },
@@ -1193,7 +1193,7 @@ export const TRANSLATIONS = {
           p2: "Often you fix friction → customers feel happier → they stop complaining.",
           p3: "But they also don't suddenly become raving fans.",
           p4:
-            "Moving someone from 6 → 7 does lift NPS (it removes a Detractor), but in larger samples the impact per customer is small — meaningful score movement usually comes from shifting groups, not single responses.",
+            "Moving someone from 6 → 7 does lift NPS (it removes a Detractor), but in larger samples the impact per customer is small - meaningful score movement usually comes from shifting groups, not single responses.",
           p5: "This creates “silent success”:",
           bullets: {
             1: "fewer refunds",
@@ -1266,7 +1266,7 @@ export const TRANSLATIONS = {
       },
     },
     dataAutomation: {
-      seoTitle: "Data, Automation & Insight — Transform Your Reporting | NPS Me",
+      seoTitle: "Data, Automation & Insight - Transform Your Reporting | NPS Me",
       seoDescription:
         "How NPS Me helps teams clean up messy data, connect systems, and automate reporting so people spend less time in spreadsheets and more time improving customer experience.",
 
@@ -1469,7 +1469,7 @@ export const TRANSLATIONS = {
         seo: {
           title: "NPS & CX Consulting, Training and Insights | NPS Me",
           description:
-            "I help teams run NPS properly and turn feedback into measurable growth—strategy, implementation, enablement and insight, alongside Intercom/HubSpot/Zendesk or CSV.",
+            "I help teams run NPS properly and turn feedback into measurable growth-strategy, implementation, enablement and insight, alongside Intercom/HubSpot/Zendesk or CSV.",
         },
 
         hero: {
@@ -1635,11 +1635,11 @@ export const TRANSLATIONS = {
       },
       services: {
         title: "Four ways to work together",
-        body: "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
+        body: "Choose the format that fits your stage - hands-on delivery, enablement, inspiration, or ongoing insight.",
         cards: [
           {
             title: "Consulting",
-            desc: "Most consultants advise. I implement — diagnose → prioritise → ship.",
+            desc: "Most consultants advise. I implement - diagnose → prioritise → ship.",
             bullets: [
               "NPS programme design (no survey spam, no bad data)",
               "Theme/driver analysis from real comments",
@@ -1648,7 +1648,7 @@ export const TRANSLATIONS = {
           },
           {
             title: "Workshops & training",
-            desc: "Practical training to help teams run NPS well — not theory-only decks.",
+            desc: "Practical training to help teams run NPS well - not theory-only decks.",
             bullets: [
               "Survey design, sampling, comparability",
               "Close-the-loop workflows and templates",
@@ -1690,7 +1690,7 @@ export const TRANSLATIONS = {
         tag: "NPS Me / Survey Programme",
         accent: "Your personalised NPS Survey Programme",
         subtitle:
-          "Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you — invitations, reminders, dashboards and export-ready data — so you can focus on acting on the insight, not wrestling with tools.",
+          "Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you - invitations, reminders, dashboards and export-ready data - so you can focus on acting on the insight, not wrestling with tools.",
       },
 
       howItWorks: {
@@ -1771,7 +1771,7 @@ export const TRANSLATIONS = {
       demo: {
         title: "Try the NPS survey demo",
         body:
-          "See how invitations, reminders, scoring, and dashboards all work — exactly as your customers would experience them. Quick, safe, and designed to show how NPSme runs full programmes.",
+          "See how invitations, reminders, scoring, and dashboards all work - exactly as your customers would experience them. Quick, safe, and designed to show how NPSme runs full programmes.",
         button: "Open the NPS demo",
         note: "Sends a real invite and logs your demo response into the metrics.",
       },
@@ -1788,7 +1788,7 @@ export const TRANSLATIONS = {
         accent: "Productized services",
         title: "that turn feedback into growth",
         subtitle:
-          "Pick the package that fits your stage—from foundations, to enablement, to a weekly CX intelligence feed you can act on.",
+          "Pick the package that fits your stage-from foundations, to enablement, to a weekly CX intelligence feed you can act on.",
       },
 
       cards: {
@@ -2087,7 +2087,7 @@ export const TRANSLATIONS = {
           body1:
             "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that’s harder to translate into everyday decisions.",
           body2:
-            "Access to more data doesn’t automatically create clarity. NPS Me is designed to help teams focus on what matters most — turning feedback into clear priorities and practical action, without adding unnecessary complexity.",
+            "Access to more data doesn’t automatically create clarity. NPS Me is designed to help teams focus on what matters most - turning feedback into clear priorities and practical action, without adding unnecessary complexity.",
         },
 
         deliver: {
@@ -2187,14 +2187,14 @@ export const TRANSLATIONS = {
     },
     envola: {
       seo: {
-        title: "Envola — Intercom NPS Analytics (Live Example) | NPS Me",
+        title: "Envola - Intercom NPS Analytics (Live Example) | NPS Me",
         description:
           "A live, anonymised example showing how NPS Me layers analytics on top of Intercom NPS.",
       },
       tag: "Client example / Envola",
-      h1: "Envola — Intercom NPS Analytics",
+      h1: "Envola - Intercom NPS Analytics",
       intro:
-        "This is a live, anonymised example. It shows what NPS Me can surface once an NPS survey is running in Intercom — starting with score + distribution, and soon drivers, themes, and recommendations.",
+        "This is a live, anonymised example. It shows what NPS Me can surface once an NPS survey is running in Intercom - starting with score + distribution, and soon drivers, themes, and recommendations.",
       ctaPrimary: "See how it works",
       ctaSecondary: "Book a CX review",
 
@@ -2209,13 +2209,13 @@ export const TRANSLATIONS = {
         promoters: "Promoters",
         passives: "Passives",
         detractors: "Detractors",
-        noneSelected: "No filter selected — showing all",
+        noneSelected: "No filter selected - showing all",
       },
 
       live: {
         title: "Live snapshot (last 30 days)",
         subtitle:
-          "Aggregated only — no personal data. Data source: Intercom survey completions → NPS Me clean store.",
+          "Aggregated only - no personal data. Data source: Intercom survey completions → NPS Me clean store.",
         noData:
           "No completions yet in the last 30 days. Once responses arrive, this panel updates automatically.",
         kpiNps: "NPS (last 30 days)",
@@ -2298,7 +2298,7 @@ export const TRANSLATIONS = {
     socialListeningIndex: {
       seoTitle: "Social Listening Reports (Anonymised) | NPS Me",
       seoDescription:
-        "Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions — how we turn feedback into growth.",
+        "Anonymised weekly CX Pulse reports showing sentiment trends, themes, and actions - how we turn feedback into growth.",
 
       header: {
         iconLabel: "Social listening gallery",
@@ -2625,7 +2625,7 @@ export const TRANSLATIONS = {
       cxCockpit: "Cockpit CX",
     },
     about: {
-      seoTitle: "À propos — Caspar Ritchie | NPS Me",
+      seoTitle: "À propos - Caspar Ritchie | NPS Me",
       seoDescription:
         "Découvrez Caspar Ritchie. Spécialiste CX & NPS : transformer le feedback en croissance mesurable.",
 
@@ -2713,16 +2713,16 @@ export const TRANSLATIONS = {
       human: {
         title: "Quelques mots sur moi",
         p1:
-          "Je suis obsédé par une question : pourquoi les clients agissent comme ils le font — et ce que les équipes peuvent réellement changer pour améliorer les résultats.",
+          "Je suis obsédé par une question : pourquoi les clients agissent comme ils le font - et ce que les équipes peuvent réellement changer pour améliorer les résultats.",
         p2:
-          "J’ai travaillé entre produit, data, opérations et engineering. Résultat : une approche simple — mesurer correctement, puis traiter les causes racines.",
+          "J’ai travaillé entre produit, data, opérations et engineering. Résultat : une approche simple - mesurer correctement, puis traiter les causes racines.",
         p3:
           "Aujourd’hui, j’aide les équipes à sortir du “dashboard theatre” pour se concentrer sur les actions qui améliorent vraiment la vie des clients (et la performance business).",
       },
 
       cta: {
         title: "Envie d’améliorer la CX sans théâtre ?",
-        body: "Si vous voulez des insights clairs, des actions rapides et un impact mesurable — parlons-en.",
+        body: "Si vous voulez des insights clairs, des actions rapides et un impact mesurable - parlons-en.",
         primary: "Prendre rendez-vous",
         secondary: "Écrire à hello@npsme.com",
       },
@@ -2753,7 +2753,7 @@ export const TRANSLATIONS = {
           title:
             "Quand la fatigue des enquêtes s’installe : l’éthique des enquêtes d’expérience client",
           excerpt:
-            "Comment la sélection des contacts et la pression à la réponse peuvent fausser le NPS — et comment l’éviter.",
+            "Comment la sélection des contacts et la pression à la réponse peuvent fausser le NPS - et comment l’éviter.",
         },
         closingTheLoop: {
           title:
@@ -2770,11 +2770,11 @@ export const TRANSLATIONS = {
           title:
             "Envoyer une enquête NPS avant Noël (sans agacer vos clients)",
           excerpt:
-            "Comment lancer une enquête NPS efficace et respectueuse avant les fêtes — et exploiter les enseignements.",
+            "Comment lancer une enquête NPS efficace et respectueuse avant les fêtes - et exploiter les enseignements.",
         },
         whyNpsIsntImproving: {
           title:
-            "Pourquoi votre NPS n’augmente pas — même quand votre CX s’améliore",
+            "Pourquoi votre NPS n’augmente pas - même quand votre CX s’améliore",
           excerpt:
             "Quand l’expérience progresse mais que le score stagne, le problème vient rarement du NPS lui-même.",
         },
@@ -3091,7 +3091,7 @@ export const TRANSLATIONS = {
         2: {
           title: "Taux de réponse vs authenticité",
           p1:
-            "Une fois la fenêtre d’enquête ouverte, les Account Managers étaient encouragés à “relancer” les clients — souvent trop fortement.",
+            "Une fois la fenêtre d’enquête ouverte, les Account Managers étaient encouragés à “relancer” les clients - souvent trop fortement.",
           quote: "« Donnez-nous 9 ou 10, sinon c’est considéré comme mauvais. »",
           quoteNote: "Un vrai poster trouvé un jour dans l’ascenseur d’un hôtel Mercure.",
           p2:
@@ -3125,7 +3125,7 @@ export const TRANSLATIONS = {
         4: {
           title: "Dernières réflexions",
           p1:
-            "Les systèmes de feedback éthiques ne servent pas à éviter la critique — ils servent à gagner en crédibilité. Un programme CX sain ne se juge pas seulement à la hauteur de la barre NPS, mais à l’intégrité qui se cache derrière.",
+            "Les systèmes de feedback éthiques ne servent pas à éviter la critique - ils servent à gagner en crédibilité. Un programme CX sain ne se juge pas seulement à la hauteur de la barre NPS, mais à l’intégrité qui se cache derrière.",
           p2a: "Le vrai progrès vient du fait d’affronter des vérités inconfortables…",
           p2b: " et de créer un espace où les clients se sentent suffisamment en sécurité pour les exprimer.",
         },
@@ -3158,7 +3158,7 @@ export const TRANSLATIONS = {
           "En CX, l’intégrité des données est essentielle. L’un des moyens les plus simples de déformer la vérité client est de décider",
         p1b: "qui",
         p1c:
-          "sera interrogé. Si l’échantillon peut être orienté — volontairement ou non — le Net Promoter Score (NPS)® devient une mesure de design d’enquête, pas d’adhésion.",
+          "sera interrogé. Si l’échantillon peut être orienté - volontairement ou non - le Net Promoter Score (NPS)® devient une mesure de design d’enquête, pas d’adhésion.",
         p1d: "",
       },
       sections: {
@@ -3170,11 +3170,11 @@ export const TRANSLATIONS = {
           p1c: "ou au niveau compte",
           p1d: "« Do Not Survey » (DNS)",
           p1e:
-            ". Ce sont des contrôles utiles — contraintes légales, contractuelles, ou contacts réellement inadaptés — mais ils créent aussi une pente glissante.",
+            ". Ce sont des contrôles utiles - contraintes légales, contractuelles, ou contacts réellement inadaptés - mais ils créent aussi une pente glissante.",
           p2:
             "Il devient tentant d’exclure les voix mécontentes pour protéger un indicateur trimestriel.",
           p3:
-            "Avec le temps, cela ressemble à une amélioration sur le papier, alors que les frictions réelles persistent. La direction investit sur la base de données biaisées ; les clients remarquent qu’on ne les interroge pas — ou pire, que leur voix ne compte pas.",
+            "Avec le temps, cela ressemble à une amélioration sur le papier, alors que les frictions réelles persistent. La direction investit sur la base de données biaisées ; les clients remarquent qu’on ne les interroge pas - ou pire, que leur voix ne compte pas.",
         },
         2: {
           title: "Taux de réponse vs authenticité",
@@ -3187,7 +3187,7 @@ export const TRANSLATIONS = {
             "(« Donnez-nous 9-10 »). La seconde approche érode la confiance et contredit l’objectif même du feedback.",
           p1e: "",
           quoteLine1:
-            "« Si vous êtes satisfait, mettez 9 ou 10 — tout le reste est considéré comme mauvais. »",
+            "« Si vous êtes satisfait, mettez 9 ou 10 - tout le reste est considéré comme mauvais. »",
           quoteLine2:
             "Ce message peut faire monter le chiffre, mais il détruit la crédibilité.",
           p2:
@@ -3235,7 +3235,7 @@ export const TRANSLATIONS = {
             2: "Les taux de réponse progressent sans langage de coaching.",
             3: "La distribution des notes est stable et crédible.",
             4:
-              "Les leaders célèbrent les problèmes identifiés et corrigés — pas seulement un chiffre sur une slide.",
+              "Les leaders célèbrent les problèmes identifiés et corrigés - pas seulement un chiffre sur une slide.",
           },
         },
         5: {
@@ -3254,7 +3254,7 @@ export const TRANSLATIONS = {
         p1:
           "Besoin d’aide pour renforcer les règles d’échantillonnage et augmenter des taux de réponse fiables ?",
         p2:
-          "NPS Me peut concevoir une logique d’échantillonnage éthique, une gouvernance DNS et des cadres de communication qui protègent l’intégrité — et la crédibilité — de votre programme NPS.",
+          "NPS Me peut concevoir une logique d’échantillonnage éthique, une gouvernance DNS et des cadres de communication qui protègent l’intégrité - et la crédibilité - de votre programme NPS.",
         btnServices: "Découvrir les services NPS Me",
         btnBook: "Réserver un appel découverte",
       },
@@ -3664,14 +3664,14 @@ export const TRANSLATIONS = {
     },
     blogWhyNpsIsntImproving: {
       seo: {
-        title: "Pourquoi votre NPS ne progresse pas — même si votre CX s’améliore | NPS Me",
+        title: "Pourquoi votre NPS ne progresse pas - même si votre CX s’améliore | NPS Me",
         description:
           "Un guide pratique pour comprendre un NPS qui stagne : frictions invisibles, dérive d’échantillon, et quoi corriger en priorité lorsque les scores ne bougent plus.",
       },
       header: {
         iconLabel: "Comprendre le NPS et la CX",
         tag: "CX & NPS / Blog",
-        title: "Pourquoi votre NPS ne progresse pas — même si votre CX s’améliore",
+        title: "Pourquoi votre NPS ne progresse pas - même si votre CX s’améliore",
         subtitle:
           "Un guide pratique pour comprendre un NPS qui stagne : frictions invisibles, dérive d’échantillon, et quoi corriger en priorité lorsque les scores ne bougent plus.",
       },
@@ -3679,12 +3679,12 @@ export const TRANSLATIONS = {
       p: {
         1: {
           a:
-            "Dans chaque entreprise, il arrive un moment où l’équipe a le sentiment sincère que les choses se sont améliorées — moins de réclamations, un onboarding plus fluide, un support mieux organisé — et pourtant",
+            "Dans chaque entreprise, il arrive un moment où l’équipe a le sentiment sincère que les choses se sont améliorées - moins de réclamations, un onboarding plus fluide, un support mieux organisé - et pourtant",
           bStrong: "le score NPS refuse de bouger.",
         },
         2:
           "C’est frustrant. Démoralisant. Et cela déclenche souvent en interne des discussions du type : « Peut-être que le NPS est cassé ».",
-        3: { a: "Mais non. Un NPS plat est presque toujours un", bEm: "signal", c: "— simplement pas celui auquel vous pensez." },
+        3: { a: "Mais non. Un NPS plat est presque toujours un", bEm: "signal", c: "- simplement pas celui auquel vous pensez." },
         4: "Voici pourquoi.",
       },
 
@@ -3699,12 +3699,12 @@ export const TRANSLATIONS = {
             4: "une étape de paiement trop lourde",
           },
           p2:
-            "Ces correctifs aident une partie des clients — souvent ceux qui étaient déjà proches du statut « Passif ».",
+            "Ces correctifs aident une partie des clients - souvent ceux qui étaient déjà proches du statut « Passif ».",
           p3: {
             a: "Mais si les clients qui donnent des",
             bStrong: "notes 0–6",
             c:
-              "ne ressentent pas cette amélioration — ou pire, s’ils restent bloqués dans des processus lents et très frictionnels — le NPS bouge à peine.",
+              "ne ressentent pas cette amélioration - ou pire, s’ils restent bloqués dans des processus lents et très frictionnels - le NPS bouge à peine.",
           },
           p4: {
             strong: "Le NPS est pondéré par votre pire expérience, pas par la meilleure.",
@@ -3713,7 +3713,7 @@ export const TRANSLATIONS = {
         },
 
         2: {
-          title: "2. Vous avez amélioré les processus — mais pas les attentes",
+          title: "2. Vous avez amélioré les processus - mais pas les attentes",
           p1: "L’un des freins cachés les plus fréquents :",
           quote: {
             a: "Les clients vous jugent selon ce qu’ils",
@@ -3732,7 +3732,7 @@ export const TRANSLATIONS = {
         },
 
         3: {
-          title: "3. Vous avez réduit les frictions — mais vous n’avez pas « fermé la boucle »",
+          title: "3. Vous avez réduit les frictions - mais vous n’avez pas « fermé la boucle »",
           p1: "Les clients ne devinent pas automatiquement que vous avez corrigé ce dont ils se plaignaient.",
           p2:
             "Les équipes lancent souvent des améliorations discrètement, en se disant : « les clients vont le remarquer ».",
@@ -3751,7 +3751,7 @@ export const TRANSLATIONS = {
           title: "4. La dérive de l’échantillon masque la vraie amélioration",
           p1: "C’est la raison cachée la plus fréquente.",
           p2:
-            "Si le profil des personnes interrogées change — même légèrement — votre NPS peut se comporter de façon étrange.",
+            "Si le profil des personnes interrogées change - même légèrement - votre NPS peut se comporter de façon étrange.",
           p3: "Exemples :",
           bullets: {
             1: "Votre segment le plus frustré représente désormais une plus grande part de l’échantillon.",
@@ -3770,7 +3770,7 @@ export const TRANSLATIONS = {
         },
 
         5: {
-          title: "5. Les Promoteurs ne notent pas plus haut — ils se plaignent juste moins",
+          title: "5. Les Promoteurs ne notent pas plus haut - ils se plaignent juste moins",
           p1: "Ça surprend souvent.",
           p2:
             "Souvent, vous corrigez des frictions → les clients se sentent mieux → ils arrêtent de se plaindre.",
@@ -3785,7 +3785,7 @@ export const TRANSLATIONS = {
             4: "NPS inchangé",
           },
           p7:
-            "L’entreprise s’améliore — mais le NPS ne le reflète pas tant que vous ne franchissez pas un seuil.",
+            "L’entreprise s’améliore - mais le NPS ne le reflète pas tant que vous ne franchissez pas un seuil.",
         },
 
         6: {
@@ -3801,7 +3801,7 @@ export const TRANSLATIONS = {
           },
           p3:
             "Tant que l’origine n’est pas traitée, vous obtenez un léger gain… puis tout repart en plateau.",
-          p4: { strong: "Le NPS est un score de système — pas un score de quick wins." },
+          p4: { strong: "Le NPS est un score de système - pas un score de quick wins." },
         },
 
         7: {
@@ -3906,7 +3906,7 @@ export const TRANSLATIONS = {
       },
     },
     dataAutomation: {
-      seoTitle: "Données, automatisation & insight — Transformez votre reporting | NPS Me",
+      seoTitle: "Données, automatisation & insight - Transformez votre reporting | NPS Me",
       seoDescription:
         "Comment NPS Me aide les équipes à assainir des données complexes, connecter les systèmes et automatiser le reporting pour passer moins de temps sur Excel et plus de temps à améliorer l’expérience client.",
 
@@ -3933,13 +3933,13 @@ export const TRANSLATIONS = {
           "Chaque équipe entretient ses propres fichiers et sa propre définition de “la vérité”.",
         ],
         outro:
-          "Ce n’est pas que les gens ne s’intéressent pas à la donnée. C’est que les systèmes ne se parlent pas — et que personne n’a le temps (ou le mandat) pour démêler tout ça.",
+          "Ce n’est pas que les gens ne s’intéressent pas à la donnée. C’est que les systèmes ne se parlent pas - et que personne n’a le temps (ou le mandat) pour démêler tout ça.",
       },
 
       leaders: {
         title: "Ce que l’on entend chez les dirigeants",
         quote1:
-          "« On a des outils d’enquête, un CRM, des systèmes support et de la product analytics, mais je n’arrive toujours pas à obtenir une vue simple et unifiée de ce que les clients nous disent — et de ce que ça nous coûte de l’ignorer. »",
+          "« On a des outils d’enquête, un CRM, des systèmes support et de la product analytics, mais je n’arrive toujours pas à obtenir une vue simple et unifiée de ce que les clients nous disent - et de ce que ça nous coûte de l’ignorer. »",
         quote2:
           "« Chaque trimestre, on reconstruit la même analyse à partir de zéro au lieu d’améliorer les flux de données à la source. »",
         note:
@@ -3964,7 +3964,7 @@ export const TRANSLATIONS = {
           insight: {
             title: "Construire des couches d’insight",
             text:
-              "Relier NPS et CSAT au churn, au repeat purchase et aux coûts support. Identifier les thèmes qui déplacent réellement le revenu — pas seulement le score.",
+              "Relier NPS et CSAT au churn, au repeat purchase et aux coûts support. Identifier les thèmes qui déplacent réellement le revenu - pas seulement le score.",
           },
           upskill: {
             title: "Faire monter l’équipe en compétence",
@@ -3979,7 +3979,7 @@ export const TRANSLATIONS = {
       outcomes: {
         title: "Ce que ça change concrètement",
         intro:
-          "Vous n’avez pas besoin d’un énième grand projet. Vous avez besoin d’une image plus propre, plus honnête de ce qui se passe — et de moyens simples d’agir chaque semaine.",
+          "Vous n’avez pas besoin d’un énième grand projet. Vous avez besoin d’une image plus propre, plus honnête de ce qui se passe - et de moyens simples d’agir chaque semaine.",
         bullets: [
           "Plus rapide entre « quelque chose cloche » et « on sait quoi corriger ».",
           "Moins d’heures de reporting manuel, sans recruter une personne de plus.",
@@ -4000,7 +4000,7 @@ export const TRANSLATIONS = {
       cta: {
         title: "La plupart des entreprises n’ont pas besoin de plus de dashboards. Elles ont besoin de meilleures données.",
         body:
-          "Si vos équipes se noient dans les exports et débattent encore de la bonne version des chiffres, on peut vous aider à assainir les fondations et automatiser les tâches ingrates — pour que vous reveniez à l’essentiel : vos clients.",
+          "Si vos équipes se noient dans les exports et débattent encore de la bonne version des chiffres, on peut vous aider à assainir les fondations et automatiser les tâches ingrates - pour que vous reveniez à l’essentiel : vos clients.",
         ctaBook: "Réserver un échange découverte",
         ctaProducts: "Voir les offres packagées",
         footnote:
@@ -4110,7 +4110,7 @@ export const TRANSLATIONS = {
           seo: {
             title: "Conseil, formation et insights NPS/CX | NPS Me",
             description:
-              "J’aide les équipes à opérer un NPS fiable et à transformer le feedback en croissance mesurable — stratégie, mise en œuvre, enablement et insights, avec Intercom/HubSpot/Zendesk ou CSV.",
+              "J’aide les équipes à opérer un NPS fiable et à transformer le feedback en croissance mesurable - stratégie, mise en œuvre, enablement et insights, avec Intercom/HubSpot/Zendesk ou CSV.",
           },
 
           hero: {
@@ -4174,7 +4174,7 @@ export const TRANSLATIONS = {
       platform: {
         title: "Une couche d’analyse au-dessus de vos enquêtes",
         body:
-          "La plupart des équipes ont déjà un outil d’envoi. NPS Me vous aide à opérer un programme fiable, comparable dans le temps et utile pour décider — quel que soit votre stack.",
+          "La plupart des équipes ont déjà un outil d’envoi. NPS Me vous aide à opérer un programme fiable, comparable dans le temps et utile pour décider - quel que soit votre stack.",
         cards: [
           {
             title: "Gouvernance",
@@ -4295,7 +4295,7 @@ export const TRANSLATIONS = {
           },
           {
             title: "Ateliers & formation",
-            desc: "Formation pratique pour bien faire du NPS — pas des slides pour faire joli.",
+            desc: "Formation pratique pour bien faire du NPS - pas des slides pour faire joli.",
             bullets: [
               "Design d’enquête, échantillonnage, comparabilité",
               "Close-the-loop + templates",
@@ -4337,7 +4337,7 @@ export const TRANSLATIONS = {
         tag: "NPS Me / Programme d’enquête",
         accent: "Votre programme d’enquête NPS personnalisé",
         subtitle:
-          "Fournissez un fichier de contacts clients et nous déployons pour vous un programme NPS structuré — invitations, relances, dashboards et données prêtes à exporter — pour que vous puissiez vous concentrer sur l’action, pas sur les outils.",
+          "Fournissez un fichier de contacts clients et nous déployons pour vous un programme NPS structuré - invitations, relances, dashboards et données prêtes à exporter - pour que vous puissiez vous concentrer sur l’action, pas sur les outils.",
       },
 
       howItWorks: {
@@ -4354,7 +4354,7 @@ export const TRANSLATIONS = {
             step: "2",
             title: "Nous paramétrons l’enquête",
             text:
-              "Nous configurons l’enquête NPS, le branding et le calendrier — y compris qui interroger, quand, et la fréquence des relances.",
+              "Nous configurons l’enquête NPS, le branding et le calendrier - y compris qui interroger, quand, et la fréquence des relances.",
           },
           {
             step: "3",
@@ -4374,9 +4374,9 @@ export const TRANSLATIONS = {
       pulseBox: {
         title: "Idéal pour un baromètre client rapide et simple à lancer",
         body:
-          "Si vous avez une liste de clients à interroger rapidement, nous pouvons lancer une enquête NPS focalisée en quelques jours — pas en quelques mois. Vous envoyez la liste, nous gérons les invitations et le suivi, et vous vous connectez pour voir le NPS, l’avancement et les commentaires en temps réel.",
+          "Si vous avez une liste de clients à interroger rapidement, nous pouvons lancer une enquête NPS focalisée en quelques jours - pas en quelques mois. Vous envoyez la liste, nous gérons les invitations et le suivi, et vous vous connectez pour voir le NPS, l’avancement et les commentaires en temps réel.",
         bullets: [
-          "Un seul upload CSV — pas d’outil complexe pour vos équipes.",
+          "Un seul upload CSV - pas d’outil complexe pour vos équipes.",
           "Enquête NPS brandée, adaptée à votre ton de voix.",
           "NPS et taux de complétion en direct pendant la fenêtre d’enquête.",
           "Filtre des commentaires par segment, persona ou CSM.",
@@ -4387,7 +4387,7 @@ export const TRANSLATIONS = {
         left: {
           title: "Dashboard client",
           intro:
-            "Chaque client dispose d’une vue sécurisée de son programme — sans lourdeur d’admin ni outil complexe. Ils peuvent voir :",
+            "Chaque client dispose d’une vue sécurisée de son programme - sans lourdeur d’admin ni outil complexe. Ils peuvent voir :",
           bullets: [
             "NPS actuel et taux de réponse.",
             "Découpes par segment, secteur ou persona.",
@@ -4398,7 +4398,7 @@ export const TRANSLATIONS = {
         right: {
           title: "Sous le capot",
           intro:
-            "En coulisses, NPS Me gère le stockage sécurisé, la déduplication des invitations, le suivi et les relances — sans que vous ayez à construire (ou acheter) une plateforme CX lourde juste pour un programme d’enquête.",
+            "En coulisses, NPS Me gère le stockage sécurisé, la déduplication des invitations, le suivi et les relances - sans que vous ayez à construire (ou acheter) une plateforme CX lourde juste pour un programme d’enquête.",
           bullets: [
             "Fichier contacts stocké de façon sécurisée et versionné.",
             "Liens uniques par client pour éviter les doublons de réponse.",
@@ -4411,14 +4411,14 @@ export const TRANSLATIONS = {
       cta: {
         title: "Vous voulez lancer une enquête NPS auprès de vos clients ?",
         body:
-          "Partagez votre liste clients et une date cible de lancement : nous vous proposerons un plan simple de bout en bout — incluant le contenu email, le timing et le reporting.",
+          "Partagez votre liste clients et une date cible de lancement : nous vous proposerons un plan simple de bout en bout - incluant le contenu email, le timing et le reporting.",
         button: "Parlons-en pour mettre en place votre programme →",
       },
 
       demo: {
         title: "Tester la démo d’enquête NPS",
         body:
-          "Découvrez le fonctionnement des invitations, relances, scoring et dashboards — exactement comme vos clients le vivraient. Rapide, sans risque, et conçu pour montrer comment NPS Me exécute des programmes complets.",
+          "Découvrez le fonctionnement des invitations, relances, scoring et dashboards - exactement comme vos clients le vivraient. Rapide, sans risque, et conçu pour montrer comment NPS Me exécute des programmes complets.",
         button: "Ouvrir la démo NPS",
         note: "Envoie une vraie invitation et enregistre votre réponse démo dans les métriques.",
       },
@@ -4530,7 +4530,7 @@ export const TRANSLATIONS = {
           {
             title: "Analyse de sentiment",
             text:
-              "Comprendre le ton derrière chaque mention — du compliment à la frustration — pour prioriser les améliorations.",
+              "Comprendre le ton derrière chaque mention - du compliment à la frustration - pour prioriser les améliorations.",
           },
           {
             title: "Détection de thèmes",
@@ -4566,7 +4566,7 @@ export const TRANSLATIONS = {
       cta: {
         title: "Envie de comprendre le sentiment autour de votre marque ?",
         body:
-          "Recevez un CX Pulse Report sur mesure : où vos clients sont ravis — et où l’expérience décroche.",
+          "Recevez un CX Pulse Report sur mesure : où vos clients sont ravis - et où l’expérience décroche.",
         button: "Voir un exemple →",
       },
     },
@@ -4836,14 +4836,14 @@ export const TRANSLATIONS = {
     },
     envola: {
       seo: {
-        title: "Envola — Analyse NPS Intercom (exemple live) | NPS Me",
+        title: "Envola - Analyse NPS Intercom (exemple live) | NPS Me",
         description:
           "Un exemple live et anonymisé montrant comment NPS Me ajoute une couche d’analyse au-dessus du NPS Intercom.",
       },
       tag: "Exemple client / Envola",
-      h1: "Envola — Analyse NPS Intercom",
+      h1: "Envola - Analyse NPS Intercom",
       intro:
-        "Ceci est un exemple live et anonymisé. Il illustre ce que NPS Me peut révéler lorsqu’une enquête NPS tourne dans Intercom — d’abord score + répartition, puis drivers, thèmes et recommandations.",
+        "Ceci est un exemple live et anonymisé. Il illustre ce que NPS Me peut révéler lorsqu’une enquête NPS tourne dans Intercom - d’abord score + répartition, puis drivers, thèmes et recommandations.",
       ctaPrimary: "Voir comment ça marche",
       ctaSecondary: "Prendre un rendez-vous CX",
 
@@ -4858,13 +4858,13 @@ export const TRANSLATIONS = {
         promoters: "Promoteurs",
         passives: "Passifs",
         detractors: "Détracteurs",
-        noneSelected: "Aucun filtre sélectionné — affichage de tout",
+        noneSelected: "Aucun filtre sélectionné - affichage de tout",
       },
 
       live: {
         title: "Instantané live (30 derniers jours)",
         subtitle:
-          "Données agrégées uniquement — aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
+          "Données agrégées uniquement - aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
         noData:
           "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
         kpiNps: "NPS (30 derniers jours)",
@@ -4948,7 +4948,7 @@ export const TRANSLATIONS = {
     socialListeningIndex: {
       seoTitle: "Rapports Social Listening (anonymisés) | NPS Me",
       seoDescription:
-        "Exemples anonymisés de CX Pulse hebdomadaires : tendances de sentiment, thèmes et actions — comment on transforme le feedback en croissance.",
+        "Exemples anonymisés de CX Pulse hebdomadaires : tendances de sentiment, thèmes et actions - comment on transforme le feedback en croissance.",
 
       header: {
         iconLabel: "Galerie social listening",
@@ -5037,7 +5037,7 @@ export const TRANSLATIONS = {
         tag: "Guide / Expérience client",
         title: "Qu’est-ce que le Net Promoter Score (NPS) ?",
         subtitle:
-          "Une explication pratique : comment le NPS fonctionne, quand il est utile, où il peut induire en erreur, et comment l’utiliser comme point de départ pour des améliorations concrètes — pas seulement comme un chiffre dans un dashboard.",
+          "Une explication pratique : comment le NPS fonctionne, quand il est utile, où il peut induire en erreur, et comment l’utiliser comme point de départ pour des améliorations concrètes - pas seulement comme un chiffre dans un dashboard.",
       },
 
       core: {
@@ -5160,7 +5160,7 @@ export const TRANSLATIONS = {
       cta: {
         title: "Besoin d’aide pour concevoir un programme NPS qui génère de vrais changements ?",
         body:
-          "NPS Me accompagne les équipes pour concevoir des enquêtes justes, un échantillonnage réaliste, et des boucles de suivi pratiques — afin que chaque feedback mène quelque part.",
+          "NPS Me accompagne les équipes pour concevoir des enquêtes justes, un échantillonnage réaliste, et des boucles de suivi pratiques - afin que chaque feedback mène quelque part.",
         explore: "Découvrir les offres",
         book: "Prendre rendez-vous",
         disclaimer:

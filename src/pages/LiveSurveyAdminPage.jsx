@@ -158,7 +158,7 @@ function NpsDial({ value, label }) {
       </svg>
       <div className="leading-tight">
         <div className="text-xs text-slate-400">{label}</div>
-        <div className="text-sm font-semibold text-slate-100">{isNull ? "—" : v}</div>
+        <div className="text-sm font-semibold text-slate-100">{isNull ? "-" : v}</div>
       </div>
     </div>
   );
@@ -1097,11 +1097,11 @@ const withCount = (label, n) => `${label} (${n})`;
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <KpiCard label={tr("liveAdmin.insights.kpi.n", "Responses analysed")} value={insights?.insights?.n ?? 0} />
-                    <KpiCard label={tr("liveAdmin.insights.kpi.nps", "NPS")} value={insights?.insights?.nps ?? "—"} />
+                    <KpiCard label={tr("liveAdmin.insights.kpi.nps", "NPS")} value={insights?.insights?.nps ?? "-"} />
                     <KpiCard label={tr("liveAdmin.insights.kpi.stage", "Stage")} value={insights?.stage ?? "All"} />
                     <KpiCard
                       label={tr("liveAdmin.insights.kpi.generated", "Generated")}
-                      value={insights?.generated_at ? new Date(insights.generated_at).toISOString() : "—"}
+                      value={insights?.generated_at ? new Date(insights.generated_at).toISOString() : "-"}
                     />
                   </div>
 
@@ -1112,7 +1112,7 @@ const withCount = (label, n) => `${label} (${n})`;
                     </div>
 
                     {(insights?.insights?.top_actions || []).length === 0 ? (
-                      <div className="text-sm text-slate-400">—</div>
+                      <div className="text-sm text-slate-400">-</div>
                     ) : (
                       <ul className="space-y-2">
                         {insights.insights.top_actions.map((a, i) => (
@@ -1148,7 +1148,7 @@ const withCount = (label, n) => `${label} (${n})`;
                           </li>
                         ))}
                         {(insights?.insights?.response_themes || []).length === 0 ? (
-                          <li className="text-sm text-slate-400">—</li>
+                          <li className="text-sm text-slate-400">-</li>
                         ) : null}
                       </ul>
                     </div>
@@ -1170,7 +1170,7 @@ const withCount = (label, n) => `${label} (${n})`;
                           </li>
                         ))}
                         {(insights?.insights?.delighters || []).length === 0 ? (
-                          <li className="text-sm text-slate-400">—</li>
+                          <li className="text-sm text-slate-400">-</li>
                         ) : null}
                       </ul>
                     </div>
@@ -1194,7 +1194,7 @@ const withCount = (label, n) => `${label} (${n})`;
                       ))}
 
                       {(insights?.insights?.close_the_loop_templates || []).length === 0 ? (
-                        <div className="text-sm text-slate-400">—</div>
+                        <div className="text-sm text-slate-400">-</div>
                       ) : null}
                     </div>
                   </div>

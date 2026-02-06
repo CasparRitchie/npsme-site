@@ -78,7 +78,8 @@ export const TRANSLATIONS = {
 
       work: {
         title: "Four ways to work together",
-        subtitle: "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
+        subtitle:
+          "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
         consulting: {
           title: "Consulting",
           body:
@@ -96,6 +97,12 @@ export const TRANSLATIONS = {
           body:
             "Keynotes and talks on practical customer experience: what actually moves NPS, and how to build momentum across teams.",
           cta: "View speaking",
+        },
+        insight: {
+          title: "Ongoing insight",
+          body:
+            "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week — themes, risk flags, and clear next steps.",
+          cta: "View insight products",
         },
       },
 
@@ -1627,9 +1634,8 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Three ways to work together",
-        body:
-          "Pick the format that matches your team’s stage — hands-on delivery, enablement, or inspiration at scale.",
+        title: "Four ways to work together",
+        body: "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight.",
         cards: [
           {
             title: "Consulting",
@@ -2676,7 +2682,8 @@ export const TRANSLATIONS = {
 
       work: {
         title: "Quatre façons de travailler ensemble",
-        subtitle:  "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
+        subtitle:
+          "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
         consulting: {
           title: "Conseil / accompagnement",
           body:
@@ -2694,6 +2701,12 @@ export const TRANSLATIONS = {
           body:
             "Keynotes et interventions sur une CX pragmatique : ce qui fait bouger le NPS, et comment créer une dynamique cross-équipes.",
           cta: "Voir les conférences",
+        },
+        insight: {
+          title: "Suivi continu",
+          body:
+            "Un flux d’insights CX léger (Pulse / analytics Intercom) actionnable semaine après semaine : thèmes, signaux de risque, prochaines étapes.",
+          cta: "Voir les offres d’insights",
         },
       },
 
@@ -4268,9 +4281,8 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Trois façons de travailler ensemble",
-        body:
-          "Choisissez le format adapté : accompagnement opérationnel, montée en compétence, ou inspiration à grande échelle.",
+        title: "Quatre façons de travailler ensemble",
+        body: "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
         cards: [
           {
             title: "Conseil / accompagnement",

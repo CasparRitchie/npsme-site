@@ -123,17 +123,20 @@ export default function About() {
         {/* Ways to work together */}
         <div className="mt-12">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "about.work.title", "Three ways to work together")}
+            {translations(lang, "about.work.title", "Four ways to work together")}
           </h3>
+
           <p className="mt-2 text-sm text-slate-300 max-w-3xl">
             {translations(
               lang,
               "about.work.subtitle",
-              "Pick the format that matches your team’s stage — hands-on delivery, enablement, or inspiration at scale."
+              "Choose the format that fits your stage — hands-on delivery, enablement, inspiration, or ongoing insight."
             )}
           </p>
 
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+            {/* Consulting */}
             <OfferCard
               icon={<Briefcase className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.consulting.title", "Consulting")}
@@ -146,6 +149,7 @@ export default function About() {
               ctaHref={localizePath("/products", lang)}
             />
 
+            {/* Training */}
             <OfferCard
               icon={<GraduationCap className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.training.title", "Workshops & training")}
@@ -159,6 +163,7 @@ export default function About() {
               featured
             />
 
+            {/* Speaking */}
             <OfferCard
               icon={<Mic className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.speaking.title", "Speaking")}
@@ -170,6 +175,20 @@ export default function About() {
               ctaLabel={translations(lang, "about.work.speaking.cta", "View speaking")}
               ctaHref={localizePath("/speaking", lang)}
             />
+
+            {/* Ongoing Insight */}
+            <OfferCard
+              icon={<LineChart className="h-5 w-5 text-white" />}
+              title={translations(lang, "about.work.insight.title", "Ongoing insight")}
+              body={translations(
+                lang,
+                "about.work.insight.body",
+                "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week — themes, risk flags, and clear next steps."
+              )}
+              ctaLabel={translations(lang, "about.work.insight.cta", "View insight products")}
+              ctaHref={localizePath("/products", lang)}
+            />
+
           </div>
         </div>
 

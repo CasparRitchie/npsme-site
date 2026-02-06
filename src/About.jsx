@@ -7,7 +7,7 @@ import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
 import { TRANSLATIONS, translations } from "./i18n/translations.js";
 import { localizePath } from "./i18n/pathHelpers.js";
-import { ArrowRight, GraduationCap, Mic, Briefcase, CheckCircle2 } from "lucide-react";
+import { ArrowRight, GraduationCap, Mic, Briefcase, CheckCircle2, LineChart } from "lucide-react";
 
 export default function About() {
   const { lang } = useLanguage();

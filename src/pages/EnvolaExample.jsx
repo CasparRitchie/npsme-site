@@ -6,6 +6,8 @@ import { ArrowRight } from "lucide-react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import { localizePath } from "../i18n/pathHelpers";
+import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
+
 
 function StatCard({ label, value, sub }) {
   return (
@@ -137,6 +139,36 @@ export default function EnvolaExample() {
 
     return `${base}&days=${encodeURIComponent(trendDays)}`;
   }, [trendGranularity, trendMode, trendDays, trendFrom, trendTo]);
+
+  const [ts, setTs] = useState({ loading: true, data: null, error: null });
+  const [granularity, setGranularity] = useState("week"); // day | week | month
+  const [days, setDays] = useState(90);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    setTs((s) => ({ ...s, loading: true }));
+
+    (async () => {
+      try {
+        const r = await fetch(
+          `/api/intercom/public/nps-timeseries?content_id=189616&granularity=${encodeURIComponent(
+            granularity
+          )}&days=${encodeURIComponent(days)}`
+        );
+        const j = await r.json();
+        if (!cancelled) {
+          setTs({ loading: false, data: j, error: r.ok ? null : j?.error || "Error" });
+        }
+      } catch (e) {
+        if (!cancelled) setTs({ loading: false, data: null, error: e.message });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [granularity, days]);
 
   // LIVE
   useEffect(() => {
@@ -302,6 +334,58 @@ export default function EnvolaExample() {
           </div>
         </div>
       </PageHeader>
+
+      {/* NEW: NPS chart */}
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.timeseries.title", "NPS over time")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr("envola.timeseries.subtitle", "Track NPS trends by day, week, or month.")}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                value={granularity}
+                onChange={(e) => setGranularity(e.target.value)}
+              >
+                <option value="day">{tr("common.day", "Day")}</option>
+                <option value="week">{tr("common.week", "Week")}</option>
+                <option value="month">{tr("common.month", "Month")}</option>
+              </select>
+
+              <select
+                className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
+              >
+                <option value={30}>30d</option>
+                <option value={90}>90d</option>
+                <option value={180}>180d</option>
+                <option value={365}>365d</option>
+              </select>
+            </div>
+          </div>
+
+          {ts.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
+          {!ts.loading && ts.error && <p className="mt-6 text-sm text-red-300">Error: {ts.error}</p>}
+
+          {!ts.loading && ts.data?.ok && (
+            <div className="mt-6">
+              <NpsTimeseriesChart points={ts.data.points || []} granularity={granularity} />
+              <div className="mt-3 text-xs text-slate-400">
+                {tr("common.window", "Window")} : {ts.data.from} → {ts.data.to} • {tr("common.points", "Points")} : {(ts.data.points || []).length}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* NEW: NPS over time */}
       <section className="mx-auto max-w-7xl px-6 pb-20">

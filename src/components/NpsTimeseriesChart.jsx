@@ -34,10 +34,35 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
+export default function NpsTimeseriesChart({
+  points = [],
+  granularity = "week",
+  onPointClick,
+}) {
   const data = [...points].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
+
+  // Make clicks reliable by attaching the handler to the actual dot payload,
+  // not the chart surface (which often gives you no activePayload).
+  const ClickableDot = (props) => {
+    const { cx, cy, payload } = props || {};
+    if (cx == null || cy == null) return null;
+
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={5}
+        className="cursor-pointer"
+        onClick={() => {
+          if (typeof onPointClick === "function" && payload) onPointClick(payload);
+        }}
+      />
+    );
+  };
+
+  const ActiveClickableDot = (props) => <ClickableDot {...props} />;
 
   return (
     <div className="h-72 w-full">
@@ -45,11 +70,6 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
         <LineChart
           data={data}
           margin={{ top: 10, right: 16, bottom: 0, left: 0 }}
-          onClick={(e) => {
-            // Recharts gives activePayload when you click near a point
-            const p = e?.activePayload?.[0]?.payload;
-            if (p && onPointClick) onPointClick(p);
-          }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -60,7 +80,7 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
           <YAxis domain={[-100, 100]} />
           <Tooltip
             labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
-            formatter={(value, name, item) => {
+            formatter={(value, name) => {
               if (name === "nps") return [value, "NPS"];
               return [value, name];
             }}
@@ -69,7 +89,8 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
           <Line
             type="monotone"
             dataKey="nps"
-            dot={false}
+            dot={<ClickableDot />}
+            activeDot={<ActiveClickableDot />}
             strokeWidth={2}
             isAnimationActive={false}
           />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import { useLocation, Link } from "react-router-dom";
@@ -26,7 +26,6 @@ function Pill({ children }) {
 }
 
 function TogglePill({ active, onClick, color, children }) {
-  // color: "green" | "amber" | "red"
   const base =
     "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition select-none";
   const inactive = "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10";
@@ -49,7 +48,7 @@ function TogglePill({ active, onClick, color, children }) {
 }
 
 function prettyDate(iso) {
-  if (!iso) return "-";
+  if (!iso) return "—";
   const d = new Date(iso);
   return d.toLocaleString(undefined, {
     year: "numeric",
@@ -60,7 +59,16 @@ function prettyDate(iso) {
   });
 }
 
+function todayYmdLocal() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export default function EnvolaExample() {
+  const CONTENT_ID = "189616";
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
@@ -69,6 +77,22 @@ export default function EnvolaExample() {
   const [rate, setRate] = useState({ loading: true, data: null, error: null });
   const [themes, setThemes] = useState({ loading: true, data: null, error: null });
   const [comments, setComments] = useState({ loading: true, data: null, error: null });
+
+  // NEW: NPS over time
+  const [trend, setTrend] = useState({ loading: true, data: null, error: null });
+  const [trendGranularity, setTrendGranularity] = useState("week"); // day|week|month
+  const [trendMode, setTrendMode] = useState("rolling"); // rolling|range
+  const [trendDays, setTrendDays] = useState(90);
+  const [trendFrom, setTrendFrom] = useState(() => {
+    // default: 90 days ago (approx) -> keep simple (user can edit)
+    const d = new Date();
+    d.setDate(d.getDate() - 90);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  });
+  const [trendTo, setTrendTo] = useState(() => todayYmdLocal());
 
   const [bucketFilter, setBucketFilter] = useState({
     promoters: true,
@@ -95,34 +119,40 @@ export default function EnvolaExample() {
   }
 
   function labelTheme(themeKey) {
-    // If you later add theme label translations, this will pick them up.
     return tr(`envola.themeLabels.${themeKey}`, themeKey);
   }
+
+  const trendUrl = useMemo(() => {
+    const base = `/api/intercom/public/nps-timeseries?content_id=${encodeURIComponent(
+      CONTENT_ID
+    )}&granularity=${encodeURIComponent(trendGranularity)}`;
+
+    if (trendMode === "range") {
+      const from = (trendFrom || "").trim();
+      const to = (trendTo || "").trim();
+      // If user leaves blanks, fall back to rolling
+      if (from && to) return `${base}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+      return `${base}&days=${encodeURIComponent(trendDays)}`;
+    }
+
+    return `${base}&days=${encodeURIComponent(trendDays)}`;
+  }, [trendGranularity, trendMode, trendDays, trendFrom, trendTo]);
 
   // LIVE
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch(
-          "/api/intercom/public/nps-summary?content_id=189616&days=30"
-        );
+        const r = await fetch(`/api/intercom/public/nps-summary?content_id=${CONTENT_ID}&days=30`);
         const j = await r.json();
         if (!cancelled) {
-          setLive({
-            loading: false,
-            data: j,
-            error: r.ok ? null : j?.error || "Error",
-          });
+          setLive({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
         }
       } catch (e) {
-        if (!cancelled)
-          setLive({ loading: false, data: null, error: e.message });
+        if (!cancelled) setLive({ loading: false, data: null, error: e.message });
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   // RATE
@@ -130,31 +160,42 @@ export default function EnvolaExample() {
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch(
-          "/api/intercom/public/nps-response-rate?content_id=189616&days=30"
-        );
+        const r = await fetch(`/api/intercom/public/nps-response-rate?content_id=${CONTENT_ID}&days=30`);
         const j = await r.json();
         if (!cancelled) {
-          setRate({
-            loading: false,
-            data: j,
-            error: r.ok ? null : j?.error || "Error",
-          });
+          setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
         }
       } catch (e) {
-        if (!cancelled)
-          setRate({ loading: false, data: null, error: e.message });
+        if (!cancelled) setRate({ loading: false, data: null, error: e.message });
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
+
+  // NEW: TREND (refetch when filters change)
+  useEffect(() => {
+    let cancelled = false;
+
+    setTrend((s) => ({ ...s, loading: true, error: null }));
+
+    (async () => {
+      try {
+        const r = await fetch(trendUrl);
+        const j = await r.json();
+        if (!cancelled) {
+          setTrend({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+        }
+      } catch (e) {
+        if (!cancelled) setTrend({ loading: false, data: null, error: e.message });
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [trendUrl]);
 
   // THEMES (refetches when toggles change)
   useEffect(() => {
     let cancelled = false;
-
     setThemes((s) => ({ ...s, loading: true }));
 
     (async () => {
@@ -165,31 +206,22 @@ export default function EnvolaExample() {
         if (bucketFilter.detractors) selected.push("detractor");
 
         const bucketsParam =
-          selected.length === 0
-            ? ""
-            : `&buckets=${encodeURIComponent(selected.join(","))}`;
+          selected.length === 0 ? "" : `&buckets=${encodeURIComponent(selected.join(","))}`;
 
         const r = await fetch(
-          `/api/intercom/public/nps-themes?content_id=189616&days=30${bucketsParam}`
+          `/api/intercom/public/nps-themes?content_id=${CONTENT_ID}&days=30${bucketsParam}`
         );
         const j = await r.json();
 
         if (!cancelled) {
-          setThemes({
-            loading: false,
-            data: j,
-            error: r.ok ? null : j?.error || "Error",
-          });
+          setThemes({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
         }
       } catch (e) {
-        if (!cancelled)
-          setThemes({ loading: false, data: null, error: e.message });
+        if (!cancelled) setThemes({ loading: false, data: null, error: e.message });
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
   // COMMENTS (fetch once; filter client-side)
@@ -198,56 +230,56 @@ export default function EnvolaExample() {
     (async () => {
       try {
         const r = await fetch(
-          "/api/intercom/public/nps-comments?content_id=189616&days=30&limit=50"
+          `/api/intercom/public/nps-comments?content_id=${CONTENT_ID}&days=30&limit=50`
         );
         const j = await r.json();
         if (!cancelled) {
-          setComments({
-            loading: false,
-            data: j,
-            error: r.ok ? null : j?.error || "Error",
-          });
+          setComments({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
         }
       } catch (e) {
-        if (!cancelled)
-          setComments({ loading: false, data: null, error: e.message });
+        if (!cancelled) setComments({ loading: false, data: null, error: e.message });
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
+
+  // Simple derived helpers for the trend table
+  const trendPoints = useMemo(() => {
+    const pts = trend.data?.points || [];
+    return Array.isArray(pts) ? pts : [];
+  }, [trend.data]);
+
+  const trendTotals = useMemo(() => {
+    if (!trendPoints.length) return null;
+    const total = trendPoints.reduce((acc, p) => acc + (p.responses || 0), 0);
+    const last = trendPoints[trendPoints.length - 1];
+    return { totalResponses: total, lastNps: last?.nps ?? null, lastDate: last?.date ?? null };
+  }, [trendPoints]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr(
-          "envola.seo.title",
-          "Envola - Intercom NPS Analytics (Live Example) | NPSme"
-        )}
+        title={tr("envola.seo.title", "Envola — Intercom NPS Analytics (Live Example) | NPSme")}
         description={tr(
           "envola.seo.description",
           "A live, anonymised example showing how NPSme layers analytics on top of Intercom NPS."
         )}
-        altPaths={{
-          en: "/envola",
-          fr: "/fr/exemple-envola",
-        }}
+        altPaths={{ en: "/envola", fr: "/fr/exemple-envola" }}
       />
 
       <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client example / Envola")}>
         <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
-              {tr("envola.h1", "Envola - Intercom NPS Analytics")}
+              {tr("envola.h1", "Envola — Intercom NPS Analytics")}
             </h1>
 
             <p className="mt-5 text-slate-300 max-w-2xl">
               {tr(
                 "envola.intro",
-                "This is a live, anonymised example. It shows what NPSme can surface once an NPS survey is running in Intercom - starting with score + distribution, and soon drivers, themes, and recommendations."
+                "This is a live, anonymised example. It shows what NPSme can surface once an NPS survey is running in Intercom — starting with score + distribution, and soon drivers, themes, and recommendations."
               )}
             </p>
 
@@ -270,6 +302,177 @@ export default function EnvolaExample() {
           </div>
         </div>
       </PageHeader>
+
+      {/* NEW: NPS over time */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.trend.title", "NPS over time")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr(
+                  "envola.trend.subtitle",
+                  "Trend view to show how sentiment is moving. Use the filters to zoom in."
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
+              <Pill>
+                {trend.data?.from && trend.data?.to
+                  ? `${tr("envola.trend.range", "Range")}: ${trend.data.from} → ${trend.data.to}`
+                  : tr("envola.meta.window", "Window")}
+              </Pill>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-slate-400">{tr("envola.trend.granularity", "Granularity:")}</span>
+              {["day", "week", "month"].map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setTrendGranularity(g)}
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                    trendGranularity === g
+                      ? "bg-white text-black border-white"
+                      : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                  }`}
+                >
+                  {g === "day" ? tr("common.day", "Day") : g === "week" ? tr("common.week", "Week") : tr("common.month", "Month")}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-slate-400">{tr("envola.trend.mode", "View:")}</span>
+
+              <button
+                type="button"
+                onClick={() => setTrendMode("rolling")}
+                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                  trendMode === "rolling"
+                    ? "bg-white text-black border-white"
+                    : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                }`}
+              >
+                {tr("envola.trend.rolling", "Rolling")}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTrendMode("range")}
+                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                  trendMode === "range"
+                    ? "bg-white text-black border-white"
+                    : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                }`}
+              >
+                {tr("envola.trend.rangeBtn", "Date range")}
+              </button>
+
+              {trendMode === "rolling" ? (
+                <div className="ml-2 flex items-center gap-2">
+                  <span className="text-xs text-slate-400">{tr("envola.trend.last", "Last")}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={3650}
+                    value={trendDays}
+                    onChange={(e) => setTrendDays(Number(e.target.value || 30))}
+                    className="w-24 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200"
+                  />
+                  <span className="text-xs text-slate-400">{tr("common.days", "days")}</span>
+                </div>
+              ) : (
+                <div className="ml-2 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-slate-400">{tr("common.from", "From")}</span>
+                  <input
+                    type="date"
+                    value={trendFrom}
+                    onChange={(e) => setTrendFrom(e.target.value)}
+                    className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200"
+                  />
+                  <span className="text-xs text-slate-400">{tr("common.to", "To")}</span>
+                  <input
+                    type="date"
+                    value={trendTo}
+                    onChange={(e) => setTrendTo(e.target.value)}
+                    className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {trend.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
+          {!trend.loading && trend.error && <p className="mt-6 text-sm text-red-300">Error: {trend.error}</p>}
+
+          {!trend.loading && trend.data?.ok && (
+            <>
+              {!trendPoints.length ? (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  {tr("envola.trend.noData", "No trend data for this period yet.")}
+                </div>
+              ) : (
+                <>
+                  <div className="mt-6 grid gap-4 md:grid-cols-3">
+                    <StatCard
+                      label={tr("envola.trend.totalResponses", "Responses in period")}
+                      value={trendTotals?.totalResponses ?? "—"}
+                    />
+                    <StatCard
+                      label={tr("envola.trend.latestNps", "Latest NPS point")}
+                      value={trendTotals?.lastNps == null ? "—" : trendTotals.lastNps}
+                      sub={trendTotals?.lastDate ? `${tr("envola.trend.asOf", "As of")} ${trendTotals.lastDate}` : null}
+                    />
+                    <StatCard
+                      label={tr("envola.trend.points", "Data points")}
+                      value={trendPoints.length}
+                      sub={tr("envola.trend.pointsSub", "One row per time bucket")}
+                    />
+                  </div>
+
+                  <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                    <table className="w-full border-collapse">
+                      <thead className="bg-white/5">
+                        <tr className="text-left text-xs text-slate-300">
+                          <th className="px-4 py-3">{tr("envola.trend.cols.period", "Period")}</th>
+                          <th className="px-4 py-3">{tr("envola.trend.cols.nps", "NPS")}</th>
+                          <th className="px-4 py-3">{tr("envola.trend.cols.responses", "Responses")}</th>
+                          <th className="px-4 py-3">{tr("envola.trend.cols.promoters", "Promoters")}</th>
+                          <th className="px-4 py-3">{tr("envola.trend.cols.passives", "Passives")}</th>
+                          <th className="px-4 py-3">{tr("envola.trend.cols.detractors", "Detractors")}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {trendPoints.slice(-36).map((p) => (
+                          <tr key={p.date} className="border-t border-white/10">
+                            <td className="px-4 py-3 text-white">{p.date}</td>
+                            <td className="px-4 py-3 text-slate-200">{p.nps == null ? "—" : p.nps}</td>
+                            <td className="px-4 py-3 text-slate-200">{p.responses ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-200">{p.promoters ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-200">{p.passives ?? "—"}</td>
+                            <td className="px-4 py-3 text-slate-200">{p.detractors ?? "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="mt-3 text-xs text-slate-400">
+                    {tr("envola.trend.note", "Showing the most recent 36 time buckets to keep the page fast.")}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </section>
 
       {/* Live snapshot */}
       <section className="mx-auto max-w-7xl px-6 pb-20">

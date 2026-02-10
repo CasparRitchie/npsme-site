@@ -407,6 +407,15 @@ export default function EnvolaExample() {
           {!ts.loading && ts.data?.ok && (
             <div className="mt-6">
               <NpsTimeseriesChart points={ts.data.points || []} granularity={granularity}   onPointClick={loadBucketResponses}/>
+              {!ts.loading && ts.data?.ok && (ts.data.points || []).length > 0 && (
+              <button
+                type="button"
+                className="mt-4 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                onClick={() => loadBucketResponses(ts.data.points[ts.data.points.length - 1])}
+              >
+                Test drilldown (latest point)
+              </button>
+            )}
               <div className="mt-3 text-xs text-slate-400">
                 {tr("common.window", "Window")} : {ts.data.from} → {ts.data.to} • {tr("common.points", "Points")} : {(ts.data.points || []).length}
               </div>

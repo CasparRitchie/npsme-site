@@ -124,6 +124,8 @@ export default function EnvolaExample() {
     return tr(`envola.themeLabels.${themeKey}`, themeKey);
   }
 
+
+
   const trendUrl = useMemo(() => {
     const base = `/api/intercom/public/nps-timeseries?content_id=${encodeURIComponent(
       CONTENT_ID
@@ -144,6 +146,32 @@ export default function EnvolaExample() {
   const [granularity, setGranularity] = useState("week"); // day | week | month
   const [days, setDays] = useState(90);
 
+  const [selectedPoint, setSelectedPoint] = useState(null);
+  const [bucketResponses, setBucketResponses] = useState({ loading: false, data: null, error: null });
+
+  async function loadBucketResponses(point) {
+    setSelectedPoint(point);
+    setBucketResponses({ loading: true, data: null, error: null });
+
+    try {
+      const r = await fetch(
+        `/api/intercom/public/nps-responses?content_id=${encodeURIComponent(
+          CONTENT_ID
+        )}&granularity=${encodeURIComponent(granularity)}&date=${encodeURIComponent(
+          point.date
+        )}&limit=200`
+      );
+      const j = await r.json();
+      setBucketResponses({
+        loading: false,
+        data: j,
+        error: r.ok ? null : j?.error || "Error",
+      });
+    } catch (e) {
+      setBucketResponses({ loading: false, data: null, error: e.message });
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -152,7 +180,7 @@ export default function EnvolaExample() {
     (async () => {
       try {
         const r = await fetch(
-          `/api/intercom/public/nps-timeseries?content_id=189616&granularity=${encodeURIComponent(
+          `/api/intercom/public/nps-timeseries?content_id=${encodeURIComponent(CONTENT_ID)}&granularity=${encodeURIComponent(
             granularity
           )}&days=${encodeURIComponent(days)}`
         );
@@ -378,14 +406,102 @@ export default function EnvolaExample() {
 
           {!ts.loading && ts.data?.ok && (
             <div className="mt-6">
-              <NpsTimeseriesChart points={ts.data.points || []} granularity={granularity} />
+              <NpsTimeseriesChart points={ts.data.points || []} granularity={granularity}   onPointClick={loadBucketResponses}/>
               <div className="mt-3 text-xs text-slate-400">
                 {tr("common.window", "Window")} : {ts.data.from} → {ts.data.to} • {tr("common.points", "Points")} : {(ts.data.points || []).length}
               </div>
             </div>
           )}
+        {selectedPoint && (
+        <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm text-slate-200">
+              <span className="text-slate-400">Selected:</span>{" "}
+              <span className="text-white font-semibold">{selectedPoint.date}</span>{" "}
+              <span className="text-slate-400">• NPS:</span>{" "}
+              <span className="text-white font-semibold">{selectedPoint.nps ?? "—"}</span>{" "}
+              <span className="text-slate-400">• Responses:</span>{" "}
+              <span className="text-white font-semibold">{selectedPoint.responses ?? "—"}</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedPoint(null);
+                setBucketResponses({ loading: false, data: null, error: null });
+              }}
+              className="text-sm text-slate-300 hover:text-white"
+            >
+              Close
+            </button>
+          </div>
+
+          {bucketResponses.loading && (
+            <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!bucketResponses.loading && bucketResponses.error && (
+            <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
+          )}
+
+          {!bucketResponses.loading && bucketResponses.data?.ok && (
+            <>
+              <div className="mt-3 text-xs text-slate-400">
+                Window: {bucketResponses.data.bucket_start} → {bucketResponses.data.bucket_end} •
+                {` `}Promoters {bucketResponses.data.promoters}, Passives {bucketResponses.data.passives}, Detractors {bucketResponses.data.detractors}
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {(bucketResponses.data.items || []).map((r) => (
+                  <div key={r.response_id || `${r.submitted_at}-${r.contact_id}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                        {labelBucket(r.bucket)} • {r.score_0_10}/10
+                      </span>
+                      <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
+                      {r.contact_id ? (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                          Intercom contact: {r.contact_id}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Optional: show the multi-select benefits */}
+                    {Array.isArray(r.selected_options) && r.selected_options.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {r.selected_options.slice(0, 12).map((opt) => (
+                          <span key={opt} className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200">
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Show verbatims */}
+                    {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
+                      <div className="mt-3 space-y-2">
+                        {r.verbatims.slice(0, 6).map((v, idx) => (
+                          <div key={idx} className="text-sm text-slate-200">
+                            {v.question_text ? (
+                              <div className="text-xs text-slate-400">{v.question_text}</div>
+                            ) : null}
+                            <div className="leading-relaxed">“{v.text}”</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3 text-sm text-slate-400">No verbatims stored for this response.</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
+      )}
+      </div>
       </section>
+
+
 
       {/* NEW: NPS over time */}
       <section className="mx-auto max-w-7xl px-6 pb-20">

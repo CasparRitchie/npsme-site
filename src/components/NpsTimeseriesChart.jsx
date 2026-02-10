@@ -34,8 +34,7 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({ points = [], granularity = "week" }) {
-  // Ensure sorted by date (API looks sorted, but this keeps it safe)
+export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
   const data = [...points].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
@@ -43,7 +42,15 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week" }
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+        <LineChart
+          data={data}
+          margin={{ top: 10, right: 16, bottom: 0, left: 0 }}
+          onClick={(e) => {
+            // Recharts gives activePayload when you click near a point
+            const p = e?.activePayload?.[0]?.payload;
+            if (p && onPointClick) onPointClick(p);
+          }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"

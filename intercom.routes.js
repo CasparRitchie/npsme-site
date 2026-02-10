@@ -1227,6 +1227,87 @@ router.get("/public/nps-timeseries", async (req, res) => {
   }
 });
 
+router.get("/public/nps-responses", async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    const granularity = String(req.query.granularity || "week").trim(); // day|week|month
+    const date = String(req.query.date || "").trim(); // bucket start date, e.g. "2026-02-02"
+    const limit = Math.min(Math.max(Number(req.query.limit || 200), 1), 500);
+
+    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+    if (!date) return res.status(400).json({ ok: false, error: "Missing date" });
+
+    const bucketStart = new Date(date);
+    if (Number.isNaN(bucketStart.getTime())) {
+      return res.status(400).json({ ok: false, error: "Invalid date" });
+    }
+
+    // Compute [start, end) of bucket in UTC to keep it stable
+    const start = new Date(Date.UTC(bucketStart.getUTCFullYear(), bucketStart.getUTCMonth(), bucketStart.getUTCDate()));
+    let end = null;
+
+    if (granularity === "day") {
+      end = new Date(start);
+      end.setUTCDate(end.getUTCDate() + 1);
+    } else if (granularity === "month") {
+      end = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
+    } else {
+      // week (default): assume "date" is already the week start you emitted in /nps-timeseries
+      end = new Date(start);
+      end.setUTCDate(end.getUTCDate() + 7);
+    }
+
+    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+    const rows = parseJsonl(text);
+
+    const items = rows
+      .filter((r) => String(r.content_id || "") === contentId)
+      .filter((r) => typeof r.score_0_10 === "number")
+      .filter((r) => {
+        const t = Date.parse(r.submitted_at || "");
+        return Number.isFinite(t) && t >= start.getTime() && t < end.getTime();
+      })
+      .sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")))
+      .slice(0, limit)
+      .map((r) => ({
+        // Keep this “semi-anonymous”: enough to cross-ref in Intercom, not direct PII
+        response_id: r.response_id || null,
+        receipt_id: r.receipt_id || null,
+        contact_id: r.contact_id || null,
+        submitted_at: r.submitted_at || null,
+        score_0_10: r.score_0_10,
+        bucket: scoreBucket(r.score_0_10),
+        selected_options: Array.isArray(r.selected_options) ? r.selected_options : [],
+        verbatims: Array.isArray(r.verbatims) ? r.verbatims : [],
+        // Never include email/name on public endpoint
+      }));
+
+    // Summary (optional but handy for UI header)
+    const total = items.length;
+    const promoters = items.filter((x) => x.score_0_10 >= 9).length;
+    const passives = items.filter((x) => x.score_0_10 >= 7 && x.score_0_10 <= 8).length;
+    const detractors = items.filter((x) => x.score_0_10 <= 6).length;
+    const nps = total ? Math.round(((promoters - detractors) / total) * 100) : null;
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      granularity,
+      bucket_start: start.toISOString().slice(0, 10),
+      bucket_end: end.toISOString().slice(0, 10),
+      responses: total,
+      promoters,
+      passives,
+      detractors,
+      nps,
+      items,
+    });
+  } catch (err) {
+    console.error("[intercom] public nps-responses error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
   // -----------------------
   // Everything below requires an Intercom access token
   // -----------------------

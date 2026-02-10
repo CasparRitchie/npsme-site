@@ -289,25 +289,42 @@ app.use((req, res, next) => {
   return next();
 });
 
-const BLOCKED_PATHS = [
+const BLOCKED_PREFIXES = [
+  // secrets / env
   "/.env",
   "/.git",
-  "/.git/config",
   "/.svn",
   "/.hg",
+  "/backup",
+  "/config",
+  "/credentials",
+  "/aws",
+  "/.aws",
+
+  // common debug tools
+  "/debug",
+  "/_debug",
+  "/debugbar",
+  "/_debugbar",
+  "/_ignition",
+
+  // wordpress/php junk scans
   "/wp-admin",
   "/wp-login.php",
   "/phpmyadmin",
   "/cgi-bin",
   "/vendor",
-  "/_ignition",
+  "/xmlrpc.php",
+  "/phpinfo.php",
 ];
 
 app.use((req, res, next) => {
-  const p = req.path || "";
-  if (BLOCKED_PATHS.some((b) => p === b || p.startsWith(b + "/"))) {
+  const p = (req.path || "").toLowerCase();
+
+  if (BLOCKED_PREFIXES.some((b) => p.startsWith(b))) {
     return res.status(404).type("text/plain").send("Not found");
   }
+
   next();
 });
 

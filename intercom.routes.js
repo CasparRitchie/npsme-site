@@ -1104,6 +1104,130 @@ export function createIntercomRouter() {
 
 
   // -----------------------
+// Public endpoint: NPS time series
+// -----------------------
+router.get("/public/nps-timeseries", async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+
+    const granularity = String(req.query.granularity || "day").toLowerCase(); // day|week|month
+    if (!["day", "week", "month"].includes(granularity)) {
+      return res.status(400).json({ ok: false, error: "Invalid granularity (day|week|month)" });
+    }
+
+    const days = req.query.days != null ? Math.min(Math.max(Number(req.query.days || 30), 1), 3650) : null;
+
+    const fromQ = String(req.query.from || "").trim(); // YYYY-MM-DD (optional)
+    const toQ = String(req.query.to || "").trim();     // YYYY-MM-DD (optional)
+
+    // Parse date range
+    const parseYmdToMs = (ymd, endOfDay = false) => {
+      if (!ymd) return null;
+      // Interpret as UTC date
+      const ms = Date.parse(endOfDay ? `${ymd}T23:59:59.999Z` : `${ymd}T00:00:00.000Z`);
+      return Number.isFinite(ms) ? ms : null;
+    };
+
+    let fromMs = parseYmdToMs(fromQ, false);
+    let toMs = parseYmdToMs(toQ, true);
+
+    // If no explicit from/to, fall back to `days`
+    if (fromMs == null || toMs == null) {
+      const windowDays = days ?? 30;
+      toMs = Date.now();
+      fromMs = toMs - windowDays * 24 * 60 * 60 * 1000;
+    }
+
+    // Helpers
+    const scoreBucket = (score) => {
+      if (typeof score !== "number") return "unknown";
+      if (score >= 9) return "promoter";
+      if (score >= 7) return "passive";
+      return "detractor";
+    };
+
+    const pad2 = (n) => String(n).padStart(2, "0");
+
+    const ymdUTC = (ms) => {
+      const d = new Date(ms);
+      return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+    };
+
+    // ISO week start (Monday) in UTC
+    const weekStartYmdUTC = (ms) => {
+      const d = new Date(ms);
+      // Convert to “date only” (UTC)
+      const day = d.getUTCDay(); // 0=Sun..6=Sat
+      const diffToMonday = (day === 0 ? -6 : 1) - day;
+      const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+      monday.setUTCDate(monday.getUTCDate() + diffToMonday);
+      return `${monday.getUTCFullYear()}-${pad2(monday.getUTCMonth() + 1)}-${pad2(monday.getUTCDate())}`;
+    };
+
+    const monthStartYmdUTC = (ms) => {
+      const d = new Date(ms);
+      return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-01`;
+    };
+
+    const groupKey = (ms) => {
+      if (granularity === "day") return ymdUTC(ms);
+      if (granularity === "week") return weekStartYmdUTC(ms);
+      return monthStartYmdUTC(ms);
+    };
+
+    // Load clean store
+    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+    const rows = parseJsonl(text);
+
+    // Filter rows
+    const scored = rows
+      .filter((r) => String(r.content_id || "") === contentId)
+      .map((r) => {
+        const t = Date.parse(r.submitted_at || "");
+        return { ...r, _t: t };
+      })
+      .filter((r) => Number.isFinite(r._t))
+      .filter((r) => r._t >= fromMs && r._t <= toMs)
+      .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
+
+    // Aggregate
+    const map = new Map();
+    for (const r of scored) {
+      const key = groupKey(r._t);
+      const cur = map.get(key) || { key, responses: 0, promoters: 0, passives: 0, detractors: 0 };
+
+      cur.responses += 1;
+      const b = scoreBucket(r.score_0_10);
+      if (b === "promoter") cur.promoters += 1;
+      else if (b === "passive") cur.passives += 1;
+      else if (b === "detractor") cur.detractors += 1;
+
+      map.set(key, cur);
+    }
+
+    const points = Array.from(map.values())
+      .map((x) => {
+        const nps = x.responses ? Math.round(((x.promoters - x.detractors) / x.responses) * 100) : null;
+        return { date: x.key, nps, responses: x.responses, promoters: x.promoters, passives: x.passives, detractors: x.detractors };
+      })
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      granularity,
+      from: ymdUTC(fromMs),
+      to: ymdUTC(toMs),
+      points,
+    });
+  } catch (err) {
+    console.error("[intercom] public nps-timeseries error", err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+  // -----------------------
   // Everything below requires an Intercom access token
   // -----------------------
   router.use((_req, res, next) => {

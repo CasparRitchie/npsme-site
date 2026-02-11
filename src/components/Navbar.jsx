@@ -14,8 +14,7 @@ export default function NavBar() {
   const location = useLocation();
   const { lang, setLang } = useLanguage();
 
-  // NEW: auth state for showing Admin link
-  const [isAuthed, setIsAuthed] = React.useState(null); // null = unknown
+  const [isAuthed, setIsAuthed] = React.useState(null);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -34,6 +33,22 @@ export default function NavBar() {
       cancelled = true;
     };
   }, []);
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (e) {
+      // Even if it fails, we still "log out" locally to keep UX simple.
+    } finally {
+      setIsAuthed(false);
+      setOpen(false);
+      navigate(localizePath("/private/login", lang));
+    }
+  }
 
   // Still used for mobile (simple full list)
   const headerLinks = ROUTES.filter(
@@ -124,11 +139,21 @@ export default function NavBar() {
             {translations(lang, "routes.blog", "Blog")}
           </NavItem>
 
-          {/* NEW: Admin link only when authed */}
+          {/* Admin + Logout (only when authed) */}
           {isAuthed === true && (
-            <NavItem to={localizePath("/private/closing-the-loop", lang)}>
-              {translations(lang, "navbar.admin", "Admin")}
-            </NavItem>
+            <>
+              <NavItem to={localizePath("/private/closing-the-loop", lang)}>
+                {translations(lang, "navbar.admin", "Admin")}
+              </NavItem>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="shrink-0 inline-flex items-center gap-2 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
+              >
+                {translations(lang, "navbar.logout", "Log out")}
+              </button>
+            </>
           )}
 
           <button
@@ -176,11 +201,21 @@ export default function NavBar() {
               </NavItem>
             ))}
 
-            {/* NEW: Admin link only when authed */}
+            {/* Admin + Logout (mobile) */}
             {isAuthed === true && (
-              <NavItem to={localizePath("/private/closing-the-loop", lang)} mobile>
-                {translations(lang, "navbar.admin", "Admin")}
-              </NavItem>
+              <>
+                <NavItem to={localizePath("/private/closing-the-loop", lang)} mobile>
+                  {translations(lang, "navbar.admin", "Admin")}
+                </NavItem>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="mt-1 inline-flex items-center justify-center rounded-2xl border border-white/15 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 transition self-start"
+                >
+                  {translations(lang, "navbar.logout", "Log out")}
+                </button>
+              </>
             )}
 
             <button

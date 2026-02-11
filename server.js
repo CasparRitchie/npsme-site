@@ -318,8 +318,14 @@ app.post("/api/auth/login", (req, res) => {
 });
 
 app.post("/api/auth/logout", (_req, res) => {
-  res.clearCookie(PRIVATE_COOKIE_NAME, { path: "/" });
-  return res.json({ ok: true });
+  res.clearCookie("npsme_auth", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
+
+  res.json({ ok: true });
 });
 
 app.get("/api/auth/me", (req, res) => {

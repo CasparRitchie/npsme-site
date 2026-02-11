@@ -7,6 +7,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import { localizePath } from "../i18n/pathHelpers";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
+import WordCloud from "../components/WordCloud";
 
 
 function StatCard({ label, value, sub }) {
@@ -357,6 +358,12 @@ export default function EnvolaExample() {
     const last = trendPoints[trendPoints.length - 1];
     return { totalResponses: total, lastNps: last?.nps ?? null, lastDate: last?.date ?? null };
   }, [trendPoints]);
+
+  const wordCloudTexts = useMemo(() => {
+    const all = comments.data?.comments || [];
+    const filtered = all.filter((c) => bucketAllowed(c.bucket));
+    return filtered.map((c) => c.comment).filter(Boolean);
+  }, [comments.data, bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]); // bucketAllowed depends on these
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -1044,6 +1051,11 @@ export default function EnvolaExample() {
                                       {labelBucket(c.bucket)} • {c.score_0_10}/10
                                     </span>
                                     <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+                                  {c.contact_id ? (
+                                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                                      Intercom contact: {c.contact_id}
+                                    </span>
+                                  ) : null}
                                     {c.is_substantive && (
                                       <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
                                         {tr("envola.comments.tookTime", "Took time to write")}
@@ -1084,7 +1096,21 @@ export default function EnvolaExample() {
         </div>
       </section>
 
-{/* Comments */}
+      {/* Word cloud */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <WordCloud
+          texts={wordCloudTexts}
+          title={tr("envola.wordcloud.title", "Word cloud")}
+          subtitle={tr(
+            "envola.wordcloud.subtitle",
+            "Most common words in redacted comments (respects the bucket filters)."
+          )}
+          minCount={2}
+          maxWords={60}
+        />
+      </section>
+
+      {/* Comments */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-white">
@@ -1172,6 +1198,11 @@ export default function EnvolaExample() {
                             {labelBucket(c.bucket)} • {c.score_0_10}/10
                           </span>
                           <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+                          {c.contact_id ? (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                              Intercom contact: {c.contact_id}
+                            </span>
+                          ) : null}
                           {c.is_substantive && (
                             <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
                               {tr("envola.comments.tookTime", "Took time to write")}

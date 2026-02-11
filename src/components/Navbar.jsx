@@ -14,6 +14,27 @@ export default function NavBar() {
   const location = useLocation();
   const { lang, setLang } = useLanguage();
 
+  // NEW: auth state for showing Admin link
+  const [isAuthed, setIsAuthed] = React.useState(null); // null = unknown
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const r = await fetch("/api/auth/me", { credentials: "include" });
+        const j = await r.json();
+        if (!cancelled) setIsAuthed(Boolean(j?.authed));
+      } catch (e) {
+        if (!cancelled) setIsAuthed(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Still used for mobile (simple full list)
   const headerLinks = ROUTES.filter(
     (r) => r.enabled && r.inHeader && (r.lang ? r.lang === lang : true)
@@ -39,7 +60,8 @@ export default function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         {/* Brand */}
         <Link to={localizePath("/", lang)} className="flex items-center gap-3 shrink-0">
           <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
@@ -102,6 +124,13 @@ export default function NavBar() {
             {translations(lang, "routes.blog", "Blog")}
           </NavItem>
 
+          {/* NEW: Admin link only when authed */}
+          {isAuthed === true && (
+            <NavItem to={localizePath("/private/closing-the-loop", lang)}>
+              {translations(lang, "navbar.admin", "Admin")}
+            </NavItem>
+          )}
+
           <button
             type="button"
             onClick={toggleLang}
@@ -146,6 +175,13 @@ export default function NavBar() {
                 {translations(lang, labelKey, label)}
               </NavItem>
             ))}
+
+            {/* NEW: Admin link only when authed */}
+            {isAuthed === true && (
+              <NavItem to={localizePath("/private/closing-the-loop", lang)} mobile>
+                {translations(lang, "navbar.admin", "Admin")}
+              </NavItem>
+            )}
 
             <button
               type="button"

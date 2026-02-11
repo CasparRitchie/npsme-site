@@ -1102,211 +1102,313 @@ export function createIntercomRouter() {
     }
   });
 
+  // -----------------------
+  // Public endpoint: Theme drill-down (safe)
+  // -----------------------
+  router.get("/public/nps-theme-comments", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      const theme = String(req.query.theme || "").trim();
+      const days = Math.min(Math.max(Number(req.query.days || 30), 1), 365);
+      const limit = Math.min(Math.max(Number(req.query.limit || 50), 1), 300);
+
+      // Optional buckets filter, same semantics as /public/nps-themes
+      const bucketsRaw = String(req.query.buckets || "").trim(); // "promoter,passive"
+      const requestedBuckets = bucketsRaw
+        ? bucketsRaw
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
+        : null;
+
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+      if (!theme) return res.status(400).json({ ok: false, error: "Missing theme" });
+
+      // Validate theme key (prevents typos + makes behaviour predictable)
+      const validThemeKeys = new Set(THEME_RULES.map((r) => r.key));
+      if (!validThemeKeys.has(theme)) {
+        return res.status(400).json({
+          ok: false,
+          error: "Invalid theme",
+          valid_themes: Array.from(validThemeKeys),
+        });
+      }
+
+      const allowedBuckets = new Set(
+        ["promoter", "passive", "detractor"].filter((b) => {
+          if (!requestedBuckets) return true;
+          return requestedBuckets.includes(b);
+        })
+      );
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      const responses = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .filter((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return Number.isFinite(t) && t >= cutoff;
+        })
+        .filter((r) => typeof r.score_0_10 === "number")
+        .filter((r) => allowedBuckets.has(scoreBucket(r.score_0_10)));
+
+      const matches = [];
+      for (const r of responses) {
+        const vs = Array.isArray(r.verbatims) ? r.verbatims : [];
+        for (const v of vs) {
+          const raw = String(v?.text || "").trim();
+          if (!raw) continue;
+
+          const themes = detectThemes(raw);
+          if (!themes.includes(theme)) continue;
+
+          const red = truncate(redactText(raw), 320);
+          const wc = wordCount(red);
+
+          matches.push({
+            submitted_at: r.submitted_at || null,
+            score_0_10: r.score_0_10,
+            bucket: scoreBucket(r.score_0_10),
+            question_text: v?.question_text || null,
+            word_count: wc,
+            is_substantive: wc >= 8,
+            comment: red,
+            // No PII, no contact ids on public endpoint
+          });
+        }
+      }
+
+      matches.sort((a, b) =>
+        String(b.submitted_at || "").localeCompare(String(a.submitted_at || ""))
+      );
+
+      const returned = matches.slice(0, limit);
+      const substantive = returned.filter((x) => x.is_substantive).length;
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        theme,
+        window_days: days,
+        buckets: Array.from(allowedBuckets),
+        matched: matches.length,
+        returned: returned.length,
+        substantive,
+        comments: returned,
+      });
+    } catch (err) {
+      console.error("[intercom] public nps-theme-comments error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   // -----------------------
-// Public endpoint: NPS time series
-// -----------------------
-router.get("/public/nps-timeseries", async (req, res) => {
-  try {
-    const contentId = String(req.query.content_id || "").trim();
-    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+  // Public endpoint: NPS time series
+  // -----------------------
+  router.get("/public/nps-timeseries", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
 
-    const granularity = String(req.query.granularity || "day").toLowerCase(); // day|week|month
-    if (!["day", "week", "month"].includes(granularity)) {
-      return res.status(400).json({ ok: false, error: "Invalid granularity (day|week|month)" });
+      const granularity = String(req.query.granularity || "day").toLowerCase(); // day|week|month
+      if (!["day", "week", "month"].includes(granularity)) {
+        return res.status(400).json({ ok: false, error: "Invalid granularity (day|week|month)" });
+      }
+
+      const days = req.query.days != null ? Math.min(Math.max(Number(req.query.days || 30), 1), 3650) : null;
+
+      const fromQ = String(req.query.from || "").trim(); // YYYY-MM-DD (optional)
+      const toQ = String(req.query.to || "").trim();     // YYYY-MM-DD (optional)
+
+      // Parse date range
+      const parseYmdToMs = (ymd, endOfDay = false) => {
+        if (!ymd) return null;
+        // Interpret as UTC date
+        const ms = Date.parse(endOfDay ? `${ymd}T23:59:59.999Z` : `${ymd}T00:00:00.000Z`);
+        return Number.isFinite(ms) ? ms : null;
+      };
+
+      let fromMs = parseYmdToMs(fromQ, false);
+      let toMs = parseYmdToMs(toQ, true);
+
+      // If no explicit from/to, fall back to `days`
+      if (fromMs == null || toMs == null) {
+        const windowDays = days ?? 30;
+        toMs = Date.now();
+        fromMs = toMs - windowDays * 24 * 60 * 60 * 1000;
+      }
+
+      // Helpers
+      const scoreBucket = (score) => {
+        if (typeof score !== "number") return "unknown";
+        if (score >= 9) return "promoter";
+        if (score >= 7) return "passive";
+        return "detractor";
+      };
+
+      const pad2 = (n) => String(n).padStart(2, "0");
+
+      const ymdUTC = (ms) => {
+        const d = new Date(ms);
+        return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+      };
+
+      // ISO week start (Monday) in UTC
+      const weekStartYmdUTC = (ms) => {
+        const d = new Date(ms);
+        // Convert to “date only” (UTC)
+        const day = d.getUTCDay(); // 0=Sun..6=Sat
+        const diffToMonday = (day === 0 ? -6 : 1) - day;
+        const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+        monday.setUTCDate(monday.getUTCDate() + diffToMonday);
+        return `${monday.getUTCFullYear()}-${pad2(monday.getUTCMonth() + 1)}-${pad2(monday.getUTCDate())}`;
+      };
+
+      const monthStartYmdUTC = (ms) => {
+        const d = new Date(ms);
+        return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-01`;
+      };
+
+      const groupKey = (ms) => {
+        if (granularity === "day") return ymdUTC(ms);
+        if (granularity === "week") return weekStartYmdUTC(ms);
+        return monthStartYmdUTC(ms);
+      };
+
+      // Load clean store
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      // Filter rows
+      const scored = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .map((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return { ...r, _t: t };
+        })
+        .filter((r) => Number.isFinite(r._t))
+        .filter((r) => r._t >= fromMs && r._t <= toMs)
+        .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
+
+      // Aggregate
+      const map = new Map();
+      for (const r of scored) {
+        const key = groupKey(r._t);
+        const cur = map.get(key) || { key, responses: 0, promoters: 0, passives: 0, detractors: 0 };
+
+        cur.responses += 1;
+        const b = scoreBucket(r.score_0_10);
+        if (b === "promoter") cur.promoters += 1;
+        else if (b === "passive") cur.passives += 1;
+        else if (b === "detractor") cur.detractors += 1;
+
+        map.set(key, cur);
+      }
+
+      const points = Array.from(map.values())
+        .map((x) => {
+          const nps = x.responses ? Math.round(((x.promoters - x.detractors) / x.responses) * 100) : null;
+          return { date: x.key, nps, responses: x.responses, promoters: x.promoters, passives: x.passives, detractors: x.detractors };
+        })
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        granularity,
+        from: ymdUTC(fromMs),
+        to: ymdUTC(toMs),
+        points,
+      });
+    } catch (err) {
+      console.error("[intercom] public nps-timeseries error", err);
+      return res.status(500).json({ ok: false, error: err.message });
     }
+  });
 
-    const days = req.query.days != null ? Math.min(Math.max(Number(req.query.days || 30), 1), 3650) : null;
+  router.get("/public/nps-responses", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      const granularity = String(req.query.granularity || "week").trim(); // day|week|month
+      const date = String(req.query.date || "").trim(); // bucket start date, e.g. "2026-02-02"
+      const limit = Math.min(Math.max(Number(req.query.limit || 200), 1), 500);
 
-    const fromQ = String(req.query.from || "").trim(); // YYYY-MM-DD (optional)
-    const toQ = String(req.query.to || "").trim();     // YYYY-MM-DD (optional)
+      if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
+      if (!date) return res.status(400).json({ ok: false, error: "Missing date" });
 
-    // Parse date range
-    const parseYmdToMs = (ymd, endOfDay = false) => {
-      if (!ymd) return null;
-      // Interpret as UTC date
-      const ms = Date.parse(endOfDay ? `${ymd}T23:59:59.999Z` : `${ymd}T00:00:00.000Z`);
-      return Number.isFinite(ms) ? ms : null;
-    };
+      const bucketStart = new Date(date);
+      if (Number.isNaN(bucketStart.getTime())) {
+        return res.status(400).json({ ok: false, error: "Invalid date" });
+      }
 
-    let fromMs = parseYmdToMs(fromQ, false);
-    let toMs = parseYmdToMs(toQ, true);
+      // Compute [start, end) of bucket in UTC to keep it stable
+      const start = new Date(Date.UTC(bucketStart.getUTCFullYear(), bucketStart.getUTCMonth(), bucketStart.getUTCDate()));
+      let end = null;
 
-    // If no explicit from/to, fall back to `days`
-    if (fromMs == null || toMs == null) {
-      const windowDays = days ?? 30;
-      toMs = Date.now();
-      fromMs = toMs - windowDays * 24 * 60 * 60 * 1000;
+      if (granularity === "day") {
+        end = new Date(start);
+        end.setUTCDate(end.getUTCDate() + 1);
+      } else if (granularity === "month") {
+        end = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
+      } else {
+        // week (default): assume "date" is already the week start you emitted in /nps-timeseries
+        end = new Date(start);
+        end.setUTCDate(end.getUTCDate() + 7);
+      }
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const items = rows
+        .filter((r) => String(r.content_id || "") === contentId)
+        .filter((r) => typeof r.score_0_10 === "number")
+        .filter((r) => {
+          const t = Date.parse(r.submitted_at || "");
+          return Number.isFinite(t) && t >= start.getTime() && t < end.getTime();
+        })
+        .sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")))
+        .slice(0, limit)
+        .map((r) => ({
+          // Keep this “semi-anonymous”: enough to cross-ref in Intercom, not direct PII
+          response_id: r.response_id || null,
+          receipt_id: r.receipt_id || null,
+          contact_id: r.contact_id || null,
+          submitted_at: r.submitted_at || null,
+          score_0_10: r.score_0_10,
+          bucket: scoreBucket(r.score_0_10),
+          selected_options: Array.isArray(r.selected_options) ? r.selected_options : [],
+          verbatims: Array.isArray(r.verbatims) ? r.verbatims : [],
+          // Never include email/name on public endpoint
+        }));
+
+      // Summary (optional but handy for UI header)
+      const total = items.length;
+      const promoters = items.filter((x) => x.score_0_10 >= 9).length;
+      const passives = items.filter((x) => x.score_0_10 >= 7 && x.score_0_10 <= 8).length;
+      const detractors = items.filter((x) => x.score_0_10 <= 6).length;
+      const nps = total ? Math.round(((promoters - detractors) / total) * 100) : null;
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        granularity,
+        bucket_start: start.toISOString().slice(0, 10),
+        bucket_end: end.toISOString().slice(0, 10),
+        responses: total,
+        promoters,
+        passives,
+        detractors,
+        nps,
+        items,
+      });
+    } catch (err) {
+      console.error("[intercom] public nps-responses error", err);
+      return res.status(500).json({ ok: false, error: err.message });
     }
-
-    // Helpers
-    const scoreBucket = (score) => {
-      if (typeof score !== "number") return "unknown";
-      if (score >= 9) return "promoter";
-      if (score >= 7) return "passive";
-      return "detractor";
-    };
-
-    const pad2 = (n) => String(n).padStart(2, "0");
-
-    const ymdUTC = (ms) => {
-      const d = new Date(ms);
-      return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
-    };
-
-    // ISO week start (Monday) in UTC
-    const weekStartYmdUTC = (ms) => {
-      const d = new Date(ms);
-      // Convert to “date only” (UTC)
-      const day = d.getUTCDay(); // 0=Sun..6=Sat
-      const diffToMonday = (day === 0 ? -6 : 1) - day;
-      const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-      monday.setUTCDate(monday.getUTCDate() + diffToMonday);
-      return `${monday.getUTCFullYear()}-${pad2(monday.getUTCMonth() + 1)}-${pad2(monday.getUTCDate())}`;
-    };
-
-    const monthStartYmdUTC = (ms) => {
-      const d = new Date(ms);
-      return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-01`;
-    };
-
-    const groupKey = (ms) => {
-      if (granularity === "day") return ymdUTC(ms);
-      if (granularity === "week") return weekStartYmdUTC(ms);
-      return monthStartYmdUTC(ms);
-    };
-
-    // Load clean store
-    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-    const rows = parseJsonl(text);
-
-    // Filter rows
-    const scored = rows
-      .filter((r) => String(r.content_id || "") === contentId)
-      .map((r) => {
-        const t = Date.parse(r.submitted_at || "");
-        return { ...r, _t: t };
-      })
-      .filter((r) => Number.isFinite(r._t))
-      .filter((r) => r._t >= fromMs && r._t <= toMs)
-      .filter((r) => typeof r.score_0_10 === "number" && r.score_0_10 >= 0 && r.score_0_10 <= 10);
-
-    // Aggregate
-    const map = new Map();
-    for (const r of scored) {
-      const key = groupKey(r._t);
-      const cur = map.get(key) || { key, responses: 0, promoters: 0, passives: 0, detractors: 0 };
-
-      cur.responses += 1;
-      const b = scoreBucket(r.score_0_10);
-      if (b === "promoter") cur.promoters += 1;
-      else if (b === "passive") cur.passives += 1;
-      else if (b === "detractor") cur.detractors += 1;
-
-      map.set(key, cur);
-    }
-
-    const points = Array.from(map.values())
-      .map((x) => {
-        const nps = x.responses ? Math.round(((x.promoters - x.detractors) / x.responses) * 100) : null;
-        return { date: x.key, nps, responses: x.responses, promoters: x.promoters, passives: x.passives, detractors: x.detractors };
-      })
-      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-
-    return res.json({
-      ok: true,
-      content_id: contentId,
-      granularity,
-      from: ymdUTC(fromMs),
-      to: ymdUTC(toMs),
-      points,
-    });
-  } catch (err) {
-    console.error("[intercom] public nps-timeseries error", err);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
-
-router.get("/public/nps-responses", async (req, res) => {
-  try {
-    const contentId = String(req.query.content_id || "").trim();
-    const granularity = String(req.query.granularity || "week").trim(); // day|week|month
-    const date = String(req.query.date || "").trim(); // bucket start date, e.g. "2026-02-02"
-    const limit = Math.min(Math.max(Number(req.query.limit || 200), 1), 500);
-
-    if (!contentId) return res.status(400).json({ ok: false, error: "Missing content_id" });
-    if (!date) return res.status(400).json({ ok: false, error: "Missing date" });
-
-    const bucketStart = new Date(date);
-    if (Number.isNaN(bucketStart.getTime())) {
-      return res.status(400).json({ ok: false, error: "Invalid date" });
-    }
-
-    // Compute [start, end) of bucket in UTC to keep it stable
-    const start = new Date(Date.UTC(bucketStart.getUTCFullYear(), bucketStart.getUTCMonth(), bucketStart.getUTCDate()));
-    let end = null;
-
-    if (granularity === "day") {
-      end = new Date(start);
-      end.setUTCDate(end.getUTCDate() + 1);
-    } else if (granularity === "month") {
-      end = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
-    } else {
-      // week (default): assume "date" is already the week start you emitted in /nps-timeseries
-      end = new Date(start);
-      end.setUTCDate(end.getUTCDate() + 7);
-    }
-
-    const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-    const rows = parseJsonl(text);
-
-    const items = rows
-      .filter((r) => String(r.content_id || "") === contentId)
-      .filter((r) => typeof r.score_0_10 === "number")
-      .filter((r) => {
-        const t = Date.parse(r.submitted_at || "");
-        return Number.isFinite(t) && t >= start.getTime() && t < end.getTime();
-      })
-      .sort((a, b) => String(b.submitted_at || "").localeCompare(String(a.submitted_at || "")))
-      .slice(0, limit)
-      .map((r) => ({
-        // Keep this “semi-anonymous”: enough to cross-ref in Intercom, not direct PII
-        response_id: r.response_id || null,
-        receipt_id: r.receipt_id || null,
-        contact_id: r.contact_id || null,
-        submitted_at: r.submitted_at || null,
-        score_0_10: r.score_0_10,
-        bucket: scoreBucket(r.score_0_10),
-        selected_options: Array.isArray(r.selected_options) ? r.selected_options : [],
-        verbatims: Array.isArray(r.verbatims) ? r.verbatims : [],
-        // Never include email/name on public endpoint
-      }));
-
-    // Summary (optional but handy for UI header)
-    const total = items.length;
-    const promoters = items.filter((x) => x.score_0_10 >= 9).length;
-    const passives = items.filter((x) => x.score_0_10 >= 7 && x.score_0_10 <= 8).length;
-    const detractors = items.filter((x) => x.score_0_10 <= 6).length;
-    const nps = total ? Math.round(((promoters - detractors) / total) * 100) : null;
-
-    return res.json({
-      ok: true,
-      content_id: contentId,
-      granularity,
-      bucket_start: start.toISOString().slice(0, 10),
-      bucket_end: end.toISOString().slice(0, 10),
-      responses: total,
-      promoters,
-      passives,
-      detractors,
-      nps,
-      items,
-    });
-  } catch (err) {
-    console.error("[intercom] public nps-responses error", err);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
+  });
 
   // -----------------------
   // Everything below requires an Intercom access token

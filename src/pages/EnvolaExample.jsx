@@ -124,8 +124,6 @@ export default function EnvolaExample() {
     return tr(`envola.themeLabels.${themeKey}`, themeKey);
   }
 
-
-
   const trendUrl = useMemo(() => {
     const base = `/api/intercom/public/nps-timeseries?content_id=${encodeURIComponent(
       CONTENT_ID
@@ -148,10 +146,48 @@ export default function EnvolaExample() {
 
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [bucketResponses, setBucketResponses] = useState({ loading: false, data: null, error: null });
+  // NEW: Theme drilldown
+  const [selectedTheme, setSelectedTheme] = useState(null); // theme key string
+  const [themeComments, setThemeComments] = useState({ loading: false, data: null, error: null });
 
+  function selectedBucketsParam() {
+    const selected = [];
+    if (bucketFilter.promoters) selected.push("promoter");
+    if (bucketFilter.passives) selected.push("passive");
+    if (bucketFilter.detractors) selected.push("detractor");
+    return selected.length === 0 ? "" : `&buckets=${encodeURIComponent(selected.join(","))}`;
+  }
+
+  async function openTheme(themeKey) {
+    setSelectedTheme(themeKey);
+    setThemeComments({ loading: true, data: null, error: null });
+
+    try {
+      const r = await fetch(
+        `/api/intercom/public/nps-theme-comments?content_id=${encodeURIComponent(
+          CONTENT_ID
+        )}&theme=${encodeURIComponent(themeKey)}&days=30&limit=80${selectedBucketsParam()}`
+      );
+      const j = await r.json();
+      setThemeComments({
+        loading: false,
+        data: j,
+        error: r.ok ? null : j?.error || "Error",
+      });
+    } catch (e) {
+      setThemeComments({ loading: false, data: null, error: e.message });
+    }
+  }
+
+  function closeTheme() {
+    setSelectedTheme(null);
+    setThemeComments({ loading: false, data: null, error: null });
+  }
   async function loadBucketResponses(point) {
     setSelectedPoint(point);
     setBucketResponses({ loading: true, data: null, error: null });
+
+
 
     try {
       const r = await fetch(
@@ -302,6 +338,12 @@ export default function EnvolaExample() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    // If filters change, close the open theme drilldown to avoid stale interpretation
+    if (selectedTheme) closeTheme();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
   // Simple derived helpers for the trend table
   const trendPoints = useMemo(() => {
@@ -900,7 +942,7 @@ export default function EnvolaExample() {
 
           {!themes.loading && themes.data?.ok && (
             <>
-              {(!themes.data.themes || themes.data.themes.length === 0) ? (
+              {!themes.data.themes || themes.data.themes.length === 0 ? (
                 <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
                   {tr(
                     "envola.themes.noThemes",
@@ -908,30 +950,127 @@ export default function EnvolaExample() {
                   )}
                 </div>
               ) : (
-                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-white/5">
-                      <tr className="text-left text-xs text-slate-300">
-                        <th className="px-4 py-3">{tr("envola.themes.cols.theme", "Theme")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.mentions", "Mentions")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.avgScore", "Avg score")}</th>
-                        <th className="px-4 py-3">{tr("envola.themes.cols.detrShare", "Detractor share")}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                      {themes.data.themes.slice(0, 8).map((t) => (
-                        <tr key={t.theme} className="border-t border-white/10">
-                          <td className="px-4 py-3 text-white">{labelTheme(t.theme)}</td>
-                          <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
-                          <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "-"}</td>
-                          <td className="px-4 py-3 text-slate-200">
-                            {t.share_of_detractor_mentions == null ? "-" : `${t.share_of_detractor_mentions}%`}
-                          </td>
+                <>
+                  <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                    <table className="w-full border-collapse">
+                      <thead className="bg-white/5">
+                        <tr className="text-left text-xs text-slate-300">
+                          <th className="px-4 py-3">{tr("envola.themes.cols.theme", "Theme")}</th>
+                          <th className="px-4 py-3">{tr("envola.themes.cols.mentions", "Mentions")}</th>
+                          <th className="px-4 py-3">{tr("envola.themes.cols.avgScore", "Avg score")}</th>
+                          <th className="px-4 py-3">{tr("envola.themes.cols.detrShare", "Detractor share")}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="text-sm">
+                        {themes.data.themes.slice(0, 8).map((t) => (
+                          <tr
+                            key={t.theme}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => openTheme(t.theme)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") openTheme(t.theme);
+                            }}
+                            className="border-t border-white/10 cursor-pointer hover:bg-white/5 focus:outline-none focus:bg-white/5"
+                          >
+                            <td className="px-4 py-3 text-white">
+                              <span className="inline-flex items-center gap-2">
+                                {labelTheme(t.theme)}
+                                <span className="text-xs text-slate-400">↗</span>
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-slate-200">{t.mentions}</td>
+                            <td className="px-4 py-3 text-slate-200">{t.avg_score ?? "-"}</td>
+                            <td className="px-4 py-3 text-slate-200">
+                              {t.share_of_detractor_mentions == null
+                                ? "-"
+                                : `${t.share_of_detractor_mentions}%`}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {selectedTheme && (
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-5">
+                      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                        <div className="text-sm text-slate-200">
+                          <span className="text-slate-400">{tr("common.theme", "Theme")}:</span>{" "}
+                          <span className="text-white font-semibold">
+                            {labelTheme(selectedTheme)}
+                          </span>
+                          <span className="text-slate-400"> • {tr("common.window", "Window")}:</span>{" "}
+                          <span className="text-slate-200">30d</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={closeTheme}
+                          className="text-sm text-slate-300 hover:text-white"
+                        >
+                          {tr("common.close", "Close")}
+                        </button>
+                      </div>
+
+                      {themeComments.loading && (
+                        <p className="mt-4 text-sm text-slate-300">
+                          {tr("common.loading", "Loading…")}
+                        </p>
+                      )}
+                      {!themeComments.loading && themeComments.error && (
+                        <p className="mt-4 text-sm text-red-300">Error: {themeComments.error}</p>
+                      )}
+
+                      {!themeComments.loading && themeComments.data?.ok && (
+                        <>
+                          <div className="mt-3 text-xs text-slate-400">
+                            {tr("common.returned", "Returned")}: {themeComments.data.returned} •{" "}
+                            {tr("common.substantive", "Substantive")}: {themeComments.data.substantive}
+                            {themeComments.data.matched != null
+                              ? ` • Matched: ${themeComments.data.matched}`
+                              : ""}
+                          </div>
+
+                          {(themeComments.data.comments || []).length ? (
+                            <div className="mt-4 space-y-3">
+                              {(themeComments.data.comments || []).map((c, idx) => (
+                                <div
+                                  key={`${c.submitted_at || "x"}-${idx}`}
+                                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                                >
+                                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                                      {labelBucket(c.bucket)} • {c.score_0_10}/10
+                                    </span>
+                                    <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+                                    {c.is_substantive && (
+                                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                                        {tr("envola.comments.tookTime", "Took time to write")}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {c.question_text ? (
+                                    <div className="mt-3 text-xs text-slate-400">{c.question_text}</div>
+                                  ) : null}
+
+                                  <p className="mt-2 text-sm text-slate-200 leading-relaxed">
+                                    “{c.comment}”
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-4 text-sm text-slate-300">
+                              {tr("envola.comments.none", "No comments returned for this filter yet.")}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="mt-6 text-xs text-slate-400">
@@ -945,7 +1084,7 @@ export default function EnvolaExample() {
         </div>
       </section>
 
-      {/* Comments */}
+{/* Comments */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-white">

@@ -10,6 +10,7 @@ import OpenAI from "openai";
 import { createIntercomRouter } from "./intercom.routes.js";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
+import crypto from "crypto";
 
 
 // Rate limit: tune as you like
@@ -250,6 +251,80 @@ app.use((req, res, next) => {
 app.use("/api/intercom", createIntercomRouter());
 
 app.use(express.json());
+
+// ---------------------------------------------------------------------------
+// Simple shared-password protection (Option B)
+// - POST /api/auth/login { password }
+// - POST /api/auth/logout
+// - GET  /api/auth/me
+// Sets an HttpOnly cookie that unlocks "private" routes.
+// ---------------------------------------------------------------------------
+
+const PRIVATE_COOKIE_NAME = "npsme_private";
+
+function parseCookies(header = "") {
+  // Minimal cookie parser (avoids adding cookie-parser dependency)
+  const out = {};
+  if (!header) return out;
+  header.split(";").forEach((part) => {
+    const idx = part.indexOf("=");
+    if (idx === -1) return;
+    const k = part.slice(0, idx).trim();
+    const v = part.slice(idx + 1).trim();
+    if (k) out[k] = decodeURIComponent(v);
+  });
+  return out;
+}
+
+function expectedPrivateCookieValue() {
+  const secret = process.env.PRIVATE_DASH_COOKIE_SECRET || process.env.PRIVATE_DASH_PASSWORD || "";
+  if (!secret) return null;
+  return crypto.createHmac("sha256", secret).update("npsme_private_v1").digest("hex");
+}
+
+function hasPrivateAuth(req) {
+  const expected = expectedPrivateCookieValue();
+  if (!expected) return false;
+  const cookies = parseCookies(req.headers.cookie || "");
+  return cookies[PRIVATE_COOKIE_NAME] === expected;
+}
+
+app.post("/api/auth/login", (req, res) => {
+  const password = String(req.body?.password || "");
+  const expectedPassword = process.env.PRIVATE_DASH_PASSWORD || "";
+
+  if (!expectedPassword) {
+    return res.status(500).json({ ok: false, error: "PRIVATE_DASH_PASSWORD is not set" });
+  }
+  if (!password || password !== expectedPassword) {
+    return res.status(401).json({ ok: false, error: "Invalid password" });
+  }
+
+  const value = expectedPrivateCookieValue();
+  if (!value) {
+    return res.status(500).json({ ok: false, error: "PRIVATE_DASH_COOKIE_SECRET is not set" });
+  }
+
+  const isProd = process.env.NODE_ENV === "production";
+  res.cookie(PRIVATE_COOKIE_NAME, value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProd,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: "/",
+  });
+
+  return res.json({ ok: true });
+});
+
+app.post("/api/auth/logout", (_req, res) => {
+  res.clearCookie(PRIVATE_COOKIE_NAME, { path: "/" });
+  return res.json({ ok: true });
+});
+
+app.get("/api/auth/me", (req, res) => {
+  return res.json({ ok: true, authed: hasPrivateAuth(req) });
+});
 
 // Security headers (CSP off so we don’t break your current inline styles/scripts)
 app.use(

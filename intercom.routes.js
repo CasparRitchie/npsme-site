@@ -579,6 +579,46 @@ export function createIntercomRouter() {
     next();
   }
 
+  // -------------------------------------------------------------------------
+  // Private (shared-password) auth via HttpOnly cookie
+  // Cookie is set by server.js: POST /api/auth/login
+  // -------------------------------------------------------------------------
+  const PRIVATE_COOKIE_NAME = "npsme_private";
+
+  function parseCookies(header = "") {
+    const out = {};
+    if (!header) return out;
+    header.split(";").forEach((part) => {
+      const idx = part.indexOf("=");
+      if (idx === -1) return;
+      const k = part.slice(0, idx).trim();
+      const v = part.slice(idx + 1).trim();
+      if (k) out[k] = decodeURIComponent(v);
+    });
+    return out;
+  }
+
+  function expectedPrivateCookieValue() {
+    const secret = process.env.PRIVATE_DASH_COOKIE_SECRET || process.env.PRIVATE_DASH_PASSWORD || "";
+    if (!secret) return null;
+    return crypto.createHmac("sha256", secret).update("npsme_private_v1").digest("hex");
+  }
+
+  function requirePrivateCookie(req, res, next) {
+    const expected = expectedPrivateCookieValue();
+    if (!expected) {
+      return res
+        .status(500)
+        .json({ ok: false, error: "Private auth is not configured (missing PRIVATE_DASH_COOKIE_SECRET)" });
+    }
+
+    const cookies = parseCookies(req.headers.cookie || "");
+    if (cookies[PRIVATE_COOKIE_NAME] !== expected) {
+      return res.status(401).json({ ok: false, error: "Unauthorised" });
+    }
+    return next();
+  }
+
   // -----------------------
   // Auto-ingest settings (server-side only)
   // -----------------------
@@ -818,6 +858,13 @@ export function createIntercomRouter() {
 
   router.post("/webhooks", rawJson, webhookHandler);
   router.post("/webhooks/surveys", rawJson, webhookHandler);
+  // -----------------------------
+  // Private test endpoint
+  // -----------------------------
+  router.get("/private/ping", requirePrivateCookie, (_req, res) => {
+    return res.json({ ok: true, message: "private ok" });
+  });
+
   router.get("/webhooks/surveys", (_req, res) => res.status(405).json({ ok: false, error: "POST only" }));
 
   // -----------------------

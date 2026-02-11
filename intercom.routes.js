@@ -6,26 +6,57 @@ import { parse } from "csv-parse/sync";
 import crypto from "crypto";
 
 // --- Private auth (shared password cookie) ---
-// Mirrors the simple HttpOnly cookie approach used in server.js.
-// Cookie is verified using PRIVATE_DASH_COOKIE_SECRET (HMAC) to avoid trivial spoofing.
-const PRIVATE_COOKIE_NAMES = ["npsme_private", "npsme_auth"];
+// Mirrors server.js: cookie name "npsme_private", value = HMAC(secret, "npsme_private_v1")
+const PRIVATE_COOKIE_NAME = "npsme_private";
+
+function parseCookies(header = "") {
+  const out = {};
+  if (!header) return out;
+  header.split(";").forEach((part) => {
+    const idx = part.indexOf("=");
+    if (idx === -1) return;
+    const k = part.slice(0, idx).trim();
+    const v = part.slice(idx + 1).trim();
+    if (k) out[k] = decodeURIComponent(v);
+  });
+  return out;
+}
 
 function expectedPrivateCookieValue() {
-  const secret = process.env.PRIVATE_DASH_COOKIE_SECRET || "";
+  const secret =
+    process.env.PRIVATE_DASH_COOKIE_SECRET || process.env.PRIVATE_DASH_PASSWORD || "";
   if (!secret) return null;
-  return crypto.createHmac("sha256", secret).update("npsme_private").digest("hex");
+  return crypto.createHmac("sha256", secret).update("npsme_private_v1").digest("hex");
 }
 
 function requirePrivateCookie(req, res, next) {
   const expected = expectedPrivateCookieValue();
   if (!expected) {
-    return res.status(500).json({ ok: false, error: "PRIVATE_DASH_COOKIE_SECRET is not set" });
+    return res.status(500).json({
+      ok: false,
+      error: "Private auth is not configured (missing PRIVATE_DASH_COOKIE_SECRET or PRIVATE_DASH_PASSWORD)",
+    });
   }
-  const cookies = req.cookies || {};
-  const got = PRIVATE_COOKIE_NAMES.map((n) => cookies[n]).find(Boolean);
-  if (got && got === expected) return next();
-  return res.status(401).json({ ok: false, error: "Not authorised" });
+
+  const cookies = parseCookies(req.headers.cookie || "");
+  if (cookies[PRIVATE_COOKIE_NAME] !== expected) {
+    return res.status(401).json({ ok: false, error: "Not authorised" });
+  }
+
+  return next();
 }
+
+function clampInt(v, def, min, max) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return def;
+  return Math.min(Math.max(Math.trunc(n), min), max);
+}
+
+function toYmd(d) {
+  const pad = (x) => String(x).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+}
+
 
 // Data-export endpoints behave best pinned to their own API version
 const INTERCOM_EXPORT_VERSION = process.env.INTERCOM_EXPORT_VERSION || "2.7";
@@ -1432,6 +1463,134 @@ export function createIntercomRouter() {
     }
   });
 
+  // Private: Closing the loop queue (per Intercom contact_id)
+  // Reads from clean-store JSONL and returns a prioritised action list.
+  router.get("/private/closing-the-loop", requirePrivateCookie, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      if (!contentId) {
+        return res.status(400).json({ ok: false, error: "content_id is required" });
+      }
+
+      const days = clampInt(req.query.days, 30, 1, 3650);
+      const limit = clampInt(req.query.limit, 50, 1, 2000);
+
+      // Pull from clean store (Dropbox JSONL)
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const since = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      // Group by contact_id
+      const byContact = new Map();
+      for (const r of rows) {
+        if (!r) continue;
+        if (String(r.content_id || "") !== contentId) continue;
+
+        const submittedAt = r.submitted_at ? Date.parse(r.submitted_at) : NaN;
+        if (!Number.isFinite(submittedAt) || submittedAt < since) continue;
+
+        const contactId = r.contact_id ? String(r.contact_id) : "";
+        if (!contactId) continue;
+
+        const entry = byContact.get(contactId) || { contact_id: contactId, responses: [] };
+        entry.responses.push(r);
+        byContact.set(contactId, entry);
+      }
+
+      function extractTexts(resp) {
+        const texts = [];
+        const vs = Array.isArray(resp?.verbatims) ? resp.verbatims : [];
+        for (const v of vs) {
+          const t = typeof v?.text === "string" ? v.text.trim() : "";
+          if (t) texts.push(t);
+        }
+        return texts;
+      }
+
+      function scoreRisk({ latestBucket, latestScore, themes, hasSubstantive }) {
+        let risk = 0;
+
+        if (latestBucket === "detractor") risk += 60;
+        else if (latestBucket === "passive") risk += 25;
+        else if (latestBucket === "promoter") risk += 5;
+
+        if (typeof latestScore === "number") {
+          risk += Math.max(0, 10 - latestScore) * 2; // 0..20
+        }
+
+        if (Array.isArray(themes) && themes.length) {
+          risk += Math.min(20, themes.length * 4);
+        }
+
+        if (hasSubstantive) risk += 8;
+
+        return risk;
+      }
+
+      function recommendAction(latestBucket, riskScore) {
+        if (latestBucket === "detractor") return riskScore >= 80 ? "Call today" : "Message today";
+        if (latestBucket === "passive") return "Follow up (ask what would improve)";
+        if (latestBucket === "promoter") return "Thank them / ask for referral";
+        return "Review";
+      }
+
+      const queue = [];
+      for (const { contact_id, responses } of byContact.values()) {
+        responses.sort((a, b) => Date.parse(a.submitted_at) - Date.parse(b.submitted_at));
+        const latest = responses[responses.length - 1];
+
+        const latestScore = typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
+        const latestBucket =
+          latestScore == null ? null : scoreBucket(latestScore);
+
+        const texts = extractTexts(latest);
+        const joined = texts.join(" ");
+        const themes = joined ? detectThemes(joined) : [];
+
+        const hasSubstantive = texts.some(
+          (t) => t.split(/\s+/).filter(Boolean).length >= 8
+        );
+
+        const risk_score = scoreRisk({
+          latestBucket,
+          latestScore: latestScore == null ? undefined : latestScore,
+          themes,
+          hasSubstantive,
+        });
+
+        queue.push({
+          contact_id,
+          responses_count: responses.length,
+          latest: {
+            submitted_at: latest.submitted_at || null,
+            date: latest.submitted_at ? toYmd(new Date(latest.submitted_at)) : null,
+            score_0_10: latestScore,
+            bucket: latestBucket,
+            comment_excerpt: texts[0] ? String(texts[0]).slice(0, 220) : null,
+          },
+          themes,
+          risk_score,
+          recommendation: recommendAction(latestBucket, risk_score),
+        });
+      }
+
+      queue.sort((a, b) => b.risk_score - a.risk_score);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        days,
+        returned: Math.min(limit, queue.length),
+        queue: queue.slice(0, limit),
+      });
+    } catch (e) {
+      console.error("[intercom] private closing-the-loop error", e);
+      return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+  });
+
+
   // -----------------------
   // Everything below requires an Intercom access token
   // -----------------------
@@ -1460,137 +1619,6 @@ export function createIntercomRouter() {
   // (Optional) keep your existing export debug routes here if you still use them:
   // /survey-export/start, /survey-export/status/:jobId, /survey-export/parse/:jobId
 
-  // Private: Closing the loop queue (per Intercom contact_id)
-// Uses Intercom contact_id as the "customer entity" and returns a prioritised action list.
-// NOTE: relies only on the clean-store JSONL (no external "last login" data yet).
-router.get("/private/closing-the-loop", requirePrivateCookie, async (req, res) => {
-  try {
-    const contentId = String(req.query.content_id || "").trim();
-    if (!contentId) {
-      return res.status(400).json({ ok: false, error: "content_id is required" });
-    }
-
-    const days = clampInt(req.query.days, 30, 1, 3650);
-    const limit = clampInt(req.query.limit, 200, 1, 2000);
-
-    // Pull from clean store (Dropbox JSONL)
-    const buf = await downloadDropboxFileBuffer({
-      accessToken: dropboxAccessToken,
-      path: DROPBOX_INTERCOM_NPS_RESPONSES_PATH,
-    });
-    const rows = parseJsonl(buf.toString("utf8"));
-
-    const since = Date.now() - days * 24 * 60 * 60 * 1000;
-
-    // Group by contact_id
-    const byContact = new Map();
-    for (const r of rows) {
-      if (!r) continue;
-      if (String(r.content_id || "") !== contentId) continue;
-      const submittedAt = r.submitted_at ? Date.parse(r.submitted_at) : NaN;
-      if (!Number.isFinite(submittedAt) || submittedAt < since) continue;
-
-      const contactId = r.contact_id ? String(r.contact_id) : "";
-      if (!contactId) continue; // closing-the-loop needs a contact identity
-
-      const entry = byContact.get(contactId) || { contact_id: contactId, responses: [] };
-      entry.responses.push(r);
-      byContact.set(contactId, entry);
-    }
-
-    function extractTexts(resp) {
-      const texts = [];
-      if (Array.isArray(resp.verbatims)) {
-        for (const v of resp.verbatims) {
-          if (v && typeof v.text === "string" && v.text.trim()) texts.push(v.text.trim());
-        }
-      }
-      return texts;
-    }
-
-    function scoreRisk({ latestBucket, latestScore, themes, hasSubstantive }) {
-      let risk = 0;
-
-      // Bucket-based urgency
-      if (latestBucket === "detractor") risk += 60;
-      else if (latestBucket === "passive") risk += 25;
-      else if (latestBucket === "promoter") risk += 5;
-
-      // Lower score -> higher risk (within bucket)
-      if (typeof latestScore === "number") {
-        risk += Math.max(0, 10 - latestScore) * 2; // 0..20
-      }
-
-      // Themes -> extra signal (simple until we tune stopwords + taxonomy)
-      if (Array.isArray(themes) && themes.length) {
-        risk += Math.min(20, themes.length * 4);
-      }
-
-      // A substantive comment usually means "they took time" -> respond
-      if (hasSubstantive) risk += 8;
-
-      return risk;
-    }
-
-    function recommendAction(latestBucket, riskScore) {
-      if (latestBucket === "detractor") return riskScore >= 80 ? "Call today" : "Message today";
-      if (latestBucket === "passive") return "Follow up (ask what would improve)";
-      if (latestBucket === "promoter") return "Thank them / ask for referral";
-      return "Review";
-    }
-
-    const queue = [];
-    for (const { contact_id, responses } of byContact.values()) {
-      responses.sort((a, b) => Date.parse(a.submitted_at) - Date.parse(b.submitted_at));
-      const latest = responses[responses.length - 1];
-
-      const latestScore = typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
-      const latestBucket = latest.bucket || (latestScore == null ? null : scoreBucket(latestScore));
-
-      // Themes + comment excerpt from the *latest* response
-      const texts = extractTexts(latest);
-      const joined = texts.join(" ");
-      const themes = joined ? detectThemes(joined) : [];
-
-      // "Substantive" = any verbatim 8+ words
-      const hasSubstantive = texts.some((t) => (t.split(/\s+/).filter(Boolean).length >= 8));
-
-      const risk_score = scoreRisk({
-        latestBucket,
-        latestScore: latestScore == null ? undefined : latestScore,
-        themes,
-        hasSubstantive,
-      });
-
-      queue.push({
-        contact_id,
-        responses_count: responses.length,
-        latest: {
-          submitted_at: latest.submitted_at || null,
-          date: latest.date || (latest.submitted_at ? toYmd(new Date(latest.submitted_at)) : null),
-          score_0_10: latestScore,
-          bucket: latestBucket,
-          comment_excerpt: texts[0] ? String(texts[0]).slice(0, 220) : null,
-        },
-        themes,
-        risk_score,
-        recommendation: recommendAction(latestBucket, risk_score),
-      });
-    }
-
-    queue.sort((a, b) => b.risk_score - a.risk_score);
-
-    return res.json({
-      ok: true,
-      content_id: contentId,
-      days,
-      returned: Math.min(limit, queue.length),
-      queue: queue.slice(0, limit),
-    });
-  } catch (e) {
-    return res.status(500).json({ ok: false, error: e?.message || String(e) });
-  }
-});
 
 router.get("/survey-export/start", async (req, res) => {
     try {

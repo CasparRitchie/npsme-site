@@ -318,14 +318,17 @@ app.post("/api/auth/login", (req, res) => {
 });
 
 app.post("/api/auth/logout", (_req, res) => {
+  const isProd = process.env.NODE_ENV === "production";
+
   res.clearCookie("npsme_auth", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    secure: isProd,     // true on https in prod
+    path: "/",          // MUST match how it was set
+    // domain: ".npsme.com", // ONLY include if you set it with a domain
   });
 
-  res.json({ ok: true });
+  return res.json({ ok: true });
 });
 
 app.get("/api/auth/me", (req, res) => {

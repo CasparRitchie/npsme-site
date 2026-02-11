@@ -179,6 +179,16 @@ function scoreBucket(score) {
   return "detractor";
 }
 
+function intercomContactUrl(contactId) {
+  const appId = process.env.ENVOLA_INTERCOM_APP_ID; // from Heroku config
+
+  if (!appId || !contactId) return null;
+
+  return `https://app.intercom.com/a/apps/${appId}/users/${contactId}`;
+}
+
+
+
 async function getDropboxAccessToken() {
   if (!DROPBOX_REFRESH_TOKEN) return LEGACY_DROPBOX_TOKEN || null;
 
@@ -1546,7 +1556,7 @@ export function createIntercomRouter() {
 
         const texts = extractTexts(latest);
         const joined = texts.join(" ");
-        const themes = joined ? detectThemes(joined) : [];
+        const themes = joined ? Array.from(new Set(detectThemes(joined))) : [];
 
         const hasSubstantive = texts.some(
           (t) => t.split(/\s+/).filter(Boolean).length >= 8
@@ -1561,6 +1571,7 @@ export function createIntercomRouter() {
 
         queue.push({
           contact_id,
+          intercom_contact_url: intercomContactUrl(contact_id),
           responses_count: responses.length,
           latest: {
             submitted_at: latest.submitted_at || null,

@@ -1571,6 +1571,7 @@ export function createIntercomRouter() {
 
         queue.push({
           contact_id,
+          response_id: latest.response_id || null,
           intercom_contact_url: intercomContactUrl(contact_id),
           responses_count: responses.length,
           latest: {
@@ -1598,6 +1599,42 @@ export function createIntercomRouter() {
     } catch (e) {
       console.error("[intercom] private closing-the-loop error", e);
       return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+  });
+
+  router.get("/private/nps-response", requirePrivateCookie, async (req, res) => {
+    try {
+      const responseId = String(req.query.response_id || "").trim();
+      if (!responseId) return res.status(400).json({ ok: false, error: "response_id is required" });
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const r = rows.find((x) => String(x?.response_id || "") === responseId);
+      if (!r) return res.status(404).json({ ok: false, error: "Response not found" });
+
+      const appId = process.env.ENVOLA_INTERCOM_APP_ID || "";
+      const intercom_contact_url =
+        appId && r.contact_id ? `https://app.intercom.com/a/apps/${appId}/users/${r.contact_id}` : null;
+
+      return res.json({
+        ok: true,
+        response: {
+          response_id: r.response_id || null,
+          content_id: r.content_id || null,
+          receipt_id: r.receipt_id || null,
+          submitted_at: r.submitted_at || null,
+          score_0_10: r.score_0_10 ?? null,
+          bucket: scoreBucket(r.score_0_10),
+          selected_options: Array.isArray(r.selected_options) ? r.selected_options : [],
+          verbatims: Array.isArray(r.verbatims) ? r.verbatims : [],
+          answers: Array.isArray(r.answers) ? r.answers : [], // optional but useful
+          intercom_contact_url,
+        },
+      });
+    } catch (err) {
+      console.error("[intercom] private nps-response error", err);
+      return res.status(500).json({ ok: false, error: err.message });
     }
   });
 

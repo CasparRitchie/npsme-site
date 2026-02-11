@@ -6,7 +6,10 @@ export const TRANSLATIONS = {
       bookDiscovery: "Book discovery",
       languageEn: "EN",
       languageFr: "FR",
-    },
+    
+    admin: "Admin",
+    logout: "Log out",
+},
     routes: {
       products: "Products",
       whyNpsMe: "Why NPS Me",
@@ -19,7 +22,9 @@ export const TRANSLATIONS = {
       socialListening: "Social Listening",
       blog: "Blog",
       cxCockpit: "CX Cockpit",
-    },
+    
+    closingTheLoop: "Closing the loop",
+},
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
       seoDescription:
@@ -2610,7 +2615,10 @@ export const TRANSLATIONS = {
       bookDiscovery: "Prendre rendez-vous",
       languageEn: "EN",
       languageFr: "FR",
-    },
+    
+    admin: "Admin",
+    logout: "Déconnexion",
+},
     routes: {
       products: "Produits",
       whyNpsMe: "Pourquoi NPS Me",
@@ -2623,7 +2631,9 @@ export const TRANSLATIONS = {
       socialListening: "Social listening",
       blog: "Blog",
       cxCockpit: "Cockpit CX",
-    },
+    
+    closingTheLoop: "Boucler la boucle",
+},
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
       seoDescription:

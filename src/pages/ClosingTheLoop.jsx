@@ -1,4 +1,7 @@
+// src/pages/ClosingTheLoop.jsx
 import React from "react";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
 
 const DEFAULT_CONTENT_ID = "189616";
 
@@ -27,7 +30,34 @@ function bucketPill(bucket) {
   return `${base} border-white/10 bg-white/5 text-slate-200`;
 }
 
+function scoreBucket(score) {
+  if (typeof score !== "number") return "unknown";
+  if (score >= 9) return "promoter";
+  if (score >= 7) return "passive";
+  return "detractor";
+}
+
+function chipClass() {
+  return "inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-200";
+}
+
+function groupVerbatims(verbatims) {
+  const out = new Map();
+  for (const v of verbatims || []) {
+    const q = (v?.question_text || "").trim() || "—";
+    const t = (v?.text || "").trim();
+    if (!t) continue;
+    const cur = out.get(q) || [];
+    cur.push(t);
+    out.set(q, cur);
+  }
+  return Array.from(out.entries()); // [ [question, [texts...]], ...]
+}
+
 export default function ClosingTheLoop() {
+  const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
   const [days, setDays] = React.useState(30);
   const [limit, setLimit] = React.useState(50);
@@ -38,6 +68,19 @@ export default function ClosingTheLoop() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [data, setData] = React.useState(null);
+
+  // Modal state
+  const [openId, setOpenId] = React.useState(null); // response_id
+  const [detailLoading, setDetailLoading] = React.useState(false);
+  const [detailError, setDetailError] = React.useState("");
+  const [detail, setDetail] = React.useState(null);
+
+  const closeModal = React.useCallback(() => {
+    setOpenId(null);
+    setDetail(null);
+    setDetailError("");
+    setDetailLoading(false);
+  }, []);
 
   const fetchQueue = React.useCallback(async () => {
     setLoading(true);
@@ -102,14 +145,104 @@ export default function ClosingTheLoop() {
     return sorted;
   }, [data, bucket, sortBy]);
 
+  const openResponse = React.useCallback(async (responseId) => {
+    if (!responseId) return;
+    setOpenId(responseId);
+    setDetail(null);
+    setDetailError("");
+    setDetailLoading(true);
+
+    try {
+      const qs = new URLSearchParams({ response_id: responseId });
+      const r = await fetch(`/api/intercom/private/nps-response?${qs.toString()}`, {
+        credentials: "include",
+      });
+      const j = await r.json().catch(() => null);
+
+      if (!r.ok || !j?.ok) {
+        const msg = j?.error || `Request failed (${r.status})`;
+        throw new Error(msg);
+      }
+
+      setDetail(j.response || null);
+    } catch (e) {
+      setDetailError(String(e?.message || e));
+      setDetail(null);
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
+  // Escape closes modal
+  React.useEffect(() => {
+    if (!openId) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openId, closeModal]);
+
+  const title = tr("closingTheLoop.title", "Closing the loop");
+  const subtitle = tr(
+    "closingTheLoop.subtitle",
+    "Action queue from recent NPS responses, prioritised by risk."
+  );
+
+  const labels = {
+    refresh: tr("closingTheLoop.controls.refresh", "Refresh"),
+    refreshing: tr("closingTheLoop.controls.refreshing", "Refreshing…"),
+    contentId: tr("closingTheLoop.controls.contentId", "content_id"),
+    days: tr("closingTheLoop.controls.days", "days"),
+    limit: tr("closingTheLoop.controls.limit", "limit"),
+    bucket: tr("closingTheLoop.controls.bucket", "bucket"),
+    sort: tr("closingTheLoop.controls.sort", "sort"),
+    all: tr("closingTheLoop.filters.all", "All"),
+    detractors: tr("closingTheLoop.filters.detractors", "Detractors"),
+    passives: tr("closingTheLoop.filters.passives", "Passives"),
+    promoters: tr("closingTheLoop.filters.promoters", "Promoters"),
+    risk: tr("closingTheLoop.sort.risk", "Risk"),
+    latestDate: tr("closingTheLoop.sort.date", "Latest date"),
+    score: tr("closingTheLoop.sort.score", "Score"),
+    loadingQueue: tr("closingTheLoop.state.loading", "Loading queue…"),
+    noResults: tr("closingTheLoop.state.noResults", "No results for this filter/window."),
+    errorTitle: tr("closingTheLoop.state.errorTitle", "Error"),
+    notAuthHint: tr(
+      "closingTheLoop.state.notAuthHint",
+      'If you see “Not authorised”, log in again at /private/login.'
+    ),
+
+    thRisk: tr("closingTheLoop.table.risk", "Risk"),
+    thLatest: tr("closingTheLoop.table.latest", "Latest"),
+    thScore: tr("closingTheLoop.table.score", "Score"),
+    thBucket: tr("closingTheLoop.table.bucket", "Bucket"),
+    thThemes: tr("closingTheLoop.table.themes", "Themes"),
+    thRecommendation: tr("closingTheLoop.table.recommendation", "Recommendation"),
+    thResponse: tr("closingTheLoop.table.response", "Response"),
+    thIntercom: tr("closingTheLoop.table.intercom", "Intercom"),
+    open: tr("closingTheLoop.actions.open", "Open"),
+    view: tr("closingTheLoop.actions.view", "View"),
+    dash: tr("common.dash", "—"),
+
+    modalTitle: tr("closingTheLoop.modal.title", "Survey response"),
+    modalClose: tr("closingTheLoop.modal.close", "Close"),
+    modalLoading: tr("closingTheLoop.modal.loading", "Loading response…"),
+    modalError: tr("closingTheLoop.modal.error", "Couldn’t load this response."),
+    modalScore: tr("closingTheLoop.modal.score", "Score"),
+    modalSubmitted: tr("closingTheLoop.modal.submitted", "Submitted"),
+    modalReceipt: tr("closingTheLoop.modal.receipt", "Receipt"),
+    modalOptions: tr("closingTheLoop.modal.selectedOptions", "Selected options"),
+    modalVerbatims: tr("closingTheLoop.modal.verbatims", "Verbatims"),
+    modalRaw: tr("closingTheLoop.modal.rawAnswers", "Raw answers"),
+    modalOpenIntercom: tr("closingTheLoop.modal.openIntercom", "Open contact in Intercom"),
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="flex items-start justify-between gap-6 flex-wrap">
         <div>
-          <h1 className="text-3xl font-semibold text-white">Closing the loop</h1>
-          <p className="mt-3 text-slate-300">
-            Action queue from recent NPS responses, prioritised by risk.
-          </p>
+          <h1 className="text-3xl font-semibold text-white">{title}</h1>
+          <p className="mt-3 text-slate-300">{subtitle}</p>
         </div>
 
         <button
@@ -119,16 +252,16 @@ export default function ClosingTheLoop() {
                      bg-white/10 hover:bg-white/15 text-white border border-white/10
                      transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60"
           disabled={loading}
-          title="Refresh"
+          title={labels.refresh}
         >
-          {loading ? "Refreshing…" : "Refresh"}
+          {loading ? labels.refreshing : labels.refresh}
         </button>
       </div>
 
       {/* Controls */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-3">
         <div className="md:col-span-4">
-          <label className="text-xs text-slate-400">content_id</label>
+          <label className="text-xs text-slate-400">{labels.contentId}</label>
           <input
             value={contentId}
             onChange={(e) => setContentId(e.target.value)}
@@ -138,7 +271,7 @@ export default function ClosingTheLoop() {
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">days</label>
+          <label className="text-xs text-slate-400">{labels.days}</label>
           <input
             type="number"
             min={1}
@@ -150,7 +283,7 @@ export default function ClosingTheLoop() {
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">limit</label>
+          <label className="text-xs text-slate-400">{labels.limit}</label>
           <input
             type="number"
             min={1}
@@ -162,29 +295,29 @@ export default function ClosingTheLoop() {
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">bucket</label>
+          <label className="text-xs text-slate-400">{labels.bucket}</label>
           <select
             value={bucket}
             onChange={(e) => setBucket(e.target.value)}
             className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
           >
-            <option value="all">All</option>
-            <option value="detractor">Detractors</option>
-            <option value="passive">Passives</option>
-            <option value="promoter">Promoters</option>
+            <option value="all">{labels.all}</option>
+            <option value="detractor">{labels.detractors}</option>
+            <option value="passive">{labels.passives}</option>
+            <option value="promoter">{labels.promoters}</option>
           </select>
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">sort</label>
+          <label className="text-xs text-slate-400">{labels.sort}</label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
           >
-            <option value="risk">Risk</option>
-            <option value="date">Latest date</option>
-            <option value="score">Score</option>
+            <option value="risk">{labels.risk}</option>
+            <option value="date">{labels.latestDate}</option>
+            <option value="score">{labels.score}</option>
           </select>
         </div>
       </div>
@@ -192,23 +325,24 @@ export default function ClosingTheLoop() {
       {/* Status */}
       {error && (
         <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
-          <div className="font-medium">Error</div>
+          <div className="font-medium">{labels.errorTitle}</div>
           <div className="mt-1 text-sm opacity-90">{error}</div>
           <div className="mt-3 text-xs text-rose-100/80">
-            If you see “Not authorised”, log in again at <span className="font-mono">/private/login</span>.
+            {labels.notAuthHint.split("/private/login")[0]}
+            <span className="font-mono">/private/login</span>.
           </div>
         </div>
       )}
 
       {!error && loading && (
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
-          Loading queue…
+          {labels.loadingQueue}
         </div>
       )}
 
       {!error && !loading && data && queue.length === 0 && (
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
-          No results for this filter/window.
+          {labels.noResults}
         </div>
       )}
 
@@ -219,46 +353,70 @@ export default function ClosingTheLoop() {
             <table className="min-w-full text-sm">
               <thead className="bg-white/5 text-slate-300">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium">Risk</th>
-                  <th className="text-left px-4 py-3 font-medium">Latest</th>
-                  <th className="text-left px-4 py-3 font-medium">Score</th>
-                  <th className="text-left px-4 py-3 font-medium">Bucket</th>
-                  <th className="text-left px-4 py-3 font-medium">Themes</th>
-                  <th className="text-left px-4 py-3 font-medium">Recommendation</th>
-                  <th className="text-left px-4 py-3 font-medium">Intercom</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thRisk}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thLatest}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thScore}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thBucket}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thThemes}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thRecommendation}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thResponse}</th>
+                  <th className="text-left px-4 py-3 font-medium">{labels.thIntercom}</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-white/10">
                 {queue.map((it) => {
                   const latest = it.latest || {};
+                  const hasResponse = Boolean(it.response_id);
+                  const themes =
+                    Array.isArray(it.themes) && it.themes.length ? it.themes.join(", ") : labels.dash;
+
+                  const score =
+                    typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
+
+                  const bucketKey = latest.bucket || (score != null ? scoreBucket(score) : null);
+
                   return (
                     <tr key={it.contact_id} className="hover:bg-white/5">
                       <td className="px-4 py-3 text-white font-semibold">
-                        {typeof it.risk_score === "number" ? it.risk_score : "—"}
+                        {typeof it.risk_score === "number" ? it.risk_score : labels.dash}
                       </td>
 
                       <td className="px-4 py-3 text-slate-200">
                         <div className="text-white/90">{formatDate(latest.submitted_at)}</div>
                         <div className="text-xs text-slate-400 mt-1 line-clamp-2">
-                          {latest.comment_excerpt || "—"}
+                          {latest.comment_excerpt || labels.dash}
                         </div>
                       </td>
 
                       <td className="px-4 py-3 text-slate-200">
-                        {typeof latest.score_0_10 === "number" ? latest.score_0_10 : "—"}
+                        {score != null ? score : labels.dash}
                       </td>
 
                       <td className="px-4 py-3">
-                        <span className={bucketPill(latest.bucket)}>{latest.bucket || "—"}</span>
+                        <span className={bucketPill(bucketKey)}>{bucketKey || labels.dash}</span>
                       </td>
+
+                      <td className="px-4 py-3 text-slate-200">{themes}</td>
 
                       <td className="px-4 py-3 text-slate-200">
-                        {Array.isArray(it.themes) && it.themes.length
-                          ? it.themes.join(", ")
-                          : "—"}
+                        {it.recommendation || labels.dash}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-200">{it.recommendation || "—"}</td>
+                      <td className="px-4 py-3">
+                        {hasResponse ? (
+                          <button
+                            type="button"
+                            onClick={() => openResponse(it.response_id)}
+                            className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium
+                                       bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                          >
+                            {labels.view}
+                          </button>
+                        ) : (
+                          <span className="text-slate-500">{labels.dash}</span>
+                        )}
+                      </td>
 
                       <td className="px-4 py-3">
                         {it.intercom_contact_url ? (
@@ -269,10 +427,10 @@ export default function ClosingTheLoop() {
                             className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium
                                        bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
                           >
-                            Open
+                            {labels.open}
                           </a>
                         ) : (
-                          <span className="text-slate-500">—</span>
+                          <span className="text-slate-500">{labels.dash}</span>
                         )}
                       </td>
                     </tr>
@@ -283,8 +441,155 @@ export default function ClosingTheLoop() {
           </div>
 
           <div className="px-4 py-3 text-xs text-slate-400 border-t border-white/10">
-            Showing <span className="text-slate-200">{queue.length}</span> items (content_id{" "}
-            <span className="text-slate-200">{data?.content_id}</span>, {data?.days} days)
+            {tr("closingTheLoop.footer.showing", "Showing")}{" "}
+            <span className="text-slate-200">{queue.length}</span>{" "}
+            {tr("closingTheLoop.footer.items", "items")} ({labels.contentId}{" "}
+            <span className="text-slate-200">{data?.content_id}</span>,{" "}
+            <span className="text-slate-200">{data?.days}</span>{" "}
+            {tr("closingTheLoop.footer.days", "days")})
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {openId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/70"
+            onClick={closeModal}
+            aria-label={labels.modalClose}
+          />
+
+          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+              <div className="font-semibold text-white">{labels.modalTitle}</div>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              >
+                {labels.modalClose}
+              </button>
+            </div>
+
+            <div className="p-6">
+              {detailLoading && (
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
+                  {labels.modalLoading}
+                </div>
+              )}
+
+              {!detailLoading && detailError && (
+                <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
+                  <div className="font-medium">{labels.modalError}</div>
+                  <div className="mt-1 text-sm opacity-90">{detailError}</div>
+                </div>
+              )}
+
+              {!detailLoading && !detailError && detail && (
+                <div className="space-y-6">
+                  {/* Top summary */}
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <div className="text-xs text-slate-400">{labels.modalScore}</div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="text-2xl font-semibold text-white">
+                          {typeof detail.score_0_10 === "number" ? detail.score_0_10 : "—"}
+                        </div>
+                        <span className={bucketPill(detail.bucket)}>
+                          {detail.bucket || scoreBucket(detail.score_0_10)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <div className="text-xs text-slate-400">{labels.modalSubmitted}</div>
+                      <div className="mt-2 text-white">{formatDate(detail.submitted_at)}</div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <div className="text-xs text-slate-400">{labels.modalReceipt}</div>
+                      <div className="mt-2 text-white font-mono text-xs break-all">
+                        {(detail.content_id || "—") + ":" + (detail.receipt_id || "—")}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Intercom link (if present) */}
+                  {detail.intercom_contact_url && (
+                    <div>
+                      <a
+                        href={detail.intercom_contact_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-2xl px-4 py-2 text-sm font-medium
+                                   bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                      >
+                        {labels.modalOpenIntercom}
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Selected options */}
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                    <div className="text-white font-semibold">{labels.modalOptions}</div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {Array.isArray(detail.selected_options) && detail.selected_options.length ? (
+                        detail.selected_options.map((o) => (
+                          <span key={o} className={chipClass()}>
+                            {o}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-slate-400 text-sm">{labels.dash}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Verbatims */}
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                    <div className="text-white font-semibold">{labels.modalVerbatims}</div>
+
+                    <div className="mt-4 space-y-4">
+                      {(() => {
+                        const groups = groupVerbatims(detail.verbatims);
+                        if (!groups.length) {
+                          return <div className="text-slate-400 text-sm">{labels.dash}</div>;
+                        }
+
+                        return groups.map(([q, texts]) => (
+                          <div key={q} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                            <div className="text-xs text-slate-400">{q}</div>
+                            <ul className="mt-2 space-y-2 text-sm text-slate-200">
+                              {texts.map((t, idx) => (
+                                <li key={`${q}-${idx}`} className="leading-relaxed">
+                                  {t}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Raw answers (optional) */}
+                  <details className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                    <summary className="cursor-pointer select-none text-white font-semibold">
+                      {labels.modalRaw}
+                    </summary>
+                    <pre className="mt-4 overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-slate-200">
+                      {JSON.stringify(detail.answers || [], null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

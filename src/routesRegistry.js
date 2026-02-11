@@ -1,4 +1,5 @@
 // src/routesRegistry.js
+import React from "react";
 import { ROUTES_MANIFEST } from "./routesManifest";
 
 // React components (browser-only)
@@ -44,6 +45,20 @@ import LiveThankYou from "./pages/LiveThankYou";
 import LiveResultsPanel from "./pages/LiveResultsPanel";
 
 import CxCockpit from "./pages/CxCockpit";
+
+import PrivateLogin from "./pages/PrivateLogin";
+import ClosingTheLoop from "./pages/ClosingTheLoop";
+import RequireAuth from "./components/auth/RequireAuth";
+
+const protect = (Component) => {
+  return function ProtectedPage() {
+    return React.createElement(
+      RequireAuth,
+      null,
+      React.createElement(Component, null)
+    );
+  };
+};
 
 // Path to component mapping (EN + FR point to the same components)
 const COMPONENTS = {
@@ -164,7 +179,14 @@ const COMPONENTS = {
 
   "/live-results": LiveResultsPanel,
   "/fr/live-results": LiveResultsPanel,
+
+  "/private/login": PrivateLogin,
+  "/fr/private/login": PrivateLogin,
+
+  "/private/closing-the-loop": protect(ClosingTheLoop),
+  "/fr/private/closing-the-loop": protect(ClosingTheLoop),
 };
+
 
 export const ROUTES = ROUTES_MANIFEST.map((r) => ({
   ...r,

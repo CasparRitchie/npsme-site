@@ -42,6 +42,13 @@ export const ROUTES_MANIFEST = [
   { path: "/book",     label: "Book discovery",      labelKey: "routes.book", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/book",  label: "Prendre rendez-vous", labelKey: "routes.book", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "fr" },
 
+  // Private (auth)
+  { path: "/private/login", label: "Private login", labelKey: "routes.privateLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/private/login", label: "Connexion privée", labelKey: "routes.privateLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/private/closing-the-loop", label: "Closing the loop", labelKey: "routes.closingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/private/closing-the-loop", label: "Boucler la boucle", labelKey: "routes.closingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // Social listening (indexable)
   { path: "/social-listening",     label: "Social Listening",       labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/social-listening",  label: "Écoute sociale",         labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "fr" },

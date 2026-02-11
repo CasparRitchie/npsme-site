@@ -465,8 +465,7 @@ export default function ClosingTheLoop() {
             aria-label={labels.modalClose}
           />
 
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+            <div className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
               <div className="font-semibold text-white">{labels.modalTitle}</div>
               <button
                 type="button"
@@ -477,8 +476,8 @@ export default function ClosingTheLoop() {
               </button>
             </div>
 
-            <div className="p-6">
-              {detailLoading && (
+              <div className="p-6 overflow-y-auto max-h-[calc(85vh-56px)]">
+                {detailLoading && (
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
                   {labels.modalLoading}
                 </div>

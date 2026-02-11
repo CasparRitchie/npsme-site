@@ -310,8 +310,9 @@ app.post("/api/auth/login", (req, res) => {
     httpOnly: true,
     sameSite: "lax",
     secure: isProd,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
+    domain: ".npsme.com",
   });
 
   return res.json({ ok: true });
@@ -320,12 +321,12 @@ app.post("/api/auth/login", (req, res) => {
 app.post("/api/auth/logout", (_req, res) => {
   const isProd = process.env.NODE_ENV === "production";
 
-  res.clearCookie("npsme_auth", {
+  res.clearCookie(PRIVATE_COOKIE_NAME, {
     httpOnly: true,
     sameSite: "lax",
-    secure: isProd,     // true on https in prod
-    path: "/",          // MUST match how it was set
-    // domain: ".npsme.com", // ONLY include if you set it with a domain
+    secure: isProd,
+    path: "/",
+    domain: ".npsme.com",
   });
 
   return res.json({ ok: true });

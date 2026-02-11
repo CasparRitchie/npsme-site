@@ -8,6 +8,7 @@ import { translations } from "../i18n/translations";
 import { localizePath } from "../i18n/pathHelpers";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import WordCloud from "../components/WordCloud";
+import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 
 
 function StatCard({ label, value, sub }) {
@@ -559,7 +560,35 @@ export default function EnvolaExample() {
       </div>
       </section>
 
+      {/* Top: overall NPS card + split chart */}
+      <section className="mx-auto max-w-7xl px-6 pt-10 pb-10">
+        <div className="grid gap-4 md:grid-cols-12 items-stretch">
+          <div className="md:col-span-4">
+            <StatCard
+              label={tr("envola.top.npsOverall", "NPS (selected period)")}
+              value={trendTotals?.lastNps == null ? "—" : trendTotals.lastNps}
+              sub={
+                trend.data?.from && trend.data?.to
+                  ? `${tr("common.window", "Window")}: ${trend.data.from} → ${trend.data.to}`
+                  : null
+              }
+            />
+          </div>
 
+          <div className="md:col-span-8">
+            <NpsBucketStackedColumns
+              points={trendPoints}
+              height={170}
+              maxBars={36}
+              title={tr("envola.top.splitTitle", "Score split over time")}
+              subtitle={tr(
+                "envola.top.splitSubtitle",
+                "Stacked distribution per time bucket (hover bars for totals)."
+              )}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* NEW: NPS over time */}
       <section className="mx-auto max-w-7xl px-6 pb-20">

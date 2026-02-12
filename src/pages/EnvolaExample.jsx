@@ -347,6 +347,20 @@ export default function EnvolaExample() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
+  // Add near your other state/hooks
+  const [chartMountReady, setChartMountReady] = useState(false);
+
+  useEffect(() => {
+    // Wait for layout to settle after route navigation
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => setChartMountReady(true));
+      // cleanup nested raf
+      return () => cancelAnimationFrame(raf2);
+    });
+
+    return () => cancelAnimationFrame(raf1);
+  }, []);
+
   // Simple derived helpers for the trend table
   const trendPoints = useMemo(() => {
     const pts = trend.data?.points || [];
@@ -457,11 +471,15 @@ export default function EnvolaExample() {
           {!ts.loading && ts.data?.ok && (
             <div className="mt-6">
               <div className="mt-6 h-72 w-full min-w-0">
-              <NpsTimeseriesChart
-                points={ts.data.points || []}
-                granularity={granularity}
-                onPointClick={loadBucketResponses}
-              />
+              {chartMountReady ? (
+                <NpsTimeseriesChart
+                  points={ts.data.points || []}
+                  granularity={granularity}
+                  onPointClick={loadBucketResponses}
+                />
+              ) : (
+                <div className="w-full" style={{ aspectRatio: "2.6 / 1" }} />
+              )}
             </div>
               {!ts.loading && ts.data?.ok && (ts.data.points || []).length > 0 && (
               <button

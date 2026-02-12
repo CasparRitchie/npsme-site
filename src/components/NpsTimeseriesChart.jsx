@@ -19,8 +19,7 @@ function formatDateLabel(iso, granularity) {
   if (granularity === "month") {
     return d.toLocaleDateString(undefined, { year: "numeric", month: "short" });
   }
-  // week (default): show week starting date
-  return d.toLocaleDateString(undefined, { month: "short", day: "2-digit" });
+  return d.toLocaleDateString(undefined, { month: "short", day: "2-digit" }); // week
 }
 
 function tooltipLabelFormatter(label, granularity) {
@@ -34,8 +33,16 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
-  const data = [...points].sort((a, b) => new Date(a.date) - new Date(b.date));
+export default function NpsTimeseriesChart({
+  points = [],
+  granularity = "week",
+  onPointClick,
+}) {
+  const data = React.useMemo(() => {
+    const arr = Array.isArray(points) ? [...points] : [];
+    arr.sort((a, b) => new Date(a?.date).getTime() - new Date(b?.date).getTime());
+    return arr;
+  }, [points]);
 
   const ClickableDot = (props) => {
     const { cx, cy, payload } = props || {};
@@ -53,6 +60,8 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
       />
     );
   };
+
+  const ActiveClickableDot = (props) => <ClickableDot {...props} />;
 
   return (
     <div className="h-72 w-full min-w-0">
@@ -74,7 +83,7 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
             type="monotone"
             dataKey="nps"
             dot={<ClickableDot />}
-            activeDot={<ClickableDot />}
+            activeDot={<ActiveClickableDot />}
             strokeWidth={2}
             isAnimationActive={false}
           />

@@ -33,16 +33,8 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({
-  points = [],
-  granularity = "week",
-  onPointClick,
-}) {
-  const data = React.useMemo(() => {
-    const arr = Array.isArray(points) ? [...points] : [];
-    arr.sort((a, b) => new Date(a?.date).getTime() - new Date(b?.date).getTime());
-    return arr;
-  }, [points]);
+export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
+  const data = [...points].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const ClickableDot = (props) => {
     const { cx, cy, payload } = props || {};
@@ -61,11 +53,9 @@ export default function NpsTimeseriesChart({
     );
   };
 
-  const ActiveClickableDot = (props) => <ClickableDot {...props} />;
-
   return (
-    <div className="h-72 w-full min-w-0">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full min-w-0">
+      <ResponsiveContainer width="100%" aspect={2.6}>
         <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -83,7 +73,7 @@ export default function NpsTimeseriesChart({
             type="monotone"
             dataKey="nps"
             dot={<ClickableDot />}
-            activeDot={<ActiveClickableDot />}
+            activeDot={<ClickableDot />}
             strokeWidth={2}
             isAnimationActive={false}
           />

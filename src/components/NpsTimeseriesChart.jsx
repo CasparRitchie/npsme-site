@@ -34,17 +34,9 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({
-  points = [],
-  granularity = "week",
-  onPointClick,
-}) {
-  const data = [...points].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
+  const data = [...points].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Make clicks reliable by attaching the handler to the actual dot payload,
-  // not the chart surface (which often gives you no activePayload).
   const ClickableDot = (props) => {
     const { cx, cy, payload } = props || {};
     if (cx == null || cy == null) return null;
@@ -62,15 +54,10 @@ export default function NpsTimeseriesChart({
     );
   };
 
-  const ActiveClickableDot = (props) => <ClickableDot {...props} />;
-
   return (
-    <div className="h-72 w-full">
-      <ResponsiveContainer width="100%" aspect={2.6}>
-        <LineChart
-          data={data}
-          margin={{ top: 10, right: 16, bottom: 0, left: 0 }}
-        >
+    <div className="h-72 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
@@ -80,17 +67,14 @@ export default function NpsTimeseriesChart({
           <YAxis domain={[-100, 100]} />
           <Tooltip
             labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
-            formatter={(value, name) => {
-              if (name === "nps") return [value, "NPS"];
-              return [value, name];
-            }}
+            formatter={(value, name) => (name === "nps" ? [value, "NPS"] : [value, name])}
             contentStyle={{ borderRadius: 12 }}
           />
           <Line
             type="monotone"
             dataKey="nps"
             dot={<ClickableDot />}
-            activeDot={<ActiveClickableDot />}
+            activeDot={<ClickableDot />}
             strokeWidth={2}
             isAnimationActive={false}
           />

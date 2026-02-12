@@ -1639,6 +1639,100 @@ export function createIntercomRouter() {
   });
 
 
+  router.get("/private/nps-by-question", requirePrivateCookie, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      if (!contentId) return res.status(400).json({ ok: false, error: "content_id is required" });
+
+      const days = clampInt(req.query.days, 30, 1, 3650);
+      const minResponses = clampInt(req.query.min_responses, 3, 1, 9999);
+      const limit = clampInt(req.query.limit, 20, 1, 200);
+
+      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+      const rows = parseJsonl(text);
+
+      const since = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      // key: question_id (preferred) else question_text
+      const byQ = new Map();
+
+      function bump(questionId, questionText, bucket) {
+        const qid = questionId != null ? String(questionId) : "";
+        const qText = String(questionText || "").trim() || "—";
+        const key = qid ? `id:${qid}` : `text:${qText}`;
+
+        const cur =
+          byQ.get(key) || {
+            question_id: qid ? Number(questionId) : null,
+            question: qText,
+            promoters: 0,
+            passives: 0,
+            detractors: 0,
+            responses: 0,
+          };
+
+        if (bucket === "promoter") cur.promoters += 1;
+        else if (bucket === "passive") cur.passives += 1;
+        else if (bucket === "detractor") cur.detractors += 1;
+
+        cur.responses += 1;
+
+        // Keep the nicest question text we’ve seen
+        if (cur.question === "—" && qText !== "—") cur.question = qText;
+
+        byQ.set(key, cur);
+      }
+
+      for (const r of rows) {
+        if (!r) continue;
+        if (String(r.content_id || "") !== contentId) continue;
+
+        const submittedAt = r.submitted_at ? Date.parse(r.submitted_at) : NaN;
+        if (!Number.isFinite(submittedAt) || submittedAt < since) continue;
+
+        const score = typeof r.score_0_10 === "number" ? r.score_0_10 : null;
+        if (score == null) continue;
+
+        const bucket = scoreBucket(score);
+
+        // Count once per response per question_id
+        const seen = new Set();
+
+        const answers = Array.isArray(r.answers) ? r.answers : [];
+        for (const a of answers) {
+          const qid = a?.question_id;
+          const qText = a?.question_text;
+
+          // Need at least some identifier
+          const key = qid != null ? `id:${qid}` : `text:${String(qText || "").trim()}`;
+          if (!key || key === "text:") continue;
+
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          bump(qid, qText, bucket);
+        }
+      }
+
+      const items = Array.from(byQ.values())
+        .filter((x) => x.responses >= minResponses)
+        .sort((a, b) => b.responses - a.responses)
+        .slice(0, limit);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        days,
+        returned: items.length,
+        min_responses: minResponses,
+        items,
+      });
+    } catch (e) {
+      console.error("[intercom] private nps-by-question error", e);
+      return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+  });
+
   // -----------------------
   // Everything below requires an Intercom access token
   // -----------------------

@@ -93,11 +93,38 @@ export default function ClosingTheLoop() {
         limit: String(limit),
       });
 
-      const r = await fetch(`/api/intercom/private/closing-the-loop?${qs.toString()}`, {
-        credentials: "include",
-      });
+      const url = `/api/intercom/private/closing-the-loop?${qs.toString()}`;
 
-      const j = await r.json().catch(() => null);
+      const r = await fetch(url, { credentials: "include" });
+
+      // If the server returns 304, fetch will usually give you the cached body,
+      // but some setups/proxies can behave oddly. We'll still handle it safely.
+      const contentType = (r.headers.get("content-type") || "").toLowerCase();
+
+      // Read body ONCE (then parse from the text)
+      const rawText = await r.text().catch(() => "");
+
+      // If it isn't JSON, give a helpful error (often login HTML)
+      const looksLikeJson = rawText.trim().startsWith("{") || rawText.trim().startsWith("[");
+      if (!contentType.includes("application/json") && !looksLikeJson) {
+        const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
+        throw new Error(
+          `Expected JSON from ${url} but got "${contentType || "unknown content-type"}" (status ${r.status}). ` +
+          `First chars: ${preview || "«empty body»"}`
+        );
+      }
+
+      // Now parse JSON safely
+      let j = null;
+      try {
+        j = rawText ? JSON.parse(rawText) : null;
+      } catch (parseErr) {
+        const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
+        throw new Error(
+          `JSON parse failed (status ${r.status}, content-type "${contentType || "unknown"}"). ` +
+          `First chars: ${preview || "«empty body»"}`
+        );
+      }
 
       if (!r.ok || !j?.ok) {
         const msg = j?.error || `Request failed (${r.status})`;

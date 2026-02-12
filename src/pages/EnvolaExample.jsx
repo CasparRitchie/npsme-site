@@ -456,7 +456,13 @@ export default function EnvolaExample() {
 
           {!ts.loading && ts.data?.ok && (
             <div className="mt-6">
-              <NpsTimeseriesChart points={ts.data.points || []} granularity={granularity}   onPointClick={loadBucketResponses}/>
+              <div className="mt-6 h-72 w-full min-w-0">
+              <NpsTimeseriesChart
+                points={ts.data.points || []}
+                granularity={granularity}
+                onPointClick={loadBucketResponses}
+              />
+            </div>
               {!ts.loading && ts.data?.ok && (ts.data.points || []).length > 0 && (
               <button
                 type="button"

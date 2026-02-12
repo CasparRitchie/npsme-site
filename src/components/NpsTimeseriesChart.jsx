@@ -9,6 +9,8 @@ import {
   CartesianGrid,
 } from "recharts";
 
+
+
 function formatDateLabel(iso, granularity) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
@@ -35,12 +37,33 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-export default function NpsTimeseriesChart({
-  points = [],
-  granularity = "week",
-  onPointClick,
-}) {
+function useElementWidth() {
+  const ref = React.useRef(null);
+  const [width, setWidth] = React.useState(0);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const measure = () => setWidth(el.getBoundingClientRect().width || 0);
+    measure();
+
+    if (typeof ResizeObserver === "undefined") {
+      const t = window.setInterval(measure, 150);
+      return () => window.clearInterval(t);
+    }
+
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return { ref, width };
+}
+
+export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
   const data = [...points].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const { ref, width } = useElementWidth();
 
   const wrapRef = React.useRef(null);
   const [ready, setReady] = React.useState(false);
@@ -96,17 +119,14 @@ export default function NpsTimeseriesChart({
   };
 
   return (
-    // IMPORTANT: give the wrapper a real height so ResponsiveContainer has something to measure
-    <div ref={wrapRef} className="w-full min-w-0 h-72">
-      {!ready ? null : (
-        <ResponsiveContainer width="100%" height="100%">
+    <div ref={ref} className="w-full min-w-0">
+      {width <= 0 ? (
+        <div className="w-full" style={{ aspectRatio: "2.6 / 1" }} />
+      ) : (
+        <ResponsiveContainer width="100%" aspect={2.6}>
           <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(v) => formatDateLabel(v, granularity)}
-              minTickGap={16}
-            />
+            <XAxis dataKey="date" /* ... */ />
             <YAxis domain={[-100, 100]} />
             <Tooltip
               labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}

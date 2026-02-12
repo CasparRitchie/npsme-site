@@ -349,17 +349,19 @@ export default function EnvolaExample() {
 
   // Add near your other state/hooks
   const [chartMountReady, setChartMountReady] = useState(false);
+    useEffect(() => {
+      let raf1 = 0;
+      let raf2 = 0;
 
-  useEffect(() => {
-    // Wait for layout to settle after route navigation
-    const raf1 = requestAnimationFrame(() => {
-      const raf2 = requestAnimationFrame(() => setChartMountReady(true));
-      // cleanup nested raf
-      return () => cancelAnimationFrame(raf2);
-    });
+      raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setChartMountReady(true));
+      });
 
-    return () => cancelAnimationFrame(raf1);
-  }, []);
+      return () => {
+        if (raf1) cancelAnimationFrame(raf1);
+        if (raf2) cancelAnimationFrame(raf2);
+      };
+    }, []);
 
   // Simple derived helpers for the trend table
   const trendPoints = useMemo(() => {

@@ -45,16 +45,35 @@ function useElementWidth() {
     const el = ref.current;
     if (!el) return;
 
-    const measure = () => setWidth(el.getBoundingClientRect().width || 0);
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const w = rect.width || 0;
+
+      // 🔍 Only log when container collapses (helps debug Recharts warning)
+      if (w <= 0.5) {
+        console.log("[useElementWidth] container width collapsed:", {
+          width: w,
+          rect,
+          el,
+        });
+      }
+
+      setWidth(w);
+    };
+
+    // initial measurement
     measure();
 
+    // Fallback for older browsers
     if (typeof ResizeObserver === "undefined") {
       const t = window.setInterval(measure, 150);
       return () => window.clearInterval(t);
     }
 
+    // Modern resize tracking
     const ro = new ResizeObserver(() => measure());
     ro.observe(el);
+
     return () => ro.disconnect();
   }, []);
 

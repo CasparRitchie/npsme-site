@@ -406,139 +406,118 @@ export default function EnvolaExample() {
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
   // NEW: QUESTION AVERAGES (private/logged-in)
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-  function extractNumber(v) {
-    // Support common shapes: 7, "7", { value: 7 }, { answer: 7 }, etc.
-    if (v == null) return null;
-
-    if (typeof v === "number") return Number.isFinite(v) ? v : null;
-    if (typeof v === "string") {
+    const toNum0to10 = (v) => {
       const n = Number(v);
-      return Number.isFinite(n) ? n : null;
-    }
-    if (typeof v === "object") {
-      const cand =
-        ("value" in v ? v.value : undefined) ??
-        ("answer" in v ? v.answer : undefined) ??
-        ("score" in v ? v.score : undefined);
-      const n = Number(cand);
-      return Number.isFinite(n) ? n : null;
-    }
-    return null;
-  }
+      if (!Number.isFinite(n)) return null;
+      if (n < 0 || n > 10) return null;
+      return n;
+    };
 
-  async function fetchJsonSafe(url) {
-    const r = await fetch(url, { credentials: "include" });
-    const contentType = (r.headers.get("content-type") || "").toLowerCase();
-    const rawText = await r.text().catch(() => "");
-
-    const looksLikeJson =
-      rawText.trim().startsWith("{") || rawText.trim().startsWith("[");
-
-    if (!contentType.includes("application/json") && !looksLikeJson) {
-      const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
-      throw new Error(
-        `Expected JSON from ${url} but got "${contentType || "unknown"}" (status ${
-          r.status
-        }). First chars: ${preview || "«empty body»"}`
-      );
-    }
-
-    let j = null;
-    try {
-      j = rawText ? JSON.parse(rawText) : null;
-    } catch (e) {
-      const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
-      throw new Error(
-        `JSON parse failed for ${url} (status ${r.status}, content-type "${
-          contentType || "unknown"
-        }"). First chars: ${preview || "«empty body»"}`
-      );
-    }
-
-    return { r, j };
-  }
-
-  (async () => {
-    setQa({ loading: true, data: null, error: null });
-
-    try {
-      // 1) Pull the queue list (same basis as Closing the Loop "raw")
-      const qs = new URLSearchParams({
-        content_id: String(CONTENT_ID),
-        days: String(qaDays),
-        limit: String(qaLimit),
-      });
-
-      const listUrl = `/api/intercom/private/closing-the-loop?${qs.toString()}`;
-      const { r: listR, j: listJ } = await fetchJsonSafe(listUrl);
-
-      if (!listR.ok || !listJ?.ok) {
-        throw new Error(listJ?.error || `Request failed (${listR.status})`);
+    const fetchJson = async (url) => {
+      const r = await fetch(url, { credentials: "include" });
+      const t = await r.text();
+      let j;
+      try {
+        j = JSON.parse(t);
+      } catch {
+        throw new Error(
+          `Expected JSON from ${url} but got non-JSON (status ${r.status}). First chars: ${t
+            .slice(0, 160)
+            .replace(/\s+/g, " ")
+            .trim()}`
+        );
       }
+      return { r, j };
+    };
 
-      // IMPORTANT: real shape is listJ.queue (see ClosingTheLoop.jsx)
-      const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
-      // response_id appears inside item.latest.response_id in your ClosingTheLoop UI
-      const responseIds = queue
-        .map((x) => x?.latest?.response_id)
-        .filter(Boolean)
-        .slice(0, qaLimit);
+    (async () => {
+      setQa({ loading: true, data: null, error: null });
 
-      if (!responseIds.length) {
-        if (!cancelled) setQa({ loading: false, data: [], error: null });
-        return;
-      }
+      try {
+        // 1) queue list (Closing the Loop basis)
+        const listQs = new URLSearchParams({
+          content_id: String(CONTENT_ID),
+          days: String(qaDays),
+          limit: String(qaLimit),
+        });
 
-      // 2) Fetch each response detail
-      const acc = {}; // label -> { sum, count }
+        const listUrl = `/api/intercom/private/closing-the-loop?${listQs.toString()}`;
+        const { r: listR, j: listJ } = await fetchJson(listUrl);
 
-      // sequential is fine; if you want faster later we can pool-concurrency
-      for (const responseId of responseIds) {
-        const rqs = new URLSearchParams({ response_id: String(responseId) });
-        const detailUrl = `/api/intercom/private/nps-response?${rqs.toString()}`;
+        if (!listR.ok || !listJ?.ok) {
+          throw new Error(listJ?.error || `closing-the-loop failed (${listR.status})`);
+        }
 
-        const { r: respR, j: respJ } = await fetchJsonSafe(detailUrl);
-        if (!respR.ok || !respJ?.ok) continue;
+        const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
+        const responseIds = queue
+          .map((x) => x?.response_id) // ✅ correct for your payload
+          .filter(Boolean)
+          .slice(0, qaLimit);
 
-        // IMPORTANT: shape is respJ.response (see ClosingTheLoop.jsx openResponse)
-        const answers = respJ?.response?.answers;
-        if (!answers || typeof answers !== "object") continue;
+        if (!responseIds.length) {
+          if (!cancelled) setQa({ loading: false, data: [], error: null });
+          return;
+        }
 
-        for (const [k, v] of Object.entries(answers)) {
-          const num = extractNumber(v);
-          if (num == null) continue;
+        // 2) aggregate per question_id (use question_text as label)
+        const acc = new Map(); // key -> { label, sum, count }
 
-          // NPS question scores are 0–10
-          if (num < 0 || num > 10) continue;
+        for (const responseId of responseIds) {
+          const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
+            responseId
+          )}`;
 
-          if (!acc[k]) acc[k] = { sum: 0, count: 0 };
-          acc[k].sum += num;
-          acc[k].count += 1;
+          const { r: respR, j: respJ } = await fetchJson(detailUrl);
+          if (!respR.ok || !respJ?.ok) continue;
+
+          const answers = respJ?.response?.answers;
+          if (!Array.isArray(answers)) continue;
+
+          for (const a of answers) {
+            const num = toNum0to10(a?.response);
+            if (num == null) continue;
+
+            const qid = a?.question_id ?? a?.question_text ?? "unknown";
+            const label = a?.question_text || `Question ${qid}`;
+
+            const cur = acc.get(qid) || { label, sum: 0, count: 0 };
+            cur.sum += num;
+            cur.count += 1;
+
+            // keep the nicest label if we see it later
+            if (label && (!cur.label || cur.label.startsWith("Question "))) {
+              cur.label = label;
+            }
+
+            acc.set(qid, cur);
+          }
+        }
+
+        const data = Array.from(acc.entries())
+          .map(([qid, v]) => ({
+            id: String(qid),
+            label: v.label,
+            avg: v.count ? Number((v.sum / v.count).toFixed(2)) : null,
+            count: v.count,
+          }))
+          .filter((d) => d.avg != null)
+          .sort((a, b) => (b.count - a.count) || (b.avg - a.avg));
+
+        if (!cancelled) setQa({ loading: false, data, error: null });
+      } catch (e) {
+        if (!cancelled) {
+          setQa({ loading: false, data: null, error: String(e?.message || e) });
         }
       }
+    })();
 
-      const data = Object.entries(acc)
-        .map(([label, { sum, count }]) => ({
-          label,
-          avg: count ? Number((sum / count).toFixed(2)) : null,
-          count,
-        }))
-        .filter((d) => d.avg != null)
-        .sort((a, b) => (b.count - a.count) || (b.avg - a.avg));
-
-      if (!cancelled) setQa({ loading: false, data, error: null });
-    } catch (e) {
-      if (!cancelled) setQa({ loading: false, data: null, error: String(e?.message || e) });
-    }
-  })();
-
-  return () => {
-    cancelled = true;
-  };
-}, [CONTENT_ID, qaDays, qaLimit]);
+    return () => {
+      cancelled = true;
+    };
+  }, [CONTENT_ID, qaDays, qaLimit]);
 
   // Add near your other state/hooks
   const [chartMountReady, setChartMountReady] = useState(false);

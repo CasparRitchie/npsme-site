@@ -8,6 +8,19 @@ import ScrollToTop from "./components/ScrollToTop";
 import { ROUTES } from "./routesRegistry";
 
 function AppShell() {
+  if (import.meta.env.DEV) {
+    const origError = console.error;
+    console.error = (...args) => {
+      const msg = String(args?.[0] ?? "");
+      if (msg.includes("The width(") && msg.includes("height(") && msg.includes("of chart")) {
+        origError("🔎 Recharts size warning caught:", ...args);
+        origError("🔎 Stack trace:\n", new Error().stack);
+        return;
+      }
+      origError(...args);
+    };
+  }
+
   const location = useLocation();
 
   const bareRoutes = [

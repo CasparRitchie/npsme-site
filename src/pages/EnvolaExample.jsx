@@ -602,7 +602,7 @@ export default function EnvolaExample() {
           </div>
 
           <div className="md:col-span-8">
-            {/* <NpsBucketStackedColumns
+            <NpsBucketStackedColumns
               points={trendPoints}
               height={170}
               maxBars={36}
@@ -611,7 +611,7 @@ export default function EnvolaExample() {
                 "envola.top.splitSubtitle",
                 "Stacked distribution per time bucket (hover bars for totals)."
               )}
-            /> */}
+            />
           </div>
         </div>
       </section>

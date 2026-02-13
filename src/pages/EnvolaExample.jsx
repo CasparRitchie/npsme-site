@@ -9,7 +9,45 @@ import { localizePath } from "../i18n/pathHelpers";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import WordCloud from "../components/WordCloud";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
+import QuestionAveragesBarChart from "../components/QuestionAveragesBarChart";
 
+function IntercomContactPill({ id, url }) {
+  if (!id) return null;
+
+  if (url) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          background: "#eef2ff",
+          padding: "4px 10px",
+          borderRadius: 20,
+          fontSize: 12,
+          textDecoration: "none",
+        }}
+        title="Open contact in Intercom"
+      >
+        Intercom contact: {id}
+      </a>
+    );
+  }
+
+  return (
+    <span
+      style={{
+        background: "#f1f1f1",
+        padding: "4px 10px",
+        borderRadius: 20,
+        fontSize: 12,
+      }}
+      title="Contact id (no Intercom URL provided by API)"
+    >
+      Intercom contact: {id}
+    </span>
+  );
+}
 
 function StatCard({ label, value, sub }) {
   return (
@@ -71,6 +109,25 @@ function todayYmdLocal() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/**
+ * Concurrency-limited pool runner to avoid hammering your private endpoint.
+ */
+async function mapPool(items, concurrency, mapper) {
+  const results = new Array(items.length);
+  let idx = 0;
+
+  async function worker() {
+    while (idx < items.length) {
+      const i = idx++;
+      results[i] = await mapper(items[i], i);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
+
 export default function EnvolaExample() {
   const CONTENT_ID = "189616";
   const { lang } = useLanguage();
@@ -88,7 +145,6 @@ export default function EnvolaExample() {
   const [trendMode, setTrendMode] = useState("rolling"); // rolling|range
   const [trendDays, setTrendDays] = useState(90);
   const [trendFrom, setTrendFrom] = useState(() => {
-    // default: 90 days ago (approx) -> keep simple (user can edit)
     const d = new Date();
     d.setDate(d.getDate() - 90);
     const yyyy = d.getFullYear();
@@ -134,7 +190,6 @@ export default function EnvolaExample() {
     if (trendMode === "range") {
       const from = (trendFrom || "").trim();
       const to = (trendTo || "").trim();
-      // If user leaves blanks, fall back to rolling
       if (from && to) return `${base}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
       return `${base}&days=${encodeURIComponent(trendDays)}`;
     }
@@ -151,6 +206,11 @@ export default function EnvolaExample() {
   // NEW: Theme drilldown
   const [selectedTheme, setSelectedTheme] = useState(null); // theme key string
   const [themeComments, setThemeComments] = useState({ loading: false, data: null, error: null });
+
+  // NEW: Question averages (private/logged-in)
+  const [qaDays, setQaDays] = useState(90);
+  const [qaLimit, setQaLimit] = useState(120);
+  const [qa, setQa] = useState({ loading: false, data: null, error: null });
 
   function selectedBucketsParam() {
     const selected = [];
@@ -185,11 +245,10 @@ export default function EnvolaExample() {
     setSelectedTheme(null);
     setThemeComments({ loading: false, data: null, error: null });
   }
+
   async function loadBucketResponses(point) {
     setSelectedPoint(point);
     setBucketResponses({ loading: true, data: null, error: null });
-
-
 
     try {
       const r = await fetch(
@@ -342,26 +401,108 @@ export default function EnvolaExample() {
   }, []);
 
   useEffect(() => {
-    // If filters change, close the open theme drilldown to avoid stale interpretation
     if (selectedTheme) closeTheme();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
+  // NEW: QUESTION AVERAGES (private/logged-in)
+  useEffect(() => {
+    let cancelled = false;
+
+    setQa({ loading: true, data: null, error: null });
+
+    (async () => {
+      try {
+        // 1) Pull recent raw responses list (your Closing the Loop raw basis)
+        const listR = await fetch(
+          `/api/intercom/private/closing-the-loop?content_id=${encodeURIComponent(
+            CONTENT_ID
+          )}&days=${encodeURIComponent(qaDays)}&limit=${encodeURIComponent(qaLimit)}`
+        );
+
+        const listJ = await listR.json();
+        if (!listR.ok) {
+          if (!cancelled) {
+            setQa({ loading: false, data: null, error: listJ?.error || "Error loading raw list" });
+          }
+          return;
+        }
+
+        const rows = Array.isArray(listJ?.items) ? listJ.items : Array.isArray(listJ) ? listJ : [];
+        const responseIds = rows.map((r) => r.response_id).filter(Boolean);
+
+        if (!responseIds.length) {
+          if (!cancelled) setQa({ loading: false, data: [], error: null });
+          return;
+        }
+
+        // 2) For each response_id, fetch the full answers
+        const responses = await mapPool(responseIds, 8, async (responseId) => {
+          try {
+            const rr = await fetch(
+              `/api/intercom/private/nps-response?response_id=${encodeURIComponent(responseId)}`
+            );
+            const jj = await rr.json();
+            if (!rr.ok) return null;
+            return jj;
+          } catch {
+            return null;
+          }
+        });
+
+        if (cancelled) return;
+
+        // 3) Aggregate numeric answers (0..10) per question key
+        const acc = {}; // key -> { sum, count }
+        for (const r of responses) {
+          const answers = r?.answers;
+          if (!answers || typeof answers !== "object") continue;
+
+          for (const [k, v] of Object.entries(answers)) {
+            const num = Number(v);
+            if (Number.isFinite(num) && num >= 0 && num <= 10) {
+              if (!acc[k]) acc[k] = { sum: 0, count: 0 };
+              acc[k].sum += num;
+              acc[k].count += 1;
+            }
+          }
+        }
+
+        const data = Object.entries(acc)
+          .map(([label, { sum, count }]) => ({
+            label,
+            avg: count ? Number((sum / count).toFixed(2)) : null,
+            count,
+          }))
+          .filter((d) => d.avg != null)
+          .sort((a, b) => (b.count - a.count) || (b.avg - a.avg));
+
+        setQa({ loading: false, data, error: null });
+      } catch (e) {
+        if (!cancelled) setQa({ loading: false, data: null, error: e?.message || "Error" });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [CONTENT_ID, qaDays, qaLimit]);
+
   // Add near your other state/hooks
   const [chartMountReady, setChartMountReady] = useState(false);
-    useEffect(() => {
-      let raf1 = 0;
-      let raf2 = 0;
+  useEffect(() => {
+    let raf1 = 0;
+    let raf2 = 0;
 
-      raf1 = requestAnimationFrame(() => {
-        raf2 = requestAnimationFrame(() => setChartMountReady(true));
-      });
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setChartMountReady(true));
+    });
 
-      return () => {
-        if (raf1) cancelAnimationFrame(raf1);
-        if (raf2) cancelAnimationFrame(raf2);
-      };
-    }, []);
+    return () => {
+      if (raf1) cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+  }, []);
 
   // Simple derived helpers for the trend table
   const trendPoints = useMemo(() => {
@@ -380,7 +521,14 @@ export default function EnvolaExample() {
     const all = comments.data?.comments || [];
     const filtered = all.filter((c) => bucketAllowed(c.bucket));
     return filtered.map((c) => c.comment).filter(Boolean);
-  }, [comments.data, bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]); // bucketAllowed depends on these
+  }, [comments.data, bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
+
+  const qaForChart = useMemo(() => {
+    // Chart expects [{label, avg}] — keep it simple and stable
+    const arr = Array.isArray(qa.data) ? qa.data : [];
+    // show top 20 by count to keep the chart legible
+    return arr.slice(0, 20).map((d) => ({ label: d.label, avg: d.avg }));
+  }, [qa.data]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -430,7 +578,6 @@ export default function EnvolaExample() {
       </PageHeader>
 
       {/* NEW: NPS chart */}
-
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -473,117 +620,130 @@ export default function EnvolaExample() {
           {!ts.loading && ts.data?.ok && (
             <div className="mt-6">
               <div className="mt-6 h-72 w-full min-w-0">
-              {chartMountReady ? (
-                <NpsTimeseriesChart
-                  points={ts.data.points || []}
-                  granularity={granularity}
-                  onPointClick={loadBucketResponses}
-                />
-              ) : (
-                <div className="w-full" style={{ aspectRatio: "2.6 / 1" }} />
+                {chartMountReady ? (
+                  <NpsTimeseriesChart
+                    points={ts.data.points || []}
+                    granularity={granularity}
+                    onPointClick={loadBucketResponses}
+                  />
+                ) : (
+                  <div className="w-full" style={{ aspectRatio: "2.6 / 1" }} />
+                )}
+              </div>
+
+              {!ts.loading && ts.data?.ok && (ts.data.points || []).length > 0 && (
+                <button
+                  type="button"
+                  className="mt-4 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                  onClick={() => loadBucketResponses(ts.data.points[ts.data.points.length - 1])}
+                >
+                  Test drilldown (latest point)
+                </button>
+              )}
+
+              <div className="mt-3 text-xs text-slate-400">
+                {tr("common.window", "Window")} : {ts.data.from} → {ts.data.to} •{" "}
+                {tr("common.points", "Points")} : {(ts.data.points || []).length}
+              </div>
+            </div>
+          )}
+
+          {selectedPoint && (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div className="text-sm text-slate-200">
+                  <span className="text-slate-400">Selected:</span>{" "}
+                  <span className="text-white font-semibold">{selectedPoint.date}</span>{" "}
+                  <span className="text-slate-400">• NPS:</span>{" "}
+                  <span className="text-white font-semibold">{selectedPoint.nps ?? "—"}</span>{" "}
+                  <span className="text-slate-400">• Responses:</span>{" "}
+                  <span className="text-white font-semibold">{selectedPoint.responses ?? "—"}</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPoint(null);
+                    setBucketResponses({ loading: false, data: null, error: null });
+                  }}
+                  className="text-sm text-slate-300 hover:text-white"
+                >
+                  Close
+                </button>
+              </div>
+
+              {bucketResponses.loading && (
+                <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+              )}
+              {!bucketResponses.loading && bucketResponses.error && (
+                <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
+              )}
+
+              {!bucketResponses.loading && bucketResponses.data?.ok && (
+                <>
+                  <div className="mt-3 text-xs text-slate-400">
+                    Window: {bucketResponses.data.bucket_start} → {bucketResponses.data.bucket_end} •{" "}
+                    Promoters {bucketResponses.data.promoters}, Passives {bucketResponses.data.passives},
+                    Detractors {bucketResponses.data.detractors}
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {(bucketResponses.data.items || []).map((r) => (
+                      <div
+                        key={r.response_id || `${r.submitted_at}-${r.contact_id}`}
+                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                            {labelBucket(r.bucket)} • {r.score_0_10}/10
+                          </span>
+                          <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
+
+                          {r.contact_id ? (
+                            <IntercomContactPill
+                              id={r.contact_id}
+                              url={r.intercom_contact_url}
+                            />
+                          ) : null}
+                        </div>
+
+                        {Array.isArray(r.selected_options) && r.selected_options.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {r.selected_options.slice(0, 12).map((opt) => (
+                              <span
+                                key={opt}
+                                className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200"
+                              >
+                                {opt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
+                          <div className="mt-3 space-y-2">
+                            {r.verbatims.slice(0, 6).map((v, idx) => (
+                              <div key={idx} className="text-sm text-slate-200">
+                                {v.question_text ? (
+                                  <div className="text-xs text-slate-400">{v.question_text}</div>
+                                ) : null}
+                                <div className="leading-relaxed">“{v.text}”</div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="mt-3 text-sm text-slate-400">
+                            No verbatims stored for this response.
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
-              {!ts.loading && ts.data?.ok && (ts.data.points || []).length > 0 && (
-              <button
-                type="button"
-                className="mt-4 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
-                onClick={() => loadBucketResponses(ts.data.points[ts.data.points.length - 1])}
-              >
-                Test drilldown (latest point)
-              </button>
-            )}
-              <div className="mt-3 text-xs text-slate-400">
-                {tr("common.window", "Window")} : {ts.data.from} → {ts.data.to} • {tr("common.points", "Points")} : {(ts.data.points || []).length}
-              </div>
-            </div>
-          )}
-        {selectedPoint && (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div className="text-sm text-slate-200">
-              <span className="text-slate-400">Selected:</span>{" "}
-              <span className="text-white font-semibold">{selectedPoint.date}</span>{" "}
-              <span className="text-slate-400">• NPS:</span>{" "}
-              <span className="text-white font-semibold">{selectedPoint.nps ?? "—"}</span>{" "}
-              <span className="text-slate-400">• Responses:</span>{" "}
-              <span className="text-white font-semibold">{selectedPoint.responses ?? "—"}</span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedPoint(null);
-                setBucketResponses({ loading: false, data: null, error: null });
-              }}
-              className="text-sm text-slate-300 hover:text-white"
-            >
-              Close
-            </button>
-          </div>
-
-          {bucketResponses.loading && (
-            <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
-          )}
-          {!bucketResponses.loading && bucketResponses.error && (
-            <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
-          )}
-
-          {!bucketResponses.loading && bucketResponses.data?.ok && (
-            <>
-              <div className="mt-3 text-xs text-slate-400">
-                Window: {bucketResponses.data.bucket_start} → {bucketResponses.data.bucket_end} •
-                {` `}Promoters {bucketResponses.data.promoters}, Passives {bucketResponses.data.passives}, Detractors {bucketResponses.data.detractors}
-              </div>
-
-              <div className="mt-4 space-y-3">
-                {(bucketResponses.data.items || []).map((r) => (
-                  <div key={r.response_id || `${r.submitted_at}-${r.contact_id}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                        {labelBucket(r.bucket)} • {r.score_0_10}/10
-                      </span>
-                      <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
-                      {r.contact_id ? (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                          Intercom contact: {r.contact_id}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    {/* Optional: show the multi-select benefits */}
-                    {Array.isArray(r.selected_options) && r.selected_options.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {r.selected_options.slice(0, 12).map((opt) => (
-                          <span key={opt} className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200">
-                            {opt}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Show verbatims */}
-                    {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
-                      <div className="mt-3 space-y-2">
-                        {r.verbatims.slice(0, 6).map((v, idx) => (
-                          <div key={idx} className="text-sm text-slate-200">
-                            {v.question_text ? (
-                              <div className="text-xs text-slate-400">{v.question_text}</div>
-                            ) : null}
-                            <div className="leading-relaxed">“{v.text}”</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="mt-3 text-sm text-slate-400">No verbatims stored for this response.</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
           )}
         </div>
-      )}
-      </div>
       </section>
 
       {/* Top: overall NPS card + split chart */}
@@ -644,7 +804,9 @@ export default function EnvolaExample() {
           {/* Controls */}
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-400">{tr("envola.trend.granularity", "Granularity:")}</span>
+              <span className="text-xs text-slate-400">
+                {tr("envola.trend.granularity", "Granularity:")}
+              </span>
               {["day", "week", "month"].map((g) => (
                 <button
                   key={g}
@@ -656,7 +818,11 @@ export default function EnvolaExample() {
                       : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
                   }`}
                 >
-                  {g === "day" ? tr("common.day", "Day") : g === "week" ? tr("common.week", "Week") : tr("common.month", "Month")}
+                  {g === "day"
+                    ? tr("common.day", "Day")
+                    : g === "week"
+                      ? tr("common.week", "Week")
+                      : tr("common.month", "Month")}
                 </button>
               ))}
             </div>
@@ -722,8 +888,12 @@ export default function EnvolaExample() {
             </div>
           </div>
 
-          {trend.loading && <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>}
-          {!trend.loading && trend.error && <p className="mt-6 text-sm text-red-300">Error: {trend.error}</p>}
+          {trend.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!trend.loading && trend.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {trend.error}</p>
+          )}
 
           {!trend.loading && trend.data?.ok && (
             <>
@@ -782,6 +952,109 @@ export default function EnvolaExample() {
                   </div>
                 </>
               )}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* NEW: Average score per question (private) */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.qa.title", "Average score per question")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr(
+                  "envola.qa.subtitle",
+                  "Calculated from raw Intercom survey answers (requires login)."
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Pill>{tr("envola.meta.private", "Private (login required)")}</Pill>
+              <Pill>
+                {tr("common.window", "Window")}: {qaDays}d • {tr("common.sample", "Sample")}:{" "}
+                {qaLimit}
+              </Pill>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400">{tr("common.window", "Window")}:</span>
+            <select
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+              value={qaDays}
+              onChange={(e) => setQaDays(Number(e.target.value))}
+            >
+              <option value={30}>30d</option>
+              <option value={90}>90d</option>
+              <option value={180}>180d</option>
+              <option value={365}>365d</option>
+            </select>
+
+            <span className="ml-2 text-xs text-slate-400">{tr("common.sample", "Sample")}:</span>
+            <select
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+              value={qaLimit}
+              onChange={(e) => setQaLimit(Number(e.target.value))}
+            >
+              <option value={60}>60</option>
+              <option value={120}>120</option>
+              <option value={160}>160</option>
+              <option value={240}>240</option>
+            </select>
+          </div>
+
+          {qa.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!qa.loading && qa.error && (
+            <p className="mt-6 text-sm text-red-300">
+              {tr("common.error", "Error")}: {qa.error}
+            </p>
+          )}
+
+          {!qa.loading && !qa.error && Array.isArray(qa.data) && qa.data.length === 0 && (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+              {tr("envola.qa.none", "No numeric answers found in this window yet.")}
+            </div>
+          )}
+
+          {!qa.loading && !qa.error && Array.isArray(qa.data) && qa.data.length > 0 && (
+            <>
+              <div className="mt-6">
+                <QuestionAveragesBarChart data={qaForChart} />
+              </div>
+
+              <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                <table className="w-full border-collapse">
+                  <thead className="bg-white/5">
+                    <tr className="text-left text-xs text-slate-300">
+                      <th className="px-4 py-3">{tr("common.question", "Question")}</th>
+                      <th className="px-4 py-3">{tr("common.avg", "Average")}</th>
+                      <th className="px-4 py-3">{tr("common.count", "Count")}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm">
+                    {qa.data.slice(0, 20).map((row) => (
+                      <tr key={row.label} className="border-t border-white/10">
+                        <td className="px-4 py-3 text-white">{row.label}</td>
+                        <td className="px-4 py-3 text-slate-200">{row.avg}</td>
+                        <td className="px-4 py-3 text-slate-200">{row.count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-3 text-xs text-slate-400">
+                {tr(
+                  "envola.qa.note",
+                  "Chart/table show top 20 questions by response count to keep this page readable."
+                )}
+              </div>
             </>
           )}
         </div>
@@ -1106,11 +1379,14 @@ export default function EnvolaExample() {
                                       {labelBucket(c.bucket)} • {c.score_0_10}/10
                                     </span>
                                     <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
-                                  {c.contact_id ? (
-                                    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                                      Intercom contact: {c.contact_id}
-                                    </span>
-                                  ) : null}
+
+                                    {c.contact_id ? (
+                                      <IntercomContactPill
+                                        id={c.contact_id}
+                                        url={c.intercom_contact_url}
+                                      />
+                                    ) : null}
+
                                     {c.is_substantive && (
                                       <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
                                         {tr("envola.comments.tookTime", "Took time to write")}
@@ -1253,11 +1529,14 @@ export default function EnvolaExample() {
                             {labelBucket(c.bucket)} • {c.score_0_10}/10
                           </span>
                           <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+
                           {c.contact_id ? (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                              Intercom contact: {c.contact_id}
-                            </span>
+                            <IntercomContactPill
+                              id={c.contact_id}
+                              url={c.intercom_contact_url}
+                            />
                           ) : null}
+
                           {c.is_substantive && (
                             <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
                               {tr("envola.comments.tookTime", "Took time to write")}

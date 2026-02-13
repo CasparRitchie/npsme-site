@@ -21,7 +21,7 @@ help:
 	@echo "  make dev           → start frontend + backend locally"
 	@echo "  make backend       → start node server only"
 	@echo "  make build         → build frontend (vite)"
-	@echo "  make deploy        → build + git push heroku main"
+	@echo "  make deploy        → build + git push origin main"
 	@echo "  make context-pack  → create project snapshot zip for ChatGPT"
 	@echo "  make tree          → print full project tree"
 	@echo "  make clean         → remove builds + context pack"
@@ -53,8 +53,8 @@ build:
 
 deploy: build
 	git add .
-	git commit -m "deploy" || true
-	git push heroku main
+	@git diff --cached --quiet || (git commit -m "$(if $(m),$(m),Deploy)" )
+	git push origin main
 
 
 # ==========================================

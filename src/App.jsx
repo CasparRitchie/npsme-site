@@ -8,17 +8,23 @@ import ScrollToTop from "./components/ScrollToTop";
 import { ROUTES } from "./routesRegistry";
 
 function AppShell() {
-  if (import.meta.env.DEV) {
-    const origError = console.error;
-    console.error = (...args) => {
-      const msg = String(args?.[0] ?? "");
-      if (msg.includes("The width(") && msg.includes("height(") && msg.includes("of chart")) {
-        origError("🔎 Recharts size warning caught:", ...args);
-        origError("🔎 Stack trace:\n", new Error().stack);
-        return;
-      }
-      origError(...args);
-    };
+  // main.jsx (or App.jsx)
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    const debugCharts = params.get("debugCharts") === "1";
+
+    if (debugCharts) {
+      const origError = console.error;
+      console.error = (...args) => {
+        const msg = String(args?.[0] ?? "");
+        if (msg.includes("The width(") && msg.includes("height(") && msg.includes("of chart")) {
+          origError("🔎 Recharts size warning caught:", ...args);
+          origError("🔎 Stack trace:\n", new Error().stack);
+          return;
+        }
+        origError(...args);
+      };
+    }
   }
 
   const location = useLocation();

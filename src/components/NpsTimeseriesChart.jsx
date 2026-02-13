@@ -117,30 +117,32 @@ export default function NpsTimeseriesChart({
       {!ready ? (
         <div className="w-full h-full" />
       ) : (
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(v) => formatDateLabel(v, granularity)}
-              minTickGap={18}
-            />
-            <YAxis domain={[-100, 100]} />
-            <Tooltip
-              labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
-              formatter={(value, name) => (name === "nps" ? [value, "NPS"] : [value, name])}
-              contentStyle={{ borderRadius: 12 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="nps"
-              dot={<ClickableDot />}
-              activeDot={<ClickableDot />}
-              strokeWidth={2}
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="w-full min-w-0" style={{ height: 170 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(v) => formatDateLabel(v, granularity)}
+                minTickGap={18}
+                />
+              <YAxis domain={[-100, 100]} />
+              <Tooltip
+                labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
+                formatter={(value, name) => (name === "nps" ? [value, "NPS"] : [value, name])}
+                contentStyle={{ borderRadius: 12 }}
+                />
+              <Line
+                type="monotone"
+                dataKey="nps"
+                dot={<ClickableDot />}
+                activeDot={<ClickableDot />}
+                strokeWidth={2}
+                isAnimationActive={false}
+                />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   );

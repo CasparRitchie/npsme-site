@@ -9,8 +9,6 @@ import {
   CartesianGrid,
 } from "recharts";
 
-
-
 function formatDateLabel(iso, granularity) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
@@ -37,88 +35,64 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-function useElementWidth() {
+function useElementSize() {
   const ref = React.useRef(null);
-  const [width, setWidth] = React.useState(0);
+  const [size, setSize] = React.useState({ width: 0, height: 0 });
 
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-      const w = rect.width || 0;
+    let raf = 0;
 
-      // 🔍 Only log when container collapses (helps debug Recharts warning)
-      if (w <= 0.5) {
-        console.log("[useElementWidth] container width collapsed:", {
-          width: w,
-          rect,
-          el,
-        });
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      const width = r.width || 0;
+      const height = r.height || 0;
+
+      // only log when it collapses (debug)
+      if (width <= 0.5 || height <= 0.5) {
+        console.log("[useElementSize] collapsed:", { width, height, rect: r, el });
       }
 
-      setWidth(w);
+      setSize({ width, height });
     };
 
-    // initial measurement
+    // measure now + after layout settles
     measure();
+    raf = requestAnimationFrame(measure);
 
-    // Fallback for older browsers
-    if (typeof ResizeObserver === "undefined") {
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => measure());
+      ro.observe(el);
+    } else {
       const t = window.setInterval(measure, 150);
       return () => window.clearInterval(t);
     }
 
-    // Modern resize tracking
-    const ro = new ResizeObserver(() => measure());
-    ro.observe(el);
-
-    return () => ro.disconnect();
-  }, []);
-
-  return { ref, width };
-}
-
-export default function NpsTimeseriesChart({ points = [], granularity = "week", onPointClick }) {
-  const data = [...points].sort((a, b) => new Date(a.date) - new Date(b.date));
-  const { ref, width } = useElementWidth();
-
-  const wrapRef = React.useRef(null);
-  const [ready, setReady] = React.useState(false);
-
-  React.useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-
-    let raf1 = 0;
-    let raf2 = 0;
-
-    const measure = () => {
-      const r = el.getBoundingClientRect();
-      // Require BOTH width and height > 0 before mounting Recharts
-      setReady(r.width > 0 && r.height > 0);
-    };
-
-    // Measure now, then again after layout settles
-    measure();
-    raf1 = window.requestAnimationFrame(() => {
-      measure();
-      raf2 = window.requestAnimationFrame(measure);
-    });
-
-    let ro = null;
-    if (typeof ResizeObserver !== "undefined") {
-      ro = new ResizeObserver(measure);
-      ro.observe(el);
-    }
-
     return () => {
       if (ro) ro.disconnect();
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
+      cancelAnimationFrame(raf);
     };
   }, []);
+
+  return { ref, ...size };
+}
+
+export default function NpsTimeseriesChart({
+  points = [],
+  granularity = "week",
+  onPointClick,
+}) {
+  const data = React.useMemo(
+    () => [...points].sort((a, b) => new Date(a.date) - new Date(b.date)),
+    [points]
+  );
+
+  // IMPORTANT: this ref must be on the SAME element that defines the chart size
+  const { ref, width, height } = useElementSize();
+  const ready = width > 1 && height > 1;
 
   const ClickableDot = (props) => {
     const { cx, cy, payload } = props || {};
@@ -138,14 +112,19 @@ export default function NpsTimeseriesChart({ points = [], granularity = "week", 
   };
 
   return (
-    <div ref={ref} className="w-full min-w-0">
-      {width <= 0 ? (
-        <div className="w-full" style={{ aspectRatio: "2.6 / 1" }} />
+    // Make sure this wrapper has REAL height (you already set h-72 on the parent in EnvolaExample)
+    <div ref={ref} className="w-full h-full min-w-0">
+      {!ready ? (
+        <div className="w-full h-full" />
       ) : (
-        <ResponsiveContainer width="100%" aspect={2.6}>
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" /* ... */ />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(v) => formatDateLabel(v, granularity)}
+              minTickGap={18}
+            />
             <YAxis domain={[-100, 100]} />
             <Tooltip
               labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}

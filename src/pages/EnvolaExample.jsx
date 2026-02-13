@@ -406,87 +406,139 @@ export default function EnvolaExample() {
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
   // NEW: QUESTION AVERAGES (private/logged-in)
-  useEffect(() => {
-    let cancelled = false;
+useEffect(() => {
+  let cancelled = false;
 
+  function extractNumber(v) {
+    // Support common shapes: 7, "7", { value: 7 }, { answer: 7 }, etc.
+    if (v == null) return null;
+
+    if (typeof v === "number") return Number.isFinite(v) ? v : null;
+    if (typeof v === "string") {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+    if (typeof v === "object") {
+      const cand =
+        ("value" in v ? v.value : undefined) ??
+        ("answer" in v ? v.answer : undefined) ??
+        ("score" in v ? v.score : undefined);
+      const n = Number(cand);
+      return Number.isFinite(n) ? n : null;
+    }
+    return null;
+  }
+
+  async function fetchJsonSafe(url) {
+    const r = await fetch(url, { credentials: "include" });
+    const contentType = (r.headers.get("content-type") || "").toLowerCase();
+    const rawText = await r.text().catch(() => "");
+
+    const looksLikeJson =
+      rawText.trim().startsWith("{") || rawText.trim().startsWith("[");
+
+    if (!contentType.includes("application/json") && !looksLikeJson) {
+      const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
+      throw new Error(
+        `Expected JSON from ${url} but got "${contentType || "unknown"}" (status ${
+          r.status
+        }). First chars: ${preview || "«empty body»"}`
+      );
+    }
+
+    let j = null;
+    try {
+      j = rawText ? JSON.parse(rawText) : null;
+    } catch (e) {
+      const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
+      throw new Error(
+        `JSON parse failed for ${url} (status ${r.status}, content-type "${
+          contentType || "unknown"
+        }"). First chars: ${preview || "«empty body»"}`
+      );
+    }
+
+    return { r, j };
+  }
+
+  (async () => {
     setQa({ loading: true, data: null, error: null });
 
-    (async () => {
-      try {
-        // 1) Pull recent raw responses list (your Closing the Loop raw basis)
-        const listR = await fetch(
-          `/api/intercom/private/closing-the-loop?content_id=${encodeURIComponent(
-            CONTENT_ID
-          )}&days=${encodeURIComponent(qaDays)}&limit=${encodeURIComponent(qaLimit)}`
-        );
+    try {
+      // 1) Pull the queue list (same basis as Closing the Loop "raw")
+      const qs = new URLSearchParams({
+        content_id: String(CONTENT_ID),
+        days: String(qaDays),
+        limit: String(qaLimit),
+      });
 
-        const listJ = await listR.json();
-        if (!listR.ok) {
-          if (!cancelled) {
-            setQa({ loading: false, data: null, error: listJ?.error || "Error loading raw list" });
-          }
-          return;
-        }
+      const listUrl = `/api/intercom/private/closing-the-loop?${qs.toString()}`;
+      const { r: listR, j: listJ } = await fetchJsonSafe(listUrl);
 
-        const rows = Array.isArray(listJ?.items) ? listJ.items : Array.isArray(listJ) ? listJ : [];
-        const responseIds = rows.map((r) => r.response_id).filter(Boolean);
-
-        if (!responseIds.length) {
-          if (!cancelled) setQa({ loading: false, data: [], error: null });
-          return;
-        }
-
-        // 2) For each response_id, fetch the full answers
-        const responses = await mapPool(responseIds, 8, async (responseId) => {
-          try {
-            const rr = await fetch(
-              `/api/intercom/private/nps-response?response_id=${encodeURIComponent(responseId)}`
-            );
-            const jj = await rr.json();
-            if (!rr.ok) return null;
-            return jj;
-          } catch {
-            return null;
-          }
-        });
-
-        if (cancelled) return;
-
-        // 3) Aggregate numeric answers (0..10) per question key
-        const acc = {}; // key -> { sum, count }
-        for (const r of responses) {
-          const answers = r?.answers;
-          if (!answers || typeof answers !== "object") continue;
-
-          for (const [k, v] of Object.entries(answers)) {
-            const num = Number(v);
-            if (Number.isFinite(num) && num >= 0 && num <= 10) {
-              if (!acc[k]) acc[k] = { sum: 0, count: 0 };
-              acc[k].sum += num;
-              acc[k].count += 1;
-            }
-          }
-        }
-
-        const data = Object.entries(acc)
-          .map(([label, { sum, count }]) => ({
-            label,
-            avg: count ? Number((sum / count).toFixed(2)) : null,
-            count,
-          }))
-          .filter((d) => d.avg != null)
-          .sort((a, b) => (b.count - a.count) || (b.avg - a.avg));
-
-        setQa({ loading: false, data, error: null });
-      } catch (e) {
-        if (!cancelled) setQa({ loading: false, data: null, error: e?.message || "Error" });
+      if (!listR.ok || !listJ?.ok) {
+        throw new Error(listJ?.error || `Request failed (${listR.status})`);
       }
-    })();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [CONTENT_ID, qaDays, qaLimit]);
+      // IMPORTANT: real shape is listJ.queue (see ClosingTheLoop.jsx)
+      const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
+      // response_id appears inside item.latest.response_id in your ClosingTheLoop UI
+      const responseIds = queue
+        .map((x) => x?.latest?.response_id)
+        .filter(Boolean)
+        .slice(0, qaLimit);
+
+      if (!responseIds.length) {
+        if (!cancelled) setQa({ loading: false, data: [], error: null });
+        return;
+      }
+
+      // 2) Fetch each response detail
+      const acc = {}; // label -> { sum, count }
+
+      // sequential is fine; if you want faster later we can pool-concurrency
+      for (const responseId of responseIds) {
+        const rqs = new URLSearchParams({ response_id: String(responseId) });
+        const detailUrl = `/api/intercom/private/nps-response?${rqs.toString()}`;
+
+        const { r: respR, j: respJ } = await fetchJsonSafe(detailUrl);
+        if (!respR.ok || !respJ?.ok) continue;
+
+        // IMPORTANT: shape is respJ.response (see ClosingTheLoop.jsx openResponse)
+        const answers = respJ?.response?.answers;
+        if (!answers || typeof answers !== "object") continue;
+
+        for (const [k, v] of Object.entries(answers)) {
+          const num = extractNumber(v);
+          if (num == null) continue;
+
+          // NPS question scores are 0–10
+          if (num < 0 || num > 10) continue;
+
+          if (!acc[k]) acc[k] = { sum: 0, count: 0 };
+          acc[k].sum += num;
+          acc[k].count += 1;
+        }
+      }
+
+      const data = Object.entries(acc)
+        .map(([label, { sum, count }]) => ({
+          label,
+          avg: count ? Number((sum / count).toFixed(2)) : null,
+          count,
+        }))
+        .filter((d) => d.avg != null)
+        .sort((a, b) => (b.count - a.count) || (b.avg - a.avg));
+
+      if (!cancelled) setQa({ loading: false, data, error: null });
+    } catch (e) {
+      if (!cancelled) setQa({ loading: false, data: null, error: String(e?.message || e) });
+    }
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+}, [CONTENT_ID, qaDays, qaLimit]);
 
   // Add near your other state/hooks
   const [chartMountReady, setChartMountReady] = useState(false);

@@ -35,9 +35,10 @@ function tooltipLabelFormatter(label, granularity) {
   return granularity === "week" ? `Week of ${base}` : base;
 }
 
-function useElementSize() {
+// Width-only observer (height no longer needed because we give chart a fixed px height)
+function useElementWidth() {
   const ref = React.useRef(null);
-  const [size, setSize] = React.useState({ width: 0, height: 0 });
+  const [width, setWidth] = React.useState(0);
 
   React.useEffect(() => {
     const el = ref.current;
@@ -47,24 +48,22 @@ function useElementSize() {
 
     const measure = () => {
       const r = el.getBoundingClientRect();
-      const width = r.width || 0;
-      const height = r.height || 0;
+      const w = r.width || 0;
 
-      // only log when it collapses (debug)
-      if (width <= 0.5 || height <= 0.5) {
-        console.log("[useElementSize] collapsed:", { width, height, rect: r, el });
+      // Debug: only log when width collapses
+      if (w <= 0.5) {
+        console.log("[useElementWidth] collapsed:", { width: w, rect: r, el });
       }
 
-      setSize({ width, height });
+      setWidth(w);
     };
 
-    // measure now + after layout settles
     measure();
     raf = requestAnimationFrame(measure);
 
     let ro = null;
     if (typeof ResizeObserver !== "undefined") {
-      ro = new ResizeObserver(() => measure());
+      ro = new ResizeObserver(measure);
       ro.observe(el);
     } else {
       const t = window.setInterval(measure, 150);
@@ -77,7 +76,7 @@ function useElementSize() {
     };
   }, []);
 
-  return { ref, ...size };
+  return { ref, width };
 }
 
 export default function NpsTimeseriesChart({
@@ -90,9 +89,8 @@ export default function NpsTimeseriesChart({
     [points]
   );
 
-  // IMPORTANT: this ref must be on the SAME element that defines the chart size
-  const { ref, width, height } = useElementSize();
-  const ready = width > 1 && height > 1;
+  const { ref, width } = useElementWidth();
+  const ready = width > 1;
 
   const ClickableDot = (props) => {
     const { cx, cy, payload } = props || {};
@@ -112,37 +110,37 @@ export default function NpsTimeseriesChart({
   };
 
   return (
-    // Make sure this wrapper has REAL height (you already set h-72 on the parent in EnvolaExample)
-    <div ref={ref} className="w-full h-full min-w-0">
+    <div ref={ref} className="w-full min-w-0">
       {!ready ? (
-        <div className="w-full h-full" />
+        // Placeholder keeps layout stable while width is 0 during route/layout settle
+        <div className="w-full" style={{ height: 170 }} />
       ) : (
-        <div className="w-full min-w-0" style={{ height: 170 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="date"
-                tickFormatter={(v) => formatDateLabel(v, granularity)}
-                minTickGap={18}
-                />
-              <YAxis domain={[-100, 100]} />
-              <Tooltip
-                labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
-                formatter={(value, name) => (name === "nps" ? [value, "NPS"] : [value, name])}
-                contentStyle={{ borderRadius: 12 }}
-                />
-              <Line
-                type="monotone"
-                dataKey="nps"
-                dot={<ClickableDot />}
-                activeDot={<ClickableDot />}
-                strokeWidth={2}
-                isAnimationActive={false}
-                />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={170}>
+          <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(v) => formatDateLabel(v, granularity)}
+              minTickGap={18}
+            />
+            <YAxis domain={[-100, 100]} />
+            <Tooltip
+              labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
+              formatter={(value, name) =>
+                name === "nps" ? [value, "NPS"] : [value, name]
+              }
+              contentStyle={{ borderRadius: 12 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="nps"
+              dot={<ClickableDot />}
+              activeDot={<ClickableDot />}
+              strokeWidth={2}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       )}
     </div>
   );

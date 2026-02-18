@@ -18,6 +18,14 @@ function prettyDate(iso) {
   });
 }
 
+function safeDecode(s) {
+  try {
+    return decodeURIComponent(String(s));
+  } catch {
+    return String(s);
+  }
+}
+
 function IntercomContactPill({ id, url }) {
   if (!id) return null;
 
@@ -141,7 +149,9 @@ export default function EnvolaQuestionDetail() {
         const { r: listR, j: listJ } = await fetchJson(listUrl);
 
         if (!listR.ok || !listJ?.ok) {
-          throw new Error(listJ?.error || `closing-the-loop failed (${listR.status})`);
+          throw new Error(
+            listJ?.error || `closing-the-loop failed (${listR.status})`
+          );
         }
 
         const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
@@ -175,45 +185,59 @@ export default function EnvolaQuestionDetail() {
             const resp = respJ?.response || {};
             const answers = Array.isArray(resp?.answers) ? resp.answers : [];
 
+            const targetId = String(questionId);
+            const targetDecoded = safeDecode(questionId);
+
             // Match by question_id primarily, fallback to question_text match
             const matched = answers.filter((a) => {
               const qid = a?.question_id != null ? String(a.question_id) : null;
-              if (qid && qid === String(questionId)) return true;
+              if (qid && qid === targetId) return true;
 
-              // Optional fallback: if your route ever uses encoded question text
               const qt = (a?.question_text || "").trim();
-              if (qt && decodeURIComponent(String(questionId)) === qt) return true;
+              if (qt && targetDecoded === qt) return true;
 
               return false;
             });
+
+            // Debug sanity check (keep for now; remove when you're happy)
             if (matched.length) {
+              // eslint-disable-next-line no-console
               console.log("QD matched answer sample:", matched[0]);
+              // eslint-disable-next-line no-console
               console.log("QD response-level verbatims sample:", resp?.verbatims?.[0]);
             }
+
             if (!matched.length) return null;
 
-            // Collect evidence from ALL matched answers in this response
+            // Decide what kind of question this is (scored 0–10 vs free-text)
+            // If ANY matched answer is 0–10, treat it as a scored question.
+            const isScoredQuestion = matched.some(
+              (a) => toNum0to10(a?.response) != null
+            );
+
+            // Collect evidence
             const nums = [];
             const verbatims = [];
             const options = [];
 
-            // 1) Some payloads store verbatims at response-level (like your public drilldown)
+            // 1) Response-level verbatims (follow-ups like “Pourquoi ?”)
+            // For scored questions: include ALL response-level verbatims as linked follow-ups.
+            // (This fixes the “No verbatims for every question” issue.)
             const respVerbatims = Array.isArray(resp?.verbatims) ? resp.verbatims : [];
-            for (const v of respVerbatims) {
-              const vQid = v?.question_id != null ? String(v.question_id) : null;
-              const vQtext = (v?.question_text || "").trim();
-              const targetId = String(questionId);
-
-              const matches =
-                (vQid && vQid === targetId) ||
-                (vQtext && decodeURIComponent(targetId) === vQtext);
-
-              if (matches && v?.text && String(v.text).trim()) {
-                verbatims.push(String(v.text).trim());
+            if (isScoredQuestion) {
+              for (const v of respVerbatims) {
+                const txt = v?.text != null ? String(v.text).trim() : "";
+                if (txt) verbatims.push(txt);
+              }
+            } else {
+              // For non-scored questions, you can also include these (kept as include-all for now)
+              for (const v of respVerbatims) {
+                const txt = v?.text != null ? String(v.text).trim() : "";
+                if (txt) verbatims.push(txt);
               }
             }
 
-            // 2) Answers: numeric + text (text often lives in answer.response as a string)
+            // 2) Answers: numeric + text (text can live in answer.response)
             matched.forEach((a) => {
               const raw = a?.response;
 
@@ -222,7 +246,7 @@ export default function EnvolaQuestionDetail() {
               if (n != null) {
                 nums.push(n);
               } else {
-                // free-text often arrives as a string response
+                // free-text as string
                 if (typeof raw === "string" && raw.trim()) {
                   verbatims.push(raw.trim());
                 }
@@ -262,10 +286,7 @@ export default function EnvolaQuestionDetail() {
                 null,
               bucket: resp?.bucket || null,
               score_0_10:
-                resp?.score_0_10 ??
-                resp?.nps_score ??
-                resp?.score ??
-                null,
+                resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
               numericAnswers: nums,
               verbatims,
               selected_options: options,
@@ -278,8 +299,7 @@ export default function EnvolaQuestionDetail() {
         const rows = items.filter(Boolean);
 
         // Choose best label we saw
-        const bestLabel =
-          rows.find((r) => r.questionLabel)?.questionLabel || null;
+        const bestLabel = rows.find((r) => r.questionLabel)?.questionLabel || null;
 
         if (!cancelled) {
           setState({
@@ -306,7 +326,7 @@ export default function EnvolaQuestionDetail() {
     };
   }, [questionId, days, limit]);
 
-  // Derived stats
+  // Derived stats (numeric only)
   const stats = useMemo(() => {
     const allNums = state.rows.flatMap((r) => r.numericAnswers || []);
     const n = allNums.length;
@@ -326,12 +346,20 @@ export default function EnvolaQuestionDetail() {
     return { n, avg, dist, max };
   }, [state.rows]);
 
+  const questionLooksScored = useMemo(() => {
+    // If we have any numeric answers, it’s scored
+    return stats.n > 0;
+  }, [stats.n]);
+
   const sampleVerbatims = useMemo(() => {
     const out = [];
     for (const r of state.rows) {
       for (const v of r.verbatims || []) {
+        const txt = String(v || "").trim();
+        if (!txt) continue;
+
         out.push({
-          text: v,
+          text: txt,
           submitted_at: r.submitted_at,
           contact_id: r.contact_id,
           intercom_contact_url: r.intercom_contact_url,
@@ -380,7 +408,9 @@ export default function EnvolaQuestionDetail() {
             </Link>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-400">{tr("common.window", "Window")}:</span>
+              <span className="text-xs text-slate-400">
+                {tr("common.window", "Window")}:
+              </span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={days}
@@ -392,7 +422,9 @@ export default function EnvolaQuestionDetail() {
                 <option value={365}>365d</option>
               </select>
 
-              <span className="text-xs text-slate-400">{tr("common.sample", "Sample")}:</span>
+              <span className="text-xs text-slate-400">
+                {tr("common.sample", "Sample")}:
+              </span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={limit}
@@ -422,14 +454,8 @@ export default function EnvolaQuestionDetail() {
 
           {!state.loading && !state.error && (
             <>
-              {stats.n === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
-                  {tr(
-                    "envola.qd.noData",
-                    "No numeric answers found for this question in the selected window."
-                  )}
-                </div>
-              ) : (
+              {/* NUMERIC SECTION (only if we have numeric answers) */}
+              {stats.n > 0 ? (
                 <>
                   <div className="grid gap-4 md:grid-cols-3">
                     <StatCard
@@ -477,65 +503,77 @@ export default function EnvolaQuestionDetail() {
                       })}
                     </div>
                   </div>
-
-                  {/* Verbatims */}
-                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="text-sm font-semibold text-white">
-                        {tr("envola.qd.verbatims", "Verbatims")}
-                      </div>
-                      <div className="text-xs text-slate-400">
-                        {tr("common.returned", "Returned")}: {sampleVerbatims.length}
-                      </div>
-                    </div>
-
-                    {sampleVerbatims.length ? (
-                      <div className="mt-4 space-y-3">
-                        {sampleVerbatims.map((v, idx) => (
-                          <div
-                            key={`${v.submitted_at || "x"}-${idx}`}
-                            className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                          >
-                            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                              {v.score_0_10 != null ? (
-                                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                                  Score: {v.score_0_10}/10
-                                </span>
-                              ) : null}
-                              <span className="text-slate-400">{prettyDate(v.submitted_at)}</span>
-
-                              {v.contact_id ? (
-                                <IntercomContactPill
-                                  id={v.contact_id}
-                                  url={v.intercom_contact_url}
-                                />
-                              ) : null}
-                            </div>
-
-                            <p className="mt-3 text-sm text-slate-200 leading-relaxed">
-                              “{v.text}”
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="mt-4 text-sm text-slate-300">
-                        {tr(
-                          "envola.qd.noVerbatims",
-                          "No free-text verbatims found for this question in the selected window."
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 text-xs text-slate-400">
-                    {tr(
-                      "envola.qd.note",
-                      "This view is built from raw Intercom survey answers (private endpoints, login required)."
-                    )}
-                  </div>
                 </>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  {tr(
+                    "envola.qd.noNumeric",
+                    "No numeric (0–10) answers found for this question in the selected window."
+                  )}
+                </div>
               )}
+
+              {/* VERBATIMS (always shown, independent of numeric stats) */}
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="text-sm font-semibold text-white">
+                    {tr("envola.qd.verbatims", "Verbatims")}
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {tr("common.returned", "Returned")}: {sampleVerbatims.length}
+                  </div>
+                </div>
+
+                {sampleVerbatims.length ? (
+                  <div className="mt-4 space-y-3">
+                    {sampleVerbatims.map((v, idx) => (
+                      <div
+                        key={`${v.submitted_at || "x"}-${idx}`}
+                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                          {v.score_0_10 != null ? (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                              Score: {v.score_0_10}/10
+                            </span>
+                          ) : null}
+                          <span className="text-slate-400">{prettyDate(v.submitted_at)}</span>
+
+                          {v.contact_id ? (
+                            <IntercomContactPill
+                              id={v.contact_id}
+                              url={v.intercom_contact_url}
+                            />
+                          ) : null}
+                        </div>
+
+                        <p className="mt-3 text-sm text-slate-200 leading-relaxed">
+                          “{v.text}”
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-4 text-sm text-slate-300">
+                    {questionLooksScored
+                      ? tr(
+                          "envola.qd.noVerbatimsScored",
+                          "This is a scored (0–10) question. Free-text comments usually appear in follow-up questions (e.g. “Pourquoi ?”). None were found in this window."
+                        )
+                      : tr(
+                          "envola.qd.noVerbatims",
+                          "No free-text answers found for this question in the selected window."
+                        )}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 text-xs text-slate-400">
+                {tr(
+                  "envola.qd.note",
+                  "This view is built from raw Intercom survey answers (private endpoints, login required)."
+                )}
+              </div>
             </>
           )}
         </div>

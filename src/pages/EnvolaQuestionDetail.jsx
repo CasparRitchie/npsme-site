@@ -185,59 +185,24 @@ export default function EnvolaQuestionDetail() {
             const resp = respJ?.response || {};
             const answers = Array.isArray(resp?.answers) ? resp.answers : [];
 
-            const targetId = String(questionId);
-            const targetDecoded = safeDecode(questionId);
-
             // Match by question_id primarily, fallback to question_text match
             const matched = answers.filter((a) => {
               const qid = a?.question_id != null ? String(a.question_id) : null;
-              if (qid && qid === targetId) return true;
+              if (qid && qid === String(questionId)) return true;
 
               const qt = (a?.question_text || "").trim();
-              if (qt && targetDecoded === qt) return true;
+              if (qt && decodeURIComponent(String(questionId)) === qt) return true;
 
               return false;
             });
 
-            // Debug sanity check (keep for now; remove when you're happy)
-            if (matched.length) {
-              // eslint-disable-next-line no-console
-              console.log("QD matched answer sample:", matched[0]);
-              // eslint-disable-next-line no-console
-              console.log("QD response-level verbatims sample:", resp?.verbatims?.[0]);
-            }
-
             if (!matched.length) return null;
 
-            // Decide what kind of question this is (scored 0–10 vs free-text)
-            // If ANY matched answer is 0–10, treat it as a scored question.
-            const isScoredQuestion = matched.some(
-              (a) => toNum0to10(a?.response) != null
-            );
-
-            // Collect evidence
+            // Collect evidence ONLY for this question
             const nums = [];
             const verbatims = [];
             const options = [];
 
-            // 1) Response-level verbatims (follow-ups like “Pourquoi ?”)
-            // For scored questions: include ALL response-level verbatims as linked follow-ups.
-            // (This fixes the “No verbatims for every question” issue.)
-            const respVerbatims = Array.isArray(resp?.verbatims) ? resp.verbatims : [];
-            if (isScoredQuestion) {
-              for (const v of respVerbatims) {
-                const txt = v?.text != null ? String(v.text).trim() : "";
-                if (txt) verbatims.push(txt);
-              }
-            } else {
-              // For non-scored questions, you can also include these (kept as include-all for now)
-              for (const v of respVerbatims) {
-                const txt = v?.text != null ? String(v.text).trim() : "";
-                if (txt) verbatims.push(txt);
-              }
-            }
-
-            // 2) Answers: numeric + text (text can live in answer.response)
             matched.forEach((a) => {
               const raw = a?.response;
 
@@ -245,19 +210,19 @@ export default function EnvolaQuestionDetail() {
               const n = toNum0to10(raw);
               if (n != null) {
                 nums.push(n);
-              } else {
-                // free-text as string
-                if (typeof raw === "string" && raw.trim()) {
-                  verbatims.push(raw.trim());
-                }
+                return;
+              }
 
-                // sometimes it's an object
-                if (raw && typeof raw === "object") {
-                  const maybeText =
-                    raw.text || raw.value || raw.comment || raw.verbatim || null;
-                  if (maybeText && String(maybeText).trim()) {
-                    verbatims.push(String(maybeText).trim());
-                  }
+              // free-text often arrives as a string response
+              if (typeof raw === "string" && raw.trim()) {
+                verbatims.push(raw.trim());
+              }
+
+              // sometimes it's an object
+              if (raw && typeof raw === "object") {
+                const maybeText = raw.text || raw.value || raw.comment || raw.verbatim || null;
+                if (maybeText && String(maybeText).trim()) {
+                  verbatims.push(String(maybeText).trim());
                 }
               }
 
@@ -267,26 +232,19 @@ export default function EnvolaQuestionDetail() {
               }
             });
 
-            // Best-guess metadata (defensive)
+            // Best-guess label
             const questionLabel =
               matched.find((a) => a?.question_text)?.question_text || null;
 
             return {
               response_id: responseId,
               questionLabel,
-              submitted_at:
-                resp?.submitted_at ||
-                resp?.created_at ||
-                resp?.updated_at ||
-                null,
+              submitted_at: resp?.submitted_at || resp?.created_at || resp?.updated_at || null,
               contact_id: resp?.contact_id || resp?.contact?.id || null,
               intercom_contact_url:
-                resp?.intercom_contact_url ||
-                resp?.contact?.intercom_contact_url ||
-                null,
+                resp?.intercom_contact_url || resp?.contact?.intercom_contact_url || null,
               bucket: resp?.bucket || null,
-              score_0_10:
-                resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
+              score_0_10: resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
               numericAnswers: nums,
               verbatims,
               selected_options: options,

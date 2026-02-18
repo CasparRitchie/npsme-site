@@ -14,6 +14,7 @@ import NpsSurveyProgramme from "./NpsSurveyProgramme";
 import NpsIntelligenceLayer from "./pages/NpsIntelligenceLayer";
 import IntercomNpsAnalytics from "./pages/IntercomNpsAnalytics";
 import EnvolaExample from "./pages/EnvolaExample";
+import EnvolaQuestionDetail from "./pages/EnvolaQuestionDetail";
 import Book from "./Book";
 import CxPulseSample from "./CxPulseSample";
 import Privacy from "./Privacy";
@@ -93,6 +94,9 @@ const COMPONENTS = {
 
   "/envola": EnvolaExample,
   "/fr/exemple-envola": EnvolaExample,
+
+  "/envola/questions/:questionId": EnvolaQuestionDetail,
+  "/fr/exemple-envola/questions/:questionId": EnvolaQuestionDetail,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

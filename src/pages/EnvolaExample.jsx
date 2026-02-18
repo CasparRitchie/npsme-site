@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
@@ -10,7 +10,6 @@ import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import WordCloud from "../components/WordCloud";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 import QuestionAveragesBarChart from "../components/QuestionAveragesBarChart";
-import { useNavigate } from "react-router-dom";
 
 function IntercomContactPill({ id, url }) {
   if (!id) return null;
@@ -129,14 +128,21 @@ async function mapPool(items, concurrency, mapper) {
   return results;
 }
 
+
 export default function EnvolaExample() {
   const navigate = useNavigate();
-  function openQuestionDetail(q) {
-    if (!q?.id) return;
-    navigate(localizePath(`/envola/questions/${encodeURIComponent(q.id)}`, lang));
-  }
-  const CONTENT_ID = "189616";
   const { lang } = useLanguage();
+
+  const envolaQuestionPath = (id) => {
+    const base = lang === "fr" ? "/fr/exemple-envola" : "/envola";
+    return `${base}/questions/${encodeURIComponent(id)}`;
+  };
+
+  const openQuestionDetail = (q) => {
+    if (!q?.id) return;
+    navigate(envolaQuestionPath(q.id));
+  };
+  const CONTENT_ID = "189616";
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
 

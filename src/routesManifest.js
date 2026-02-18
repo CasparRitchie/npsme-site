@@ -42,6 +42,10 @@ export const ROUTES_MANIFEST = [
   { path: "/book",     label: "Book discovery",      labelKey: "routes.book", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/book",  label: "Prendre rendez-vous", labelKey: "routes.book", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "fr" },
 
+  // Envola question drilldown (private-ish UX, not indexable)
+  { path: "/envola/questions/:questionId",            label: "Envola Question", labelKey: "routes.envolaQuestion", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/exemple-envola/questions/:questionId", label: "Envola Question", labelKey: "routes.envolaQuestion", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // Private (auth)
   { path: "/private/login", label: "Private login", labelKey: "routes.privateLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/private/login", label: "Connexion privée", labelKey: "routes.privateLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },

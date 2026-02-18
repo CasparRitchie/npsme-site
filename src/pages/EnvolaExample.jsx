@@ -10,6 +10,7 @@ import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import WordCloud from "../components/WordCloud";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 import QuestionAveragesBarChart from "../components/QuestionAveragesBarChart";
+import { useNavigate } from "react-router-dom";
 
 function IntercomContactPill({ id, url }) {
   if (!id) return null;
@@ -129,6 +130,11 @@ async function mapPool(items, concurrency, mapper) {
 }
 
 export default function EnvolaExample() {
+  const navigate = useNavigate();
+  function openQuestionDetail(q) {
+    if (!q?.id) return;
+    navigate(localizePath(`/envola/questions/${encodeURIComponent(q.id)}`, lang));
+  }
   const CONTENT_ID = "189616";
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
@@ -558,7 +564,7 @@ export default function EnvolaExample() {
     // Chart expects [{label, avg}] — keep it simple and stable
     const arr = Array.isArray(qa.data) ? qa.data : [];
     // show top 20 by count to keep the chart legible
-    return arr.slice(0, 20).map((d) => ({ label: d.label, avg: d.avg }));
+    return arr.slice(0, 20).map((d) => ({ id: d.id, label: d.label, avg: d.avg, count: d.count }));
   }, [qa.data]);
 
   return (
@@ -1056,7 +1062,7 @@ export default function EnvolaExample() {
           {!qa.loading && !qa.error && Array.isArray(qa.data) && qa.data.length > 0 && (
             <>
               <div className="mt-6">
-                <QuestionAveragesBarChart data={qaForChart} />
+                <QuestionAveragesBarChart data={qaForChart}   onBarClick={openQuestionDetail}/>
               </div>
 
               <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
@@ -1070,7 +1076,16 @@ export default function EnvolaExample() {
                   </thead>
                   <tbody className="text-sm">
                     {qa.data.slice(0, 20).map((row) => (
-                      <tr key={row.label} className="border-t border-white/10">
+                      <tr
+                        key={row.id || row.label}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openQuestionDetail(row)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") openQuestionDetail(row);
+                        }}
+                        className="border-t border-white/10 cursor-pointer hover:bg-white/5 focus:outline-none focus:bg-white/5"
+                      >
                         <td className="px-4 py-3 text-white">{row.label}</td>
                         <td className="px-4 py-3 text-slate-200">{row.avg}</td>
                         <td className="px-4 py-3 text-slate-200">{row.count}</td>

@@ -126,7 +126,7 @@ function QaTooltip({ active, payload, label }) {
   );
 }
 
-export default function QuestionAveragesBarChart({ data }) {
+export default function QuestionAveragesBarChart({ data, onBarClick }) {
   if (!Array.isArray(data) || data.length === 0) return null;
 
   const GREEN = "#22C55E";
@@ -185,7 +185,9 @@ export default function QuestionAveragesBarChart({ data }) {
             isAnimationActive={false}
             onClick={(_, idx) => {
               const d = chartData[idx];
-              if (d) setSelected(d);
+              if (!d) return;
+              if (typeof onBarClick === "function") return onBarClick(d);
+              setSelected(d); // fallback to modal if no handler passed
             }}
           >
             {chartData.map((d, i) => {

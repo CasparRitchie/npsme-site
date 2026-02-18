@@ -125,7 +125,8 @@ export default function EnvolaQuestionDetail() {
 
   const isNonEmptyText = (v) => typeof v === "string" && v.trim().length >= 2;
 
-  const answerQid = (a) => (a?.question_id != null ? String(a.question_id) : null);
+  const answerQid = (a) =>
+    a?.question_id != null ? String(a.question_id) : null;
 
   /**
    * Detect if an answer looks like a multi-select "option" rather than a free-text verbatim.
@@ -134,13 +135,22 @@ export default function EnvolaQuestionDetail() {
    * - If this question_id appears multiple times in the same response.answers, it’s almost certainly multi-select.
    * - If the raw text matches an item in resp.selected_options, treat it as an option.
    */
-  const looksLikeOptionAnswer = ({ qid, raw, qidCountInThisResponse, respSelectedOptions }) => {
+  const looksLikeOptionAnswer = ({
+    qid,
+    raw,
+    qidCountInThisResponse,
+    respSelectedOptions,
+  }) => {
     if (!qid) return false;
 
     if (qidCountInThisResponse > 1) return true;
 
     const txt = typeof raw === "string" ? raw.trim() : "";
-    if (txt && Array.isArray(respSelectedOptions) && respSelectedOptions.includes(txt)) {
+    if (
+      txt &&
+      Array.isArray(respSelectedOptions) &&
+      respSelectedOptions.includes(txt)
+    ) {
       return true;
     }
 
@@ -150,7 +160,7 @@ export default function EnvolaQuestionDetail() {
   /**
    * Infer "follow-up question" links from many responses.
    *
-   * We only infer links of the form:
+   * We infer links of the form:
    *   scored (0–10) question -> next question that is free-text (not numeric, not option)
    *
    * Output:
@@ -174,7 +184,9 @@ export default function EnvolaQuestionDetail() {
         qidCounts[qid] = (qidCounts[qid] || 0) + 1;
       }
 
-      const respSelectedOptions = Array.isArray(resp?.selected_options) ? resp.selected_options : [];
+      const respSelectedOptions = Array.isArray(resp?.selected_options)
+        ? resp.selected_options
+        : [];
 
       for (let i = 0; i < answers.length - 1; i++) {
         const prev = answers[i];
@@ -207,14 +219,12 @@ export default function EnvolaQuestionDetail() {
       }
     }
 
-    // decide which pairs are "strong enough"
     const map = {};
 
     // thresholds: tuneable
-    const MIN_SUPPORT = 3;     // needs to appear at least 3 times
-    const MIN_RATIO = 0.45;    // and be >=45% of the time after that scored question
+    const MIN_SUPPORT = 3; // needs to appear at least 3 times
+    const MIN_RATIO = 0.45; // and be >=45% of the time after that scored question
 
-    // aggregate per prevQid
     const byPrev = new Map(); // prevQid -> [{nextQid, count, ratio}]
     for (const [k, count] of pairCounts.entries()) {
       const [prevQid, nextQid] = k.split("->");
@@ -227,10 +237,9 @@ export default function EnvolaQuestionDetail() {
     for (const [prevQid, candidates] of byPrev.entries()) {
       const strong = candidates
         .filter((c) => c.count >= MIN_SUPPORT && c.ratio >= MIN_RATIO)
-        .sort((a, b) => (b.ratio - a.ratio) || (b.count - a.count));
+        .sort((a, b) => b.ratio - a.ratio || b.count - a.count);
 
       if (strong.length) {
-        // keep top 1–2 followups just in case
         map[prevQid] = strong.slice(0, 2).map((c) => c.nextQid);
       }
     }
@@ -253,45 +262,67 @@ export default function EnvolaQuestionDetail() {
       qidCounts[qid] = (qidCounts[qid] || 0) + 1;
     }
 
-    const respSelectedOptions = Array.isArray(resp?.selected_options) ? resp.selected_options : [];
+    const respSelectedOptions = Array.isArray(resp?.selected_options)
+      ? resp.selected_options
+      : [];
 
     const targetAnswers = answers.filter((a) => answerQid(a) === targetQid);
     if (!targetAnswers.length) return null;
 
-    const questionLabel = targetAnswers.find((a) => a?.question_text)?.question_text || null;
+    const questionLabel =
+      targetAnswers.find((a) => a?.question_text)?.question_text || null;
 
-    const isScoredQuestion = targetAnswers.some((a) => toNum0to10(a?.response) != null);
+    const isScoredQuestion = targetAnswers.some(
+      (a) => toNum0to10(a?.response) != null
+    );
+
+    // Multi-select detection (strong signal): same qid appears multiple times in this response
+    const isMultiSelectInThisResponse = (qidCounts[targetQid] || 0) > 1;
 
     const nums = [];
     const verbatims = [];
     const options = [];
+    const optionAnswers = [];
 
-    // numeric stats from target itself
+    // Extract from target answers
     for (const a of targetAnswers) {
-      const n = toNum0to10(a?.response);
-      if (n != null) nums.push(n);
+      const raw = a?.response;
 
-      // selected_options (if present)
+      // Multi-select: treat string responses as options, not verbatims
+      if (isMultiSelectInThisResponse && typeof raw === "string" && raw.trim()) {
+        optionAnswers.push(raw.trim());
+        continue;
+      }
+
+      const n = toNum0to10(raw);
+      if (n != null) {
+        nums.push(n);
+        continue;
+      }
+
+      // selected_options (rarely on answer; keep defensively)
       if (Array.isArray(a?.selected_options)) {
         options.push(...a.selected_options.filter(Boolean));
       }
 
-      // sometimes a scored question also has direct text (rare) — keep it
-      if (!isScoredQuestion && isNonEmptyText(a?.response)) {
-        const raw = String(a.response).trim();
+      // Direct free-text question (non-scored)
+      if (!isScoredQuestion && isNonEmptyText(raw)) {
+        const txt = String(raw).trim();
         const looksOption = looksLikeOptionAnswer({
           qid: targetQid,
-          raw,
+          raw: txt,
           qidCountInThisResponse: qidCounts[targetQid] || 0,
           respSelectedOptions,
         });
-        if (!looksOption) verbatims.push(raw);
+        if (!looksOption) verbatims.push(txt);
       }
     }
 
     // If scored, verbatims come from inferred follow-up question ids
     if (isScoredQuestion) {
-      const followIds = Array.isArray(followupsMap?.[targetQid]) ? followupsMap[targetQid] : [];
+      const followIds = Array.isArray(followupsMap?.[targetQid])
+        ? followupsMap[targetQid]
+        : [];
 
       for (const fid of followIds) {
         const followAnswers = answers.filter((a) => answerQid(a) === String(fid));
@@ -302,7 +333,6 @@ export default function EnvolaQuestionDetail() {
 
           const txt = String(raw).trim();
 
-          // exclude option-y things
           const looksOption = looksLikeOptionAnswer({
             qid: String(fid),
             raw: txt,
@@ -312,8 +342,8 @@ export default function EnvolaQuestionDetail() {
           if (!looksOption) verbatims.push(txt);
         }
       }
-    } else {
-      // If not scored, verbatims are the direct text answers for the target question_id
+    } else if (!isMultiSelectInThisResponse) {
+      // If not scored and not multi-select, verbatims are direct text answers for target qid
       for (const a of targetAnswers) {
         const raw = a?.response;
         if (!isNonEmptyText(raw)) continue;
@@ -331,7 +361,6 @@ export default function EnvolaQuestionDetail() {
       }
     }
 
-    // de-dupe verbatims within this response
     const uniqVerbatims = Array.from(new Set(verbatims)).filter(Boolean);
 
     return {
@@ -339,12 +368,14 @@ export default function EnvolaQuestionDetail() {
       questionLabel,
       submitted_at: resp?.submitted_at || resp?.created_at || resp?.updated_at || null,
       contact_id: resp?.contact_id || resp?.contact?.id || null,
-      intercom_contact_url: resp?.intercom_contact_url || resp?.contact?.intercom_contact_url || null,
+      intercom_contact_url:
+        resp?.intercom_contact_url || resp?.contact?.intercom_contact_url || null,
       bucket: resp?.bucket || null,
       score_0_10: resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
       numericAnswers: nums,
       verbatims: uniqVerbatims,
       selected_options: options,
+      optionAnswers: Array.from(new Set(optionAnswers)).filter(Boolean),
       isScoredQuestion,
     };
   };
@@ -368,7 +399,9 @@ export default function EnvolaQuestionDetail() {
         const { r: listR, j: listJ } = await fetchJson(listUrl);
 
         if (!listR.ok || !listJ?.ok) {
-          throw new Error(listJ?.error || `closing-the-loop failed (${listR.status})`);
+          throw new Error(
+            listJ?.error || `closing-the-loop failed (${listR.status})`
+          );
         }
 
         const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
@@ -445,17 +478,14 @@ export default function EnvolaQuestionDetail() {
     };
   }, [questionId, days, limit]);
 
-  // Derived stats
+  // Derived stats (scored)
   const stats = useMemo(() => {
     const allNums = state.rows.flatMap((r) => r.numericAnswers || []);
     const n = allNums.length;
     const sum = allNums.reduce((a, b) => a + b, 0);
     const avg = n ? Number((sum / n).toFixed(2)) : null;
 
-    const dist = Array.from({ length: 11 }, (_, i) => ({
-      score: i,
-      count: 0,
-    }));
+    const dist = Array.from({ length: 11 }, (_, i) => ({ score: i, count: 0 }));
     allNums.forEach((v) => {
       if (v >= 0 && v <= 10) dist[v].count += 1;
     });
@@ -465,11 +495,46 @@ export default function EnvolaQuestionDetail() {
     return { n, avg, dist, max };
   }, [state.rows]);
 
-  const questionLooksScored = useMemo(() => {
-    if (stats.n > 0) return true;
-    // fallback: if any extracted row flagged scored
-    return state.rows.some((r) => r?.isScoredQuestion);
-  }, [stats.n, state.rows]);
+  // Derived stats (multi-select)
+  const optionStats = useMemo(() => {
+    const rowsWithOptions = state.rows.filter(
+      (r) => (r.optionAnswers || []).length > 0
+    );
+
+    const respondentCount = rowsWithOptions.length;
+
+    const counts = new Map(); // optionText -> count (respondents who selected it)
+    for (const r of rowsWithOptions) {
+      const uniq = new Set((r.optionAnswers || []).filter(Boolean));
+      for (const opt of uniq) counts.set(opt, (counts.get(opt) || 0) + 1);
+    }
+
+    const items = Array.from(counts.entries())
+      .map(([text, count]) => ({
+        text,
+        count,
+        pct: respondentCount ? (count / respondentCount) * 100 : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    const max = items.reduce((m, x) => Math.max(m, x.count), 0);
+    const totalSelections = rowsWithOptions.reduce(
+      (s, r) => s + (r.optionAnswers?.length || 0),
+      0
+    );
+
+    const avgSelections = respondentCount
+      ? Number((totalSelections / respondentCount).toFixed(2))
+      : null;
+
+    return { respondentCount, totalSelections, avgSelections, items, max };
+  }, [state.rows]);
+
+  const mode = useMemo(() => {
+    if (stats.n > 0) return "scored";
+    if (optionStats.respondentCount > 0) return "multi";
+    return "text";
+  }, [stats.n, optionStats.respondentCount]);
 
   const followupIds = useMemo(() => {
     const qid = String(questionId);
@@ -521,7 +586,7 @@ export default function EnvolaQuestionDetail() {
             </p>
           ) : null}
 
-          {questionLooksScored && followupIds.length ? (
+          {mode === "scored" && followupIds.length ? (
             <p className="mt-2 text-xs text-slate-400">
               Inferred follow-up question(s):{" "}
               <span className="text-slate-200">{followupIds.join(", ")}</span>
@@ -537,7 +602,9 @@ export default function EnvolaQuestionDetail() {
             </Link>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-400">{tr("common.window", "Window")}:</span>
+              <span className="text-xs text-slate-400">
+                {tr("common.window", "Window")}:
+              </span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={days}
@@ -549,7 +616,9 @@ export default function EnvolaQuestionDetail() {
                 <option value={365}>365d</option>
               </select>
 
-              <span className="text-xs text-slate-400">{tr("common.sample", "Sample")}:</span>
+              <span className="text-xs text-slate-400">
+                {tr("common.sample", "Sample")}:
+              </span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={limit}
@@ -579,58 +648,169 @@ export default function EnvolaQuestionDetail() {
 
           {!state.loading && !state.error && (
             <>
-              {stats.n === 0 ? (
+              {/* Empty state */}
+              {state.rows.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
                   {tr(
-                    "envola.qd.noData",
-                    "No numeric answers found for this question in the selected window."
+                    "envola.qd.noRows",
+                    "No answers found for this question in the selected window."
                   )}
                 </div>
               ) : (
                 <>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <StatCard
-                      label={tr("common.count", "Count")}
-                      value={stats.n}
-                      sub={tr("envola.qd.countSub", "Numeric answers (0–10)")}
-                    />
-                    <StatCard
-                      label={tr("common.avg", "Average")}
-                      value={stats.avg == null ? "—" : stats.avg}
-                      sub={tr("envola.qd.avgSub", "Mean score for this question")}
-                    />
-                    <StatCard
-                      label={tr("envola.qd.sample", "Sample")}
-                      value={`${days}d / ${limit}`}
-                      sub={tr("envola.qd.sampleSub", "Window / response cap")}
-                    />
-                  </div>
-
-                  {/* Simple distribution chart */}
-                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
-                    <div className="text-sm font-semibold text-white">
-                      {tr("envola.qd.distribution", "Score distribution")}
+                  {/* Top stats */}
+                  {mode === "scored" ? (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <StatCard
+                        label={tr("common.count", "Count")}
+                        value={stats.n}
+                        sub={tr("envola.qd.countSub", "Numeric answers (0–10)")}
+                      />
+                      <StatCard
+                        label={tr("common.avg", "Average")}
+                        value={stats.avg == null ? "—" : stats.avg}
+                        sub={tr("envola.qd.avgSub", "Mean score for this question")}
+                      />
+                      <StatCard
+                        label={tr("envola.qd.sample", "Sample")}
+                        value={`${days}d / ${limit}`}
+                        sub={tr("envola.qd.sampleSub", "Window / response cap")}
+                      />
                     </div>
+                  ) : mode === "multi" ? (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <StatCard
+                        label={tr("common.respondents", "Respondents")}
+                        value={optionStats.respondentCount}
+                        sub={tr(
+                          "envola.qd.respondentsSub",
+                          "Responses that selected at least one option"
+                        )}
+                      />
+                      <StatCard
+                        label={tr("envola.qd.avgSelections", "Avg selections")}
+                        value={optionStats.avgSelections == null ? "—" : optionStats.avgSelections}
+                        sub={tr(
+                          "envola.qd.avgSelectionsSub",
+                          "Average number of options selected per respondent"
+                        )}
+                      />
+                      <StatCard
+                        label={tr("envola.qd.sample", "Sample")}
+                        value={`${days}d / ${limit}`}
+                        sub={tr("envola.qd.sampleSub", "Window / response cap")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <StatCard
+                        label={tr("common.count", "Count")}
+                        value={state.rows.length}
+                        sub={tr("envola.qd.textCountSub", "Responses with this question answered")}
+                      />
+                      <StatCard
+                        label={tr("common.returned", "Returned")}
+                        value={sampleVerbatims.length}
+                        sub={tr("envola.qd.textReturnedSub", "Free-text answers shown below")}
+                      />
+                      <StatCard
+                        label={tr("envola.qd.sample", "Sample")}
+                        value={`${days}d / ${limit}`}
+                        sub={tr("envola.qd.sampleSub", "Window / response cap")}
+                      />
+                    </div>
+                  )}
 
-                    <div className="mt-4 grid gap-2">
-                      {stats.dist.map((d) => {
-                        const pct = stats.max ? (d.count / stats.max) * 100 : 0;
-                        return (
-                          <div key={d.score} className="flex items-center gap-3">
-                            <div className="w-8 text-xs text-slate-300">{d.score}</div>
-                            <div className="flex-1">
-                              <div className="h-3 rounded-full bg-white/10 overflow-hidden">
-                                <div className="h-3 bg-white/60" style={{ width: `${pct}%` }} />
+                  {/* Multi-select options */}
+                  {mode === "multi" ? (
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="text-sm font-semibold text-white">
+                          {tr("envola.qd.options", "Selected options")}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {tr("common.respondents", "Respondents")}:{" "}
+                          {optionStats.respondentCount} ·{" "}
+                          {tr("common.selections", "Selections")}:{" "}
+                          {optionStats.totalSelections}
+                        </div>
+                      </div>
+
+                      {optionStats.items.length ? (
+                        <div className="mt-4 grid gap-2">
+                          {optionStats.items.map((d) => {
+                            const pctWidth = optionStats.max
+                              ? (d.count / optionStats.max) * 100
+                              : 0;
+                            return (
+                              <div key={d.text} className="flex items-center gap-3">
+                                <div
+                                  className="w-64 text-xs text-slate-200 truncate"
+                                  title={d.text}
+                                >
+                                  {d.text}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="h-3 rounded-full bg-white/10 overflow-hidden">
+                                    <div
+                                      className="h-3 bg-white/60"
+                                      style={{ width: `${pctWidth}%` }}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="w-20 text-right text-xs text-slate-300">
+                                  {d.count}{" "}
+                                  <span className="text-slate-500">
+                                    ({d.pct.toFixed(0)}%)
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="mt-4 text-sm text-slate-300">
+                          {tr(
+                            "envola.qd.noOptions",
+                            "No options found for this question in the selected window."
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {/* Score distribution */}
+                  {mode === "scored" ? (
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+                      <div className="text-sm font-semibold text-white">
+                        {tr("envola.qd.distribution", "Score distribution")}
+                      </div>
+
+                      <div className="mt-4 grid gap-2">
+                        {stats.dist.map((d) => {
+                          const pct = stats.max ? (d.count / stats.max) * 100 : 0;
+                          return (
+                            <div key={d.score} className="flex items-center gap-3">
+                              <div className="w-8 text-xs text-slate-300">{d.score}</div>
+                              <div className="flex-1">
+                                <div className="h-3 rounded-full bg-white/10 overflow-hidden">
+                                  <div
+                                    className="h-3 bg-white/60"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="w-10 text-right text-xs text-slate-300">
+                                {d.count}
                               </div>
                             </div>
-                            <div className="w-10 text-right text-xs text-slate-300">{d.count}</div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
 
-                  {/* Verbatims */}
+                  {/* Verbatims (scored follow-ups or direct text questions) */}
                   <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
                     <div className="flex items-center justify-between gap-4">
                       <div className="text-sm font-semibold text-white">
@@ -657,20 +837,30 @@ export default function EnvolaQuestionDetail() {
                               <span className="text-slate-400">{prettyDate(v.submitted_at)}</span>
 
                               {v.contact_id ? (
-                                <IntercomContactPill id={v.contact_id} url={v.intercom_contact_url} />
+                                <IntercomContactPill
+                                  id={v.contact_id}
+                                  url={v.intercom_contact_url}
+                                />
                               ) : null}
                             </div>
 
-                            <p className="mt-3 text-sm text-slate-200 leading-relaxed">“{v.text}”</p>
+                            <p className="mt-3 text-sm text-slate-200 leading-relaxed">
+                              “{v.text}”
+                            </p>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="mt-4 text-sm text-slate-300">
-                        {questionLooksScored
+                        {mode === "scored"
                           ? tr(
                               "envola.qd.noVerbatimsScored",
                               "This is a scored (0–10) question. Free-text comments usually appear in follow-up questions (e.g. “Pourquoi ?”). None were found in this window."
+                            )
+                          : mode === "multi"
+                          ? tr(
+                              "envola.qd.noVerbatimsMulti",
+                              "This is a multi-select question. Any free-text comments typically appear in separate follow-up questions. None were found in this window."
                             )
                           : tr(
                               "envola.qd.noVerbatims",

@@ -18,14 +18,6 @@ function prettyDate(iso) {
   });
 }
 
-function safeDecode(s) {
-  try {
-    return decodeURIComponent(String(s));
-  } catch {
-    return String(s);
-  }
-}
-
 function IntercomContactPill({ id, url }) {
   if (!id) return null;
 
@@ -103,6 +95,7 @@ export default function EnvolaQuestionDetail() {
     error: null,
     questionLabel: null,
     rows: [],
+    followupsMap: {}, // inferred mapping: scoredQid -> [followupQid...]
   });
 
   // --- Helpers to safely parse JSON from private endpoints
@@ -130,6 +123,232 @@ export default function EnvolaQuestionDetail() {
     return n;
   };
 
+  const isNonEmptyText = (v) => typeof v === "string" && v.trim().length >= 2;
+
+  const answerQid = (a) => (a?.question_id != null ? String(a.question_id) : null);
+
+  /**
+   * Detect if an answer looks like a multi-select "option" rather than a free-text verbatim.
+   *
+   * Heuristic:
+   * - If this question_id appears multiple times in the same response.answers, it’s almost certainly multi-select.
+   * - If the raw text matches an item in resp.selected_options, treat it as an option.
+   */
+  const looksLikeOptionAnswer = ({ qid, raw, qidCountInThisResponse, respSelectedOptions }) => {
+    if (!qid) return false;
+
+    if (qidCountInThisResponse > 1) return true;
+
+    const txt = typeof raw === "string" ? raw.trim() : "";
+    if (txt && Array.isArray(respSelectedOptions) && respSelectedOptions.includes(txt)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  /**
+   * Infer "follow-up question" links from many responses.
+   *
+   * We only infer links of the form:
+   *   scored (0–10) question -> next question that is free-text (not numeric, not option)
+   *
+   * Output:
+   *   { "612560": ["612565"], "612601": ["612602"], ... }
+   */
+  const inferFollowupsMap = (fullResponses) => {
+    const pairCounts = new Map(); // key: `${prevQid}->${nextQid}` -> count
+    const prevCounts = new Map(); // prevQid -> number of times it appeared with a next answer
+
+    const bump = (m, k, by = 1) => m.set(k, (m.get(k) || 0) + by);
+
+    for (const resp of fullResponses) {
+      const answers = Array.isArray(resp?.answers) ? resp.answers : [];
+      if (answers.length < 2) continue;
+
+      // count occurrences of each qid within this response (helps detect multi-select)
+      const qidCounts = {};
+      for (const a of answers) {
+        const qid = answerQid(a);
+        if (!qid) continue;
+        qidCounts[qid] = (qidCounts[qid] || 0) + 1;
+      }
+
+      const respSelectedOptions = Array.isArray(resp?.selected_options) ? resp.selected_options : [];
+
+      for (let i = 0; i < answers.length - 1; i++) {
+        const prev = answers[i];
+        const next = answers[i + 1];
+
+        const prevQid = answerQid(prev);
+        const nextQid = answerQid(next);
+        if (!prevQid || !nextQid) continue;
+
+        const prevNum = toNum0to10(prev?.response);
+        if (prevNum == null) continue; // prev must be scored 0–10
+
+        const nextRaw = next?.response;
+
+        // next must be free-text (not numeric)
+        if (!isNonEmptyText(nextRaw)) continue;
+        if (toNum0to10(nextRaw) != null) continue;
+
+        // exclude option-y answers
+        const nextLooksOption = looksLikeOptionAnswer({
+          qid: nextQid,
+          raw: nextRaw,
+          qidCountInThisResponse: qidCounts[nextQid] || 0,
+          respSelectedOptions,
+        });
+        if (nextLooksOption) continue;
+
+        bump(prevCounts, prevQid, 1);
+        bump(pairCounts, `${prevQid}->${nextQid}`, 1);
+      }
+    }
+
+    // decide which pairs are "strong enough"
+    const map = {};
+
+    // thresholds: tuneable
+    const MIN_SUPPORT = 3;     // needs to appear at least 3 times
+    const MIN_RATIO = 0.45;    // and be >=45% of the time after that scored question
+
+    // aggregate per prevQid
+    const byPrev = new Map(); // prevQid -> [{nextQid, count, ratio}]
+    for (const [k, count] of pairCounts.entries()) {
+      const [prevQid, nextQid] = k.split("->");
+      const denom = prevCounts.get(prevQid) || 0;
+      const ratio = denom ? count / denom : 0;
+      if (!byPrev.has(prevQid)) byPrev.set(prevQid, []);
+      byPrev.get(prevQid).push({ nextQid, count, ratio });
+    }
+
+    for (const [prevQid, candidates] of byPrev.entries()) {
+      const strong = candidates
+        .filter((c) => c.count >= MIN_SUPPORT && c.ratio >= MIN_RATIO)
+        .sort((a, b) => (b.ratio - a.ratio) || (b.count - a.count));
+
+      if (strong.length) {
+        // keep top 1–2 followups just in case
+        map[prevQid] = strong.slice(0, 2).map((c) => c.nextQid);
+      }
+    }
+
+    return map;
+  };
+
+  /**
+   * Extract per-question evidence from a single response, using inferred followups.
+   */
+  const extractRowForQuestion = (resp, targetQid, followupsMap) => {
+    const answers = Array.isArray(resp?.answers) ? resp.answers : [];
+    if (!answers.length) return null;
+
+    // count qid occurrences within this response (for option detection)
+    const qidCounts = {};
+    for (const a of answers) {
+      const qid = answerQid(a);
+      if (!qid) continue;
+      qidCounts[qid] = (qidCounts[qid] || 0) + 1;
+    }
+
+    const respSelectedOptions = Array.isArray(resp?.selected_options) ? resp.selected_options : [];
+
+    const targetAnswers = answers.filter((a) => answerQid(a) === targetQid);
+    if (!targetAnswers.length) return null;
+
+    const questionLabel = targetAnswers.find((a) => a?.question_text)?.question_text || null;
+
+    const isScoredQuestion = targetAnswers.some((a) => toNum0to10(a?.response) != null);
+
+    const nums = [];
+    const verbatims = [];
+    const options = [];
+
+    // numeric stats from target itself
+    for (const a of targetAnswers) {
+      const n = toNum0to10(a?.response);
+      if (n != null) nums.push(n);
+
+      // selected_options (if present)
+      if (Array.isArray(a?.selected_options)) {
+        options.push(...a.selected_options.filter(Boolean));
+      }
+
+      // sometimes a scored question also has direct text (rare) — keep it
+      if (!isScoredQuestion && isNonEmptyText(a?.response)) {
+        const raw = String(a.response).trim();
+        const looksOption = looksLikeOptionAnswer({
+          qid: targetQid,
+          raw,
+          qidCountInThisResponse: qidCounts[targetQid] || 0,
+          respSelectedOptions,
+        });
+        if (!looksOption) verbatims.push(raw);
+      }
+    }
+
+    // If scored, verbatims come from inferred follow-up question ids
+    if (isScoredQuestion) {
+      const followIds = Array.isArray(followupsMap?.[targetQid]) ? followupsMap[targetQid] : [];
+
+      for (const fid of followIds) {
+        const followAnswers = answers.filter((a) => answerQid(a) === String(fid));
+        for (const fa of followAnswers) {
+          const raw = fa?.response;
+          if (!isNonEmptyText(raw)) continue;
+          if (toNum0to10(raw) != null) continue;
+
+          const txt = String(raw).trim();
+
+          // exclude option-y things
+          const looksOption = looksLikeOptionAnswer({
+            qid: String(fid),
+            raw: txt,
+            qidCountInThisResponse: qidCounts[String(fid)] || 0,
+            respSelectedOptions,
+          });
+          if (!looksOption) verbatims.push(txt);
+        }
+      }
+    } else {
+      // If not scored, verbatims are the direct text answers for the target question_id
+      for (const a of targetAnswers) {
+        const raw = a?.response;
+        if (!isNonEmptyText(raw)) continue;
+        if (toNum0to10(raw) != null) continue;
+
+        const txt = String(raw).trim();
+
+        const looksOption = looksLikeOptionAnswer({
+          qid: targetQid,
+          raw: txt,
+          qidCountInThisResponse: qidCounts[targetQid] || 0,
+          respSelectedOptions,
+        });
+        if (!looksOption) verbatims.push(txt);
+      }
+    }
+
+    // de-dupe verbatims within this response
+    const uniqVerbatims = Array.from(new Set(verbatims)).filter(Boolean);
+
+    return {
+      response_id: resp?.response_id || null,
+      questionLabel,
+      submitted_at: resp?.submitted_at || resp?.created_at || resp?.updated_at || null,
+      contact_id: resp?.contact_id || resp?.contact?.id || null,
+      intercom_contact_url: resp?.intercom_contact_url || resp?.contact?.intercom_contact_url || null,
+      bucket: resp?.bucket || null,
+      score_0_10: resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
+      numericAnswers: nums,
+      verbatims: uniqVerbatims,
+      selected_options: options,
+      isScoredQuestion,
+    };
+  };
+
   // Fetch evidence for this question
   useEffect(() => {
     let cancelled = false;
@@ -138,7 +357,7 @@ export default function EnvolaQuestionDetail() {
       setState((s) => ({ ...s, loading: true, error: null }));
 
       try {
-        // 1) Get recent response_ids (same basis as your QA calculation)
+        // 1) Get recent response_ids
         const listQs = new URLSearchParams({
           content_id: String(CONTENT_ID),
           days: String(days),
@@ -149,9 +368,7 @@ export default function EnvolaQuestionDetail() {
         const { r: listR, j: listJ } = await fetchJson(listUrl);
 
         if (!listR.ok || !listJ?.ok) {
-          throw new Error(
-            listJ?.error || `closing-the-loop failed (${listR.status})`
-          );
+          throw new Error(listJ?.error || `closing-the-loop failed (${listR.status})`);
         }
 
         const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
@@ -167,96 +384,38 @@ export default function EnvolaQuestionDetail() {
               error: null,
               questionLabel: null,
               rows: [],
+              followupsMap: {},
             });
           }
           return;
         }
 
-        // 2) Fetch each response (concurrency limited)
-        const items = await mapPool(responseIds, 6, async (responseId) => {
-          const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
-            responseId
-          )}`;
+        // 2) Fetch each response (concurrency limited) -> keep FULL response payload
+        const fullResponses = (
+          await mapPool(responseIds, 6, async (responseId) => {
+            const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
+              responseId
+            )}`;
 
-          try {
-            const { r: respR, j: respJ } = await fetchJson(detailUrl);
-            if (!respR.ok || !respJ?.ok) return null;
+            try {
+              const { r: respR, j: respJ } = await fetchJson(detailUrl);
+              if (!respR.ok || !respJ?.ok) return null;
+              return respJ?.response || null;
+            } catch {
+              return null;
+            }
+          })
+        ).filter(Boolean);
 
-            const resp = respJ?.response || {};
-            const answers = Array.isArray(resp?.answers) ? resp.answers : [];
+        // 3) Infer follow-ups once from this sample
+        const followupsMap = inferFollowupsMap(fullResponses);
 
-            // Match by question_id primarily, fallback to question_text match
-            const matched = answers.filter((a) => {
-              const qid = a?.question_id != null ? String(a.question_id) : null;
-              if (qid && qid === String(questionId)) return true;
+        // 4) Extract rows for the currently selected question
+        const targetQid = String(questionId);
+        const rows = fullResponses
+          .map((resp) => extractRowForQuestion(resp, targetQid, followupsMap))
+          .filter(Boolean);
 
-              const qt = (a?.question_text || "").trim();
-              if (qt && decodeURIComponent(String(questionId)) === qt) return true;
-
-              return false;
-            });
-
-            if (!matched.length) return null;
-
-            // Collect evidence ONLY for this question
-            const nums = [];
-            const verbatims = [];
-            const options = [];
-
-            matched.forEach((a) => {
-              const raw = a?.response;
-
-              // numeric 0–10
-              const n = toNum0to10(raw);
-              if (n != null) {
-                nums.push(n);
-                return;
-              }
-
-              // free-text often arrives as a string response
-              if (typeof raw === "string" && raw.trim()) {
-                verbatims.push(raw.trim());
-              }
-
-              // sometimes it's an object
-              if (raw && typeof raw === "object") {
-                const maybeText = raw.text || raw.value || raw.comment || raw.verbatim || null;
-                if (maybeText && String(maybeText).trim()) {
-                  verbatims.push(String(maybeText).trim());
-                }
-              }
-
-              // selected options (if present)
-              if (Array.isArray(a?.selected_options)) {
-                options.push(...a.selected_options.filter(Boolean));
-              }
-            });
-
-            // Best-guess label
-            const questionLabel =
-              matched.find((a) => a?.question_text)?.question_text || null;
-
-            return {
-              response_id: responseId,
-              questionLabel,
-              submitted_at: resp?.submitted_at || resp?.created_at || resp?.updated_at || null,
-              contact_id: resp?.contact_id || resp?.contact?.id || null,
-              intercom_contact_url:
-                resp?.intercom_contact_url || resp?.contact?.intercom_contact_url || null,
-              bucket: resp?.bucket || null,
-              score_0_10: resp?.score_0_10 ?? resp?.nps_score ?? resp?.score ?? null,
-              numericAnswers: nums,
-              verbatims,
-              selected_options: options,
-            };
-          } catch {
-            return null;
-          }
-        });
-
-        const rows = items.filter(Boolean);
-
-        // Choose best label we saw
         const bestLabel = rows.find((r) => r.questionLabel)?.questionLabel || null;
 
         if (!cancelled) {
@@ -265,6 +424,7 @@ export default function EnvolaQuestionDetail() {
             error: null,
             questionLabel: bestLabel,
             rows,
+            followupsMap,
           });
         }
       } catch (e) {
@@ -274,6 +434,7 @@ export default function EnvolaQuestionDetail() {
             error: String(e?.message || e),
             questionLabel: null,
             rows: [],
+            followupsMap: {},
           });
         }
       }
@@ -284,7 +445,7 @@ export default function EnvolaQuestionDetail() {
     };
   }, [questionId, days, limit]);
 
-  // Derived stats (numeric only)
+  // Derived stats
   const stats = useMemo(() => {
     const allNums = state.rows.flatMap((r) => r.numericAnswers || []);
     const n = allNums.length;
@@ -305,19 +466,22 @@ export default function EnvolaQuestionDetail() {
   }, [state.rows]);
 
   const questionLooksScored = useMemo(() => {
-    // If we have any numeric answers, it’s scored
-    return stats.n > 0;
-  }, [stats.n]);
+    if (stats.n > 0) return true;
+    // fallback: if any extracted row flagged scored
+    return state.rows.some((r) => r?.isScoredQuestion);
+  }, [stats.n, state.rows]);
+
+  const followupIds = useMemo(() => {
+    const qid = String(questionId);
+    return Array.isArray(state.followupsMap?.[qid]) ? state.followupsMap[qid] : [];
+  }, [state.followupsMap, questionId]);
 
   const sampleVerbatims = useMemo(() => {
     const out = [];
     for (const r of state.rows) {
       for (const v of r.verbatims || []) {
-        const txt = String(v || "").trim();
-        if (!txt) continue;
-
         out.push({
-          text: txt,
+          text: v,
           submitted_at: r.submitted_at,
           contact_id: r.contact_id,
           intercom_contact_url: r.intercom_contact_url,
@@ -357,6 +521,13 @@ export default function EnvolaQuestionDetail() {
             </p>
           ) : null}
 
+          {questionLooksScored && followupIds.length ? (
+            <p className="mt-2 text-xs text-slate-400">
+              Inferred follow-up question(s):{" "}
+              <span className="text-slate-200">{followupIds.join(", ")}</span>
+            </p>
+          ) : null}
+
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
               to={localizePath("/envola", lang)}
@@ -366,9 +537,7 @@ export default function EnvolaQuestionDetail() {
             </Link>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-400">
-                {tr("common.window", "Window")}:
-              </span>
+              <span className="text-xs text-slate-400">{tr("common.window", "Window")}:</span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={days}
@@ -380,9 +549,7 @@ export default function EnvolaQuestionDetail() {
                 <option value={365}>365d</option>
               </select>
 
-              <span className="text-xs text-slate-400">
-                {tr("common.sample", "Sample")}:
-              </span>
+              <span className="text-xs text-slate-400">{tr("common.sample", "Sample")}:</span>
               <select
                 className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
                 value={limit}
@@ -412,8 +579,14 @@ export default function EnvolaQuestionDetail() {
 
           {!state.loading && !state.error && (
             <>
-              {/* NUMERIC SECTION (only if we have numeric answers) */}
-              {stats.n > 0 ? (
+              {stats.n === 0 ? (
+                <div className="rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+                  {tr(
+                    "envola.qd.noData",
+                    "No numeric answers found for this question in the selected window."
+                  )}
+                </div>
+              ) : (
                 <>
                   <div className="grid gap-4 md:grid-cols-3">
                     <StatCard
@@ -447,91 +620,74 @@ export default function EnvolaQuestionDetail() {
                             <div className="w-8 text-xs text-slate-300">{d.score}</div>
                             <div className="flex-1">
                               <div className="h-3 rounded-full bg-white/10 overflow-hidden">
-                                <div
-                                  className="h-3 bg-white/60"
-                                  style={{ width: `${pct}%` }}
-                                />
+                                <div className="h-3 bg-white/60" style={{ width: `${pct}%` }} />
                               </div>
                             </div>
-                            <div className="w-10 text-right text-xs text-slate-300">
-                              {d.count}
-                            </div>
+                            <div className="w-10 text-right text-xs text-slate-300">{d.count}</div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                </>
-              ) : (
-                <div className="rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
-                  {tr(
-                    "envola.qd.noNumeric",
-                    "No numeric (0–10) answers found for this question in the selected window."
-                  )}
-                </div>
-              )}
 
-              {/* VERBATIMS (always shown, independent of numeric stats) */}
-              <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="text-sm font-semibold text-white">
-                    {tr("envola.qd.verbatims", "Verbatims")}
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {tr("common.returned", "Returned")}: {sampleVerbatims.length}
-                  </div>
-                </div>
-
-                {sampleVerbatims.length ? (
-                  <div className="mt-4 space-y-3">
-                    {sampleVerbatims.map((v, idx) => (
-                      <div
-                        key={`${v.submitted_at || "x"}-${idx}`}
-                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                      >
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                          {v.score_0_10 != null ? (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
-                              Score: {v.score_0_10}/10
-                            </span>
-                          ) : null}
-                          <span className="text-slate-400">{prettyDate(v.submitted_at)}</span>
-
-                          {v.contact_id ? (
-                            <IntercomContactPill
-                              id={v.contact_id}
-                              url={v.intercom_contact_url}
-                            />
-                          ) : null}
-                        </div>
-
-                        <p className="mt-3 text-sm text-slate-200 leading-relaxed">
-                          “{v.text}”
-                        </p>
+                  {/* Verbatims */}
+                  <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="text-sm font-semibold text-white">
+                        {tr("envola.qd.verbatims", "Verbatims")}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-4 text-sm text-slate-300">
-                    {questionLooksScored
-                      ? tr(
-                          "envola.qd.noVerbatimsScored",
-                          "This is a scored (0–10) question. Free-text comments usually appear in follow-up questions (e.g. “Pourquoi ?”). None were found in this window."
-                        )
-                      : tr(
-                          "envola.qd.noVerbatims",
-                          "No free-text answers found for this question in the selected window."
-                        )}
-                  </div>
-                )}
-              </div>
+                      <div className="text-xs text-slate-400">
+                        {tr("common.returned", "Returned")}: {sampleVerbatims.length}
+                      </div>
+                    </div>
 
-              <div className="mt-4 text-xs text-slate-400">
-                {tr(
-                  "envola.qd.note",
-                  "This view is built from raw Intercom survey answers (private endpoints, login required)."
-                )}
-              </div>
+                    {sampleVerbatims.length ? (
+                      <div className="mt-4 space-y-3">
+                        {sampleVerbatims.map((v, idx) => (
+                          <div
+                            key={`${v.submitted_at || "x"}-${idx}`}
+                            className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                          >
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                              {v.score_0_10 != null ? (
+                                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                                  Score: {v.score_0_10}/10
+                                </span>
+                              ) : null}
+                              <span className="text-slate-400">{prettyDate(v.submitted_at)}</span>
+
+                              {v.contact_id ? (
+                                <IntercomContactPill id={v.contact_id} url={v.intercom_contact_url} />
+                              ) : null}
+                            </div>
+
+                            <p className="mt-3 text-sm text-slate-200 leading-relaxed">“{v.text}”</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-4 text-sm text-slate-300">
+                        {questionLooksScored
+                          ? tr(
+                              "envola.qd.noVerbatimsScored",
+                              "This is a scored (0–10) question. Free-text comments usually appear in follow-up questions (e.g. “Pourquoi ?”). None were found in this window."
+                            )
+                          : tr(
+                              "envola.qd.noVerbatims",
+                              "No free-text answers found for this question in the selected window."
+                            )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 text-xs text-slate-400">
+                    {tr(
+                      "envola.qd.note",
+                      "This view is built from raw Intercom survey answers (private endpoints, login required)."
+                    )}
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>

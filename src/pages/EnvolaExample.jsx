@@ -223,6 +223,9 @@ export default function EnvolaExample() {
   const [qaDays, setQaDays] = useState(90);
   const [qaLimit, setQaLimit] = useState(120);
   const [qa, setQa] = useState({ loading: false, data: null, error: null });
+  const [msDays, setMsDays] = useState(90);
+  const [msLimit, setMsLimit] = useState(120);
+  const [multi, setMulti] = useState({ loading: false, data: null, error: null });
 
   function selectedBucketsParam() {
     const selected = [];
@@ -530,6 +533,119 @@ export default function EnvolaExample() {
       cancelled = true;
     };
   }, [CONTENT_ID, qaDays, qaLimit]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchJson = async (url) => {
+      const r = await fetch(url, { credentials: "include" });
+      const t = await r.text();
+      let j;
+      try {
+        j = JSON.parse(t);
+      } catch {
+        throw new Error(
+          `Expected JSON from ${url} but got non-JSON (status ${r.status}). First chars: ${t
+            .slice(0, 160)
+            .replace(/\s+/g, " ")
+            .trim()}`
+        );
+      }
+      return { r, j };
+    };
+
+    (async () => {
+      setMulti({ loading: true, data: null, error: null });
+
+      try {
+        // 1) response id queue
+        const listQs = new URLSearchParams({
+          content_id: String(CONTENT_ID),
+          days: String(msDays),
+          limit: String(msLimit),
+        });
+
+        const listUrl = `/api/intercom/private/closing-the-loop?${listQs.toString()}`;
+        const { r: listR, j: listJ } = await fetchJson(listUrl);
+
+        if (!listR.ok || !listJ?.ok) {
+          throw new Error(listJ?.error || `closing-the-loop failed (${listR.status})`);
+        }
+
+        const queue = Array.isArray(listJ.queue) ? listJ.queue : [];
+        const responseIds = queue
+          .map((x) => x?.response_id)
+          .filter(Boolean)
+          .slice(0, msLimit);
+
+        if (!responseIds.length) {
+          if (!cancelled) setMulti({ loading: false, data: [], error: null });
+          return;
+        }
+
+        // 2) aggregate multi-select questions
+        const acc = new Map(); // qid -> { id, label, respondents, selections }
+
+        const fullResponses = (
+          await mapPool(responseIds, 6, async (responseId) => {
+            const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
+              responseId
+            )}`;
+            try {
+              const { r: respR, j: respJ } = await fetchJson(detailUrl);
+              if (!respR.ok || !respJ?.ok) return null;
+              return respJ?.response || null;
+            } catch {
+              return null;
+            }
+          })
+        ).filter(Boolean);
+
+        for (const resp of fullResponses) {
+          const answers = Array.isArray(resp?.answers) ? resp.answers : [];
+          if (!answers.length) continue;
+
+          // count qid occurrences *within this response*
+          const counts = {};
+          const labels = {};
+          for (const a of answers) {
+            const qid = a?.question_id != null ? String(a.question_id) : null;
+            if (!qid) continue;
+            counts[qid] = (counts[qid] || 0) + 1;
+            if (!labels[qid] && a?.question_text) labels[qid] = a.question_text;
+          }
+
+          // any qid repeated => multi-select for that response
+          for (const [qid, c] of Object.entries(counts)) {
+            if (c <= 1) continue;
+
+            const label = labels[qid] || `Question ${qid}`;
+            const cur = acc.get(qid) || { id: qid, label, respondents: 0, selections: 0 };
+
+            cur.respondents += 1;
+            cur.selections += c; // number of picked options in this response for that question
+
+            // keep nicest label if we see later
+            if (label && (!cur.label || cur.label.startsWith("Question "))) cur.label = label;
+
+            acc.set(qid, cur);
+          }
+        }
+
+        const data = Array.from(acc.values()).sort(
+          (a, b) => (b.respondents - a.respondents) || (b.selections - a.selections)
+        );
+
+        if (!cancelled) setMulti({ loading: false, data, error: null });
+      } catch (e) {
+        if (!cancelled) setMulti({ loading: false, data: null, error: String(e?.message || e) });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [CONTENT_ID, msDays, msLimit]);
 
   // Add near your other state/hooks
   const [chartMountReady, setChartMountReady] = useState(false);
@@ -1108,6 +1224,104 @@ export default function EnvolaExample() {
                 )}
               </div>
             </>
+          )}
+        </div>
+      </section>
+
+      {/* NEW: Multi-select questions (private) */}
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.multi.title", "Multi-select questions")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300 max-w-3xl">
+                {tr(
+                  "envola.multi.subtitle",
+                  "Questions where respondents can choose multiple options (requires login). Click to view details."
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Pill>{tr("envola.meta.private", "Private (login required)")}</Pill>
+              <Pill>
+                {tr("common.window", "Window")}: {msDays}d • {tr("common.sample", "Sample")}: {msLimit}
+              </Pill>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400">{tr("common.window", "Window")}:</span>
+            <select
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+              value={msDays}
+              onChange={(e) => setMsDays(Number(e.target.value))}
+            >
+              <option value={30}>30d</option>
+              <option value={90}>90d</option>
+              <option value={180}>180d</option>
+              <option value={365}>365d</option>
+            </select>
+
+            <span className="ml-2 text-xs text-slate-400">{tr("common.sample", "Sample")}:</span>
+            <select
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+              value={msLimit}
+              onChange={(e) => setMsLimit(Number(e.target.value))}
+            >
+              <option value={60}>60</option>
+              <option value={120}>120</option>
+              <option value={160}>160</option>
+              <option value={240}>240</option>
+            </select>
+          </div>
+
+          {multi.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+          {!multi.loading && multi.error && (
+            <p className="mt-6 text-sm text-red-300">
+              {tr("common.error", "Error")}: {multi.error}
+            </p>
+          )}
+
+          {!multi.loading && !multi.error && Array.isArray(multi.data) && multi.data.length === 0 && (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5 text-sm text-slate-300">
+              {tr("envola.multi.none", "No multi-select questions detected in this window.")}
+            </div>
+          )}
+
+          {!multi.loading && !multi.error && Array.isArray(multi.data) && multi.data.length > 0 && (
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+              <table className="w-full border-collapse">
+                <thead className="bg-white/5">
+                  <tr className="text-left text-xs text-slate-300">
+                    <th className="px-4 py-3">{tr("common.question", "Question")}</th>
+                    <th className="px-4 py-3">{tr("common.respondents", "Respondents")}</th>
+                    <th className="px-4 py-3">{tr("common.selections", "Selections")}</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {multi.data.map((row) => (
+                    <tr
+                      key={row.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openQuestionDetail({ id: row.id })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") openQuestionDetail({ id: row.id });
+                      }}
+                      className="border-t border-white/10 cursor-pointer hover:bg-white/5 focus:outline-none focus:bg-white/5"
+                    >
+                      <td className="px-4 py-3 text-white">{row.label}</td>
+                      <td className="px-4 py-3 text-slate-200">{row.respondents}</td>
+                      <td className="px-4 py-3 text-slate-200">{row.selections}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </section>

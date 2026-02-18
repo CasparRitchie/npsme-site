@@ -186,7 +186,10 @@ export default function EnvolaQuestionDetail() {
 
               return false;
             });
-
+            if (matched.length) {
+              console.log("QD matched answer sample:", matched[0]);
+              console.log("QD response-level verbatims sample:", resp?.verbatims?.[0]);
+            }
             if (!matched.length) return null;
 
             // Collect evidence from ALL matched answers in this response
@@ -194,15 +197,47 @@ export default function EnvolaQuestionDetail() {
             const verbatims = [];
             const options = [];
 
+            // 1) Some payloads store verbatims at response-level (like your public drilldown)
+            const respVerbatims = Array.isArray(resp?.verbatims) ? resp.verbatims : [];
+            for (const v of respVerbatims) {
+              const vQid = v?.question_id != null ? String(v.question_id) : null;
+              const vQtext = (v?.question_text || "").trim();
+              const targetId = String(questionId);
+
+              const matches =
+                (vQid && vQid === targetId) ||
+                (vQtext && decodeURIComponent(targetId) === vQtext);
+
+              if (matches && v?.text && String(v.text).trim()) {
+                verbatims.push(String(v.text).trim());
+              }
+            }
+
+            // 2) Answers: numeric + text (text often lives in answer.response as a string)
             matched.forEach((a) => {
-              const n = toNum0to10(a?.response);
-              if (n != null) nums.push(n);
+              const raw = a?.response;
 
-              // Some answers may carry free-text (depending on your payload shape)
-              const txt = a?.text || a?.verbatim || a?.comment || null;
-              if (txt && String(txt).trim()) verbatims.push(String(txt).trim());
+              // numeric 0–10
+              const n = toNum0to10(raw);
+              if (n != null) {
+                nums.push(n);
+              } else {
+                // free-text often arrives as a string response
+                if (typeof raw === "string" && raw.trim()) {
+                  verbatims.push(raw.trim());
+                }
 
-              // Some answers may carry selected options
+                // sometimes it's an object
+                if (raw && typeof raw === "object") {
+                  const maybeText =
+                    raw.text || raw.value || raw.comment || raw.verbatim || null;
+                  if (maybeText && String(maybeText).trim()) {
+                    verbatims.push(String(maybeText).trim());
+                  }
+                }
+              }
+
+              // selected options (if present)
               if (Array.isArray(a?.selected_options)) {
                 options.push(...a.selected_options.filter(Boolean));
               }

@@ -1828,6 +1828,128 @@ export function createIntercomRouter() {
     }
   });
 
+  // Private: Multi-select questions (aggregated)
+  // Detects from r.answers so we keep question context.
+  router.get("/private/nps-multi-select", requirePrivateCookie, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || "").trim();
+      if (!contentId) return res.status(400).json({ ok: false, error: "content_id is required" });
+
+      const days = clampInt(req.query.days, 90, 1, 3650);
+      const sample = clampInt(req.query.sample, 120, 10, 5000);
+      const limit = clampInt(req.query.limit, 50, 1, 500);
+
+      const store = await getCachedNpsResponsesStore(); // fast
+      const rows = Array.isArray(store.rows) ? store.rows : [];
+
+      const since = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      // key -> aggregated stats
+      const byQ = new Map();
+
+      function qKey(a) {
+        const qid = a?.question_id != null ? String(a.question_id) : "";
+        const qt = String(a?.question_text || "").trim();
+        return qid ? `id:${qid}` : qt ? `text:${qt}` : null;
+      }
+
+      function ensureAgg(a) {
+        const key = qKey(a);
+        if (!key) return null;
+
+        const qid = a?.question_id != null ? Number(a.question_id) : null;
+        const qt = String(a?.question_text || "").trim() || "—";
+
+        const cur =
+          byQ.get(key) || {
+            question_id: qid,
+            question_text: qt,
+            responses: 0,
+            option_counts: {},     // option -> count
+            example_response_ids: [],
+            latest_submitted_at: null,
+          };
+
+        // Keep best text
+        if (cur.question_text === "—" && qt !== "—") cur.question_text = qt;
+
+        byQ.set(key, cur);
+        return cur;
+      }
+
+      // Filter to window + sample newest
+      const windowed = rows
+        .filter((r) => String(r?.content_id || "") === contentId)
+        .map((r) => ({ ...r, _t: Date.parse(r?.submitted_at || "") }))
+        .filter((r) => Number.isFinite(r._t) && r._t >= since)
+        .sort((a, b) => b._t - a._t)
+        .slice(0, sample);
+
+      for (const r of windowed) {
+        const answers = Array.isArray(r?.answers) ? r.answers : [];
+        for (const a of answers) {
+          const raw = a?.response;
+          if (raw == null) continue;
+
+          const s = String(raw).trim();
+          if (!s) continue;
+
+          // Only treat as multi-select if we are confident it is
+          const isMulti =
+            isBenefitsMultiSelectAnswer(a) || looksLikeBenefitMultiSelect(s);
+
+          if (!isMulti) continue;
+
+          const opts = splitMultiSelect(s);
+          if (opts.length < 2) continue; // must actually be multi-choice
+
+          const agg = ensureAgg(a);
+          if (!agg) continue;
+
+          agg.responses += 1;
+          agg.latest_submitted_at =
+            agg.latest_submitted_at && String(agg.latest_submitted_at) > String(r.submitted_at || "")
+              ? agg.latest_submitted_at
+              : (r.submitted_at || agg.latest_submitted_at);
+
+          for (const opt of opts) {
+            agg.option_counts[opt] = (agg.option_counts[opt] || 0) + 1;
+          }
+
+          if (agg.example_response_ids.length < 25 && r.response_id) {
+            agg.example_response_ids.push(r.response_id);
+          }
+        }
+      }
+
+      const items = Array.from(byQ.values())
+        .map((q) => ({
+          question_id: q.question_id,
+          question_text: q.question_text,
+          responses: q.responses,
+          latest_submitted_at: q.latest_submitted_at,
+          options: Object.entries(q.option_counts)
+            .map(([option, count]) => ({ option, count }))
+            .sort((a, b) => b.count - a.count),
+          example_response_ids: q.example_response_ids,
+        }))
+        .sort((a, b) => b.responses - a.responses)
+        .slice(0, limit);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        window_days: days,
+        sample,
+        returned: items.length,
+        items,
+        questions: items, // alias (handy if frontend uses a different name)
+      });
+    } catch (err) {
+      console.error("[intercom] private nps-multi-select error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
 
   // -----------------------

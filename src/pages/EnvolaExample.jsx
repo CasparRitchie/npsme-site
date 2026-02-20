@@ -676,28 +676,34 @@ export default function EnvolaExample() {
           const answers = extractAnswersFromResponse(resp);
           if (!answers.length) continue;
 
-          for (const a of answers) {
-            const qid = a?.question_id != null ? String(a.question_id) : null;
+          // 1) count occurrences of each qid within this response
+          const qidCounts = new Map();
+          for (const ans of answers) {
+            const qid = ans?.question_id != null ? String(ans.question_id) : null;
             if (!qid) continue;
+            qidCounts.set(qid, (qidCounts.get(qid) || 0) + 1);
+          }
 
-            const label = a?.question_text || `Question ${qid}`;
+          // 2) aggregate: if a qid appears 2+ times in same response, treat as multi-select
+          for (const [qid, count] of qidCounts.entries()) {
+            if (count < 2) continue;
 
-            // Multi-select often comes as:
-            // - response: ["A","B"]
-            // - response: { options: [...] }
-            // - selected_options: [...]
-            const selections =
-              (Array.isArray(a?.response) ? a.response : null) ||
-              (Array.isArray(a?.selected_options) ? a.selected_options : null) ||
-              (Array.isArray(a?.response?.options) ? a.response.options : null) ||
-              (Array.isArray(a?.options) ? a.options : null);
+            // pick a label from any matching answer
+            const sample = answers.find((x) => String(x?.question_id) === qid);
+            const label = sample?.question_text || `Question ${qid}`;
 
-            if (!selections || selections.length < 2) continue;
+            // selections = the distinct responses for that qid within this response
+            const selections = answers
+              .filter((x) => String(x?.question_id) === qid)
+              .map((x) => (x?.response == null ? "" : String(x.response).trim()))
+              .filter(Boolean);
+
+            const uniq = Array.from(new Set(selections));
+            if (uniq.length < 2) continue;
 
             const cur = acc.get(qid) || { id: qid, label, respondents: 0, selections: 0 };
-
             cur.respondents += 1;
-            cur.selections += selections.length;
+            cur.selections += uniq.length;
 
             if (label && (!cur.label || cur.label.startsWith("Question "))) cur.label = label;
 

@@ -75,6 +75,27 @@ const INTERCOM_NPS_RESPONSES_PATH =
 const INTERCOM_SURVEY_STATS_PATH =
   process.env.DROPBOX_INTERCOM_SURVEY_STATS_PATH || "/npsme/intercom/survey-stats.jsonl";
 
+// -----------------------
+// In-memory caches (per Node process)
+// -----------------------
+// Avoid re-downloading + re-parsing large JSONL files for endpoints that are called many times
+// in a single page load (e.g. /private/nps-response is hit 40+ times for "Average score per question").
+// TTL keeps it fresh enough for dashboards.
+const __cache = {
+  npsResponses: {
+    fetchedAt: 0,
+    ttlMs: 30_000,
+    rows: null,
+    byResponseId: null,
+  },
+};
+
+function invalidateNpsResponsesCache() {
+  __cache.npsResponses.fetchedAt = 0;
+  __cache.npsResponses.rows = null;
+  __cache.npsResponses.byResponseId = null;
+}
+
 let cachedDropboxToken = null;
 let cachedDropboxExpiry = 0; // seconds
 let lastNpsIngestAt = 0;
@@ -256,6 +277,9 @@ async function writeDropboxFile(path, contents) {
     const text = await res.text().catch(() => "");
     throw new Error(`Dropbox upload failed (${res.status}): ${text}`);
   }
+
+  // If we updated the clean NPS store, invalidate the in-memory cache.
+  if (path === INTERCOM_NPS_RESPONSES_PATH) invalidateNpsResponsesCache();
 }
 
 async function appendDropboxJsonl(path, obj) {
@@ -263,6 +287,30 @@ async function appendDropboxJsonl(path, obj) {
   const line = JSON.stringify(obj) + "\n";
   const next = existing ? (existing.replace(/\n*$/, "") + "\n" + line) : line;
   await writeDropboxFile(path, next);
+}
+
+// Cached reader for the clean NPS responses JSONL store.
+// This is the single biggest win for the Envola example page because the UI
+// can call /private/nps-response dozens of times; without a cache we would
+// download + parse the entire JSONL file for each request.
+async function getCachedNpsResponsesStore({ force = false } = {}) {
+  const c = __cache.npsResponses;
+  const fresh = c.rows && c.byResponseId && Date.now() - c.fetchedAt < c.ttlMs;
+  if (!force && fresh) return c;
+
+  const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+  const rows = text ? parseJsonl(text) : [];
+
+  const byResponseId = new Map();
+  for (const r of rows) {
+    const rid = r?.response_id ? String(r.response_id) : null;
+    if (rid) byResponseId.set(rid, r);
+  }
+
+  c.fetchedAt = Date.now();
+  c.rows = rows;
+  c.byResponseId = byResponseId;
+  return c;
 }
 
 function verifyIntercomSignature({ rawBody, signatureHeader, clientSecret }) {
@@ -1607,10 +1655,9 @@ export function createIntercomRouter() {
       const responseId = String(req.query.response_id || "").trim();
       if (!responseId) return res.status(400).json({ ok: false, error: "response_id is required" });
 
-      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-      const rows = parseJsonl(text);
-
-      const r = rows.find((x) => String(x?.response_id || "") === responseId);
+      // Cached read + O(1) lookup (huge win when this route is called 40+ times on one page).
+      const store = await getCachedNpsResponsesStore();
+      const r = store.byResponseId?.get(responseId) || null;
       if (!r) return res.status(404).json({ ok: false, error: "Response not found" });
 
       const appId = process.env.ENVOLA_INTERCOM_APP_ID || "";
@@ -1634,6 +1681,48 @@ export function createIntercomRouter() {
       });
     } catch (err) {
       console.error("[intercom] private nps-response error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // Batch version to reduce waterfall requests (useful for "Average score per question").
+  // Usage: /private/nps-responses?response_ids=189616:...,189616:...
+  router.get("/private/nps-responses", requirePrivateCookie, async (req, res) => {
+    try {
+      const idsRaw = String(req.query.response_ids || "").trim();
+      if (!idsRaw) return res.status(400).json({ ok: false, error: "response_ids is required" });
+
+      const ids = idsRaw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 300); // guardrail
+
+      const store = await getCachedNpsResponsesStore();
+      const items = ids.map((id) => store.byResponseId?.get(id) || null).filter(Boolean);
+
+      const appId = process.env.ENVOLA_INTERCOM_APP_ID || "";
+      const enriched = items.map((r) => {
+        const intercom_contact_url =
+          appId && r.contact_id ? `https://app.intercom.com/a/apps/${appId}/users/${r.contact_id}` : null;
+
+        return {
+          response_id: r.response_id || null,
+          content_id: r.content_id || null,
+          receipt_id: r.receipt_id || null,
+          submitted_at: r.submitted_at || null,
+          score_0_10: r.score_0_10 ?? null,
+          bucket: scoreBucket(r.score_0_10),
+          selected_options: Array.isArray(r.selected_options) ? r.selected_options : [],
+          verbatims: Array.isArray(r.verbatims) ? r.verbatims : [],
+          answers: Array.isArray(r.answers) ? r.answers : [],
+          intercom_contact_url,
+        };
+      });
+
+      return res.json({ ok: true, requested: ids.length, returned: enriched.length, items: enriched });
+    } catch (err) {
+      console.error("[intercom] private nps-responses(batch) error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }
   });
@@ -1732,6 +1821,8 @@ export function createIntercomRouter() {
       return res.status(500).json({ ok: false, error: e?.message || String(e) });
     }
   });
+
+  
 
   // -----------------------
   // Everything below requires an Intercom access token

@@ -128,6 +128,31 @@ async function mapPool(items, concurrency, mapper) {
   return results;
 }
 
+/**
+ * Fetch many /private/nps-response payloads in a few batch calls.
+ * Requires backend route: GET /api/intercom/private/nps-responses?response_ids=...
+ */
+async function fetchNpsResponsesBatch(responseIds, chunkSize = 50) {
+  const out = [];
+  const ids = Array.isArray(responseIds) ? responseIds.filter(Boolean) : [];
+
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize);
+
+    const url = `/api/intercom/private/nps-responses?response_ids=${encodeURIComponent(
+      chunk.join(",")
+    )}`;
+
+    const r = await fetch(url, { credentials: "include" });
+    const j = await r.json();
+
+    if (r.ok && j?.ok && Array.isArray(j.responses)) {
+      out.push(...j.responses.filter(Boolean));
+    }
+  }
+
+  return out;
+}
 
 export default function EnvolaExample() {
   const navigate = useNavigate();
@@ -477,18 +502,14 @@ export default function EnvolaExample() {
           return;
         }
 
-        // 2) aggregate per question_id (use question_text as label)
+        // 2) fetch responses in batches (dramatically fewer HTTP calls)
+        const fullResponses = await fetchNpsResponsesBatch(responseIds);
+
+        // 3) aggregate per question_id (use question_text as label)
         const acc = new Map(); // key -> { label, sum, count }
 
-        for (const responseId of responseIds) {
-          const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
-            responseId
-          )}`;
-
-          const { r: respR, j: respJ } = await fetchJson(detailUrl);
-          if (!respR.ok || !respJ?.ok) continue;
-
-          const answers = respJ?.response?.answers;
+        for (const resp of fullResponses) {
+          const answers = resp?.answers;
           if (!Array.isArray(answers)) continue;
 
           for (const a of answers) {
@@ -586,20 +607,7 @@ export default function EnvolaExample() {
         // 2) aggregate multi-select questions
         const acc = new Map(); // qid -> { id, label, respondents, selections }
 
-        const fullResponses = (
-          await mapPool(responseIds, 6, async (responseId) => {
-            const detailUrl = `/api/intercom/private/nps-response?response_id=${encodeURIComponent(
-              responseId
-            )}`;
-            try {
-              const { r: respR, j: respJ } = await fetchJson(detailUrl);
-              if (!respR.ok || !respJ?.ok) return null;
-              return respJ?.response || null;
-            } catch {
-              return null;
-            }
-          })
-        ).filter(Boolean);
+        const fullResponses = await fetchNpsResponsesBatch(responseIds);
 
         for (const resp of fullResponses) {
           const answers = Array.isArray(resp?.answers) ? resp.answers : [];

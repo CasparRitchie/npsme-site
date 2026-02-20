@@ -144,11 +144,29 @@ async function fetchNpsResponsesBatch(responseIds, chunkSize = 50) {
     )}`;
 
     const r = await fetch(url, { credentials: "include" });
-    const j = await r.json();
+    const t = await r.text();
 
-    if (r.ok && j?.ok && Array.isArray(j.responses)) {
-      out.push(...j.responses.filter(Boolean));
+    let j;
+    try {
+      j = JSON.parse(t);
+    } catch {
+      throw new Error(
+        `Batch endpoint returned non-JSON (status ${r.status}). First chars: ${t
+          .slice(0, 160)
+          .replace(/\s+/g, " ")
+          .trim()}`
+      );
     }
+
+    if (!r.ok || !j?.ok) {
+      throw new Error(j?.error || `Batch endpoint failed (${r.status})`);
+    }
+
+    if (!Array.isArray(j.responses)) {
+      throw new Error(`Batch endpoint ok=true but responses is not an array`);
+    }
+
+    out.push(...j.responses.filter(Boolean));
   }
 
   return out;
@@ -445,6 +463,19 @@ export default function EnvolaExample() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bucketFilter.promoters, bucketFilter.passives, bucketFilter.detractors]);
 
+  function extractAnswersFromResponse(resp) {
+    // Support a few likely shapes:
+    // 1) { answers: [...] }
+    // 2) { response: { answers: [...] } }
+    // 3) { item: { answers: [...] } }
+    // 4) { data: { answers: [...] } } (just in case)
+    if (Array.isArray(resp?.answers)) return resp.answers;
+    if (Array.isArray(resp?.response?.answers)) return resp.response.answers;
+    if (Array.isArray(resp?.item?.answers)) return resp.item.answers;
+    if (Array.isArray(resp?.data?.answers)) return resp.data.answers;
+    return [];
+  }
+
   // NEW: QUESTION AVERAGES (private/logged-in)
   useEffect(() => {
     let cancelled = false;
@@ -509,11 +540,19 @@ export default function EnvolaExample() {
         const acc = new Map(); // key -> { label, sum, count }
 
         for (const resp of fullResponses) {
-          const answers = resp?.answers;
-          if (!Array.isArray(answers)) continue;
+          const answers = extractAnswersFromResponse(resp);
+          if (!answers.length) continue;
 
           for (const a of answers) {
-            const num = toNum0to10(a?.response);
+            // Intercom answer payloads vary; try a few likely fields
+            const raw =
+              a?.response ??
+              a?.value ??
+              a?.answer ??
+              a?.numeric_value ??
+              a?.nps_rating;
+
+            const num = toNum0to10(raw);
             if (num == null) continue;
 
             const qid = a?.question_id ?? a?.question_text ?? "unknown";
@@ -523,7 +562,6 @@ export default function EnvolaExample() {
             cur.sum += num;
             cur.count += 1;
 
-            // keep the nicest label if we see it later
             if (label && (!cur.label || cur.label.startsWith("Question "))) {
               cur.label = label;
             }
@@ -610,30 +648,32 @@ export default function EnvolaExample() {
         const fullResponses = await fetchNpsResponsesBatch(responseIds);
 
         for (const resp of fullResponses) {
-          const answers = Array.isArray(resp?.answers) ? resp.answers : [];
+          const answers = extractAnswersFromResponse(resp);
           if (!answers.length) continue;
 
-          // count qid occurrences *within this response*
-          const counts = {};
-          const labels = {};
           for (const a of answers) {
             const qid = a?.question_id != null ? String(a.question_id) : null;
             if (!qid) continue;
-            counts[qid] = (counts[qid] || 0) + 1;
-            if (!labels[qid] && a?.question_text) labels[qid] = a.question_text;
-          }
 
-          // any qid repeated => multi-select for that response
-          for (const [qid, c] of Object.entries(counts)) {
-            if (c <= 1) continue;
+            const label = a?.question_text || `Question ${qid}`;
 
-            const label = labels[qid] || `Question ${qid}`;
+            // Multi-select often comes as:
+            // - response: ["A","B"]
+            // - response: { options: [...] }
+            // - selected_options: [...]
+            const selections =
+              (Array.isArray(a?.response) ? a.response : null) ||
+              (Array.isArray(a?.selected_options) ? a.selected_options : null) ||
+              (Array.isArray(a?.response?.options) ? a.response.options : null) ||
+              (Array.isArray(a?.options) ? a.options : null);
+
+            if (!selections || selections.length < 2) continue;
+
             const cur = acc.get(qid) || { id: qid, label, respondents: 0, selections: 0 };
 
             cur.respondents += 1;
-            cur.selections += c; // number of picked options in this response for that question
+            cur.selections += selections.length;
 
-            // keep nicest label if we see later
             if (label && (!cur.label || cur.label.startsWith("Question "))) cur.label = label;
 
             acc.set(qid, cur);

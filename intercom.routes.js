@@ -1720,7 +1720,13 @@ export function createIntercomRouter() {
         };
       });
 
-      return res.json({ ok: true, requested: ids.length, returned: enriched.length, items: enriched });
+      return res.json({
+        ok: true,
+        requested: ids.length,
+        returned: enriched.length,
+        responses: enriched, // ✅ what the frontend expects
+        // items: enriched,  // optional: keep temporarily if anything else uses it
+      });
     } catch (err) {
       console.error("[intercom] private nps-responses(batch) error", err);
       return res.status(500).json({ ok: false, error: err.message });
@@ -1822,7 +1828,7 @@ export function createIntercomRouter() {
     }
   });
 
-  
+
 
   // -----------------------
   // Everything below requires an Intercom access token

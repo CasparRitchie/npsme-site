@@ -136,6 +136,21 @@ async function fetchNpsResponsesBatch(responseIds, chunkSize = 50) {
   const out = [];
   const ids = Array.isArray(responseIds) ? responseIds.filter(Boolean) : [];
 
+  const pickArray = (j) => {
+    if (Array.isArray(j?.responses)) return j.responses;
+    if (Array.isArray(j?.data?.responses)) return j.data.responses;
+    if (Array.isArray(j?.result?.responses)) return j.result.responses;
+    if (Array.isArray(j?.payload?.responses)) return j.payload.responses;
+    if (Array.isArray(j?.items)) return j.items;
+    if (Array.isArray(j?.results)) return j.results;
+
+    // Sometimes devs return { responses: { ... } } by accident
+    if (Array.isArray(j?.responses?.responses)) return j.responses.responses;
+    if (Array.isArray(j?.responses?.items)) return j.responses.items;
+
+    return null;
+  };
+
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
 
@@ -162,11 +177,21 @@ async function fetchNpsResponsesBatch(responseIds, chunkSize = 50) {
       throw new Error(j?.error || `Batch endpoint failed (${r.status})`);
     }
 
-    if (!Array.isArray(j.responses)) {
-      throw new Error(`Batch endpoint ok=true but responses is not an array`);
+    const arr = pickArray(j);
+
+    if (!Array.isArray(arr)) {
+      const topKeys = j && typeof j === "object" ? Object.keys(j).slice(0, 20) : [];
+      const responsesType =
+        j?.responses === null ? "null" : Array.isArray(j?.responses) ? "array" : typeof j?.responses;
+
+      throw new Error(
+        `Batch endpoint ok=true but could not find an array. ` +
+          `Top keys: ${topKeys.join(", ")}. ` +
+          `typeof responses: ${responsesType}`
+      );
     }
 
-    out.push(...j.responses.filter(Boolean));
+    out.push(...arr.filter(Boolean));
   }
 
   return out;

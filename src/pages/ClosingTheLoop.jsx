@@ -107,18 +107,19 @@ function AnswerTable({ rows, compact = false }) {
     }
 
     return Array.from(by.values())
-    .map((g) => ({ ...g, values: Array.from(new Set(g.values)) }))
-    .sort((a, b) => {
-      const qa = Number(a.question_id);
-      const qb = Number(b.question_id);
-
-      if (Number.isFinite(qa) && Number.isFinite(qb)) {
-        return qa - qb; // ascending numeric sort
-      }
-
-      // fallback if no numeric ID
-      return (a.question_text || "").localeCompare(b.question_text || "");
-    });
+      .map((g) => ({
+        ...g,
+        values: Array.from(new Set(g.values)),
+        // store original position from rows array
+        _order: rows.findIndex(
+          (r) =>
+            String(r?.question_id) === String(g.question_id) &&
+            (r?.question_text || "") === (g.question_text || "")
+        ),
+      }))
+      .sort((a, b) => {
+        return a._order - b._order;
+      });
   }, [rows]);
 
   return (

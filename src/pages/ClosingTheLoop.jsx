@@ -107,13 +107,18 @@ function AnswerTable({ rows, compact = false }) {
     }
 
     return Array.from(by.values())
-      .map((g) => ({ ...g, values: Array.from(new Set(g.values)) }))
-      .sort((a, b) => {
-        const ta = a.answered_at ? new Date(a.answered_at).getTime() : 0;
-        const tb = b.answered_at ? new Date(b.answered_at).getTime() : 0;
-        if (ta !== tb) return ta - tb;
-        return (a.question_text || "").localeCompare(b.question_text || "");
-      });
+    .map((g) => ({ ...g, values: Array.from(new Set(g.values)) }))
+    .sort((a, b) => {
+      const qa = Number(a.question_id);
+      const qb = Number(b.question_id);
+
+      if (Number.isFinite(qa) && Number.isFinite(qb)) {
+        return qa - qb; // ascending numeric sort
+      }
+
+      // fallback if no numeric ID
+      return (a.question_text || "").localeCompare(b.question_text || "");
+    });
   }, [rows]);
 
   return (

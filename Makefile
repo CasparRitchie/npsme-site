@@ -57,14 +57,25 @@ deploy: build
 	git push origin main
 
 
+
 # ==========================================
 # CONTEXT PACK (ChatGPT helper)
 # ==========================================
 
-context-pack:
+.PHONY: context-pack clean-context-pack
+
+# Rebuild automatically if any of these change
+CONTEXT_SRC := $(shell find src -type f 2>/dev/null)
+CONTEXT_BACKEND := server.js intercom.routes.js
+CONTEXT_CONFIG := package.json Procfile $(wildcard vite.config.*)
+
+context-pack: context-pack.zip
+	@echo "✅ context-pack.zip created"
+
+context-pack.zip: $(CONTEXT_SRC) $(CONTEXT_BACKEND) $(CONTEXT_CONFIG)
 	@echo "Creating context pack..."
-	rm -rf context-pack
-	mkdir context-pack
+	rm -rf context-pack context-pack.zip
+	mkdir -p context-pack
 
 	# tree
 	tree -I 'node_modules|dist|build|.git|coverage' -a > context-pack/tree.txt
@@ -83,7 +94,9 @@ context-pack:
 
 	zip -r context-pack.zip context-pack > /dev/null
 
-	@echo "✅ context-pack.zip created"
+clean-context-pack:
+	rm -rf context-pack context-pack.zip
+	@echo "🧹 cleaned context-pack artifacts"
 
 
 # ==========================================

@@ -1,4 +1,5 @@
 .
+├── .DS_Store
 ├── .github
 │   └── workflows
 │       └── keepalive.yml
@@ -6,30 +7,19 @@
 ├── .nvmrc
 ├── .vscode
 │   └── settings.json
-├── Makefile
-├── Procfile
 ├── context-pack
-│   ├── ARCHITECTURE_NOTES.md
-│   ├── App.jsx
-│   ├── all-js-files.txt
-│   ├── frontend-files.txt
-│   ├── intercom.routes.js
-│   ├── main.jsx
-│   ├── package.json
-│   ├── routesManifest.js
-│   ├── routesRegistry.js
-│   ├── server.js
 │   └── tree.txt
-├── context-pack.zip
 ├── envola.txt
 ├── index.html
 ├── intercom-test.html
 ├── intercom.routes.js
 ├── invitations.csv
+├── Makefile
 ├── note
 ├── package-lock.json
 ├── package.json
 ├── postcss.config.js
+├── Procfile
 ├── public
 │   ├── favicon-16.png
 │   ├── favicon-192.png
@@ -49,45 +39,42 @@
 │   ├── robots.txt
 │   ├── site.webmanifest
 │   └── sitemap.xml
-├── repo.zip
 ├── repo_tree.txt
+├── repo.zip
 ├── server.js
 ├── site_brain.tgz
 ├── src
 │   ├── About.jsx
 │   ├── App.jsx
 │   ├── Book.jsx
-│   ├── CxPulseSample.jsx
-│   ├── ImpactPage.jsx
-│   ├── Layout.jsx
-│   ├── MilestoneNps.jsx
-│   ├── NpsMeLanding.jsx
-│   ├── NpsSurveyProgramme.jsx
-│   ├── Privacy.jsx
-│   ├── Products.jsx
-│   ├── SocialListening.jsx
-│   ├── Terms.jsx
 │   ├── components
+│   │   ├── auth
+│   │   │   └── RequireAuth.jsx
 │   │   ├── DemoResultsPanel.jsx
 │   │   ├── EnvolaLayout.jsx
 │   │   ├── Navbar.jsx
 │   │   ├── NpsBucketStackedColumns.jsx
 │   │   ├── NpsTimeseriesChart.jsx
 │   │   ├── PageHeader.jsx
+│   │   ├── QuestionAveragesBarChart.jsx
 │   │   ├── ScrollToTop.jsx
 │   │   ├── Seo.jsx
 │   │   ├── SiteFooter.jsx
 │   │   ├── SocialTicker.jsx
-│   │   ├── WordCloud.jsx
-│   │   └── auth
-│   │       └── RequireAuth.jsx
+│   │   └── WordCloud.jsx
+│   ├── CxPulseSample.jsx
 │   ├── data
 │   │   └── socialReports.js
 │   ├── i18n
 │   │   ├── LanguageContext.jsx
 │   │   ├── pathHelpers.js
 │   │   └── translations.js
+│   ├── ImpactPage.jsx
+│   ├── Layout.jsx
 │   ├── main.jsx
+│   ├── MilestoneNps.jsx
+│   ├── NpsMeLanding.jsx
+│   ├── NpsSurveyProgramme.jsx
 │   ├── pages
 │   │   ├── BlogClosingTheLoop.jsx
 │   │   ├── BlogDataVisualisation.jsx
@@ -105,6 +92,7 @@
 │   │   ├── DemoSurveyPage.jsx
 │   │   ├── DemoThankYou.jsx
 │   │   ├── EnvolaExample.jsx
+│   │   ├── EnvolaQuestionDetail.jsx
 │   │   ├── IntercomNpsAnalytics.jsx
 │   │   ├── LiveInvitationSurvey.jsx
 │   │   ├── LiveResultsPanel.jsx
@@ -117,14 +105,18 @@
 │   │   ├── SocialListeningReport.jsx
 │   │   ├── WhatIsNps.jsx
 │   │   └── WhyNpsMe.jsx
+│   ├── Privacy.jsx
+│   ├── Products.jsx
 │   ├── routesManifest.js
 │   ├── routesRegistry.js
 │   ├── scripts
 │   │   └── generate-sitemap.mjs
-│   └── styles.css
+│   ├── SocialListening.jsx
+│   ├── styles.css
+│   └── Terms.jsx
 ├── tailwind.config.js
 ├── utils
 │   └── nps.js
 └── vite.config.js
 
-14 directories, 114 files
+14 directories, 106 files

@@ -235,7 +235,7 @@ export default function ClosingTheLoop() {
   const [detailError, setDetailError] = React.useState("");
   const [detail, setDetail] = React.useState(null);
   // Raw answers view (modal)
-  const [rawView, setRawView] = React.useState("relevant"); // relevant | all
+  const [rawView, setRawView] = React.useState("all"); // relevant | all
   const [rawShowJson, setRawShowJson] = React.useState(false);
 
 
@@ -339,7 +339,7 @@ export default function ClosingTheLoop() {
   const openResponse = React.useCallback(async (responseId) => {
     if (!responseId) return;
     setOpenId(responseId);
-    setRawView("relevant");
+    setRawView("all");
     setRawShowJson(false);
     setDetail(null);
     setDetailError("");
@@ -809,8 +809,7 @@ export default function ClosingTheLoop() {
                               onClick={() => setRawView("all")}
                               className={
                                 rawView === "all"
-                                  ? "rounded-xl border border-indigo-500/25 bg-indigo-500/15 px-3 py-2 text-xs font-semibold text-indigo-100"
-                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
+                                ? "rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-100"                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
                               }
                             >
                               All questions

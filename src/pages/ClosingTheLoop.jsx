@@ -5,6 +5,44 @@ import { translations } from "../i18n/translations";
 
 const DEFAULT_CONTENT_ID = "189616";
 
+const SURVEY_ORDER_BY_CONTENT_ID = {
+  "189616": [
+    "612560",
+    "612565",
+    "612566",
+    "612567",
+    "612568",
+    "612570",
+    "612600",
+    "612571",
+    "612601",
+    "612602",
+    "612603",
+  ],
+};
+
+function sortAnswersForSurvey({ contentId, answers }) {
+  const order = SURVEY_ORDER_BY_CONTENT_ID[String(contentId)] || [];
+  const idx = new Map(order.map((qid, i) => [String(qid), i]));
+
+  // stable sort: keep original order for ties (e.g. multi-select repeats)
+  return (Array.isArray(answers) ? answers : [])
+    .map((a, originalIndex) => ({ a, originalIndex }))
+    .sort((x, y) => {
+      const ax = String(x.a?.question_id ?? "");
+      const ay = String(y.a?.question_id ?? "");
+
+      const ix = idx.has(ax) ? idx.get(ax) : 9999;
+      const iy = idx.has(ay) ? idx.get(ay) : 9999;
+
+      if (ix !== iy) return ix - iy;
+
+      // fallback: keep Intercom’s original sequence
+      return x.originalIndex - y.originalIndex;
+    })
+    .map((x) => x.a);
+}
+
 function formatDate(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -787,11 +825,15 @@ export default function ClosingTheLoop() {
                     });
 
                     const answersToShow = rawView === "all" ? allAnswers : relevantAnswers;
+                    const sortedAnswers = sortAnswersForSurvey({
+                      contentId: detail?.content_id || DEFAULT_CONTENT_ID,
+                      answers: answersToShow,
+                    });
 
                     return (
                       <Disclosure
                         title={labels.modalRaw}
-                        right={`${answersToShow.length} shown`}
+                        right={`${sortedAnswers.length} shown`}
                         defaultOpen={false}
                       >
                         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -815,7 +857,8 @@ export default function ClosingTheLoop() {
                               onClick={() => setRawView("all")}
                               className={
                                 rawView === "all"
-                                ? "rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-100"                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
+                                  ? "rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-100"
+                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
                               }
                             >
                               All questions
@@ -844,8 +887,8 @@ export default function ClosingTheLoop() {
                         </div>
 
                         <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                          {answersToShow.length ? (
-                            <AnswerTable rows={answersToShow} compact={false} />
+                          {sortedAnswers.length ? (
+                            <AnswerTable rows={sortedAnswers} compact={false} />
                           ) : (
                             <div className="text-sm text-slate-300">No answers found.</div>
                           )}
@@ -853,7 +896,7 @@ export default function ClosingTheLoop() {
 
                         {rawShowJson ? (
                           <pre className="mt-4 max-h-80 overflow-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-slate-200">
-                            {JSON.stringify(detail.answers || [], null, 2)}
+                            {JSON.stringify(sortedAnswers, null, 2)}
                           </pre>
                         ) : null}
                       </Disclosure>

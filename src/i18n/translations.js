@@ -6,7 +6,7 @@ export const TRANSLATIONS = {
       bookDiscovery: "Book discovery",
       languageEn: "EN",
       languageFr: "FR",
-    
+
     admin: "Admin",
     logout: "Log out",
 },
@@ -21,9 +21,9 @@ export const TRANSLATIONS = {
       dataAutomation: "Data & Automation",
       socialListening: "Social Listening",
       blog: "Blog",
+      blogIntercomNpsBeyondScore: "Intercom NPS: beyond the score",
       cxCockpit: "CX Cockpit",
-    
-    closingTheLoop: "Closing the loop",
+      closingTheLoop: "Closing the loop",
 },
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
@@ -688,6 +688,89 @@ export const TRANSLATIONS = {
           "NPS Me can design ethical sampling logic, DNS governance and communication frameworks that protect the integrity - and credibility - of your NPS programme.",
         btnServices: "Explore NPS Me services",
         btnBook: "Book a discovery call",
+      },
+    },
+    blogIntercomNps: {
+      seo: {
+        title: "Intercom NPS: Beyond the Score | NPS Me",
+        description:
+          "How to turn Intercom NPS surveys into actionable customer intelligence: themes, drivers, prioritisation, and close-the-loop.",
+      },
+      header: { tag: "Intercom NPS" },
+      h1: "Intercom NPS: Beyond the Score",
+      intro:
+        "Intercom makes it easy to collect NPS, but most teams get stuck at dashboards and anecdotes. Here’s how to turn NPS into a practical decision system.",
+      ctaPrimary: "See the Intercom NPS Analytics page",
+      ctaSecondary: "Book a CX consult",
+
+      sections: {
+        context: {
+          title: "The situation",
+          p1:
+            "A fast-growing product team was collecting NPS responses through Intercom and getting valuable verbatims — but the signal was buried in volume.",
+          p2:
+            "They didn’t want another metric. They wanted clarity: what drives promoters, what creates detractors, and what to fix first.",
+        },
+        problem: {
+          title: "Why standard Intercom NPS reporting isn’t enough",
+          p1:
+            "Most NPS programs fail for predictable reasons. The score arrives, a few comments get shared, and then the thread goes cold.",
+          bullets: [
+            "Comments are read manually (or not at all) once volume grows",
+            "Themes aren’t tracked over time, so progress is guesswork",
+            "Volume gets confused with impact — teams chase noise",
+            "Ownership is unclear, so nothing gets closed",
+          ],
+          p2:
+            "In short: the feedback exists, but the system to turn it into decisions is missing.",
+        },
+        approach: {
+          title: "The approach: a lightweight intelligence layer",
+          p1:
+            "The solution isn’t to replace Intercom. It’s to keep Intercom for collection and add a layer that structures feedback into themes and drivers.",
+          p2:
+            "That layer makes feedback searchable, measurable, and prioritised — and connects it to a close-the-loop workflow.",
+        },
+        data: {
+          title: "From raw verbatims to themes and drivers",
+          p1:
+            "We take Intercom completions (score + comment + timestamp) and standardise them into a clean dataset, then build analysis on top.",
+          p2:
+            "The goal is not fancy AI for its own sake — it’s practical CX intelligence that product and support teams can use daily.",
+        },
+        outcomes: {
+          title: "What changes once you have the layer",
+          p1:
+            "Once feedback is structured, teams stop arguing from anecdotes and start acting from evidence.",
+          bullets: [
+            "Recurring themes become visible (and measurable)",
+            "Promoter drivers and detractor drivers become clear",
+            "Priorities focus on impact, not noise",
+            "You can track whether fixes actually moved sentiment",
+          ],
+          p2:
+            "That’s when NPS becomes useful: not as a score, but as a feedback-to-action engine.",
+        },
+      },
+
+      callouts: {
+        insight: {
+          title: "Key insight",
+          body:
+            "The score is only the symptom. The verbatims contain the causes — but only if you treat them like a dataset, not a reading exercise.",
+        },
+        privacy: {
+          title: "Privacy and safety",
+          body:
+            "You can build powerful analytics while keeping data safe: aggregated views for demos, controlled access for internal detail, and no personal data in public dashboards.",
+        },
+        next: {
+          title: "Want to see the full Intercom NPS analytics setup?",
+          body:
+            "We’ve built a full Intercom-compatible workflow: clean ingestion, structured analysis, and dashboards designed for decisions and close-the-loop.",
+          button1: "Explore Intercom NPS Analytics",
+          button2: "Book a CX consult",
+        },
       },
     },
     blogSendingNpsBeforeChristmas: {
@@ -2615,7 +2698,7 @@ export const TRANSLATIONS = {
       bookDiscovery: "Prendre rendez-vous",
       languageEn: "EN",
       languageFr: "FR",
-    
+
     admin: "Admin",
     logout: "Déconnexion",
 },
@@ -2630,9 +2713,9 @@ export const TRANSLATIONS = {
       dataAutomation: "Données & automatisation",
       socialListening: "Social listening",
       blog: "Blog",
+      blogIntercomNpsBeyondScore: "Intercom NPS : au-delà du score",
       cxCockpit: "Cockpit CX",
-    
-    closingTheLoop: "Boucler la boucle",
+      closingTheLoop: "Boucler la boucle",
 },
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
@@ -3267,6 +3350,89 @@ export const TRANSLATIONS = {
           "NPS Me peut concevoir une logique d’échantillonnage éthique, une gouvernance DNS et des cadres de communication qui protègent l’intégrité - et la crédibilité - de votre programme NPS.",
         btnServices: "Découvrir les services NPS Me",
         btnBook: "Réserver un appel découverte",
+      },
+    },
+    blogIntercomNps: {
+      seo: {
+        title: "Intercom NPS : au-delà du score | NPS Me",
+        description:
+          "Transformer les enquêtes NPS Intercom en intelligence actionnable : thèmes, drivers, priorisation et close-the-loop.",
+      },
+      header: { tag: "Intercom NPS" },
+      h1: "Intercom NPS : au-delà du score",
+      intro:
+        "Intercom facilite la collecte du NPS, mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment en faire un vrai système de décision.",
+      ctaPrimary: "Voir la page Analyse NPS Intercom",
+      ctaSecondary: "Réserver un échange CX",
+
+      sections: {
+        context: {
+          title: "Le contexte",
+          p1:
+            "Une équipe produit en forte croissance collectait des réponses NPS via Intercom avec des verbatims utiles — mais le signal était noyé dans le volume.",
+          p2:
+            "Ils ne voulaient pas un indicateur de plus. Ils voulaient de la clarté : ce qui fait les promoteurs, ce qui crée les détracteurs, et quoi corriger en priorité.",
+        },
+        problem: {
+          title: "Pourquoi le reporting NPS “standard” ne suffit pas",
+          p1:
+            "La plupart des programmes NPS échouent pour des raisons classiques : le score arrive, quelques verbatims circulent, puis tout retombe.",
+          bullets: [
+            "Les commentaires sont lus à la main (ou plus du tout) quand le volume augmente",
+            "Les thèmes ne sont pas suivis dans le temps : difficile de mesurer le progrès",
+            "On confond volume et impact : on chasse le bruit",
+            "Pas d’ownership clair : rien ne se clôture",
+          ],
+          p2:
+            "Bref : le feedback existe, mais il manque le système pour le transformer en décisions.",
+        },
+        approach: {
+          title: "L’approche : une couche d’intelligence légère",
+          p1:
+            "Le but n’est pas de remplacer Intercom. On garde Intercom pour la collecte et on ajoute une couche qui structure le feedback en thèmes et drivers.",
+          p2:
+            "Cette couche rend le feedback searchable, mesurable, priorisé — et relié à un close-the-loop opérationnel.",
+        },
+        data: {
+          title: "Des verbatims bruts aux thèmes et drivers",
+          p1:
+            "On part des complétions Intercom (score + commentaire + horodatage) pour constituer un dataset propre, puis on construit l’analyse dessus.",
+          p2:
+            "L’objectif n’est pas de faire de l’IA “pour faire de l’IA”, mais une intelligence CX utile au quotidien pour produit et support.",
+        },
+        outcomes: {
+          title: "Ce qui change quand la couche existe",
+          p1:
+            "Quand le feedback est structuré, on arrête les débats à partir d’anecdotes et on agit à partir de faits.",
+          bullets: [
+            "Les thèmes récurrents deviennent visibles (et mesurables)",
+            "Les drivers des promoteurs et des détracteurs deviennent clairs",
+            "La priorisation se fait par impact, pas par bruit",
+            "On mesure si les correctifs ont vraiment changé le sentiment",
+          ],
+          p2:
+            "C’est là que le NPS devient utile : pas comme un score, mais comme un moteur feedback → action.",
+        },
+      },
+
+      callouts: {
+        insight: {
+          title: "L’idée clé",
+          body:
+            "Le score n’est qu’un symptôme. Les verbatims contiennent les causes — à condition de les traiter comme un dataset, pas comme une lecture ponctuelle.",
+        },
+        privacy: {
+          title: "Confidentialité et sécurité",
+          body:
+            "On peut faire des analytics puissants tout en protégeant les données : vues agrégées pour démos, accès contrôlé pour le détail, et zéro donnée personnelle en public.",
+        },
+        next: {
+          title: "Envie de voir la configuration complète Analyse NPS Intercom ?",
+          body:
+            "Nous avons un workflow complet compatible Intercom : ingestion propre, analyse structurée, et dashboards conçus pour décider et boucler la boucle.",
+          button1: "Découvrir Analyse NPS Intercom",
+          button2: "Réserver un échange CX",
+        },
       },
     },
     blogSendingNpsBeforeChristmas: {

@@ -24,14 +24,15 @@ import SocialListening from "./SocialListening";
 import SocialListeningIndex from "./pages/SocialListeningIndex";
 import SocialListeningReport from "./pages/SocialListeningReport";
 
-import BlogIndex from "./pages/BlogIndex";
+import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
+import BlogDataVisualisation from "./pages/BlogDataVisualisation";
 import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
-import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
-import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
+import BlogIndex from "./pages/BlogIndex";
+import BlogIntercomNpsBeyondTheScore from "./pages/BlogIntercomNpsBeyondTheScore";
 import BlogSendingNpsBeforeChristmas from "./pages/BlogSendingNpsBeforeChristmas";
+import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
 import BlogWhyNpsIsntImproving from "./pages/BlogWhyNpsIsntImproving";
-import BlogDataVisualisation from "./pages/BlogDataVisualisation";
 
 import DataAutomationPage from "./pages/DataAutomationPage";
 import DemoSurvey from "./pages/DemoSurvey";
@@ -127,26 +128,29 @@ const COMPONENTS = {
   "/blog": BlogIndex,
   "/fr/blog": BlogIndex,
 
+  "/blog/closing-the-loop": BlogClosingTheLoop,
+  "/fr/blog/closing-the-loop": BlogClosingTheLoop,
+
+  "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
+  "/fr/blog/data-visualisation-cx-insights": BlogDataVisualisation,
+
   "/blog/ethical-surveys": BlogEthicalSurveys,
   "/fr/blog/ethical-surveys": BlogEthicalSurveys,
 
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
   "/fr/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
 
-  "/blog/closing-the-loop": BlogClosingTheLoop,
-  "/fr/blog/closing-the-loop": BlogClosingTheLoop,
-
-  "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
-  "/fr/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+  "/blog/intercom-nps-beyond-the-score": BlogIntercomNpsBeyondTheScore,
+  "/blog/intercom-nps-au-dela-du-score": BlogIntercomNpsBeyondTheScore,
 
   "/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
   "/fr/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
 
+  "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+  "/fr/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+
   "/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
   "/fr/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
-
-  "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
-  "/fr/blog/data-visualisation-cx-insights": BlogDataVisualisation,
 
   // CX data
   "/cx-pulse-sample": CxPulseSample,

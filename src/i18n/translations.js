@@ -218,7 +218,7 @@ export const TRANSLATIONS = {
         intercomNps: {
           title: "Intercom NPS: Beyond the Score",
           excerpt:
-            "Intercom makes it easy to collect NPS — but most teams get stuck at dashboards and anecdotes. Here’s how to turn feedback into themes, drivers, and prioritised action.",
+            "Intercom makes it easy to collect NPS - but most teams get stuck at dashboards and anecdotes. Here’s how to turn feedback into themes, drivers, and prioritised action.",
         },
         whatToDoWithNps: {
           title: "What To Do With Your NPS Scores",
@@ -709,7 +709,7 @@ export const TRANSLATIONS = {
       h1: "Running Net Promoter Score inside your customer messaging platform",
 
       intro:
-        "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. In this implementation, we explored a different approach — running NPS directly inside the customer messaging platform already used for daily communication.",
+        "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. In this implementation, we explored a different approach - running NPS directly inside the customer messaging platform already used for daily communication.",
 
       sections: {
         context: {
@@ -2893,7 +2893,7 @@ export const TRANSLATIONS = {
         intercomNps: {
           title: "Intercom NPS : au-delà du score",
           excerpt:
-            "Intercom facilite la collecte du NPS — mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment transformer le feedback en thèmes, drivers et actions prioritaires.",
+            "Intercom facilite la collecte du NPS - mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment transformer le feedback en thèmes, drivers et actions prioritaires.",
         },
       },
     },

@@ -65,8 +65,8 @@ const POSTS = [
   },
   {
     slug: "intercom-nps-beyond-the-score",
-    titleKey: "blog.posts.intercomNpsBeyondScore.title",
-    excerptKey: "blog.posts.intercomNpsBeyondScore.excerpt",
+    titleKey: "blog.posts.intercomNps.title",
+    excerptKey: "blog.posts.intercomNps.excerpt",
     date: "2026-03-05",
     readTime: "7 min",
     tags: ["Intercom", "NPS", "Analytics"],

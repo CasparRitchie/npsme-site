@@ -697,64 +697,71 @@ export const TRANSLATIONS = {
     },
     blogIntercomNps: {
       seo: {
-        title: "Intercom NPS: Beyond the Score | NPS Me",
+        title: "Running NPS inside your customer messaging platform | NPS Me",
         description:
-          "How to turn Intercom NPS surveys into actionable customer intelligence: themes, drivers, prioritisation, and close-the-loop.",
+          "A practical approach to running Net Promoter Score inside a customer messaging platform. Learn how to capture feedback, analyse verbatims, and turn NPS into operational insight.",
       },
-      header: { tag: "Intercom NPS" },
-      h1: "Intercom NPS: Beyond the Score",
+
+      header: {
+        tag: "CX Implementation",
+      },
+
+      h1: "Running Net Promoter Score inside your customer messaging platform",
+
       intro:
-        "Intercom makes it easy to collect NPS, but most teams get stuck at dashboards and anecdotes. Here’s how to turn NPS into a practical decision system.",
-      ctaPrimary: "See the Intercom NPS Analytics page",
-      ctaSecondary: "Book a CX consult",
+        "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. In this implementation, we explored a different approach — running NPS directly inside the customer messaging platform already used for daily communication.",
 
       sections: {
         context: {
-          title: "The situation",
+          title: "The context",
           p1:
-            "A fast-growing product team was collecting NPS responses through Intercom and getting valuable verbatims — but the signal was buried in volume.",
+            "Many NPS programmes start with a traditional survey tool. Customers receive an email, click a link, complete a form, and the results appear in a reporting dashboard.",
           p2:
-            "They didn’t want another metric. They wanted clarity: what drives promoters, what creates detractors, and what to fix first.",
+            "While this approach works in theory, it often creates friction. The survey feels disconnected from the product experience, response rates remain low, and feedback rarely reaches operational teams quickly enough to make a difference.",
         },
+
         problem: {
-          title: "Why standard Intercom NPS reporting isn’t enough",
+          title: "Why traditional NPS setups often struggle",
           p1:
-            "Most NPS programs fail for predictable reasons. The score arrives, a few comments get shared, and then the thread goes cold.",
+            "In many organisations, NPS is implemented as a separate reporting system rather than an operational feedback loop.",
           bullets: [
-            "Comments are read manually (or not at all) once volume grows",
-            "Themes aren’t tracked over time, so progress is guesswork",
-            "Volume gets confused with impact — teams chase noise",
-            "Ownership is unclear, so nothing gets closed",
+            "Customers receive survey emails from unfamiliar platforms",
+            "Feedback is analysed in dashboards rather than operational tools",
+            "Teams react slowly to negative feedback",
+            "Insights rarely translate into product or service improvements",
           ],
           p2:
-            "In short: the feedback exists, but the system to turn it into decisions is missing.",
+            "The result is a programme that measures sentiment but struggles to drive meaningful change.",
         },
+
         approach: {
-          title: "The approach: a lightweight intelligence layer",
+          title: "A different approach: embed NPS into the messaging platform",
           p1:
-            "The solution isn’t to replace Intercom. It’s to keep Intercom for collection and add a layer that structures feedback into themes and drivers.",
+            "Instead of introducing another survey tool, we explored integrating NPS directly into the messaging platform already used for customer communication.",
           p2:
-            "That layer makes feedback searchable, measurable, and prioritised — and connects it to a close-the-loop workflow.",
+            "Customers were already interacting with the company through in-app chat, lifecycle messages, and support conversations. By embedding the NPS question directly into this environment, feedback became a natural extension of the customer conversation.",
         },
+
         data: {
-          title: "From raw verbatims to themes and drivers",
+          title: "From feedback messages to structured insight",
           p1:
-            "We take Intercom completions (score + comment + timestamp) and standardise them into a clean dataset, then build analysis on top.",
+            "Responses collected through the messaging platform were captured alongside contextual data such as time, interaction stage, and customer activity.",
           p2:
-            "The goal is not fancy AI for its own sake — it’s practical CX intelligence that product and support teams can use daily.",
+            "Qualitative responses were then analysed to identify recurring themes, enabling teams to understand what truly drives promoters, passives, and detractors.",
         },
+
         outcomes: {
-          title: "What changes once you have the layer",
+          title: "What changed after implementation",
           p1:
-            "Once feedback is structured, teams stop arguing from anecdotes and start acting from evidence.",
+            "Once feedback became part of the operational workflow, several improvements emerged.",
           bullets: [
-            "Recurring themes become visible (and measurable)",
-            "Promoter drivers and detractor drivers become clear",
-            "Priorities focus on impact, not noise",
-            "You can track whether fixes actually moved sentiment",
+            "Higher response rates due to lower survey friction",
+            "Faster follow-up with detractors",
+            "Better visibility of recurring product or service issues",
+            "Clearer prioritisation of improvement initiatives",
           ],
           p2:
-            "That’s when NPS becomes useful: not as a score, but as a feedback-to-action engine.",
+            "Instead of being just another dashboard metric, NPS became a practical decision-making tool.",
         },
       },
 
@@ -762,19 +769,21 @@ export const TRANSLATIONS = {
         insight: {
           title: "Key insight",
           body:
-            "The score is only the symptom. The verbatims contain the causes — but only if you treat them like a dataset, not a reading exercise.",
+            "The score itself is only the starting point. The real value comes from analysing the reasons behind the score and integrating that feedback into everyday decision-making.",
         },
+
         privacy: {
-          title: "Privacy and safety",
+          title: "Privacy and data protection",
           body:
-            "You can build powerful analytics while keeping data safe: aggregated views for demos, controlled access for internal detail, and no personal data in public dashboards.",
+            "Customer feedback programmes must respect privacy and data protection requirements. When sharing insights publicly, aggregated themes and anonymised examples ensure that customer data remains protected.",
         },
+
         next: {
-          title: "Want to see the full Intercom NPS analytics setup?",
+          title: "Want to see how this works in practice?",
           body:
-            "We’ve built a full Intercom-compatible workflow: clean ingestion, structured analysis, and dashboards designed for decisions and close-the-loop.",
-          button1: "Explore Intercom NPS Analytics",
-          button2: "Book a CX consult",
+            "NPS Me provides implementation frameworks for designing, analysing, and operationalising Net Promoter Score programmes.",
+          button1: "Explore Intercom NPS analytics",
+          button2: "Book a CX consultation",
         },
       },
     },
@@ -3363,64 +3372,71 @@ export const TRANSLATIONS = {
     },
     blogIntercomNps: {
       seo: {
-        title: "Intercom NPS : au-delà du score | NPS Me",
+        title: "Mettre en place le NPS dans une plateforme de messagerie client | NPS Me",
         description:
-          "Transformer les enquêtes NPS Intercom en intelligence actionnable : thèmes, drivers, priorisation et close-the-loop.",
+          "Une approche pratique pour déployer le Net Promoter Score dans une plateforme de messagerie client et transformer le feedback en intelligence opérationnelle.",
       },
-      header: { tag: "Intercom NPS" },
-      h1: "Intercom NPS : au-delà du score",
+
+      header: {
+        tag: "Implémentation CX",
+      },
+
+      h1: "Mettre en place le Net Promoter Score dans une plateforme de messagerie client",
+
       intro:
-        "Intercom facilite la collecte du NPS, mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment en faire un vrai système de décision.",
-      ctaPrimary: "Voir la page Analyse NPS Intercom",
-      ctaSecondary: "Réserver un échange CX",
+        "De nombreuses entreprises souhaitent mesurer le Net Promoter Score (NPS), mais se posent une question simple : où l’enquête doit-elle réellement se trouver ? Les outils d’enquête traditionnels sont souvent déconnectés de l’expérience produit. Dans ce projet, nous avons exploré une approche différente : intégrer le NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
 
       sections: {
         context: {
           title: "Le contexte",
           p1:
-            "Une équipe produit en forte croissance collectait des réponses NPS via Intercom avec des verbatims utiles — mais le signal était noyé dans le volume.",
+            "La plupart des programmes NPS commencent avec un outil d’enquête classique. Les clients reçoivent un email, cliquent sur un lien, remplissent un formulaire, et les résultats apparaissent dans un tableau de bord.",
           p2:
-            "Ils ne voulaient pas un indicateur de plus. Ils voulaient de la clarté : ce qui fait les promoteurs, ce qui crée les détracteurs, et quoi corriger en priorité.",
+            "En pratique, cette approche crée souvent de la friction. L’enquête semble déconnectée de l’expérience produit, les taux de réponse restent faibles, et le feedback atteint rarement les équipes opérationnelles assez vite pour agir.",
         },
+
         problem: {
-          title: "Pourquoi le reporting NPS “standard” ne suffit pas",
+          title: "Pourquoi les approches NPS traditionnelles montrent leurs limites",
           p1:
-            "La plupart des programmes NPS échouent pour des raisons classiques : le score arrive, quelques verbatims circulent, puis tout retombe.",
+            "Dans beaucoup d’organisations, le NPS est utilisé comme un outil de reporting plutôt que comme un système opérationnel de feedback.",
           bullets: [
-            "Les commentaires sont lus à la main (ou plus du tout) quand le volume augmente",
-            "Les thèmes ne sont pas suivis dans le temps : difficile de mesurer le progrès",
-            "On confond volume et impact : on chasse le bruit",
-            "Pas d’ownership clair : rien ne se clôture",
+            "Les clients reçoivent des emails d’enquête provenant de plateformes inconnues",
+            "Le feedback est analysé dans des dashboards plutôt que dans les outils opérationnels",
+            "Les équipes réagissent lentement aux retours négatifs",
+            "Les insights se traduisent rarement en améliorations concrètes",
           ],
           p2:
-            "Bref : le feedback existe, mais il manque le système pour le transformer en décisions.",
+            "Le programme mesure alors le sentiment client, mais peine à produire un réel impact.",
         },
+
         approach: {
-          title: "L’approche : une couche d’intelligence légère",
+          title: "Une approche différente : intégrer le NPS dans la messagerie client",
           p1:
-            "Le but n’est pas de remplacer Intercom. On garde Intercom pour la collecte et on ajoute une couche qui structure le feedback en thèmes et drivers.",
+            "Plutôt que d’ajouter un nouvel outil, nous avons exploré l’intégration du NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
           p2:
-            "Cette couche rend le feedback searchable, mesurable, priorisé — et relié à un close-the-loop opérationnel.",
+            "Les clients interagissaient déjà via le chat in-app, les messages automatisés et les conversations support. En intégrant la question NPS dans cet environnement, le feedback devient une extension naturelle de la conversation.",
         },
+
         data: {
-          title: "Des verbatims bruts aux thèmes et drivers",
+          title: "Transformer les messages en insight structuré",
           p1:
-            "On part des complétions Intercom (score + commentaire + horodatage) pour constituer un dataset propre, puis on construit l’analyse dessus.",
+            "Les réponses collectées dans la plateforme de messagerie sont capturées avec leur contexte : moment de l’interaction, étape du parcours client et activité produit.",
           p2:
-            "L’objectif n’est pas de faire de l’IA “pour faire de l’IA”, mais une intelligence CX utile au quotidien pour produit et support.",
+            "Les réponses qualitatives sont ensuite analysées pour identifier les thèmes récurrents et comprendre ce qui génère des promoteurs, des passifs ou des détracteurs.",
         },
+
         outcomes: {
-          title: "Ce qui change quand la couche existe",
+          title: "Ce qui change après l’implémentation",
           p1:
-            "Quand le feedback est structuré, on arrête les débats à partir d’anecdotes et on agit à partir de faits.",
+            "Lorsque le feedback devient opérationnel, plusieurs améliorations apparaissent rapidement.",
           bullets: [
-            "Les thèmes récurrents deviennent visibles (et mesurables)",
-            "Les drivers des promoteurs et des détracteurs deviennent clairs",
-            "La priorisation se fait par impact, pas par bruit",
-            "On mesure si les correctifs ont vraiment changé le sentiment",
+            "Des taux de réponse plus élevés grâce à une expérience plus fluide",
+            "Une réaction plus rapide face aux détracteurs",
+            "Une meilleure visibilité sur les problèmes récurrents",
+            "Une priorisation plus claire des améliorations produit ou service",
           ],
           p2:
-            "C’est là que le NPS devient utile : pas comme un score, mais comme un moteur feedback → action.",
+            "Le NPS cesse d’être un simple indicateur et devient un outil concret d’aide à la décision.",
         },
       },
 
@@ -3428,18 +3444,20 @@ export const TRANSLATIONS = {
         insight: {
           title: "L’idée clé",
           body:
-            "Le score n’est qu’un symptôme. Les verbatims contiennent les causes — à condition de les traiter comme un dataset, pas comme une lecture ponctuelle.",
+            "Le score n’est qu’un point de départ. La vraie valeur vient de l’analyse des raisons derrière ce score et de l’intégration de ce feedback dans les décisions quotidiennes.",
         },
+
         privacy: {
-          title: "Confidentialité et sécurité",
+          title: "Confidentialité et protection des données",
           body:
-            "On peut faire des analytics puissants tout en protégeant les données : vues agrégées pour démos, accès contrôlé pour le détail, et zéro donnée personnelle en public.",
+            "Les programmes de feedback doivent respecter les règles de confidentialité. Lors de démonstrations publiques, les insights sont présentés sous forme agrégée afin de protéger les données individuelles.",
         },
+
         next: {
-          title: "Envie de voir la configuration complète Analyse NPS Intercom ?",
+          title: "Envie de voir cette approche en pratique ?",
           body:
-            "Nous avons un workflow complet compatible Intercom : ingestion propre, analyse structurée, et dashboards conçus pour décider et boucler la boucle.",
-          button1: "Découvrir Analyse NPS Intercom",
+            "NPS Me propose des frameworks pour concevoir, analyser et opérationnaliser les programmes Net Promoter Score.",
+          button1: "Découvrir l’analyse NPS Intercom",
           button2: "Réserver un échange CX",
         },
       },

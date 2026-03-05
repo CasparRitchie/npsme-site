@@ -141,7 +141,7 @@ const COMPONENTS = {
   "/fr/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
 
   "/blog/intercom-nps-beyond-the-score": BlogIntercomNpsBeyondTheScore,
-  "/blog/intercom-nps-au-dela-du-score": BlogIntercomNpsBeyondTheScore,
+  "/fr/blog/intercom-nps-beyond-the-score": BlogIntercomNpsBeyondTheScore,
 
   "/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
   "/fr/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,

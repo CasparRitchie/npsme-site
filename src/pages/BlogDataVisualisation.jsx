@@ -2,11 +2,18 @@
 import React from "react";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
+import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 
 export default function BlogCxDataVisualisation() {
   const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
+
+  const BASE = "blogCxDataViz";
+  const DATE_PUBLISHED = "2025-12-08";
+  const DATE_MODIFIED = "2025-12-08";
 
   const title = translations(lang, "blogCxDataViz.seo.baseTitle");
   const description = translations(lang, "blogCxDataViz.seo.description");
@@ -17,6 +24,28 @@ export default function BlogCxDataVisualisation() {
         path="/blog/cx-data-visualisation"
         title={`${title} | NPS Me`}
         description={description}
+      />
+
+      {/* BlogPosting JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: tr(`${BASE}.h1`, tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post"))),
+            description: tr(`${BASE}.seo.description`, ""),
+            datePublished: DATE_PUBLISHED,
+            dateModified: DATE_MODIFIED,
+            inLanguage: lang,
+            author: { "@type": "Person", name: "Caspar Ritchie" },
+            publisher: { "@type": "Organization", name: "NPS Me" },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://npsme.com" + location.pathname,
+            },
+          }),
+        }}
       />
 
       {/* Header */}

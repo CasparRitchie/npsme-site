@@ -29,6 +29,9 @@ export default function BlogIntercomNpsBeyondTheScore() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
+  const BASE = "blogIntercomNps";
+  const DATE_PUBLISHED = "2026-03-05";
+  const DATE_MODIFIED = "2026-03-05";
 
   const bullets = tr("blogIntercomNps.sections.problem.bullets", []);
   const outcomes = tr("blogIntercomNps.sections.outcomes.bullets", []);
@@ -43,6 +46,28 @@ export default function BlogIntercomNpsBeyondTheScore() {
         altPaths={{
           en: "/blog/intercom-nps-beyond-the-score",
           fr: "/fr/blog/intercom-nps-au-dela-du-score",
+        }}
+      />
+
+      {/* BlogPosting JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: tr(`${BASE}.h1`, tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post"))),
+            description: tr(`${BASE}.seo.description`, ""),
+            datePublished: DATE_PUBLISHED,
+            dateModified: DATE_MODIFIED,
+            inLanguage: lang,
+            author: { "@type": "Person", name: "Caspar Ritchie" },
+            publisher: { "@type": "Organization", name: "NPS Me" },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://npsme.com" + location.pathname,
+            },
+          }),
         }}
       />
 

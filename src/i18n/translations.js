@@ -9,7 +9,7 @@ export const TRANSLATIONS = {
 
     admin: "Admin",
     logout: "Log out",
-},
+    },
     routes: {
       products: "Products",
       whyNpsMe: "Why NPS Me",
@@ -24,7 +24,7 @@ export const TRANSLATIONS = {
       blogIntercomNpsBeyondScore: "Intercom NPS: beyond the score",
       cxCockpit: "CX Cockpit",
       closingTheLoop: "Closing the loop",
-},
+    },
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
       seoDescription:
@@ -2469,7 +2469,6 @@ export const TRANSLATIONS = {
         book: "Book discovery",
       },
     },
-
     whatIsNps: {
       seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
       seoDescription:
@@ -2706,7 +2705,7 @@ export const TRANSLATIONS = {
 
     admin: "Admin",
     logout: "Déconnexion",
-},
+    },
     routes: {
       products: "Produits",
       whyNpsMe: "Pourquoi NPS Me",
@@ -2721,7 +2720,7 @@ export const TRANSLATIONS = {
       blogIntercomNpsBeyondScore: "Intercom NPS : au-delà du score",
       cxCockpit: "Cockpit CX",
       closingTheLoop: "Boucler la boucle",
-},
+    },
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
       seoDescription:
@@ -5212,7 +5211,6 @@ export const TRANSLATIONS = {
         book: "Prendre rendez-vous",
       },
     },
-
     whatIsNps: {
       seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
       seoDescription:

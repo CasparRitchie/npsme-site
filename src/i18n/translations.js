@@ -215,6 +215,11 @@ export const TRANSLATIONS = {
           excerpt:
             "NPS is more than a number. Learn why closing the loop with customers builds credibility and drives lasting improvement.",
         },
+        intercomNps: {
+          title: "Intercom NPS: Beyond the Score",
+          excerpt:
+            "Intercom makes it easy to collect NPS — but most teams get stuck at dashboards and anecdotes. Here’s how to turn feedback into themes, drivers, and prioritised action.",
+        },
         whatToDoWithNps: {
           title: "What To Do With Your NPS Scores",
           excerpt:
@@ -2877,6 +2882,11 @@ export const TRANSLATIONS = {
           excerpt:
             "Aller au-delà des beaux tableaux de bord pour mettre en lumière les frictions et attentes clients.",
         },
+        intercomNps: {
+          title: "Intercom NPS : au-delà du score",
+          excerpt:
+            "Intercom facilite la collecte du NPS — mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment transformer le feedback en thèmes, drivers et actions prioritaires.",
+        },
       },
     },
     blogClosingLoop: {
@@ -4746,7 +4756,7 @@ export const TRANSLATIONS = {
         button: "Voir un exemple →",
       },
     },
-     liveAdmin: {
+    liveAdmin: {
       seoTitle: "Admin enquête live | NPS Me",
       seoDescription:
         "Gérez et envoyez des invitations NPS en direct depuis votre liste clients Envola.",

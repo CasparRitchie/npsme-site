@@ -742,6 +742,18 @@ export const TRANSLATIONS = {
             "Customers were already interacting with the company through in-app chat, lifecycle messages, and support conversations. By embedding the NPS question directly into this environment, feedback became a natural extension of the customer conversation.",
         },
 
+        implementation: {
+          title: "Implementation example from a real CX programme",
+          p1:
+            "In one recent customer experience programme, we implemented this approach inside a company that was already using a customer messaging platform for daily interactions with users.",
+          p2:
+            "Rather than introducing a separate survey tool, the NPS question was embedded directly into the messaging workflow. Customers received the question inside the same environment where they were already communicating with support and product teams.",
+          p3:
+            "After selecting a score from 0 to 10, customers were immediately asked a follow-up question: 'What is the main reason for your score?' This generated short qualitative responses that provided the most valuable insights.",
+          p4:
+            "Each response was automatically captured and analysed. Promoters, passives, and detractors were routed into different operational workflows so that teams could respond quickly and close the feedback loop.",
+        },
+
         data: {
           title: "From feedback messages to structured insight",
           p1:
@@ -3415,6 +3427,18 @@ export const TRANSLATIONS = {
             "Plutôt que d’ajouter un nouvel outil, nous avons exploré l’intégration du NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
           p2:
             "Les clients interagissaient déjà via le chat in-app, les messages automatisés et les conversations support. En intégrant la question NPS dans cet environnement, le feedback devient une extension naturelle de la conversation.",
+        },
+
+        implementation: {
+          title: "Exemple d’implémentation dans un programme CX réel",
+          p1:
+            "Dans un programme d’expérience client récent, nous avons mis en place cette approche au sein d’une entreprise qui utilisait déjà une plateforme de messagerie pour communiquer quotidiennement avec ses utilisateurs.",
+          p2:
+            "Plutôt que d’introduire un outil d’enquête séparé, la question NPS a été intégrée directement dans le workflow de messagerie. Les clients recevaient la question dans le même environnement que celui utilisé pour les conversations avec le support ou les équipes produit.",
+          p3:
+            "Après avoir sélectionné un score de 0 à 10, les clients étaient immédiatement invités à répondre à une question de suivi : « Quelle est la principale raison de votre score ? ». Ces réponses qualitatives ont fourni les insights les plus précieux.",
+          p4:
+            "Chaque réponse était ensuite capturée et analysée automatiquement. Les promoteurs, passifs et détracteurs étaient orientés vers différents workflows opérationnels afin que les équipes puissent répondre rapidement et fermer la boucle de feedback.",
         },
 
         data: {

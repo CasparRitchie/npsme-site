@@ -45,7 +45,7 @@ export default function BlogIntercomNpsBeyondTheScore() {
         description={tr("blogIntercomNps.seo.description")}
         altPaths={{
           en: "/blog/intercom-nps-beyond-the-score",
-          fr: "/fr/blog/intercom-nps-au-dela-du-score",
+          fr: "/fr/blog/intercom-nps-beyond-the-score",
         }}
       />
 
@@ -170,6 +170,35 @@ export default function BlogIntercomNpsBeyondTheScore() {
           ) : null}
 
           <p className="mt-4">{tr("blogIntercomNps.sections.outcomes.p2")}</p>
+        </ArticleSection>
+
+        <ArticleSection title={tr("blogIntercomNps.sections.lessons.title")}>
+          <p>{tr("blogIntercomNps.sections.lessons.p1")}</p>
+
+          <div className="mt-4 space-y-4 text-slate-300">
+            <div>
+              <p className="font-semibold text-white">
+                {tr("blogIntercomNps.sections.lessons.lesson1.title")}
+              </p>
+              <p>{tr("blogIntercomNps.sections.lessons.lesson1.body")}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold text-white">
+                {tr("blogIntercomNps.sections.lessons.lesson2.title")}
+              </p>
+              <p>{tr("blogIntercomNps.sections.lessons.lesson2.body")}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold text-white">
+                {tr("blogIntercomNps.sections.lessons.lesson3.title")}
+              </p>
+              <p>{tr("blogIntercomNps.sections.lessons.lesson3.body")}</p>
+            </div>
+          </div>
+
+          <p className="mt-4">{tr("blogIntercomNps.sections.lessons.p2")}</p>
         </ArticleSection>
 
         <Callout title={tr("blogIntercomNps.callouts.next.title")}>

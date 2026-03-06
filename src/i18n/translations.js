@@ -800,6 +800,28 @@ export const TRANSLATIONS = {
           p2:
             "Instead of being just another dashboard metric, NPS became a practical decision-making tool.",
         },
+        lessons: {
+          title: "Lessons learned from the implementation",
+          p1:
+            "Several lessons emerged as the programme evolved from a simple NPS question into a more structured feedback and analytics workflow.",
+          lesson1: {
+            title: "1. Timing matters more than survey frequency",
+            body:
+              "The quality of responses depended heavily on when the question was asked. Triggering NPS after a meaningful interaction created more relevant feedback than sending surveys on a fixed schedule.",
+          },
+          lesson2: {
+            title: "2. The comment matters as much as the score",
+            body:
+              "The numeric score provides a useful signal, but the most actionable insight came from the short text explanation that followed. These comments revealed the real reasons behind promoter, passive, and detractor behaviour.",
+          },
+          lesson3: {
+            title: "3. Feedback only becomes valuable when it connects to action",
+            body:
+              "Collecting responses is not enough. The real value appears when teams can review the feedback, identify themes, and use it to prioritise concrete improvements across product, onboarding, and support.",
+          },
+          p2:
+            "This is what turns NPS from a reporting exercise into a practical customer experience improvement system.",
+        },
       },
 
       callouts: {
@@ -3514,6 +3536,29 @@ export const TRANSLATIONS = {
           ],
           p2:
             "Le NPS cesse d’être un simple indicateur et devient un outil concret d’aide à la décision.",
+        },
+
+        lessons: {
+          title: "Enseignements tirés de l’implémentation",
+          p1:
+            "Plusieurs enseignements sont apparus à mesure que le programme évoluait, passant d’une simple question NPS à un workflow plus structuré de feedback et d’analyse.",
+          lesson1: {
+            title: "1. Le timing compte plus que la fréquence d’envoi",
+            body:
+              "La qualité des réponses dépendait fortement du moment où la question était posée. Déclencher le NPS après une interaction significative produisait un feedback plus pertinent qu’un envoi selon un calendrier fixe.",
+          },
+          lesson2: {
+            title: "2. Le commentaire compte autant que le score",
+            body:
+              "Le score numérique reste un signal utile, mais les insights les plus actionnables venaient surtout de l’explication textuelle donnée juste après. Ces commentaires révélaient les vraies raisons derrière les promoteurs, passifs et détracteurs.",
+          },
+          lesson3: {
+            title: "3. Le feedback n’a de valeur que s’il mène à l’action",
+            body:
+              "Collecter des réponses ne suffit pas. La vraie valeur apparaît lorsque les équipes peuvent relire le feedback, identifier les thèmes récurrents et prioriser des améliorations concrètes sur le produit, l’onboarding ou le support.",
+          },
+          p2:
+            "C’est ce qui transforme le NPS d’un exercice de reporting en un véritable système d’amélioration de l’expérience client.",
         },
       },
 

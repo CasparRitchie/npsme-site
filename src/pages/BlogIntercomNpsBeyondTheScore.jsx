@@ -25,6 +25,15 @@ function Callout({ title, children }) {
   );
 }
 
+function RelatedLinks({ title, children }) {
+  return (
+    <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+      <h2 className="text-xl md:text-2xl font-semibold text-white">{title}</h2>
+      <div className="mt-3 space-y-3 text-slate-300">{children}</div>
+    </section>
+  );
+}
+
 export default function BlogIntercomNpsBeyondTheScore() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
@@ -150,10 +159,7 @@ export default function BlogIntercomNpsBeyondTheScore() {
           <p>{tr("blogIntercomNps.sections.cxImpact.p5")}</p>
           <p>
             {tr("blogIntercomNps.sections.cxImpact.p6")}{" "}
-            <Link
-              to={localizePath("/about", lang)}
-              className="text-[#22C55E] underline underline-offset-4 hover:text-[#16A34A]"
-            >
+            <Link to={localizePath("/about", lang)} className="text-link">
               {lang === "fr" ? "En savoir plus sur NPS Me" : "Learn more about NPS Me"}
             </Link>
             .
@@ -168,6 +174,8 @@ export default function BlogIntercomNpsBeyondTheScore() {
         <Callout title={tr("blogIntercomNps.callouts.privacy.title")}>
           {tr("blogIntercomNps.callouts.privacy.body")}
         </Callout>
+
+
 
         <ArticleSection title={tr("blogIntercomNps.sections.outcomes.title")}>
           <p>{tr("blogIntercomNps.sections.outcomes.p1")}</p>
@@ -211,6 +219,62 @@ export default function BlogIntercomNpsBeyondTheScore() {
 
           <p className="mt-4">{tr("blogIntercomNps.sections.lessons.p2")}</p>
         </ArticleSection>
+
+        <RelatedLinks title={lang === "fr" ? "À lire aussi" : "Related reading"}>
+          <p className="text-slate-300">
+            {lang === "fr"
+              ? "Pour voir plus en détail la couche d’analyse derrière cette approche, consultez la page "
+              : "To explore the analytics layer behind this approach in more detail, see the "}
+            <Link
+              to={localizePath("/intercom-nps-analytics", lang)}
+              className="text-link"
+            >
+              {lang === "fr" ? "Analyse NPS Intercom" : "Intercom NPS analytics"}
+            </Link>
+            .
+          </p>
+
+          <p className="text-slate-300">
+            {lang === "fr"
+              ? "Si vous réfléchissez à ce qu’un score NPS doit réellement déclencher ensuite, l’article "
+              : "If you are thinking about what an NPS score should actually trigger next, the article "}
+            <Link
+              to={localizePath("/blog/what-to-do-with-nps-scores", lang)}
+              className="text-link"
+            >
+              {lang === "fr" ? "Que faire avec vos scores NPS" : "What to do with NPS scores"}
+            </Link>
+            {lang === "fr"
+              ? " complète bien cette lecture."
+              : " is a good follow-on read."}
+          </p>
+
+          <p className="text-slate-300">
+            {lang === "fr"
+              ? "Et si vous voulez comprendre comment transformer le feedback en action concrète, consultez aussi "
+              : "And if you want to see how feedback turns into action, you can also read "}
+            <Link
+              to={localizePath("/blog/closing-the-loop", lang)}
+              className="text-link"
+            >
+              {lang === "fr" ? "Boucler la boucle" : "Closing the loop"}
+            </Link>
+            .
+          </p>
+
+          <p className="text-slate-300">
+            {lang === "fr"
+              ? "Pour en savoir plus sur l’approche globale de NPS Me, découvrez "
+              : "To learn more about the broader NPS Me approach, visit "}
+            <Link
+              to={localizePath("/about", lang)}
+              className="text-link"
+            >
+              {lang === "fr" ? "la page À propos" : "the About page"}
+            </Link>
+            .
+          </p>
+        </RelatedLinks>
 
         <Callout title={tr("blogIntercomNps.callouts.next.title")}>
           <div className="space-y-4">

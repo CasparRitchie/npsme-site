@@ -710,7 +710,8 @@ export const TRANSLATIONS = {
 
       intro:
         "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. In this implementation, we explored a different approach - running NPS directly inside the customer messaging platform already used for daily communication.",
-
+        ctaPrimary: "Explore Intercom NPS analytics",
+        ctaSecondary: "Book a CX consultation",
       sections: {
         context: {
           title: "The context",
@@ -3397,6 +3398,10 @@ export const TRANSLATIONS = {
 
       intro:
         "De nombreuses entreprises souhaitent mesurer le Net Promoter Score (NPS), mais se posent une question simple : où l’enquête doit-elle réellement se trouver ? Les outils d’enquête traditionnels sont souvent déconnectés de l’expérience produit. Dans ce projet, nous avons exploré une approche différente : intégrer le NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
+
+      ctaPrimary: "Découvrir l’analyse NPS Intercom",
+
+      ctaSecondary: "Réserver un échange CX",
 
       sections: {
         context: {

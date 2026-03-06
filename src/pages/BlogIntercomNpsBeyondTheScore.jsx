@@ -135,6 +135,20 @@ export default function BlogIntercomNpsBeyondTheScore() {
           <p>{tr("blogIntercomNps.sections.implementation.p4")}</p>
         </ArticleSection>
 
+        <ArticleSection title={tr("blogIntercomNps.sections.iteration.title")}>
+          <p>{tr("blogIntercomNps.sections.iteration.p1")}</p>
+          <p>{tr("blogIntercomNps.sections.iteration.p2")}</p>
+          <p>{tr("blogIntercomNps.sections.iteration.p3")}</p>
+          <p>{tr("blogIntercomNps.sections.iteration.p4")}</p>
+        </ArticleSection>
+
+        <ArticleSection title={tr("blogIntercomNps.sections.cxImpact.title")}>
+          <p>{tr("blogIntercomNps.sections.cxImpact.p1")}</p>
+          <p>{tr("blogIntercomNps.sections.cxImpact.p2")}</p>
+          <p>{tr("blogIntercomNps.sections.cxImpact.p3")}</p>
+          <p>{tr("blogIntercomNps.sections.cxImpact.p4")}</p>
+        </ArticleSection>
+
         <ArticleSection title={tr("blogIntercomNps.sections.data.title")}>
           <p>{tr("blogIntercomNps.sections.data.p1")}</p>
           <p>{tr("blogIntercomNps.sections.data.p2")}</p>

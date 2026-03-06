@@ -755,6 +755,30 @@ export const TRANSLATIONS = {
             "Each response was automatically captured and analysed. Promoters, passives, and detractors were routed into different operational workflows so that teams could respond quickly and close the feedback loop.",
         },
 
+        iteration: {
+          title: "Iterating with the client team",
+          p1:
+            "The first version of the workflow focused on collecting the NPS score and the associated comment inside the messaging platform. This immediately reduced friction and increased the likelihood that customers would respond.",
+          p2:
+            "After reviewing the first results with the client team, additional questions emerged. Which types of customers were responding most frequently? Were promoters mentioning different themes than detractors? Could the feedback be grouped into meaningful categories that product and support teams could act on?",
+          p3:
+            "These discussions led to a second iteration of the system. The analytics layer was extended to group qualitative responses into recurring themes, allowing the team to identify patterns rather than reading individual comments one by one.",
+          p4:
+            "This iterative process — designing the workflow, reviewing early feedback, and refining the analytics — helped transform the programme from a simple survey into a structured customer insight system.",
+        },
+
+        cxImpact: {
+          title: "Connecting feedback to customer experience improvement",
+          p1:
+            "Collecting feedback is only useful if it leads to action. Once the analytics layer was in place, the feedback could be used to support broader customer experience improvements.",
+          p2:
+            "Recurring themes in customer comments helped highlight areas where onboarding could be clearer, where product features created confusion, and where support interactions could be improved.",
+          p3:
+            "Because the feedback was collected inside the messaging platform, teams could quickly follow up with customers who had provided negative feedback and resolve issues before they escalated.",
+          p4:
+            "Over time, this approach turns NPS from a periodic measurement into a continuous customer intelligence system that supports product decisions, service improvements, and customer success strategies.",
+        },
+
         data: {
           title: "From feedback messages to structured insight",
           p1:
@@ -3444,6 +3468,30 @@ export const TRANSLATIONS = {
             "Après avoir sélectionné un score de 0 à 10, les clients étaient immédiatement invités à répondre à une question de suivi : « Quelle est la principale raison de votre score ? ». Ces réponses qualitatives ont fourni les insights les plus précieux.",
           p4:
             "Chaque réponse était ensuite capturée et analysée automatiquement. Les promoteurs, passifs et détracteurs étaient orientés vers différents workflows opérationnels afin que les équipes puissent répondre rapidement et fermer la boucle de feedback.",
+        },
+
+        iteration: {
+          title: "Itérations avec l’équipe client",
+          p1:
+            "La première version du workflow visait principalement à collecter le score NPS et le commentaire associé directement dans la plateforme de messagerie. Cette approche a immédiatement réduit la friction et augmenté la probabilité de réponse des clients.",
+          p2:
+            "Après avoir analysé les premiers résultats avec l’équipe cliente, de nouvelles questions sont apparues. Quels types de clients répondaient le plus souvent ? Les promoteurs mentionnaient-ils des thèmes différents des détracteurs ? Le feedback pouvait-il être regroupé en catégories exploitables par les équipes produit et support ?",
+          p3:
+            "Ces échanges ont conduit à une seconde itération du système. La couche d’analyse a été enrichie afin de regrouper les réponses qualitatives en thèmes récurrents, permettant d’identifier des tendances plutôt que de lire les commentaires un par un.",
+          p4:
+            "Ce processus itératif — concevoir le workflow, analyser les premiers retours et affiner l’analyse — a transformé le programme d’une simple enquête en un véritable système d’intelligence client.",
+        },
+
+        cxImpact: {
+          title: "Relier le feedback à l’amélioration de l’expérience client",
+          p1:
+            "Collecter du feedback n’a de valeur que s’il conduit à des actions concrètes. Une fois la couche d’analyse mise en place, les retours clients ont pu alimenter des initiatives plus larges d’amélioration de l’expérience client.",
+          p2:
+            "Les thèmes récurrents dans les commentaires ont permis d’identifier des points d’amélioration dans l’onboarding, certaines fonctionnalités produit ou encore les interactions avec le support.",
+          p3:
+            "Comme le feedback était collecté directement dans la plateforme de messagerie, les équipes pouvaient également répondre rapidement aux clients ayant donné un retour négatif et résoudre les problèmes avant qu’ils ne s’aggravent.",
+          p4:
+            "Avec le temps, cette approche transforme le NPS d’une mesure ponctuelle en un véritable système continu d’intelligence client, capable d’alimenter les décisions produit et les stratégies de customer success.",
         },
 
         data: {

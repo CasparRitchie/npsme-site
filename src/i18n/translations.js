@@ -708,10 +708,9 @@ export const TRANSLATIONS = {
 
       h1: "Running Net Promoter Score inside your customer messaging platform",
 
-      intro:
-        "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. In this implementation, we explored a different approach - running NPS directly inside the customer messaging platform already used for daily communication.",
-        ctaPrimary: "Explore Intercom NPS analytics",
-        ctaSecondary: "Book a CX consultation",
+      intro: "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. Customers receive an email from a platform they do not recognise, open a separate survey page, and the feedback ends up in a reporting dashboard that operational teams rarely use. A growing number of companies are now running their Net Promoter Score programmes directly inside customer messaging platforms such as Intercom, where conversations with customers already take place. In this implementation, we explored that approach: running NPS directly inside the messaging platform used for daily communication, reducing friction for customers and allowing feedback to flow directly into operational workflows.",
+      ctaPrimary: "Explore Intercom NPS analytics",
+      ctaSecondary: "Book a CX consultation",
       sections: {
         context: {
           title: "The context",
@@ -769,22 +768,46 @@ export const TRANSLATIONS = {
 
         cxImpact: {
           title: "Connecting feedback to customer experience improvement",
+
           p1:
-            "Collecting feedback is only useful if it leads to action. Once the analytics layer was in place, the feedback could be used to support broader customer experience improvements.",
+            "Collecting feedback is only useful if it leads to action. Once the analytics layer was in place, the feedback could be used to support broader customer experience improvements across the organisation.",
+
           p2:
             "Recurring themes in customer comments helped highlight areas where onboarding could be clearer, where product features created confusion, and where support interactions could be improved.",
+
           p3:
-            "Because the feedback was collected inside the messaging platform, teams could quickly follow up with customers who had provided negative feedback and resolve issues before they escalated.",
+            "Because the feedback was captured directly inside the messaging platform, teams could quickly follow up with customers who had provided negative feedback. In many cases, issues could be resolved within the same conversation thread where the feedback had originally been given.",
+
           p4:
-            "Over time, this approach turns NPS from a periodic measurement into a continuous customer intelligence system that supports product decisions, service improvements, and customer success strategies.",
+            "This type of operational feedback loop is where NPS becomes particularly powerful. Instead of waiting for periodic survey reports, teams receive continuous signals about what customers are experiencing.",
+
+          p5:
+            "Over time, this approach transforms NPS from a simple measurement tool into a structured customer intelligence system that supports product decisions, service improvements, and customer success strategies.",
+
+          p6:
+            "For organisations looking to improve their customer experience, the goal is not simply to measure sentiment but to create systems that continuously capture, analyse, and act on customer feedback.",
         },
 
         data: {
           title: "From feedback messages to structured insight",
+
           p1:
-            "Responses collected through the messaging platform were captured alongside contextual data such as time, interaction stage, and customer activity.",
+            "Collecting feedback is only the first step. The real value of Net Promoter Score emerges when the qualitative responses are analysed and transformed into structured insight.",
+
           p2:
-            "Qualitative responses were then analysed to identify recurring themes, enabling teams to understand what truly drives promoters, passives, and detractors.",
+            "Each customer comment provides context behind the score. Some customers highlight product usability issues, others describe onboarding friction, and some mention positive experiences with support or specific features.",
+
+          p3:
+            "Rather than reviewing comments individually, the responses can be grouped into recurring themes. This makes it possible to identify patterns across the feedback dataset and understand what consistently drives promoters, passives, and detractors.",
+
+          p4:
+            "For example, comments may reveal that promoters frequently mention ease of use or responsiveness of the support team, while detractors may highlight confusion during onboarding or difficulty discovering certain features.",
+
+          p5:
+            "Once these themes are identified, teams can begin to measure how often they appear and whether improvements in the product or service reduce the frequency of negative feedback over time.",
+
+          p6:
+            "This is where NPS moves beyond a simple score. Instead of acting as a periodic measurement, it becomes a continuous source of customer insight that informs product development, onboarding improvements, and customer success strategies.",
         },
 
         outcomes: {
@@ -3442,11 +3465,8 @@ export const TRANSLATIONS = {
 
       h1: "Mettre en place le Net Promoter Score dans une plateforme de messagerie client",
 
-      intro:
-        "De nombreuses entreprises souhaitent mesurer le Net Promoter Score (NPS), mais se posent une question simple : où l’enquête doit-elle réellement se trouver ? Les outils d’enquête traditionnels sont souvent déconnectés de l’expérience produit. Dans ce projet, nous avons exploré une approche différente : intégrer le NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
-
+      intro: "De nombreuses organisations souhaitent mesurer le Net Promoter Score (NPS), mais se heurtent à une question simple : où l’enquête doit-elle réellement se situer ? Les outils d’enquête traditionnels sont souvent déconnectés de l’expérience produit. Les clients reçoivent un email provenant d’une plateforme qu’ils ne connaissent pas, ouvrent une page d’enquête séparée, et le feedback se retrouve dans un tableau de bord que les équipes opérationnelles utilisent rarement. De plus en plus d’entreprises exécutent aujourd’hui leur programme Net Promoter Score directement dans des plateformes de messagerie client comme Intercom, là où les conversations avec les utilisateurs ont déjà lieu. Dans cette implémentation, nous avons exploré cette approche : exécuter le NPS directement dans la plateforme de messagerie utilisée pour les échanges quotidiens avec les clients, afin de réduire la friction et de permettre au feedback de s’intégrer naturellement dans les workflows opérationnels.",
       ctaPrimary: "Découvrir l’analyse NPS Intercom",
-
       ctaSecondary: "Réserver un échange CX",
 
       sections: {
@@ -3506,22 +3526,46 @@ export const TRANSLATIONS = {
 
         cxImpact: {
           title: "Relier le feedback à l’amélioration de l’expérience client",
+
           p1:
-            "Collecter du feedback n’a de valeur que s’il conduit à des actions concrètes. Une fois la couche d’analyse mise en place, les retours clients ont pu alimenter des initiatives plus larges d’amélioration de l’expérience client.",
+            "Collecter du feedback n’a de valeur que s’il conduit à des actions concrètes. Une fois la couche d’analyse mise en place, les retours clients peuvent alimenter des initiatives plus larges d’amélioration de l’expérience client.",
+
           p2:
             "Les thèmes récurrents dans les commentaires ont permis d’identifier des points d’amélioration dans l’onboarding, certaines fonctionnalités produit ou encore les interactions avec le support.",
+
           p3:
-            "Comme le feedback était collecté directement dans la plateforme de messagerie, les équipes pouvaient également répondre rapidement aux clients ayant donné un retour négatif et résoudre les problèmes avant qu’ils ne s’aggravent.",
+            "Comme le feedback était collecté directement dans la plateforme de messagerie, les équipes pouvaient également répondre rapidement aux clients ayant donné un retour négatif. Dans de nombreux cas, les problèmes pouvaient être résolus dans la même conversation.",
+
           p4:
-            "Avec le temps, cette approche transforme le NPS d’une mesure ponctuelle en un véritable système continu d’intelligence client, capable d’alimenter les décisions produit et les stratégies de customer success.",
+            "Ce type de boucle de feedback opérationnelle est l’une des forces du NPS. Au lieu d’attendre des rapports d’enquête périodiques, les équipes reçoivent des signaux continus sur l’expérience client.",
+
+          p5:
+            "Avec le temps, cette approche transforme le NPS d’un simple indicateur en un véritable système structuré d’intelligence client.",
+
+          p6:
+            "Pour les organisations qui souhaitent améliorer leur expérience client, l’objectif n’est pas seulement de mesurer le sentiment client mais de créer des systèmes capables de collecter, analyser et exploiter le feedback en continu.",
         },
 
         data: {
-          title: "Transformer les messages en insight structuré",
+          title: "Du message de feedback à l’insight structuré",
+
           p1:
-            "Les réponses collectées dans la plateforme de messagerie sont capturées avec leur contexte : moment de l’interaction, étape du parcours client et activité produit.",
+            "La collecte du feedback n’est que la première étape. La véritable valeur du Net Promoter Score apparaît lorsque les réponses qualitatives sont analysées et transformées en insight structuré.",
+
           p2:
-            "Les réponses qualitatives sont ensuite analysées pour identifier les thèmes récurrents et comprendre ce qui génère des promoteurs, des passifs ou des détracteurs.",
+            "Chaque commentaire client apporte un contexte au score. Certains clients mentionnent des problèmes d’utilisabilité du produit, d’autres décrivent des frictions dans l’onboarding, tandis que certains soulignent des expériences positives avec le support ou certaines fonctionnalités.",
+
+          p3:
+            "Plutôt que de lire les commentaires un par un, les réponses peuvent être regroupées en thèmes récurrents. Cela permet d’identifier des tendances dans l’ensemble du feedback et de comprendre ce qui génère réellement des promoteurs, des passifs ou des détracteurs.",
+
+          p4:
+            "Par exemple, les commentaires peuvent montrer que les promoteurs mentionnent fréquemment la facilité d’utilisation ou la réactivité du support, tandis que les détracteurs signalent une confusion lors de l’onboarding ou des difficultés à découvrir certaines fonctionnalités.",
+
+          p5:
+            "Une fois ces thèmes identifiés, les équipes peuvent mesurer leur fréquence et vérifier si les améliorations apportées au produit ou au service réduisent les retours négatifs au fil du temps.",
+
+          p6:
+            "C’est à ce moment que le NPS dépasse le simple indicateur. Au lieu d’être une mesure ponctuelle, il devient une source continue d’intelligence client qui éclaire les décisions produit, les améliorations d’onboarding et les stratégies de customer success.",
         },
 
         outcomes: {

@@ -147,6 +147,17 @@ export default function BlogIntercomNpsBeyondTheScore() {
           <p>{tr("blogIntercomNps.sections.cxImpact.p2")}</p>
           <p>{tr("blogIntercomNps.sections.cxImpact.p3")}</p>
           <p>{tr("blogIntercomNps.sections.cxImpact.p4")}</p>
+          <p>{tr("blogIntercomNps.sections.cxImpact.p5")}</p>
+          <p>
+            {tr("blogIntercomNps.sections.cxImpact.p6")}{" "}
+            <Link
+              to={localizePath("/about", lang)}
+              className="text-[#22C55E] underline underline-offset-4 hover:text-[#16A34A]"
+            >
+              {lang === "fr" ? "En savoir plus sur NPS Me" : "Learn more about NPS Me"}
+            </Link>
+            .
+          </p>
         </ArticleSection>
 
         <ArticleSection title={tr("blogIntercomNps.sections.data.title")}>

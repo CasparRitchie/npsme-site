@@ -785,7 +785,7 @@ export const TRANSLATIONS = {
             "Over time, this approach transforms NPS from a simple measurement tool into a structured customer intelligence system that supports product decisions, service improvements, and customer success strategies.",
 
           p6:
-            "For organisations looking to improve their customer experience, the goal is not simply to measure sentiment but to create systems that continuously capture, analyse, and act on customer feedback.",
+            "For organisations looking to improve their customer experience, the goal is not simply to measure sentiment but to create systems that continuously capture, analyse, and act on customer feedback. This type of work forms part of the broader customer experience consulting carried out by the NPS Me team.",
         },
 
         data: {

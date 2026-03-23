@@ -2160,70 +2160,67 @@ router.get("/survey-export/start", async (req, res) => {
 
           const previous = (historyByContact.get(cid) || [])
             .filter((x) => String(x?.response_id || "") !== String(r?.response_id || ""))
-            .sort((a, b) => String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || "")));
+            .sort((a, b) =>
+              String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || ""))
+            );
 
           const previousDates = previous.map((p) => p?.submitted_at).filter(Boolean);
           const previousLinks = previous.map((p) => p?.response_id).filter(Boolean);
 
           const answers = Array.isArray(r?.answers) ? r.answers : [];
 
-          answers.forEach((a, idx) => {
-            const next = answers[idx + 1];
+          // helper
+          const findAnswer = (qid) => {
+            const a = answers.find(x => Number(x?.question_id) === qid);
+            return a?.response ?? null;
+          };
 
-            const answerText =
-              a?.response == null ? "" : String(a.response).trim();
+          explorerRows.push({
+            response_id: r?.response_id || null,
+            submitted_at: r?.submitted_at || null,
+            nps_score: r?.score_0_10 ?? null,
+            bucket: scoreBucket(r?.score_0_10),
 
-            const nextText =
-              next?.response == null ? "" : String(next.response).trim();
+            contact_id: cid || null,
+            contact_name:
+              r?.name ||
+              r?.email ||
+              r?.external_id ||
+              (cid ? `Contact ${cid}` : "—"),
 
-            const currentNum = Number(answerText);
-            const nextNum = Number(nextText);
+            intercom_contact_url: cid ? intercomContactUrl(cid) : null,
 
-            const associatedComment =
-              Number.isFinite(currentNum) &&
-              currentNum >= 0 &&
-              currentNum <= 10 &&
-              nextText &&
-              !Number.isFinite(nextNum)
-                ? nextText
-                : null;
+            pioupiou:
+              r?.pioupiou_label ||
+              r?.custom_attributes?.pioupiou_label ||
+              "—",
 
-            explorerRows.push({
-              response_id: r?.response_id || null,
-              submitted_at: r?.submitted_at || null,
-              nps_score: r?.score_0_10 ?? null,
-              bucket: scoreBucket(r?.score_0_10),
+            reader_serial:
+              r?.reader_serial ||
+              r?.custom_attributes?.reader_serial ||
+              "—",
 
-              contact_id: cid || null,
-              contact_name:
-                r?.name ||
-                r?.email ||
-                r?.external_id ||
-                (cid ? `Contact ${cid}` : "—"),
+            previous_response_dates: previousDates,
+            previous_response_links: previousLinks,
 
-              intercom_contact_url: cid ? intercomContactUrl(cid) : null,
+            // ⭐ flattened survey answers
+            q_recommend_score: findAnswer(612560),
+            q_recommend_comment: findAnswer(612565),
 
-              // These may not exist yet in your clean store; keep safe fallbacks
-              pioupiou:
-                r?.pioupiou_label ||
-                r?.custom_attributes?.pioupiou_label ||
-                "—",
+            q_install_score: findAnswer(612566),
+            q_install_comment: findAnswer(612567),
 
-              reader_serial:
-                r?.reader_serial ||
-                r?.custom_attributes?.reader_serial ||
-                "—",
+            q_daily_use_score: findAnswer(612568),
 
-              previous_response_dates: previousDates,
-              previous_response_links: previousLinks,
+            q_benefits: findAnswer(612570),
 
-              question_id: a?.question_id ?? null,
-              question_text: a?.question_text || "—",
-              answer: a?.response ?? null,
-              associated_comment: associatedComment,
+            q_parent_relation_score: findAnswer(612600),
+            q_parent_relation_comment: findAnswer(612571),
 
-              selected_options: Array.isArray(r?.selected_options) ? r.selected_options : [],
-            });
+            q_support_score: findAnswer(612601),
+            q_final_comment: findAnswer(612603),
+
+            selected_options: Array.isArray(r?.selected_options) ? r.selected_options : [],
           });
         }
 

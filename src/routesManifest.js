@@ -85,6 +85,9 @@ export const ROUTES_MANIFEST = [
   { path: "/blog/closing-the-loop",                  label: "Blog: Closing the Loop",                   labelKey: "routes.blogClosingTheLoop",            enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/blog/closing-the-loop",               label: "Blog : Boucler la boucle",                 labelKey: "routes.blogClosingTheLoop",            enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "fr" },
 
+  { path: "/private/nps-responses-explorer",         label: "NPS Explorer",                             labelKey: "routes.npsExplorer",enabled: true,indexable: false,inHeader: false,inFooter: true,lang: "en"},
+  { path: "/fr/private/nps-responses-explorer",      label: "Explorateur NPS",                          labelKey: "routes.npsExplorer",enabled: true,indexable: false,inHeader: false,inFooter: true,lang: "fr"},
+
   { path: "/blog/intercom-nps-beyond-the-score",     label: "Blog: Intercom NPS Beyond the Score",      labelKey: "routes.blogIntercomNpsBeyondScore", enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/blog/intercom-nps-beyond-the-score",  label: "Blog : Intercom NPS au-delà du score",     labelKey: "routes.blogIntercomNpsBeyondScore", enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "fr" },
 

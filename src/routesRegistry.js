@@ -50,6 +50,7 @@ import CxCockpit from "./pages/CxCockpit";
 
 import PrivateLogin from "./pages/PrivateLogin";
 import ClosingTheLoop from "./pages/ClosingTheLoop";
+import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
 
 const protect = (Component) => {
@@ -193,6 +194,9 @@ const COMPONENTS = {
 
   "/private/closing-the-loop": protect(ClosingTheLoop),
   "/fr/private/closing-the-loop": protect(ClosingTheLoop),
+
+  "/private/nps-responses-explorer": protect(NpsResponsesExplorer),
+  "/fr/private/nps-responses-explorer": protect(NpsResponsesExplorer),
 };
 
 

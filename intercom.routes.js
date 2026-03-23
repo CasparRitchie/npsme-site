@@ -2105,5 +2105,126 @@ router.get("/survey-export/start", async (req, res) => {
     }
   });
 
+  // =======================================================
+  // PRIVATE — NPS RESPONSES EXPLORER
+  // =======================================================
+
+  router.get(
+    "/private/nps-responses-explorer",
+    requirePrivateCookie,
+    async (req, res) => {
+      try {
+        const contentId = String(req.query.content_id || "189616");
+        const days = clampInt(req.query.days, 120, 1, 365);
+        const limit = clampInt(req.query.limit, 200, 1, 1000);
+
+        const queue = await fetchClosingTheLoopQueue({
+          contentId,
+          days,
+          limit,
+        });
+
+        const responseIds = queue
+          .map((q) => q.response_id)
+          .filter(Boolean);
+
+        const responses = [];
+
+        for (const rid of responseIds) {
+          const detail = await fetchNpsResponseDetail(rid);
+          if (!detail) continue;
+
+          const contact = detail.contact_id
+            ? await fetchIntercomContact(detail.contact_id)
+            : null;
+
+          responses.push({
+            detail,
+            contact,
+          });
+        }
+
+        // history map per contact
+        const historyMap = {};
+        for (const r of responses) {
+          const cid = r.detail.contact_id;
+          if (!cid) continue;
+          if (!historyMap[cid]) historyMap[cid] = [];
+          historyMap[cid].push(r.detail);
+        }
+
+        const rows = [];
+
+        for (const r of responses) {
+          const d = r.detail;
+          const c = r.contact;
+
+          const previous = (historyMap[d.contact_id] || [])
+            .filter((x) => x.response_id !== d.response_id)
+            .sort(
+              (a, b) =>
+                new Date(a.submitted_at) - new Date(b.submitted_at)
+            );
+
+          const previousDates = previous.map((p) => p.submitted_at);
+          const previousLinks = previous.map((p) => p.response_id);
+
+          const answers = Array.isArray(d.answers) ? d.answers : [];
+
+          answers.forEach((a, idx) => {
+            const next = answers[idx + 1];
+
+            rows.push({
+              response_id: d.response_id,
+              submitted_at: d.submitted_at,
+              nps_score: d.score_0_10,
+              bucket: d.bucket,
+
+              contact_id: d.contact_id,
+              contact_name: c?.name || "—",
+              intercom_contact_url: d.intercom_contact_url,
+
+              pioupiou:
+                c?.custom_attributes?.pioupiou_label || "—",
+              reader_serial:
+                c?.custom_attributes?.reader_serial || "—",
+
+              previous_response_dates: previousDates,
+              previous_response_links: previousLinks,
+
+              question_id: a.question_id,
+              question_text: a.question_text,
+              answer: a.response,
+
+              associated_comment:
+                next &&
+                typeof next.response === "string" &&
+                next.question_text?.match(/pourquoi|plus|comment/i)
+                  ? next.response
+                  : null,
+
+              selected_options: d.selected_options || [],
+            });
+          });
+        }
+
+        res.json({
+          ok: true,
+          content_id: contentId,
+          rows,
+          summary: {
+            responses: responses.length,
+            rows: rows.length,
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        res.status(500).json({
+          ok: false,
+          error: String(e.message || e),
+        });
+      }
+    }
+  );
   return router;
 }

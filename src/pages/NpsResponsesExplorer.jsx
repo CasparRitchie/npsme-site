@@ -1,3 +1,5 @@
+// src/pages/NpsResponsesExplorer.jsx
+
 import { useEffect, useState } from "react";
 
 export default function NpsResponsesExplorer() {

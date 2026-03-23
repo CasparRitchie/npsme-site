@@ -2105,7 +2105,9 @@ router.get("/survey-export/start", async (req, res) => {
     }
   });
   // =======================================================
-  // PRIVATE — NPS RESPONSES EXPLORER (LIVE INTERCOM)
+  // PRIVATE — NPS RESPONSES EXPLORER
+  // Uses the same clean Dropbox-backed JSONL store as the
+  // existing private Intercom routes.
   // =======================================================
 
   router.get(
@@ -2113,105 +2115,138 @@ router.get("/survey-export/start", async (req, res) => {
     requirePrivateCookie,
     async (req, res) => {
       try {
-        const contentId = String(req.query.content_id || "189616");
-        const limit = clampInt(req.query.limit, 200, 1, 1000);
+        const contentId = String(req.query.content_id || "189616").trim();
+        const days = clampInt(req.query.days, 120, 1, 3650);
+        const limit = clampInt(req.query.limit, 200, 1, 2000);
 
-        console.log("Explorer LIVE fetch start");
-
-        // ==========================
-        // 1️⃣ Fetch survey responses list directly from Intercom
-        // ==========================
-
-        const url = `https://api.intercom.io/nps/${contentId}/responses?per_page=${limit}`;
-
-        const resp = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
-            Accept: "application/json",
-          },
-        });
-
-        if (!resp.ok) {
-          throw new Error("Intercom list fetch failed");
+        if (!contentId) {
+          return res.status(400).json({ ok: false, error: "content_id is required" });
         }
 
-        const json = await resp.json();
-        const queue = json.data || [];
+        console.log("[intercom] nps-responses-explorer start", {
+          contentId,
+          days,
+          limit,
+        });
 
-        console.log("Queue length:", queue.length);
+        const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+        const allRows = parseJsonl(text);
 
-        const rows = [];
-        const historyMap = {};
+        const since = Date.now() - days * 24 * 60 * 60 * 1000;
 
-        // ==========================
-        // 2️⃣ Fetch detail per response
-        // ==========================
+        const responses = allRows
+          .filter((r) => String(r?.content_id || "") === contentId)
+          .filter((r) => {
+            const t = Date.parse(r?.submitted_at || "");
+            return Number.isFinite(t) && t >= since;
+          })
+          .sort((a, b) => String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || "")))
+          .slice(0, limit);
 
-        for (const q of queue) {
-          const rid = q.id;
-          if (!rid) continue;
+        // Build response history by contact
+        const historyByContact = new Map();
+        for (const r of responses) {
+          const cid = r?.contact_id ? String(r.contact_id) : "";
+          if (!cid) continue;
+          const arr = historyByContact.get(cid) || [];
+          arr.push(r);
+          historyByContact.set(cid, arr);
+        }
 
-          const detail = await fetchNpsResponseDetail(rid);
-          if (!detail) continue;
+        const explorerRows = [];
 
-          const contact = detail.contact_id
-            ? await fetchIntercomContact(detail.contact_id)
-            : null;
+        for (const r of responses) {
+          const cid = r?.contact_id ? String(r.contact_id) : "";
 
-          if (!historyMap[detail.contact_id]) {
-            historyMap[detail.contact_id] = [];
-          }
-          historyMap[detail.contact_id].push(detail);
+          const previous = (historyByContact.get(cid) || [])
+            .filter((x) => String(x?.response_id || "") !== String(r?.response_id || ""))
+            .sort((a, b) => String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || "")));
 
-          const answers = Array.isArray(detail.answers)
-            ? detail.answers
-            : [];
+          const previousDates = previous.map((p) => p?.submitted_at).filter(Boolean);
+          const previousLinks = previous.map((p) => p?.response_id).filter(Boolean);
+
+          const answers = Array.isArray(r?.answers) ? r.answers : [];
 
           answers.forEach((a, idx) => {
             const next = answers[idx + 1];
 
-            rows.push({
-              response_id: detail.response_id,
-              submitted_at: detail.submitted_at,
-              nps_score: detail.score_0_10,
-              bucket: detail.bucket,
+            const answerText =
+              a?.response == null ? "" : String(a.response).trim();
 
-              contact_id: detail.contact_id,
-              contact_name: contact?.name || "—",
-              intercom_contact_url: detail.intercom_contact_url,
+            const nextText =
+              next?.response == null ? "" : String(next.response).trim();
 
+            const currentNum = Number(answerText);
+            const nextNum = Number(nextText);
+
+            const associatedComment =
+              Number.isFinite(currentNum) &&
+              currentNum >= 0 &&
+              currentNum <= 10 &&
+              nextText &&
+              !Number.isFinite(nextNum)
+                ? nextText
+                : null;
+
+            explorerRows.push({
+              response_id: r?.response_id || null,
+              submitted_at: r?.submitted_at || null,
+              nps_score: r?.score_0_10 ?? null,
+              bucket: scoreBucket(r?.score_0_10),
+
+              contact_id: cid || null,
+              contact_name:
+                r?.name ||
+                r?.email ||
+                r?.external_id ||
+                (cid ? `Contact ${cid}` : "—"),
+
+              intercom_contact_url: cid ? intercomContactUrl(cid) : null,
+
+              // These may not exist yet in your clean store; keep safe fallbacks
               pioupiou:
-                contact?.custom_attributes?.pioupiou_label || "—",
+                r?.pioupiou_label ||
+                r?.custom_attributes?.pioupiou_label ||
+                "—",
+
               reader_serial:
-                contact?.custom_attributes?.reader_serial || "—",
+                r?.reader_serial ||
+                r?.custom_attributes?.reader_serial ||
+                "—",
 
-              question_id: a.question_id,
-              question_text: a.question_text,
-              answer: a.response,
+              previous_response_dates: previousDates,
+              previous_response_links: previousLinks,
 
-              associated_comment:
-                next && typeof next.response === "string"
-                  ? next.response
-                  : null,
+              question_id: a?.question_id ?? null,
+              question_text: a?.question_text || "—",
+              answer: a?.response ?? null,
+              associated_comment: associatedComment,
+
+              selected_options: Array.isArray(r?.selected_options) ? r.selected_options : [],
             });
           });
         }
 
-        console.log("Explorer rows built:", rows.length);
+        console.log("[intercom] nps-responses-explorer built", {
+          responses: responses.length,
+          rows: explorerRows.length,
+        });
 
-        res.json({
+        return res.json({
           ok: true,
-          rows,
+          content_id: contentId,
+          days,
+          rows: explorerRows,
           summary: {
-            responses: queue.length,
-            rows: rows.length,
+            responses: responses.length,
+            rows: explorerRows.length,
           },
         });
       } catch (e) {
-        console.error("Explorer error:", e);
-        res.status(500).json({
+        console.error("[intercom] nps-responses-explorer error", e);
+        return res.status(500).json({
           ok: false,
-          error: String(e.message || e),
+          error: String(e?.message || e),
         });
       }
     }

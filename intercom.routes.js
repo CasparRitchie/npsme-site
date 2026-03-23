@@ -2105,7 +2105,7 @@ router.get("/survey-export/start", async (req, res) => {
     }
   });
   // =======================================================
-  // PRIVATE — NPS RESPONSES EXPLORER
+  // PRIVATE — NPS RESPONSES EXPLORER (LIVE INTERCOM)
   // =======================================================
 
   router.get(
@@ -2115,99 +2115,84 @@ router.get("/survey-export/start", async (req, res) => {
       try {
         const contentId = String(req.query.content_id || "189616");
         const days = clampInt(req.query.days, 120, 1, 365);
-        const limit = clampInt(req.query.limit, 500, 1, 2000);
+        const limit = clampInt(req.query.limit, 200, 1, 1000);
 
-        const filePath = process.env.INTERCOM_NPS_RESPONSES_PATH;
-        if (!filePath || !fs.existsSync(filePath)) {
-          return res.json({ ok: true, rows: [] });
-        }
+        console.log("Explorer LIVE fetch start");
 
-        const raw = fs
-          .readFileSync(filePath, "utf8")
-          .trim()
-          .split("\n")
-          .map((l) => JSON.parse(l));
-
-        const cutoff = Date.now() - days * 86400000;
-
-        const filtered = raw
-          .filter(
-            (r) =>
-              String(r.content_id) === contentId &&
-              new Date(r.submitted_at).getTime() >= cutoff
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.submitted_at) - new Date(a.submitted_at)
-          )
-          .slice(0, limit);
-
-        // build history map
-        const historyMap = {};
-        filtered.forEach((r) => {
-          if (!r.contact_id) return;
-          if (!historyMap[r.contact_id]) historyMap[r.contact_id] = [];
-          historyMap[r.contact_id].push(r);
+        const queue = await fetchClosingTheLoopQueue({
+          contentId,
+          days,
+          limit,
         });
 
+        console.log("Queue length:", queue.length);
+
         const rows = [];
+        const historyMap = {};
 
-        filtered.forEach((d) => {
-          const previous = (historyMap[d.contact_id] || [])
-            .filter((x) => x.response_id !== d.response_id)
-            .sort(
-              (a, b) =>
-                new Date(a.submitted_at) -
-                new Date(b.submitted_at)
-            );
+        for (const q of queue) {
+          const rid = q.response_id;
+          if (!rid) continue;
 
-          const previousDates = previous.map(
-            (p) => p.submitted_at
-          );
+          const detail = await fetchNpsResponseDetail(rid);
+          if (!detail) continue;
 
-          const answers = Array.isArray(d.answers) ? d.answers : [];
+          const contact = detail.contact_id
+            ? await fetchIntercomContact(detail.contact_id)
+            : null;
+
+          if (!historyMap[detail.contact_id]) {
+            historyMap[detail.contact_id] = [];
+          }
+          historyMap[detail.contact_id].push(detail);
+
+          const answers = Array.isArray(detail.answers)
+            ? detail.answers
+            : [];
 
           answers.forEach((a, idx) => {
             const next = answers[idx + 1];
 
             rows.push({
-              response_id: d.response_id,
-              submitted_at: d.submitted_at,
-              nps_score: d.score_0_10,
-              bucket: d.bucket,
+              response_id: detail.response_id,
+              submitted_at: detail.submitted_at,
+              nps_score: detail.score_0_10,
+              bucket: detail.bucket,
 
-              contact_id: d.contact_id,
-              contact_name: d.contact_name || "—",
-              intercom_contact_url: d.intercom_contact_url,
+              contact_id: detail.contact_id,
+              contact_name: contact?.name || "—",
+              intercom_contact_url: detail.intercom_contact_url,
 
-              pioupiou: d.pioupiou_label || "—",
-              reader_serial: d.reader_serial || "—",
+              pioupiou:
+                contact?.custom_attributes?.pioupiou_label || "—",
+              reader_serial:
+                contact?.custom_attributes?.reader_serial || "—",
 
-              previous_response_dates: previousDates,
-
+              question_id: a.question_id,
               question_text: a.question_text,
               answer: a.response,
 
               associated_comment:
                 next &&
-                typeof next.response === "string" &&
-                next.question_text?.match(/pourquoi|plus|comment/i)
+                typeof next.response === "string"
                   ? next.response
                   : null,
             });
           });
-        });
+        }
+
+        console.log("Explorer rows built:", rows.length);
 
         res.json({
           ok: true,
           rows,
           summary: {
-            responses: filtered.length,
+            responses: queue.length,
             rows: rows.length,
           },
         });
       } catch (e) {
-        console.error(e);
+        console.error("Explorer error:", e);
         res.status(500).json({
           ok: false,
           error: String(e.message || e),

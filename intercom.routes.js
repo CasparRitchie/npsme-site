@@ -2114,24 +2114,41 @@ router.get("/survey-export/start", async (req, res) => {
     async (req, res) => {
       try {
         const contentId = String(req.query.content_id || "189616");
-        const days = clampInt(req.query.days, 120, 1, 365);
         const limit = clampInt(req.query.limit, 200, 1, 1000);
 
         console.log("Explorer LIVE fetch start");
 
-        const queue = await fetchClosingTheLoopQueue({
-          contentId,
-          days,
-          limit,
+        // ==========================
+        // 1️⃣ Fetch survey responses list directly from Intercom
+        // ==========================
+
+        const url = `https://api.intercom.io/nps/${contentId}/responses?per_page=${limit}`;
+
+        const resp = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
+            Accept: "application/json",
+          },
         });
+
+        if (!resp.ok) {
+          throw new Error("Intercom list fetch failed");
+        }
+
+        const json = await resp.json();
+        const queue = json.data || [];
 
         console.log("Queue length:", queue.length);
 
         const rows = [];
         const historyMap = {};
 
+        // ==========================
+        // 2️⃣ Fetch detail per response
+        // ==========================
+
         for (const q of queue) {
-          const rid = q.response_id;
+          const rid = q.id;
           if (!rid) continue;
 
           const detail = await fetchNpsResponseDetail(rid);
@@ -2173,8 +2190,7 @@ router.get("/survey-export/start", async (req, res) => {
               answer: a.response,
 
               associated_comment:
-                next &&
-                typeof next.response === "string"
+                next && typeof next.response === "string"
                   ? next.response
                   : null,
             });

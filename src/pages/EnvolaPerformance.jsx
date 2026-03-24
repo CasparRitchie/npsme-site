@@ -563,7 +563,7 @@ export default function EnvolaPerformance() {
       <section className="mx-auto max-w-7xl px-6 pb-10">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            label={tr("envola.live.kpiNps", "NPS")}
+            label={tr("envola.performance.kpiNps", "NPS")}
             value={
               summary.loading
                 ? "…"
@@ -571,8 +571,16 @@ export default function EnvolaPerformance() {
                 ? "—"
                 : summary.data.nps
             }
-            sub={`${tr("common.window", "Window")}: ${activeWindowLabel}`}
+            sub={[
+              `${tr("common.window", "Window")}: ${activeWindowLabel}`,
+              filters.bucket !== "all"
+                ? `${tr("common.bucket", "Bucket")}: ${bucketLabel(filters.bucket, tr)}`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" • ")}
           />
+
           <StatCard
             label={tr("envola.live.responses", "Responses")}
             value={
@@ -582,8 +590,12 @@ export default function EnvolaPerformance() {
                 ? "—"
                 : summary.data.responses
             }
-            sub={tr("envola.live.responsesSub", "Survey completions")}
+            sub={[
+              tr("envola.live.responsesSub", "Survey completions"),
+              `${tr("common.window", "Window")}: ${activeWindowLabel}`,
+            ].join(" • ")}
           />
+
           <StatCard
             label={tr("envola.metrics.responseRate", "Response rate")}
             value={
@@ -593,8 +605,12 @@ export default function EnvolaPerformance() {
                 ? "—"
                 : `${rate.data.response_rate_pct}%`
             }
-            sub={tr("envola.metrics.responseRateSub", "Completed ÷ shown")}
+            sub={[
+              tr("envola.metrics.responseRateSub", "Completed ÷ shown"),
+              `${tr("common.window", "Window")}: ${activeWindowLabel}`,
+            ].join(" • ")}
           />
+
           <StatCard
             label={tr("envola.metrics.medianCompletion", "Median completion")}
             value={

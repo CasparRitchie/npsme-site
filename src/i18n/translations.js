@@ -2397,12 +2397,12 @@ export const TRANSLATIONS = {
       },
 
       live: {
-        title: "Live snapshot (last 30 days)",
+        title: "Live snapshot",
         subtitle:
           "Aggregated only - no personal data. Data source: Intercom survey completions → NPS Me clean store.",
         noData:
           "No completions yet in the last 30 days. Once responses arrive, this panel updates automatically.",
-        kpiNps: "NPS (last 30 days)",
+        kpiNps: "NPS",
         promoters: "Promoters",
         promotersSub: "Scores 9–10",
         passives: "Passives",
@@ -5231,12 +5231,12 @@ export const TRANSLATIONS = {
       },
 
       live: {
-        title: "Instantané live (30 derniers jours)",
+        title: "Instantané live NPS",
         subtitle:
           "Données agrégées uniquement - aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
         noData:
           "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
-        kpiNps: "NPS (30 derniers jours)",
+        kpiNps: "NPS",
         promoters: "Promoteurs",
         promotersSub: "Notes 9–10",
         passives: "Passifs",

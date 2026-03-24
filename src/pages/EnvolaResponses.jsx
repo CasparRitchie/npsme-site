@@ -1,41 +1,13 @@
 // src/pages/EnvolaResponses.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
-import { localizePath } from "../i18n/pathHelpers";
 import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
 const DEFAULT_CONTENT_ID = "189616";
-
-const QUESTION_MAP = {
-  "612560": "q_recommend_score",
-  "612565": "q_recommend_comment",
-  "612566": "q_install_score",
-  "612567": "q_install_comment",
-  "612568": "q_daily_use_score",
-  "612570": "q_benefits",
-  "612600": "q_parent_relation_score",
-  "612571": "q_parent_relation_comment",
-  "612601": "q_support_score",
-  "612602": "q_support_comment",
-  "612603": "q_final_comment",
-};
-
-function prettyDate(iso) {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function shortDate(iso) {
   if (!iso) return "—";
@@ -72,52 +44,6 @@ function Pill({ children }) {
     </span>
   );
 }
-
-// function EnvolaWorkspaceNav({ lang, currentPath }) {
-//   const items = [
-//     {
-//       key: "performance",
-//       labelEn: "Performance",
-//       labelFr: "Performance",
-//       path: "/envola/performance",
-//     },
-//     {
-//       key: "responses",
-//       labelEn: "Responses",
-//       labelFr: "Réponses",
-//       path: "/envola/responses",
-//     },
-//     {
-//       key: "invitations",
-//       labelEn: "Invitations",
-//       labelFr: "Invitations",
-//       path: "/envola/invitations",
-//     },
-//   ];
-
-//   return (
-//     <div className="mt-6 flex flex-wrap gap-2">
-//       {items.map((item) => {
-//         const to = localizePath(item.path, lang);
-//         const active = currentPath === to;
-
-//         return (
-//           <Link
-//             key={item.key}
-//             to={to}
-//             className={`inline-flex items-center rounded-2xl border px-4 py-2 text-sm font-medium transition ${
-//               active
-//                 ? "border-white bg-white text-black"
-//                 : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
-//             }`}
-//           >
-//             {lang === "fr" ? item.labelFr : item.labelEn}
-//           </Link>
-//         );
-//       })}
-//     </div>
-//   );
-// }
 
 function useExplorerFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -174,87 +100,10 @@ function bucketBadge(bucket) {
 }
 
 function scoreTextClass(score) {
+  if (!Number.isFinite(score)) return "text-slate-300";
   if (score >= 9) return "text-emerald-300";
   if (score >= 7) return "text-amber-300";
-  if (score >= 0) return "text-rose-300";
-  return "text-slate-300";
-}
-
-function normalizeText(v) {
-  if (v == null) return "";
-  return String(v).trim();
-}
-
-function aggregateResponses(rows) {
-  const byResponse = new Map();
-
-  for (const r of rows || []) {
-    const responseId = String(r?.response_id || "");
-    if (!responseId) continue;
-
-    const current = byResponse.get(responseId) || {
-      response_id: responseId,
-      submitted_at: r?.submitted_at || null,
-      nps_score: r?.nps_score ?? null,
-      bucket: r?.bucket || null,
-      contact_id: r?.contact_id || null,
-      contact_name: r?.contact_name || "—",
-      intercom_contact_url: r?.intercom_contact_url || null,
-      pioupiou: r?.pioupiou || "—",
-      reader_serial: r?.reader_serial || "—",
-      previous_response_dates: Array.isArray(r?.previous_response_dates)
-        ? r.previous_response_dates
-        : [],
-      previous_response_links: Array.isArray(r?.previous_response_links)
-        ? r.previous_response_links
-        : [],
-      q_recommend_score: "",
-      q_recommend_comment: "",
-      q_install_score: "",
-      q_install_comment: "",
-      q_daily_use_score: "",
-      q_benefits: "",
-      q_parent_relation_score: "",
-      q_parent_relation_comment: "",
-      q_support_score: "",
-      q_support_comment: "",
-      q_final_comment: "",
-      _raw_answers: [],
-    };
-
-    current._raw_answers.push({
-      question_id: r?.question_id,
-      question_text: r?.question_text,
-      answer: r?.answer,
-      associated_comment: r?.associated_comment,
-    });
-
-    const qid = String(r?.question_id || "");
-    const field = QUESTION_MAP[qid];
-    if (field) {
-      const answerText = normalizeText(r?.answer);
-      if (!current[field] && answerText) {
-        current[field] = answerText;
-      }
-    }
-
-    if (qid === "612560" && !current.q_recommend_comment && normalizeText(r?.associated_comment)) {
-      current.q_recommend_comment = normalizeText(r.associated_comment);
-    }
-    if (qid === "612566" && !current.q_install_comment && normalizeText(r?.associated_comment)) {
-      current.q_install_comment = normalizeText(r.associated_comment);
-    }
-    if (qid === "612600" && !current.q_parent_relation_comment && normalizeText(r?.associated_comment)) {
-      current.q_parent_relation_comment = normalizeText(r.associated_comment);
-    }
-    if (qid === "612601" && !current.q_support_comment && normalizeText(r?.associated_comment)) {
-      current.q_support_comment = normalizeText(r.associated_comment);
-    }
-
-    byResponse.set(responseId, current);
-  }
-
-  return Array.from(byResponse.values());
+  return "text-rose-300";
 }
 
 function compareValues(a, b, dir = "asc") {
@@ -319,9 +168,14 @@ function SortableTh({ label, sortKey, filters, updateFilters, className = "" }) 
 }
 
 function CellText({ children, className = "" }) {
+  const content =
+    children == null || children === "" || (typeof children === "string" && !children.trim())
+      ? "—"
+      : children;
+
   return (
     <div className={`whitespace-normal break-words leading-snug text-slate-100 ${className}`}>
-      {children || "—"}
+      {content}
     </div>
   );
 }
@@ -400,12 +254,12 @@ export default function EnvolaResponses() {
   }, [filters.contentId, dateParams]);
 
   const responseRows = useMemo(() => {
-    const aggregated = aggregateResponses(state.rows);
+    const rawRows = Array.isArray(state.rows) ? state.rows : [];
 
     const filteredByBucket =
       filters.bucket === "all"
-        ? aggregated
-        : aggregated.filter((r) => String(r.bucket || "") === filters.bucket);
+        ? rawRows
+        : rawRows.filter((r) => String(r?.bucket || "") === filters.bucket);
 
     const search = filters.search.trim().toLowerCase();
 
@@ -417,10 +271,15 @@ export default function EnvolaResponses() {
             r.response_id,
             r.pioupiou,
             r.reader_serial,
+            r.q_recommend_score,
             r.q_recommend_comment,
+            r.q_install_score,
             r.q_install_comment,
+            r.q_daily_use_score,
             r.q_benefits,
+            r.q_parent_relation_score,
             r.q_parent_relation_comment,
+            r.q_support_score,
             r.q_support_comment,
             r.q_final_comment,
           ]
@@ -489,9 +348,15 @@ export default function EnvolaResponses() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Pill>{tr("common.window", "Window")}: {activeWindowLabel}</Pill>
-              <Pill>{tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}</Pill>
-              <Pill>{tr("common.returned", "Returned")}: {responseRows.length}</Pill>
+              <Pill>
+                {tr("common.window", "Window")}: {activeWindowLabel}
+              </Pill>
+              <Pill>
+                {tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}
+              </Pill>
+              <Pill>
+                {tr("common.returned", "Returned")}: {responseRows.length}
+              </Pill>
             </div>
           </div>
 
@@ -616,7 +481,7 @@ export default function EnvolaResponses() {
 
           {!state.loading && !state.error && responseRows.length > 0 && (
             <div className="overflow-auto rounded-2xl border border-white/10">
-              <table className="min-w-[2550px] border-collapse text-xs">
+              <table className="min-w-[2380px] border-collapse text-xs">
                 <thead className="sticky top-0 z-30 bg-[#0F172A]">
                   <tr className="border-b border-white/10">
                     <SortableTh
@@ -633,11 +498,13 @@ export default function EnvolaResponses() {
                       updateFilters={updateFilters}
                       className="sticky left-[180px] z-40 w-[120px] bg-[#0F172A]"
                     />
-                    <th className="sticky left-[300px] z-40 w-[110px] bg-[#0F172A] px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-200">
-                      {tr("common.intercom", "Intercom")}
-                    </th>
 
-                    <SortableTh label="NPS" sortKey="nps_score" filters={filters} updateFilters={updateFilters} />
+                    <SortableTh
+                      label="NPS"
+                      sortKey="nps_score"
+                      filters={filters}
+                      updateFilters={updateFilters}
+                    />
                     <SortableTh
                       label={tr("common.bucket", "Bucket")}
                       sortKey="bucket"
@@ -717,12 +584,6 @@ export default function EnvolaResponses() {
                       updateFilters={updateFilters}
                     />
                     <SortableTh
-                      label="Support comment"
-                      sortKey="q_support_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                    />
-                    <SortableTh
                       label="Final comment"
                       sortKey="q_final_comment"
                       filters={filters}
@@ -741,32 +602,30 @@ export default function EnvolaResponses() {
                 <tbody>
                   {responseRows.map((r, i) => {
                     const rowBg = i % 2 === 0 ? "bg-slate-950/60" : "bg-slate-900/60";
+
                     return (
                       <tr
-                        key={r.response_id}
+                        key={r.response_id || `${r.contact_name}-${i}`}
                         className={`border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
                       >
                         <td className="sticky left-0 z-20 w-[180px] border-r border-white/10 bg-inherit px-3 py-3">
-                          <CellText>{r.contact_name}</CellText>
+                          <div className="space-y-2">
+                            <CellText>{r.contact_name}</CellText>
+                            {r.intercom_contact_url ? (
+                              <a
+                                href={r.intercom_contact_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
+                              >
+                                {tr("common.open", "Open")}
+                              </a>
+                            ) : null}
+                          </div>
                         </td>
 
                         <td className="sticky left-[180px] z-20 w-[120px] border-r border-white/10 bg-inherit px-3 py-3">
                           <CellText>{shortDate(r.submitted_at)}</CellText>
-                        </td>
-
-                        <td className="sticky left-[300px] z-20 w-[110px] border-r border-white/10 bg-inherit px-3 py-3">
-                          {r.intercom_contact_url ? (
-                            <a
-                              href={r.intercom_contact_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
-                            >
-                              {tr("common.open", "Open")}
-                            </a>
-                          ) : (
-                            <span className="text-slate-500">—</span>
-                          )}
                         </td>
 
                         <td className="px-3 py-3 text-center">
@@ -785,22 +644,33 @@ export default function EnvolaResponses() {
                           </span>
                         </td>
 
-                        <td className="px-3 py-3"><CellText>{r.pioupiou}</CellText></td>
-                        <td className="px-3 py-3"><CellText>{r.reader_serial}</CellText></td>
+                        <td className="px-3 py-3">
+                          <CellText>{r.pioupiou}</CellText>
+                        </td>
+
+                        <td className="px-3 py-3">
+                          <CellText>{r.reader_serial}</CellText>
+                        </td>
 
                         <td className="px-3 py-3 text-center">
                           <span className={scoreTextClass(Number(r.q_recommend_score))}>
                             {r.q_recommend_score || "—"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 min-w-[220px]"><CellText>{r.q_recommend_comment}</CellText></td>
+
+                        <td className="px-3 py-3 min-w-[260px]">
+                          <CellText>{r.q_recommend_comment}</CellText>
+                        </td>
 
                         <td className="px-3 py-3 text-center">
                           <span className={scoreTextClass(Number(r.q_install_score))}>
                             {r.q_install_score || "—"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 min-w-[220px]"><CellText>{r.q_install_comment}</CellText></td>
+
+                        <td className="px-3 py-3 min-w-[260px]">
+                          <CellText>{r.q_install_comment}</CellText>
+                        </td>
 
                         <td className="px-3 py-3 text-center">
                           <span className={scoreTextClass(Number(r.q_daily_use_score))}>
@@ -808,14 +678,17 @@ export default function EnvolaResponses() {
                           </span>
                         </td>
 
-                        <td className="px-3 py-3 min-w-[220px]"><CellText>{r.q_benefits}</CellText></td>
+                        <td className="px-3 py-3 min-w-[300px]">
+                          <CellText>{r.q_benefits}</CellText>
+                        </td>
 
                         <td className="px-3 py-3 text-center">
                           <span className={scoreTextClass(Number(r.q_parent_relation_score))}>
                             {r.q_parent_relation_score || "—"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 min-w-[240px]">
+
+                        <td className="px-3 py-3 min-w-[300px]">
                           <CellText>{r.q_parent_relation_comment}</CellText>
                         </td>
 
@@ -824,16 +697,14 @@ export default function EnvolaResponses() {
                             {r.q_support_score || "—"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 min-w-[220px]">
-                          <CellText>{r.q_support_comment}</CellText>
-                        </td>
 
-                        <td className="px-3 py-3 min-w-[260px]">
+                        <td className="px-3 py-3 min-w-[300px]">
                           <CellText>{r.q_final_comment}</CellText>
                         </td>
 
-                        <td className="px-3 py-3 min-w-[180px] text-[11px] text-slate-300">
-                          {Array.isArray(r.previous_response_dates) && r.previous_response_dates.length > 0 ? (
+                        <td className="px-3 py-3 min-w-[200px] text-[11px] text-slate-300">
+                          {Array.isArray(r.previous_response_dates) &&
+                          r.previous_response_dates.length > 0 ? (
                             <div className="space-y-1">
                               {r.previous_response_dates.map((d, idx) => (
                                 <div key={`${r.response_id}-prev-${idx}`}>{shortDate(d)}</div>

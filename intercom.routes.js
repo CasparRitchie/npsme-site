@@ -832,42 +832,62 @@ export function createIntercomRouter() {
   }
 
   function normalizeExportSurveyRow(row) {
-    const answers =
-      safeJsonParse(row.answers_json, []) ||
-      safeJsonParse(row.answers, []) ||
-      [];
+    let answers = [];
 
-    const scoreFromAnswers = pickNpsScore(answers);
-    const score =
-      typeof row.score === "number"
-        ? row.score
-        : toNumberIfNumeric(row.score) ?? scoreFromAnswers;
+    try {
+      if (row.answers_json) {
+        answers = JSON.parse(row.answers_json);
+      }
+    } catch {
+      answers = [];
+    }
+
+    const responseId =
+      row.response_id ||
+      (
+        String(row.content_id || "").trim() &&
+        String(row.receipt_id || "").trim()
+          ? `${String(row.content_id).trim()}:${String(row.receipt_id).trim()}`
+          : null
+      );
+
+    if (!responseId) return null;
+
+    // NPS score: first try exported score column, then fall back to answers
+    let score = null;
+
+    const directScore = toNumberIfNumeric(row.score);
+    if (directScore != null && directScore >= 0 && directScore <= 10) {
+      score = directScore;
+    } else {
+      score = pickNpsScore(answers);
+    }
 
     const extracted = extractCommentsAndOptions(answers);
 
-    const primaryComment =
-      firstNonEmpty(
-        row.comment,
-        ...extracted.verbatims.map((v) => v?.text)
-      ) || null;
-
-    const response_id = exportRowResponseId(row);
-    if (!response_id) return null;
+    const primary =
+      extracted.verbatims
+        .map((v) => v.text)
+        .sort((a, b) => b.length - a.length)[0] || null;
 
     return {
-      response_id,
+      response_id: responseId,
       source: "intercom_export",
-      content_id: String(row.content_id || ""),
+      content_id: String(row.content_id || "").trim() || null,
       content_title: row.content_title || null,
-      receipt_id: String(row.receipt_id || ""),
-      submitted_at: firstNonEmpty(row.received_at, row.created_at, row.submitted_at) || new Date().toISOString(),
+      receipt_id: String(row.receipt_id || "").trim() || null,
+      submitted_at:
+        row.submitted_at ||
+        row.received_at ||
+        row.created_at ||
+        new Date().toISOString(),
 
       score_0_10: score,
 
-      comment: primaryComment,
+      comment: primary || row.comment || null,
 
-      verbatims: Array.isArray(extracted.verbatims) ? extracted.verbatims : [],
-      selected_options: Array.isArray(extracted.selected_options) ? extracted.selected_options : [],
+      verbatims: extracted.verbatims,
+      selected_options: extracted.selected_options,
 
       email: row.email || null,
       name: row.name || null,
@@ -877,9 +897,8 @@ export function createIntercomRouter() {
       answers: Array.isArray(answers) ? answers : [],
 
       raw: {
-        stat_type: row.stat_type || null,
-        topic: row.topic || null,
-        export_received_at: row.received_at || null,
+        stat_type: row.stat_type || "completion",
+        topic: row.topic || "export_rebuild",
       },
     };
   }

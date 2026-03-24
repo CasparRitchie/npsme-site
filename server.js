@@ -11,7 +11,7 @@ import { createIntercomRouter } from "./intercom.routes.js";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 import crypto from "crypto";
-
+import { createEnvolaRouter } from "./envola.routes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -250,7 +250,10 @@ app.use((req, res, next) => {
 // Mount Intercom router ONCE, before express.json()
 app.use("/api/intercom", createIntercomRouter());
 
+app.use("/api/envola", createEnvolaRouter());
+
 app.use(express.json());
+
 
 // ---------------------------------------------------------------------------
 // Simple shared-password protection (Option B)
@@ -2702,6 +2705,7 @@ const ROUTE_META = {
 
   res.type("html").send(html);
 });
+
 
 /* -----------------------------
    Start server

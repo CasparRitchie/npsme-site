@@ -53,6 +53,10 @@ import ClosingTheLoop from "./pages/ClosingTheLoop";
 import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
 
+import EnvolaPerformance from "./pages/EnvolaPerformance";
+import EnvolaResponses from "./pages/EnvolaResponses";
+import EnvolaInvitations from "./pages/EnvolaInvitations";
+
 const protect = (Component) => {
   return function ProtectedPage() {
     return React.createElement(
@@ -99,6 +103,15 @@ const COMPONENTS = {
 
   "/envola/questions/:questionId": EnvolaQuestionDetail,
   "/fr/exemple-envola/questions/:questionId": EnvolaQuestionDetail,
+
+  "/envola/performance": protect(EnvolaPerformance),
+  "/fr/envola/performance": protect(EnvolaPerformance),
+
+  "/envola/responses": protect(EnvolaResponses),
+  "/fr/envola/responses": protect(EnvolaResponses),
+
+  "/envola/invitations": protect(EnvolaInvitations),
+  "/fr/envola/invitations": protect(EnvolaInvitations),
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

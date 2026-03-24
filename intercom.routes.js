@@ -669,6 +669,10 @@ async function downloadExportCsv(downloadUrl, { token }) {
   }
 }
 
+function isLikelySurveyRow(row) {
+  return String(row?.content_type || "").toLowerCase() === "survey";
+}
+
 export function createIntercomRouter() {
   const router = express.Router();
   const token = process.env.INTERCOM_ACCESS_TOKEN;
@@ -833,10 +837,11 @@ export function createIntercomRouter() {
 
   function normalizeExportSurveyRow(row) {
     let answers = [];
-
     try {
       if (row.answers_json) {
         answers = JSON.parse(row.answers_json);
+      } else if (row.answers) {
+        answers = typeof row.answers === "string" ? JSON.parse(row.answers) : row.answers;
       }
     } catch {
       answers = [];
@@ -853,10 +858,21 @@ export function createIntercomRouter() {
 
     if (!responseId) return null;
 
-    // NPS score: first try exported score column, then fall back to answers
+    const submittedAt =
+      row.submitted_at ||
+      row.received_at ||
+      row.created_at ||
+      new Date().toISOString();
+
     let score = null;
 
-    const directScore = toNumberIfNumeric(row.score);
+    const directScore =
+      toNumberIfNumeric(row.score) ??
+      toNumberIfNumeric(row.nps_score) ??
+      toNumberIfNumeric(row.rating) ??
+      toNumberIfNumeric(row.answer) ??
+      toNumberIfNumeric(row.response);
+
     if (directScore != null && directScore >= 0 && directScore <= 10) {
       score = directScore;
     } else {
@@ -876,11 +892,7 @@ export function createIntercomRouter() {
       content_id: String(row.content_id || "").trim() || null,
       content_title: row.content_title || null,
       receipt_id: String(row.receipt_id || "").trim() || null,
-      submitted_at:
-        row.submitted_at ||
-        row.received_at ||
-        row.created_at ||
-        new Date().toISOString(),
+      submitted_at: submittedAt,
 
       score_0_10: score,
 

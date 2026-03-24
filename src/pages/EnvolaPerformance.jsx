@@ -9,6 +9,7 @@ import WordCloud from "../components/WordCloud";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import { localizePath } from "../i18n/pathHelpers";
+import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
 const DEFAULT_CONTENT_ID = "189616";
 

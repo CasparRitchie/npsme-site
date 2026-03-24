@@ -296,7 +296,7 @@ export default function EnvolaExample() {
   const [msDays, setMsDays] = useState(90);
   const [msLimit, setMsLimit] = useState(120);
   const [multi, setMulti] = useState({ loading: false, data: null, error: null });
-
+  const [rateDays, setRateDays] = useState(30);
   function selectedBucketsParam() {
     const selected = [];
     if (bucketFilter.promoters) selected.push("promoter");
@@ -400,19 +400,33 @@ export default function EnvolaExample() {
   // RATE
   useEffect(() => {
     let cancelled = false;
+
+    setRate((s) => ({ ...s, loading: true, error: null }));
+
     (async () => {
       try {
-        const r = await fetch(`/api/intercom/public/nps-response-rate?content_id=${CONTENT_ID}&days=30`);
+        const r = await fetch(
+          `/api/intercom/public/nps-response-rate?content_id=${CONTENT_ID}&days=${encodeURIComponent(rateDays)}`
+        );
         const j = await r.json();
         if (!cancelled) {
-          setRate({ loading: false, data: j, error: r.ok ? null : (j?.error || "Error") });
+          setRate({
+            loading: false,
+            data: j,
+            error: r.ok ? null : (j?.error || "Error"),
+          });
         }
       } catch (e) {
-        if (!cancelled) setRate({ loading: false, data: null, error: e.message });
+        if (!cancelled) {
+          setRate({ loading: false, data: null, error: e.message });
+        }
       }
     })();
-    return () => { cancelled = true; };
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [CONTENT_ID, rateDays]);
 
   // NEW: TREND (refetch when filters change)
   useEffect(() => {
@@ -1500,8 +1514,23 @@ export default function EnvolaExample() {
             </div>
             <div className="flex flex-wrap gap-2">
               <Pill>{tr("envola.meta.publicSafe", "Public-safe (aggregated)")}</Pill>
-              <Pill>{tr("envola.meta.window", "Window: 30 days")}</Pill>
+              <Pill>{tr("common.window", "Window")}: {rateDays}d</Pill>
             </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400">
+              {tr("common.window", "Window")}:
+            </span>
+            <select
+              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm"
+              value={rateDays}
+              onChange={(e) => setRateDays(Number(e.target.value))}
+            >
+              <option value={30}>30d</option>
+              <option value={90}>90d</option>
+              <option value={180}>180d</option>
+              <option value={365}>365d</option>
+            </select>
           </div>
 
           {rate.loading && (

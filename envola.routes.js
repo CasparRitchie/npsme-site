@@ -59,8 +59,11 @@ const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
 const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
 const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
 
-const INTERCOM_NPS_RESPONSES_PATH =
-  process.env.DROPBOX_INTERCOM_NPS_RESPONSES_PATH || "/npsme/intercom/nps-responses.jsonl";
+const ENVOLA_RESPONSES_PATH =
+  process.env.DROPBOX_ENVOLA_RESPONSES_PATH || "/npsme/envola/responses.jsonl";
+
+const INTERCOM_SURVEY_EVENTS_PATH =
+  process.env.DROPBOX_INTERCOM_SURVEY_EVENTS_PATH || "/npsme/intercom/survey-events.jsonl";
 
 const DEFAULT_CONTENT_ID = process.env.ENVOLA_CONTENT_ID || "189616";
 const ENVOLA_INTERCOM_APP_ID = process.env.ENVOLA_INTERCOM_APP_ID || "";
@@ -173,6 +176,103 @@ function uniqueStrings(arr) {
   return Array.from(new Set((arr || []).filter(Boolean).map((x) => String(x))));
 }
 
+function jsonlStringify(rows) {
+  return rows.map((r) => JSON.stringify(r)).join("\n") + (rows.length ? "\n" : "");
+}
+
+function makeResponseId(e) {
+  const contentId = String(e.content_id || "").trim();
+  const receiptId = String(e.receipt_id || "").trim();
+  return contentId && receiptId ? `${contentId}:${receiptId}` : null;
+}
+
+function isBenefitsQuestion(answer) {
+  const qt = String(answer?.question_text || "").toLowerCase();
+  return qt.includes("quels bénéfices") || qt.includes("bénéfices principaux");
+}
+
+function extractCommentsAndOptions(answers) {
+  const out = {
+    verbatims: [],
+    selected_options: [],
+  };
+
+  for (const a of answers || []) {
+    const resp = a?.response;
+    if (resp == null) continue;
+
+    const s = String(resp).trim();
+    if (!s) continue;
+
+    const n = Number(s);
+    if (Number.isFinite(n) && /^\d+(\.\d+)?$/.test(s)) continue;
+
+    if (isBenefitsQuestion(a)) {
+      out.selected_options.push(s);
+      continue;
+    }
+
+    out.verbatims.push({
+      question_text: String(a?.question_text || "").trim() || null,
+      text: s,
+    });
+  }
+
+  out.selected_options = uniqueStrings(out.selected_options);
+  return out;
+}
+
+function pickNpsScore(answers) {
+  for (const a of answers || []) {
+    const n = toNumberIfNumeric(a?.response);
+    if (n !== null && n >= 0 && n <= 10) return n;
+  }
+  return null;
+}
+
+function normalizeCompletionEvent(e) {
+  let answers = [];
+  try {
+    answers = e.answers_json ? JSON.parse(e.answers_json) : [];
+  } catch {
+    answers = [];
+  }
+
+  const response_id = makeResponseId(e);
+  if (!response_id) return null;
+
+  const extracted = extractCommentsAndOptions(answers);
+  const primaryComment =
+    extracted.verbatims.map((v) => v.text).sort((a, b) => b.length - a.length)[0] || null;
+
+  return {
+    response_id,
+    source: "intercom_webhook",
+    content_id: String(e.content_id || "").trim() || null,
+    content_title: e.content_title || null,
+    receipt_id: String(e.receipt_id || "").trim() || null,
+    submitted_at: e.received_at || new Date().toISOString(),
+
+    score_0_10: pickNpsScore(answers),
+
+    comment: primaryComment,
+    verbatims: extracted.verbatims,
+    selected_options: extracted.selected_options,
+
+    email: e.email || null,
+    name: e.name || null,
+    contact_id: e.contact_id || null,
+    external_id: e.external_id || null,
+
+    answers: Array.isArray(answers) ? answers : [],
+
+    raw: {
+      stat_type: e.stat_type || null,
+      topic: e.topic || null,
+    },
+  };
+}
+
 // --------------------------------------------------
 // Dropbox helpers
 // --------------------------------------------------
@@ -227,6 +327,26 @@ async function readDropboxFile(path) {
   return res.text();
 }
 
+async function writeDropboxFile(path, contents) {
+  const token = await getDropboxAccessToken();
+  if (!token) return;
+
+  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/octet-stream",
+      "Dropbox-API-Arg": JSON.stringify({ path, mode: "overwrite", mute: true }),
+    },
+    body: contents,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Dropbox upload failed (${res.status}): ${text}`);
+  }
+}
+
 // --------------------------------------------------
 // Canonical dataset loader
 // --------------------------------------------------
@@ -237,7 +357,7 @@ async function getCanonicalResponses({ force = false } = {}) {
 
   if (!force && fresh) return cache.responses.rows;
 
-  const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+  const text = await readDropboxFile(ENVOLA_RESPONSES_PATH).catch(() => null);
   const rows = parseJsonl(text);
 
   // Deduplicate by response_id: newest record wins
@@ -467,8 +587,66 @@ function flattenResponseForTable(r, allRowsForContact = []) {
 export function createEnvolaRouter() {
   const router = express.Router();
 
+  function requireIngestToken(req, res, next) {
+    const ingestToken = process.env.NPSME_INGEST_TOKEN;
+    if (!ingestToken) {
+      return res.status(500).json({ ok: false, error: "NPSME_INGEST_TOKEN not configured" });
+    }
+
+    const provided = (req.get("X-Ingest-Token") || "").trim();
+    if (provided !== ingestToken) {
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
+
+    next();
+  }
+
   // Make whole workspace private for now
   router.use(requirePrivateCookie);
+
+  async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_ID } = {}) {
+    const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+    const rawEvents = parseJsonl(rawText);
+
+    const completions = rawEvents.filter(
+      (e) =>
+        String(e?.stat_type || "").toLowerCase() === "completion" &&
+        String(e?.content_id || "") === String(contentId)
+    );
+
+    const normalized = completions
+      .map(normalizeCompletionEvent)
+      .filter(Boolean);
+
+    const byId = new Map();
+    for (const r of normalized) {
+      const existing = byId.get(r.response_id);
+      if (!existing) {
+        byId.set(r.response_id, r);
+        continue;
+      }
+
+      const existingTs = Date.parse(existing.submitted_at || "") || 0;
+      const newTs = Date.parse(r.submitted_at || "") || 0;
+      if (newTs >= existingTs) {
+        byId.set(r.response_id, r);
+      }
+    }
+
+    const canonical = Array.from(byId.values()).sort((a, b) =>
+      String(b.submitted_at || "").localeCompare(String(a.submitted_at || ""))
+    );
+
+    await writeDropboxFile(ENVOLA_RESPONSES_PATH, jsonlStringify(canonical));
+    invalidateResponsesCache();
+
+    return {
+      ok: true,
+      content_id: contentId,
+      rebuilt_rows: canonical.length,
+      path: ENVOLA_RESPONSES_PATH,
+    };
+  }
 
   router.get("/summary", async (req, res) => {
     try {
@@ -664,6 +842,17 @@ export function createEnvolaRouter() {
       return res.json({ ok: true, refreshed: true });
     } catch (err) {
       console.error("[envola] refresh error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.post("/rebuild", requireIngestToken, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const out = await rebuildEnvolaResponsesFile({ contentId });
+      return res.json(out);
+    } catch (err) {
+      console.error("[envola] rebuild error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }
   });

@@ -404,6 +404,10 @@ export default function EnvolaPerformance() {
         )}&limit=200${bucketParams}`
       );
       const j = await r.json();
+
+      console.log("responses-for-point status:", r.status);
+      console.log("responses-for-point json:", j);
+
       setBucketResponses({
         loading: false,
         data: j,

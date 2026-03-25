@@ -391,6 +391,7 @@ export default function EnvolaPerformance() {
   }, [filters.contentId]);
 
   async function loadBucketResponses(point) {
+    console.log("Clicked point:", point);
     setSelectedPoint(point);
     setBucketResponses({ loading: true, data: null, error: null });
 
@@ -981,8 +982,8 @@ export default function EnvolaPerformance() {
                     <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                       <span
                         className={`inline-flex items-center rounded-full border px-2 py-1 ${bucketPillClass(
-                          r.bucket
-                        )}`}
+                        r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor"
+                      )}`}
                       >
                         {bucketLabel(
                           r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor",

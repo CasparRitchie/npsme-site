@@ -2477,6 +2477,7 @@ export const TRANSLATIONS = {
         redactionNote:
           "Comments are redacted automatically (emails, phone numbers, links, IDs).",
         tookTime: "Took time to write",
+        openContact: "Open contact",
       },
 
       diagnostics: {
@@ -5370,6 +5371,7 @@ export const TRANSLATIONS = {
         redactionNote:
           "Les commentaires sont anonymisés automatiquement (emails, téléphones, liens, identifiants).",
         tookTime: "A pris le temps d’écrire",
+        openContact: "Ouvrir le contact",
       },
 
       diagnostics: {

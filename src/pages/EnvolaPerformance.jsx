@@ -61,52 +61,6 @@ function Pill({ children }) {
   );
 }
 
-// function EnvolaWorkspaceNav({ lang, currentPath }) {
-//   const items = [
-//     {
-//       key: "performance",
-//       labelEn: "Performance",
-//       labelFr: "Performance",
-//       path: "/envola/performance",
-//     },
-//     {
-//       key: "responses",
-//       labelEn: "Responses",
-//       labelFr: "Réponses",
-//       path: "/envola/responses",
-//     },
-//     {
-//       key: "invitations",
-//       labelEn: "Invitations",
-//       labelFr: "Invitations",
-//       path: "/envola/invitations",
-//     },
-//   ];
-
-//   return (
-//     <div className="mt-6 flex flex-wrap gap-2">
-//       {items.map((item) => {
-//         const to = localizePath(item.path, lang);
-//         const active = currentPath === to;
-
-//         return (
-//           <Link
-//             key={item.key}
-//             to={to}
-//             className={`inline-flex items-center rounded-2xl border px-4 py-2 text-sm font-medium transition ${
-//               active
-//                 ? "border-white bg-white text-black"
-//                 : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
-//             }`}
-//           >
-//             {lang === "fr" ? item.labelFr : item.labelEn}
-//           </Link>
-//         );
-//       })}
-//     </div>
-//   );
-// }
-
 function useEnvolaFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -167,6 +121,21 @@ function bucketPillClass(bucket) {
   return "border-white/10 bg-white/5 text-slate-200";
 }
 
+function IntercomContactLink({ url, label }) {
+  if (!url) return null;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-200 hover:bg-white/10"
+    >
+      {label}
+    </a>
+  );
+}
+
 export default function EnvolaPerformance() {
   const location = useLocation();
   const { lang } = useLanguage();
@@ -179,8 +148,8 @@ export default function EnvolaPerformance() {
   const [themes, setThemes] = useState({ loading: true, data: null, error: null });
   const [comments, setComments] = useState({ loading: true, data: null, error: null });
   const [selectedPoint, setSelectedPoint] = useState(null);
-  const [bucketResponses, setBucketResponses] = useState({loading: false, data: null, error: null });
-  const [diagnostics, setDiagnostics] = useState({loading: true, data: null, error: null });
+  const [bucketResponses, setBucketResponses] = useState({ loading: false, data: null, error: null });
+  const [diagnostics, setDiagnostics] = useState({ loading: true, data: null, error: null });
   const [showAllResponsesModal, setShowAllResponsesModal] = useState(false);
 
   const dateParams = useMemo(() => {
@@ -465,7 +434,7 @@ export default function EnvolaPerformance() {
           <p className="mt-3 max-w-3xl text-slate-300">
             {tr(
               "envola.performance.subtitle",
-                "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts."
+              "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts."
             )}
           </p>
 
@@ -873,6 +842,11 @@ export default function EnvolaPerformance() {
                           • {r.score_0_10}/10
                         </span>
                         <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
+
+                        <IntercomContactLink
+                          url={r.intercom_contact_url}
+                          label={tr("envola.comments.openContact", "Open contact")}
+                        />
                       </div>
 
                       {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
@@ -1020,7 +994,9 @@ export default function EnvolaPerformance() {
             <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
           )}
           {!comments.loading && comments.error && (
-            <p className="mt-6 text-sm text-red-300">{tr("envola.common.error", "Error")}: {comments.error}</p>
+            <p className="mt-6 text-sm text-red-300">
+              {tr("envola.common.error", "Error")}: {comments.error}
+            </p>
           )}
 
           {!comments.loading && !comments.error && (
@@ -1045,6 +1021,11 @@ export default function EnvolaPerformance() {
                           {bucketLabel(c.bucket, tr)} • {c.score_0_10}/10
                         </span>
                         <span className="text-slate-400">{prettyDate(c.submitted_at)}</span>
+
+                        <IntercomContactLink
+                          url={c.intercom_contact_url}
+                          label={tr("envola.comments.openContact", "Open contact")}
+                        />
                       </div>
 
                       {c.question_text ? (
@@ -1073,8 +1054,8 @@ export default function EnvolaPerformance() {
                 </h3>
                 <p className="text-sm text-slate-400">
                   {selectedPoint?.date
-                  ? `${tr("envola.responsesPanel.selectedPeriod", "Selected period")}: ${selectedPoint.date}`
-                  : ""}
+                    ? `${tr("envola.responsesPanel.selectedPeriod", "Selected period")}: ${selectedPoint.date}`
+                    : ""}
                 </p>
               </div>
 
@@ -1107,6 +1088,11 @@ export default function EnvolaPerformance() {
                         • {r.score_0_10}/10
                       </span>
                       <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
+
+                      <IntercomContactLink
+                        url={r.intercom_contact_url}
+                        label={tr("envola.comments.openContact", "Open contact")}
+                      />
                     </div>
 
                     {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (

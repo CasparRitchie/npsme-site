@@ -1,5 +1,5 @@
 // src/pages/EnvolaResponses.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
@@ -185,6 +185,8 @@ export default function EnvolaResponses() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const { filters, updateFilters } = useExplorerFilters();
+  const navAnchorRef = useRef(null);
+  const [isNavPinned, setIsNavPinned] = useState(false);
 
   const [state, setState] = useState({
     loading: true,
@@ -257,6 +259,21 @@ export default function EnvolaResponses() {
       cancelled = true;
     };
   }, [filters.contentId, dateParams, filters.bucket]);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (!navAnchorRef.current) return;
+      const rect = navAnchorRef.current.getBoundingClientRect();
+      setIsNavPinned(rect.top <= 0);
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const responseRows = useMemo(() => {
     const rawRows = Array.isArray(state.rows) ? state.rows : [];
@@ -343,42 +360,42 @@ export default function EnvolaResponses() {
               "Vue détaillée des réponses, une ligne par réponse, avec tri et filtres globaux."
             )}
           </p>
-
-          <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
         </div>
       </PageHeader>
 
-      <section className="mx-auto max-w-7xl px-6 pb-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div ref={navAnchorRef} className="h-px w-full" />
+
+      {isNavPinned && <div className="h-[66px]" />}
+
+      <section
+        className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
+          isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-6 py-3">
+          <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-6">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 md:p-5">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">
-                {tr("envola.filters.title", "Filtres")}
+              <h2 className="text-lg font-semibold text-white">
+                {tr("envola.filters.title", "Global filters")}
               </h2>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-0.5 text-xs md:text-sm text-slate-400">
                 {tr(
                   "envola.responses.filtersSubtitle",
-                  "Filtrez et triez les réponses avant de naviguer dans le tableau."
+                  "Filter and sort responses before exploring the table."
                 )}
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>
-                {tr("common.window", "Window")}: {activeWindowLabel}
-              </Pill>
-              <Pill>
-                {tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}
-              </Pill>
-              <Pill>
-                {tr("common.returned", "Returned")}: {responseRows.length}
-              </Pill>
-            </div>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
             <div>
-              <label className="text-xs text-slate-400">
+              <label className="text-[11px] text-slate-400">
                 {tr("envola.filters.mode", "Mode")}
               </label>
               <select
@@ -393,7 +410,7 @@ export default function EnvolaResponses() {
 
             {filters.mode === "rolling" ? (
               <div>
-                <label className="text-xs text-slate-400">
+                <label className="text-[11px] text-slate-400">
                   {tr("common.window", "Window")}
                 </label>
                 <select
@@ -410,7 +427,7 @@ export default function EnvolaResponses() {
             ) : (
               <>
                 <div>
-                  <label className="text-xs text-slate-400">
+                  <label className="text-[11px] text-slate-400">
                     {tr("common.from", "From")}
                   </label>
                   <input
@@ -422,7 +439,7 @@ export default function EnvolaResponses() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400">
+                  <label className="text-[11px] text-slate-400">
                     {tr("common.to", "To")}
                   </label>
                   <input
@@ -436,7 +453,7 @@ export default function EnvolaResponses() {
             )}
 
             <div>
-              <label className="text-xs text-slate-400">
+              <label className="text-[11px] text-slate-400">
                 {tr("common.bucket", "Bucket")}
               </label>
               <select
@@ -452,7 +469,7 @@ export default function EnvolaResponses() {
             </div>
 
             <div>
-              <label className="text-xs text-slate-400">
+              <label className="text-[11px] text-slate-400">
                 {tr("common.search", "Search")}
               </label>
               <input
@@ -464,7 +481,9 @@ export default function EnvolaResponses() {
             </div>
 
             <div>
-              <label className="text-xs text-slate-400">content_id</label>
+              <label className="text-[11px] text-slate-400">
+                {tr("envola.common.contentId", "content_id")}
+              </label>
               <input
                 className="mt-1 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white"
                 value={filters.contentId}

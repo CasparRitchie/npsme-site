@@ -895,6 +895,58 @@ export function createEnvolaRouter() {
     }
   });
 
+  router.get("/debug-response-ids", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+
+      const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+      const rawEvents = parseJsonl(rawText);
+
+      const completions = rawEvents.filter(
+        (e) =>
+          String(e?.content_id || "") === String(contentId) &&
+          String(e?.stat_type || "").toLowerCase() === "completion"
+      );
+
+      const grouped = new Map();
+
+      for (const e of completions) {
+        const responseId = makeResponseId(e) || "__missing__";
+        const arr = grouped.get(responseId) || [];
+        arr.push({
+          response_id: responseId,
+          receipt_id: e?.receipt_id || null,
+          content_id: e?.content_id || null,
+          received_at: e?.received_at || null,
+          email: e?.email || null,
+          name: e?.name || null,
+        });
+        grouped.set(responseId, arr);
+      }
+
+      const collisions = Array.from(grouped.entries())
+        .filter(([, rows]) => rows.length > 1)
+        .map(([response_id, rows]) => ({
+          response_id,
+          count: rows.length,
+          rows,
+        }))
+        .sort((a, b) => b.count - a.count);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        completion_total: completions.length,
+        unique_response_ids: grouped.size,
+        collisions_count: collisions.length,
+        collisions,
+      });
+    } catch (err) {
+      console.error("[envola] debug-response-ids error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   router.post("/refresh", async (_req, res) => {
     try {
       invalidateResponsesCache();

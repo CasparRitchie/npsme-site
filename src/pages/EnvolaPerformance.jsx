@@ -978,6 +978,9 @@ export default function EnvolaPerformance() {
 
             {!bucketResponses.loading && bucketResponses.data?.ok && (
               <div className="mt-4 space-y-3">
+                    <pre className="mt-4 text-xs text-slate-400 overflow-auto">
+                      {JSON.stringify(bucketResponses.data, null, 2)}
+                    </pre>
                 {(bucketResponses.data.rows || []).map((r) => (
                   <div
                     key={r.response_id || `${r.submitted_at}-${r.contact_id}`}

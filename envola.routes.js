@@ -846,12 +846,62 @@ export function createEnvolaRouter() {
     }
   });
 
+  router.get("/debug-rebuild", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+
+      const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+      const rawEvents = parseJsonl(rawText);
+
+      const matchingContent = rawEvents.filter(
+        (e) => String(e?.content_id || "") === String(contentId)
+      );
+
+      const completions = matchingContent.filter(
+        (e) => String(e?.stat_type || "").toLowerCase() === "completion"
+      );
+
+      const normalized = completions
+        .map(normalizeCompletionEvent)
+        .filter(Boolean);
+
+      const byId = new Map();
+      for (const r of normalized) {
+        const existing = byId.get(r.response_id);
+        if (!existing) {
+          byId.set(r.response_id, r);
+          continue;
+        }
+
+        const existingTs = Date.parse(existing.submitted_at || "") || 0;
+        const newTs = Date.parse(r.submitted_at || "") || 0;
+        if (newTs >= existingTs) {
+          byId.set(r.response_id, r);
+        }
+      }
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        raw_events_total: rawEvents.length,
+        matching_content_total: matchingContent.length,
+        completion_total: completions.length,
+        normalized_total: normalized.length,
+        deduped_total: byId.size,
+      });
+    } catch (err) {
+      console.error("[envola] debug-rebuild error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   router.post("/refresh", async (_req, res) => {
     try {
       invalidateResponsesCache();
       await getCanonicalResponses({ force: true });
       return res.json({ ok: true, refreshed: true });
-    } catch (err) {
+    }
+    catch (err) {
       console.error("[envola] refresh error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }

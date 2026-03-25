@@ -2531,6 +2531,11 @@ export const TRANSLATIONS = {
       exports: {
         downloadCsv: "Download CSV",
       },
+      responses: {
+        tableTitle: "Responses",
+        tableSubtitle: "Export the currently filtered response set as CSV.",
+        sortTip: "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling.",
+      },
 
       next: {
         title: "Coming next on this page",
@@ -5433,6 +5438,12 @@ export const TRANSLATIONS = {
 
       exports: {
         downloadCsv: "Télécharger le CSV",
+      },
+
+      responses: {
+        tableTitle: "Réponses",
+        tableSubtitle: "Exporter en CSV l’ensemble des réponses correspondant aux filtres actuels.",
+        sortTip: "Astuce : cliquez sur un en-tête de colonne pour trier. Les en-têtes et les premières colonnes restent visibles pendant le défilement.",
       },
 
       next: {

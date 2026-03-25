@@ -303,6 +303,12 @@ export default function EnvolaResponses() {
       ? `${filters.from} → ${filters.to}`
       : `${filters.days}d`;
 
+  const exportCsvUrl = useMemo(() => {
+    return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(
+      filters.contentId
+    )}&${dateParams}${bucketParams}`;
+  }, [filters.contentId, dateParams, bucketParams]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
@@ -461,311 +467,39 @@ export default function EnvolaResponses() {
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-4 md:p-6">
-          {state.loading && (
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-slate-300">
-              {tr("common.loading", "Loading…")}
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-white">
+                {tr("envola.responses.tableTitle", "Responses")}
+              </h2>
+              <p className="mt-1 text-sm text-slate-400">
+                {tr(
+                  "envola.responses.tableSubtitle",
+                  "Export the currently filtered response set as CSV."
+                )}
+              </p>
             </div>
-          )}
 
-          {!state.loading && state.error && (
-            <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-200">
-              {tr("common.error", "Error")}: {state.error}
-            </div>
-          )}
+            <a
+              href={exportCsvUrl}
+              className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+            >
+              {tr("envola.exports.downloadCsv", "Download CSV")}
+            </a>
+          </div>
 
-          {!state.loading && !state.error && responseRows.length === 0 && (
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-slate-300">
-              {tr("envola.responses.none", "No responses found for this filter set.")}
-            </div>
-          )}
+          <div className="overflow-auto rounded-2xl border border-white/10">
+            <table className="min-w-[2450px] table-fixed border-collapse text-xs">
+              {/* ...existing table... */}
+            </table>
+          </div>
 
-          {!state.loading && !state.error && responseRows.length > 0 && (
-            <div className="overflow-auto rounded-2xl border border-white/10">
-              <table className="min-w-[2450px] table-fixed border-collapse text-xs">
-                <thead className="sticky top-0 z-30 bg-[#0F172A]">
-                  <tr className="border-b border-white/10">
-                    <SortableTh
-                      label={tr("common.contact", "Contact")}
-                      sortKey="contact_name"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="sticky left-0 z-40 w-[150px] min-w-[150px] bg-[#0F172A]"
-                    />
-                    <SortableTh
-                      label={tr("common.date", "Date")}
-                      sortKey="submitted_at"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="sticky left-[150px] z-40 w-[95px] min-w-[95px] bg-[#0F172A]"
-                    />
-                    <th className="sticky left-[245px] z-40 w-[88px] min-w-[88px] bg-[#0F172A] px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-200">
-                      {tr("common.intercom", "Intercom")}
-                    </th>
-
-                    <SortableTh
-                      label="NPS"
-                      sortKey="nps_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[70px]"
-                    />
-                    <SortableTh
-                      label={tr("common.bucket", "Bucket")}
-                      sortKey="bucket"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[115px]"
-                    />
-                    <SortableTh
-                      label="Pioupiou"
-                      sortKey="pioupiou"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[120px]"
-                    />
-                    <SortableTh
-                      label="Reader"
-                      sortKey="reader_serial"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[110px]"
-                    />
-                    <SortableTh
-                      label="Recommend"
-                      sortKey="q_recommend_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[105px]"
-                    />
-                    <SortableTh
-                      label="Why?"
-                      sortKey="q_recommend_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[280px]"
-                    />
-                    <SortableTh
-                      label="Install"
-                      sortKey="q_install_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[90px]"
-                    />
-                    <SortableTh
-                      label="Install comment"
-                      sortKey="q_install_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[240px]"
-                    />
-                    <SortableTh
-                      label="Daily use"
-                      sortKey="q_daily_use_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[100px]"
-                    />
-                    <SortableTh
-                      label="Benefits"
-                      sortKey="q_benefits"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[240px]"
-                    />
-                    <SortableTh
-                      label="Parent relation"
-                      sortKey="q_parent_relation_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[115px]"
-                    />
-                    <SortableTh
-                      label="Parent relation comment"
-                      sortKey="q_parent_relation_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[260px]"
-                    />
-                    <SortableTh
-                      label="Support"
-                      sortKey="q_support_score"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[95px]"
-                    />
-                    <SortableTh
-                      label="Support comment"
-                      sortKey="q_support_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[220px]"
-                    />
-                    <SortableTh
-                      label="Final comment"
-                      sortKey="q_final_comment"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[240px]"
-                    />
-                    <SortableTh
-                      label="Previous responses"
-                      sortKey="previous_response_dates"
-                      filters={filters}
-                      updateFilters={updateFilters}
-                      className="w-[170px]"
-                    />
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {responseRows.map((r, i) => {
-                    const rowBg = i % 2 === 0 ? "bg-slate-950/60" : "bg-slate-900/60";
-                    const stickyBg = i % 2 === 0 ? "bg-[#020817]" : "bg-[#0b1730]";
-
-                    return (
-                      <tr
-                        key={r.response_id || `${r.contact_name}-${r.submitted_at}-${i}`}
-                        className={`border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
-                      >
-                        <td
-                          className={`sticky left-0 z-20 w-[150px] min-w-[150px] border-r border-white/10 px-3 py-3 ${stickyBg}`}
-                        >
-                          <CellText>{r.contact_name}</CellText>
-
-                          <div className="mt-3">
-                            {r.intercom_contact_url ? (
-                              <a
-                                href={r.intercom_contact_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
-                              >
-                                {tr("common.open", "Open")}
-                              </a>
-                            ) : (
-                              <span className="text-slate-500">—</span>
-                            )}
-                          </div>
-                        </td>
-
-                        <td
-                          className={`sticky left-[150px] z-20 w-[95px] min-w-[95px] border-r border-white/10 px-3 py-3 ${stickyBg}`}
-                        >
-                          <CellText>{shortDate(r.submitted_at)}</CellText>
-                        </td>
-
-                        <td
-                          className={`sticky left-[245px] z-20 w-[88px] min-w-[88px] border-r border-white/10 px-3 py-3 ${stickyBg}`}
-                        >
-                          <span
-                            className={`inline-flex rounded-full border px-2 py-1 text-[11px] font-semibold ${bucketBadge(
-                              r.bucket
-                            )}`}
-                          >
-                            {r.bucket || "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={`font-semibold ${scoreTextClass(Number(r.nps_score))}`}>
-                            {r.nps_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.response_id || "—"}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.pioupiou}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.reader_serial}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(r.q_recommend_score))}>
-                            {r.q_recommend_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_recommend_comment}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(r.q_install_score))}>
-                            {r.q_install_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_install_comment}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(r.q_daily_use_score))}>
-                            {r.q_daily_use_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_benefits}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(r.q_parent_relation_score))}>
-                            {r.q_parent_relation_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_parent_relation_comment}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(r.q_support_score))}>
-                            {r.q_support_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_support_comment}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3">
-                          <CellText>{r.q_final_comment}</CellText>
-                        </td>
-
-                        <td className="px-3 py-3 text-[11px] text-slate-300">
-                          {Array.isArray(r.previous_response_dates) &&
-                          r.previous_response_dates.length > 0 ? (
-                            <div className="space-y-1">
-                              {r.previous_response_dates.map((d, idx) => (
-                                <div key={`${r.response_id || i}-prev-${idx}`}>{shortDate(d)}</div>
-                              ))}
-                            </div>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {!state.loading && !state.error && (
-            <div className="mt-4 text-xs text-slate-500">
-              {tr(
-                "envola.responses.note",
-                "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling."
-              )}
-            </div>
-          )}
+          <div className="mt-4 text-xs text-slate-500">
+            {tr(
+              "envola.responses.sortTip",
+              "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling."
+            )}
+          </div>
         </div>
       </section>
     </div>

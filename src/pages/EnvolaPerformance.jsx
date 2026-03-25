@@ -438,12 +438,6 @@ export default function EnvolaPerformance() {
       ? `${filters.from} → ${filters.to}`
       : `${filters.days}d`;
 
-  // const exportCsvUrl = useMemo(() => {
-  //   return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(
-  //     filters.contentId
-  //   )}&${dateParams}${bucketParams}`;
-  // }, [filters.contentId, dateParams, bucketParams]);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo

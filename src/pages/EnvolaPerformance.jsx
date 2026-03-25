@@ -449,11 +449,11 @@ export default function EnvolaPerformance() {
         </div>
       </PageHeader>
 
-      <section className="sticky top-0 z-40 border-y border-white/10 bg-[#0B1220]/85 backdrop-blur-md">
+      <div className="sticky top-16 z-40 border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-6 py-3">
           <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
         </div>
-      </section>
+      </div>
 
       <section className="mx-auto max-w-7xl px-6 pb-6 pt-6">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">

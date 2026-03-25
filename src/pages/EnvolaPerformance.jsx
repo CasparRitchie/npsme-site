@@ -181,6 +181,7 @@ export default function EnvolaPerformance() {
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [bucketResponses, setBucketResponses] = useState({loading: false, data: null, error: null });
   const [diagnostics, setDiagnostics] = useState({loading: true, data: null, error: null });
+  const [showAllResponsesModal, setShowAllResponsesModal] = useState(false);
 
   const dateParams = useMemo(() => {
     if (filters.mode === "range") {
@@ -789,6 +790,100 @@ export default function EnvolaPerformance() {
         </div>
       </section>
 
+      {selectedPoint && (
+        <section className="mx-auto max-w-7xl px-6 pb-20">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div className="text-sm text-slate-200">
+                <span className="text-slate-400">{tr("common.selected", "Selected")}:</span>{" "}
+                <span className="font-semibold text-white">{selectedPoint.date}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPoint(null);
+                  setBucketResponses({ loading: false, data: null, error: null });
+                }}
+                className="text-sm text-slate-300 hover:text-white"
+              >
+                {tr("common.close", "Close")}
+              </button>
+            </div>
+
+            {bucketResponses.loading && (
+              <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+            )}
+            {!bucketResponses.loading && bucketResponses.error && (
+              <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
+            )}
+
+            {!bucketResponses.loading && bucketResponses.data?.ok && (
+              <>
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <div className="text-sm text-slate-300">
+                    {bucketResponses.data.returned ?? bucketResponses.data.rows?.length ?? 0} response(s)
+                  </div>
+
+                  {(bucketResponses.data.rows?.length || 0) > 3 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllResponsesModal(true)}
+                      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                    >
+                      View all
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="mt-4 max-h-[560px] space-y-3 overflow-y-auto pr-2">
+                  {(bucketResponses.data.rows || []).map((r) => (
+                    <div
+                      key={r.response_id || `${r.submitted_at}-${r.contact_id}`}
+                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                    >
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2 py-1 ${bucketPillClass(
+                            r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor"
+                          )}`}
+                        >
+                          {bucketLabel(
+                            r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor",
+                            tr
+                          )}{" "}
+                          • {r.score_0_10}/10
+                        </span>
+                        <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
+                      </div>
+
+                      {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
+                        <div className="mt-3 space-y-2">
+                          {r.verbatims.slice(0, 6).map((v, idx) => (
+                            <div key={idx}>
+                              {v.question_text ? (
+                                <div className="text-xs text-slate-400">{v.question_text}</div>
+                              ) : null}
+                              <div className="text-sm leading-relaxed text-slate-200">
+                                “{v.text}”
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="mt-3 text-sm text-slate-400">
+                          {tr("envola.responses.none", "No verbatims stored for this response.")}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="mx-auto max-w-7xl px-6 pb-10">
         <NpsBucketStackedColumns
           points={trendPoints}
@@ -948,61 +1043,51 @@ export default function EnvolaPerformance() {
         </div>
       </section>
 
-      {selectedPoint && (
-        <section className="mx-auto max-w-7xl px-6 pb-20">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div className="text-sm text-slate-200">
-                <span className="text-slate-400">{tr("common.selected", "Selected")}:</span>{" "}
-                <span className="font-semibold text-white">{selectedPoint.date}</span>
+      {showAllResponsesModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-6">
+          <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0F172A] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white">All responses</h3>
+                <p className="text-sm text-slate-400">
+                  {selectedPoint?.date ? `Selected period: ${selectedPoint.date}` : ""}
+                </p>
               </div>
 
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedPoint(null);
-                  setBucketResponses({ loading: false, data: null, error: null });
-                }}
-                className="text-sm text-slate-300 hover:text-white"
+                onClick={() => setShowAllResponsesModal(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
               >
-                {tr("common.close", "Close")}
+                Close
               </button>
             </div>
 
-            {bucketResponses.loading && (
-              <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
-            )}
-            {!bucketResponses.loading && bucketResponses.error && (
-              <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
-            )}
-
-            {!bucketResponses.loading && bucketResponses.data?.ok && (
-              <div className="mt-4 space-y-3">
-                    <pre className="mt-4 text-xs text-slate-400 overflow-auto">
-                      {JSON.stringify(bucketResponses.data, null, 2)}
-                    </pre>
-                {(bucketResponses.data.rows || []).map((r) => (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="space-y-3">
+                {(bucketResponses.data?.rows || []).map((r) => (
                   <div
-                    key={r.response_id || `${r.submitted_at}-${r.contact_id}`}
+                    key={`modal-${r.response_id || `${r.submitted_at}-${r.contact_id}`}`}
                     className="rounded-2xl border border-white/10 bg-black/20 p-4"
                   >
                     <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                       <span
                         className={`inline-flex items-center rounded-full border px-2 py-1 ${bucketPillClass(
-                        r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor"
-                      )}`}
+                          r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor"
+                        )}`}
                       >
                         {bucketLabel(
                           r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor",
                           tr
-                        )} • {r.score_0_10}/10
+                        )}{" "}
+                        • {r.score_0_10}/10
                       </span>
                       <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
                     </div>
 
                     {Array.isArray(r.verbatims) && r.verbatims.length > 0 ? (
                       <div className="mt-3 space-y-2">
-                        {r.verbatims.slice(0, 6).map((v, idx) => (
+                        {r.verbatims.map((v, idx) => (
                           <div key={idx}>
                             {v.question_text ? (
                               <div className="text-xs text-slate-400">{v.question_text}</div>
@@ -1021,9 +1106,9 @@ export default function EnvolaPerformance() {
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </section>
+        </div>
       )}
     </div>
   );

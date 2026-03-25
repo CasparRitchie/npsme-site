@@ -267,7 +267,7 @@ export default function EnvolaPerformance() {
     (async () => {
       try {
         const r = await fetch(
-          `/api/intercom/public/nps-response-rate?content_id=${encodeURIComponent(
+          `/api/envola/nps-response-rate?content_id=${encodeURIComponent(
             filters.contentId
           )}&${dateParams}`
         );
@@ -299,7 +299,7 @@ export default function EnvolaPerformance() {
     (async () => {
       try {
         const r = await fetch(
-          `/api/intercom/public/nps-themes?content_id=${encodeURIComponent(
+          `/api/envola/nps-themes?content_id=${encodeURIComponent(
             filters.contentId
           )}&${dateParams}${bucketParams}`
         );
@@ -331,7 +331,7 @@ export default function EnvolaPerformance() {
     (async () => {
       try {
         const r = await fetch(
-          `/api/intercom/public/nps-comments?content_id=${encodeURIComponent(
+          `/api/envola/nps-comments?content_id=${encodeURIComponent(
             filters.contentId
           )}&${dateParams}&limit=80${bucketParams}`
         );

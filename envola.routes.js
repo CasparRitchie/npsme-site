@@ -854,7 +854,192 @@ export function createEnvolaRouter() {
     }
   });
 
-  
+  router.get("/comments", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const bucket = String(req.query.bucket || "all").trim().toLowerCase();
+      const limit = clampInt(req.query.limit, 80, 1, 500);
+
+      const window = parseWindowFromQuery(req);
+      if (!window.ok) {
+        return res.status(400).json({ ok: false, error: window.error });
+      }
+
+      const allRows = await getCanonicalResponses();
+      const filtered = filterDataset(allRows, {
+        contentId,
+        fromMs: window.fromMs,
+        toMs: window.toMs,
+        bucket,
+      });
+
+      const comments = filtered
+        .flatMap((r) => {
+          const verbatims = Array.isArray(r?.verbatims) ? r.verbatims : [];
+          const score = r?.score_0_10 ?? null;
+          const rowBucket = scoreBucket(score);
+
+          if (verbatims.length > 0) {
+            return verbatims
+              .filter((v) => v?.text)
+              .map((v) => ({
+                response_id: r?.response_id || null,
+                submitted_at: r?.submitted_at || null,
+                score_0_10: score,
+                bucket: rowBucket,
+                question_text: v?.question_text || null,
+                comment: v?.text || null,
+              }));
+          }
+
+          if (r?.comment) {
+            return [
+              {
+                response_id: r?.response_id || null,
+                submitted_at: r?.submitted_at || null,
+                score_0_10: score,
+                bucket: rowBucket,
+                question_text: null,
+                comment: r.comment,
+              },
+            ];
+          }
+
+          return [];
+        })
+        .sort((a, b) =>
+          String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
+        )
+        .slice(0, limit);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        mode: window.mode,
+        from: window.from,
+        to: window.to,
+        bucket,
+        returned: comments.length,
+        comments,
+      });
+    } catch (err) {
+      console.error("[envola] comments error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get("/response-rate", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+
+      const window = parseWindowFromQuery(req);
+      if (!window.ok) {
+        return res.status(400).json({ ok: false, error: window.error });
+      }
+
+      const allRows = await getCanonicalResponses();
+      const filtered = filterDataset(allRows, {
+        contentId,
+        fromMs: window.fromMs,
+        toMs: window.toMs,
+        bucket: "all",
+      });
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        mode: window.mode,
+        from: window.from,
+        to: window.to,
+        completed_responses: filtered.length,
+        response_rate_pct: null,
+        median_time_to_completion: null,
+        median_time_to_first_answer: null,
+        note: "Response-rate and timing fields are not yet computed in /api/envola/response-rate",
+      });
+    } catch (err) {
+      console.error("[envola] response-rate error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get("/themes", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const bucket = String(req.query.bucket || "all").trim().toLowerCase();
+
+      const window = parseWindowFromQuery(req);
+      if (!window.ok) {
+        return res.status(400).json({ ok: false, error: window.error });
+      }
+
+      const allRows = await getCanonicalResponses();
+      const filtered = filterDataset(allRows, {
+        contentId,
+        fromMs: window.fromMs,
+        toMs: window.toMs,
+        bucket,
+      });
+
+      const themeMap = new Map();
+
+      for (const r of filtered) {
+        const score = r?.score_0_10 ?? null;
+        const rowBucket = scoreBucket(score);
+        const options = Array.isArray(r?.selected_options) ? r.selected_options : [];
+
+        for (const rawTheme of options) {
+          const theme = String(rawTheme || "").trim();
+          if (!theme) continue;
+
+          const cur = themeMap.get(theme) || {
+            theme,
+            mentions: 0,
+            total_score: 0,
+            scored_count: 0,
+            detractor_mentions: 0,
+          };
+
+          cur.mentions += 1;
+
+          if (typeof score === "number") {
+            cur.total_score += score;
+            cur.scored_count += 1;
+          }
+
+          if (rowBucket === "detractor") {
+            cur.detractor_mentions += 1;
+          }
+
+          themeMap.set(theme, cur);
+        }
+      }
+
+      const themes = Array.from(themeMap.values())
+        .map((t) => ({
+          theme: t.theme,
+          mentions: t.mentions,
+          avg_score: t.scored_count ? +(t.total_score / t.scored_count).toFixed(1) : null,
+          share_of_detractor_mentions: t.mentions
+            ? Math.round((t.detractor_mentions / t.mentions) * 100)
+            : null,
+        }))
+        .sort((a, b) => b.mentions - a.mentions);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        mode: window.mode,
+        from: window.from,
+        to: window.to,
+        bucket,
+        themes,
+      });
+    } catch (err) {
+      console.error("[envola] themes error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
 
   router.get("/diagnostics", async (req, res) => {
     try {

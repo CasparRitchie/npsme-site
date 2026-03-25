@@ -180,6 +180,29 @@ function jsonlStringify(rows) {
   return rows.map((r) => JSON.stringify(r)).join("\n") + (rows.length ? "\n" : "");
 }
 
+function escapeCsv(value) {
+  if (value == null) return "";
+  const s = String(value);
+  if (s.includes('"') || s.includes(",") || s.includes("\n")) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+function toCsv(rows) {
+  if (!rows.length) return "";
+
+  const headers = Object.keys(rows[0]);
+  const lines = [
+    headers.join(","),
+    ...rows.map((row) =>
+      headers.map((header) => escapeCsv(row[header])).join(",")
+    ),
+  ];
+
+  return lines.join("\n");
+}
+
 function makeResponseId(e) {
   const contentId = String(e.content_id || "").trim();
   const receiptId = String(e.receipt_id || "").trim();
@@ -859,6 +882,89 @@ export function createEnvolaRouter() {
       });
     } catch (err) {
       console.error("[envola] responses error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  router.get("/responses-export.csv", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const bucket = String(req.query.bucket || "all").trim().toLowerCase();
+      const limit = clampInt(req.query.limit, 5000, 1, 20000);
+
+      const window = parseWindowFromQuery(req);
+      if (!window.ok) {
+        return res.status(400).json({ ok: false, error: window.error });
+      }
+
+      const allRows = await getCanonicalResponses();
+      const filtered = filterDataset(allRows, {
+        contentId,
+        fromMs: window.fromMs,
+        toMs: window.toMs,
+        bucket,
+      })
+        .sort((a, b) =>
+          String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
+        )
+        .slice(0, limit);
+
+      const byContact = new Map();
+      for (const r of filtered) {
+        const cid = String(r?.contact_id || "").trim();
+        if (!cid) continue;
+        const arr = byContact.get(cid) || [];
+        arr.push(r);
+        byContact.set(cid, arr);
+      }
+
+      const rows = filtered.map((r) => {
+        const cid = String(r?.contact_id || "").trim();
+        const history = cid ? byContact.get(cid) || [] : [];
+        const flat = flattenResponseForTable(r, history);
+
+        return {
+          response_id: flat.response_id,
+          submitted_at: flat.submitted_at,
+          nps_score: flat.nps_score,
+          bucket: flat.bucket,
+          contact_id: flat.contact_id,
+          contact_name: flat.contact_name,
+          intercom_contact_url: flat.intercom_contact_url,
+          pioupiou: flat.pioupiou,
+          reader_serial: flat.reader_serial,
+          previous_response_dates: (flat.previous_response_dates || []).join(" | "),
+          previous_response_links: (flat.previous_response_links || []).join(" | "),
+          q_recommend_score: flat.q_recommend_score,
+          q_recommend_comment: flat.q_recommend_comment,
+          q_install_score: flat.q_install_score,
+          q_install_comment: flat.q_install_comment,
+          q_daily_use_score: flat.q_daily_use_score,
+          q_benefits: flat.q_benefits,
+          q_parent_relation_score: flat.q_parent_relation_score,
+          q_parent_relation_comment: flat.q_parent_relation_comment,
+          q_support_score: flat.q_support_score,
+          q_support_comment: flat.q_support_comment,
+          q_final_comment: flat.q_final_comment,
+          selected_options: (flat.selected_options || []).join(" | "),
+        };
+      });
+
+      const csv = toCsv(rows);
+
+      const suffix =
+        window.mode === "range"
+          ? `${window.from}_to_${window.to}`
+          : `last_${window.days}d`;
+
+      const safeBucket = bucket || "all";
+      const filename = `envola_responses_${contentId}_${safeBucket}_${suffix}.csv`;
+
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.status(200).send(csv);
+    } catch (err) {
+      console.error("[envola] responses-export.csv error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }
   });

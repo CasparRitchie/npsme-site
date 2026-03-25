@@ -1,5 +1,5 @@
 // src/pages/EnvolaPerformance.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
@@ -159,6 +159,8 @@ export default function EnvolaPerformance() {
   const [bucketResponses, setBucketResponses] = useState({ loading: false, data: null, error: null });
   const [diagnostics, setDiagnostics] = useState({ loading: true, data: null, error: null });
   const [showAllResponsesModal, setShowAllResponsesModal] = useState(false);
+  const navAnchorRef = useRef(null);
+  const [isNavPinned, setIsNavPinned] = useState(false);
 
   const dateParams = useMemo(() => {
     if (filters.mode === "range") {
@@ -368,6 +370,21 @@ export default function EnvolaPerformance() {
     };
   }, [filters.contentId]);
 
+  useEffect(() => {
+    function handleScroll() {
+      if (!navAnchorRef.current) return;
+      const rect = navAnchorRef.current.getBoundingClientRect();
+      setIsNavPinned(rect.top <= 0);
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   async function loadBucketResponses(point) {
     console.log("Clicked point:", point);
     setSelectedPoint(point);
@@ -449,7 +466,15 @@ export default function EnvolaPerformance() {
         </div>
       </PageHeader>
 
-      <section className="sticky top-[72px] z-[60] border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md">
+      <div ref={navAnchorRef} className="h-px w-full" />
+
+      {isNavPinned && <div className="h-[66px]" />}
+
+      <section
+        className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
+          isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
+        }`}
+      >
         <div className="mx-auto max-w-7xl px-6 py-3">
           <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
         </div>

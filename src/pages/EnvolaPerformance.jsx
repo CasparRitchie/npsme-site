@@ -438,11 +438,11 @@ export default function EnvolaPerformance() {
       ? `${filters.from} → ${filters.to}`
       : `${filters.days}d`;
 
-  const exportCsvUrl = useMemo(() => {
-    return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(
-      filters.contentId
-    )}&${dateParams}${bucketParams}`;
-  }, [filters.contentId, dateParams, bucketParams]);
+  // const exportCsvUrl = useMemo(() => {
+  //   return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(
+  //     filters.contentId
+  //   )}&${dateParams}${bucketParams}`;
+  // }, [filters.contentId, dateParams, bucketParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -499,15 +499,6 @@ export default function EnvolaPerformance() {
                   "These filters apply to the whole page: KPIs, trends, themes and comments."
                 )}
               </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <a
-                href={exportCsvUrl}
-                className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-              >
-                {tr("envola.exports.downloadCsv", "Download CSV")}
-              </a>
             </div>
           </div>
 
@@ -1090,7 +1081,7 @@ export default function EnvolaPerformance() {
       {showAllResponsesModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-6">
           <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0F172A] shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-4">
               <div>
                 <h3 className="text-lg font-semibold text-white">
                   {tr("envola.responsesPanel.allResponses", "All responses")}
@@ -1102,13 +1093,28 @@ export default function EnvolaPerformance() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowAllResponsesModal(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
-              >
-                {tr("common.close", "Close")}
-              </button>
+              <div className="flex items-center gap-2">
+                {selectedPoint?.date ? (
+                  <a
+                    href={`/api/envola/responses-export.csv?content_id=${encodeURIComponent(
+                      filters.contentId
+                    )}&granularity=${encodeURIComponent(
+                      filters.granularity
+                    )}&date=${encodeURIComponent(selectedPoint.date)}${bucketParams}`}
+                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                  >
+                    {tr("envola.exports.downloadCsv", "Download CSV")}
+                  </a>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={() => setShowAllResponsesModal(false)}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                >
+                  {tr("common.close", "Close")}
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-5">

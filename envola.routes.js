@@ -783,7 +783,16 @@ export function createEnvolaRouter() {
         .sort((a, b) =>
           String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
         )
-        .slice(0, limit);
+        .slice(0, limit)
+        .map((r) => ({
+          ...r,
+          contact_name:
+            r?.name ||
+            r?.email ||
+            r?.external_id ||
+            (r?.contact_id ? `Contact ${r.contact_id}` : "—"),
+          intercom_contact_url: r?.contact_id ? intercomContactUrl(r.contact_id) : null,
+        }));
 
       return res.json({
         ok: true,
@@ -878,6 +887,12 @@ export function createEnvolaRouter() {
           const verbatims = Array.isArray(r?.verbatims) ? r.verbatims : [];
           const score = r?.score_0_10 ?? null;
           const rowBucket = scoreBucket(score);
+          const contactName =
+            r?.name ||
+            r?.email ||
+            r?.external_id ||
+            (r?.contact_id ? `Contact ${r.contact_id}` : "—");
+          const contactUrl = r?.contact_id ? intercomContactUrl(r.contact_id) : null;
 
           if (verbatims.length > 0) {
             return verbatims
@@ -889,6 +904,9 @@ export function createEnvolaRouter() {
                 bucket: rowBucket,
                 question_text: v?.question_text || null,
                 comment: v?.text || null,
+                contact_id: r?.contact_id || null,
+                contact_name: contactName,
+                intercom_contact_url: contactUrl,
               }));
           }
 
@@ -901,6 +919,9 @@ export function createEnvolaRouter() {
                 bucket: rowBucket,
                 question_text: null,
                 comment: r.comment,
+                contact_id: r?.contact_id || null,
+                contact_name: contactName,
+                intercom_contact_url: contactUrl,
               },
             ];
           }

@@ -205,9 +205,14 @@ export default function EnvolaResponses() {
 
     (async () => {
       try {
-        const url = `/api/intercom/private/nps-responses-explorer?content_id=${encodeURIComponent(
+        const bucketParam =
+          filters.bucket && filters.bucket !== "all"
+            ? `&bucket=${encodeURIComponent(filters.bucket)}`
+            : "";
+
+        const url = `/api/envola/responses?content_id=${encodeURIComponent(
           filters.contentId
-        )}&${dateParams}&limit=2000`;
+        )}&${dateParams}${bucketParam}&limit=2000`;
 
         const r = await fetch(url, { credentials: "include" });
         const t = await r.text();
@@ -264,30 +269,30 @@ export default function EnvolaResponses() {
     const search = filters.search.trim().toLowerCase();
 
     const searched = !search
-      ? filteredByBucket
-      : filteredByBucket.filter((r) => {
-          const haystack = [
-            r.contact_name,
-            r.response_id,
-            r.pioupiou,
-            r.reader_serial,
-            r.q_recommend_score,
-            r.q_recommend_comment,
-            r.q_install_score,
-            r.q_install_comment,
-            r.q_daily_use_score,
-            r.q_benefits,
-            r.q_parent_relation_score,
-            r.q_parent_relation_comment,
-            r.q_support_score,
-            r.q_support_comment,
-            r.q_final_comment,
-          ]
-            .join(" ")
-            .toLowerCase();
+    ? rawRows
+    : rawRows.filter((r) => {
+        const haystack = [
+          r.contact_name,
+          r.response_id,
+          r.pioupiou,
+          r.reader_serial,
+          r.q_recommend_score,
+          r.q_recommend_comment,
+          r.q_install_score,
+          r.q_install_comment,
+          r.q_daily_use_score,
+          r.q_benefits,
+          r.q_parent_relation_score,
+          r.q_parent_relation_comment,
+          r.q_support_score,
+          r.q_support_comment,
+          r.q_final_comment,
+        ]
+          .join(" ")
+          .toLowerCase();
 
-          return haystack.includes(search);
-        });
+        return haystack.includes(search);
+      });
 
     const sorted = [...searched].sort((a, b) => {
       const result = compareValues(a?.[filters.sort], b?.[filters.sort], filters.dir);
@@ -302,6 +307,11 @@ export default function EnvolaResponses() {
     filters.mode === "range"
       ? `${filters.from} → ${filters.to}`
       : `${filters.days}d`;
+
+  const bucketParams =
+  filters.bucket && filters.bucket !== "all"
+    ? `&bucket=${encodeURIComponent(filters.bucket)}`
+    : "";
 
   const exportCsvUrl = useMemo(() => {
     return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(

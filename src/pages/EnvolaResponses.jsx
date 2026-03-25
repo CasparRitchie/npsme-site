@@ -256,7 +256,7 @@ export default function EnvolaResponses() {
     return () => {
       cancelled = true;
     };
-  }, [filters.contentId, dateParams]);
+  }, [filters.contentId, dateParams, filters.bucket]);
 
   const responseRows = useMemo(() => {
     const rawRows = Array.isArray(state.rows) ? state.rows : [];
@@ -269,8 +269,8 @@ export default function EnvolaResponses() {
     const search = filters.search.trim().toLowerCase();
 
     const searched = !search
-    ? rawRows
-    : rawRows.filter((r) => {
+      ? filteredByBucket
+      : filteredByBucket.filter((r) => {
         const haystack = [
           r.contact_name,
           r.response_id,

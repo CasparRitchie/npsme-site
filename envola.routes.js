@@ -825,10 +825,26 @@ export function createEnvolaRouter() {
           .sort()
           .slice(-1)[0] || null;
 
+      const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+      const rawEvents = parseJsonl(rawText);
+
+      const matchingContentEvents = rawEvents.filter(
+        (e) => String(e?.content_id || "") === String(contentId)
+      );
+
+      const completionEvents = matchingContentEvents.filter(
+        (e) => String(e?.stat_type || "").toLowerCase() === "completion"
+      );
+
+      const dedupeDifference = completionEvents.length - contentRows.length;
+
       return res.json({
         ok: true,
         content_id: contentId,
+        raw_events_matching_content: matchingContentEvents.length,
+        completion_events: completionEvents.length,
         total_canonical_rows: contentRows.length,
+        dedupe_removed: dedupeDifference,
         total_scored_rows: scoredRows.length,
         unique_contacts: uniqueContacts.size,
         latest_submitted_at: latestSubmittedAt,
@@ -952,8 +968,7 @@ export function createEnvolaRouter() {
       invalidateResponsesCache();
       await getCanonicalResponses({ force: true });
       return res.json({ ok: true, refreshed: true });
-    }
-    catch (err) {
+    } catch (err) {
       console.error("[envola] refresh error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }

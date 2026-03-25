@@ -208,7 +208,7 @@ function extractCommentsAndOptions(answers) {
     if (Number.isFinite(n) && /^\d+(\.\d+)?$/.test(s)) continue;
 
     if (isBenefitsQuestion(a)) {
-      out.selected_options.push(s);
+      out.selected_options.push(...splitMultiSelect(s));
       continue;
     }
 
@@ -360,7 +360,6 @@ async function getCanonicalResponses({ force = false } = {}) {
   const text = await readDropboxFile(ENVOLA_RESPONSES_PATH).catch(() => null);
   const rows = parseJsonl(text);
 
-  // Deduplicate by response_id: newest record wins
   const byId = new Map();
 
   for (const r of rows) {
@@ -601,9 +600,6 @@ export function createEnvolaRouter() {
     next();
   }
 
-  // Make whole workspace private for now
-  router.use(requirePrivateCookie);
-
   async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_ID } = {}) {
     const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
     const rawEvents = parseJsonl(rawText);
@@ -647,6 +643,21 @@ export function createEnvolaRouter() {
       path: ENVOLA_RESPONSES_PATH,
     };
   }
+
+  // Public to ingest-token only
+  router.post("/rebuild", requireIngestToken, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const out = await rebuildEnvolaResponsesFile({ contentId });
+      return res.json(out);
+    } catch (err) {
+      console.error("[envola] rebuild error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  // Everything below this line requires private cookie
+  router.use(requirePrivateCookie);
 
   router.get("/summary", async (req, res) => {
     try {
@@ -842,17 +853,6 @@ export function createEnvolaRouter() {
       return res.json({ ok: true, refreshed: true });
     } catch (err) {
       console.error("[envola] refresh error", err);
-      return res.status(500).json({ ok: false, error: err.message });
-    }
-  });
-
-  router.post("/rebuild", requireIngestToken, async (req, res) => {
-    try {
-      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
-      const out = await rebuildEnvolaResponsesFile({ contentId });
-      return res.json(out);
-    } catch (err) {
-      console.error("[envola] rebuild error", err);
       return res.status(500).json({ ok: false, error: err.message });
     }
   });

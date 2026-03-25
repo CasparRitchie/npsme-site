@@ -412,7 +412,7 @@ export default function EnvolaPerformance() {
       setBucketResponses({
         loading: false,
         data: j,
-        error: r.ok ? null : j?.error || "Error",
+        error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
       });
     } catch (e) {
       setBucketResponses({ loading: false, data: null, error: e.message });
@@ -586,7 +586,9 @@ export default function EnvolaPerformance() {
             </div>
 
             <div>
-              <label className="text-xs text-slate-400">content_id</label>
+              <label className="text-xs text-slate-400">
+                {tr("envola.common.contentId", "content_id")}
+              </label>
               <input
                 className="mt-1 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white"
                 value={filters.contentId}

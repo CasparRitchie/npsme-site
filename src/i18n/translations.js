@@ -2389,11 +2389,35 @@ export const TRANSLATIONS = {
       },
 
       filters: {
+        title: "Global filters",
+        subtitle: "These filters apply to the whole page: KPIs, trends, themes, and comments.",
         label: "Filter:",
+        mode: "Mode",
+        rolling: "Rolling",
+        range: "Date range",
+        all: "All",
         promoters: "Promoters",
         passives: "Passives",
         detractors: "Detractors",
         noneSelected: "No filter selected - showing all",
+      },
+
+      metrics: {
+        title: "Response funnel & timing",
+        subtitle:
+          "Pulled from Intercom content stats export (shown → completed) and summarised for fast reporting.",
+        shown: "Shown",
+        shownSub: "Survey displayed to users",
+        completed: "Completed",
+        completedSub: "Survey fully completed",
+        responseRate: "Response rate",
+        responseRateSub: "Completed ÷ shown",
+        medianCompletion: "Median completion time",
+        medianAnswerSub: "Median time to first answer:",
+        firstAnswer: "First answer",
+        firstAnswerFallback: "First answer: —",
+        note:
+          "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
       },
 
       live: {
@@ -2413,22 +2437,6 @@ export const TRANSLATIONS = {
         meta: "Survey ID: 189616",
         earlyNote:
           "Note: early sample. NPS will stabilise as response volume increases.",
-      },
-
-      metrics: {
-        title: "Response funnel & timing",
-        subtitle:
-          "Pulled from Intercom content stats export (shown → completed) and summarised for fast reporting.",
-        shown: "Shown",
-        shownSub: "Survey displayed to users",
-        completed: "Completed",
-        completedSub: "Survey fully completed",
-        responseRate: "Response rate",
-        responseRateSub: "Completed ÷ shown",
-        medianCompletion: "Median completion time",
-        medianAnswerSub: "Median time to first answer:",
-        note:
-          "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
       },
 
       themeLabels: {
@@ -2472,28 +2480,53 @@ export const TRANSLATIONS = {
       },
 
       diagnostics: {
-      title: "Survey diagnostics",
-      subtitle:
-        "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.",
-      rawCompletionEvents: "Raw completion events",
-      uniqueResponses: "Unique responses",
-      duplicatesRemoved: "Duplicates removed",
-      scoredResponses: "Scored responses",
-      missingScores: "Missing scores",
-      latestResponse: "Latest response",
-      intercomCompletionEvents: "Intercom completion events",
-    },
-    responsesPanel: {
-      count: "response(s)",
-      viewAll: "View all",
-      allResponses: "All responses",
-      selectedPeriod: "Selected period",
-    },
-    common: {
-      contentId: "content_id",
-      error: "Error",
-      duplicatesRemovedSuffix: "duplicates removed",
-    },
+        title: "Survey diagnostics",
+        subtitle:
+          "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.",
+        rawCompletionEvents: "Raw completion events",
+        uniqueResponses: "Unique responses",
+        duplicatesRemoved: "Duplicates removed",
+        scoredResponses: "Scored responses",
+        missingScores: "Missing scores",
+        latestResponse: "Latest response",
+        intercomCompletionEvents: "Intercom completion events",
+      },
+      responsesPanel: {
+        count: "response(s)",
+        viewAll: "View all",
+        allResponses: "All responses",
+        selectedPeriod: "Selected period",
+      },
+      common: {
+        contentId: "content_id",
+        error: "Error",
+        duplicatesRemovedSuffix: "duplicates removed",
+      },
+      performance: {
+        seoTitle: "Envola — Performance | NPS Me",
+        seoDesc: "Private Envola performance dashboard with consistent global filters.",
+        title: "Envola — Performance",
+        subtitle: "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts.",
+        kpiNps: "NPS",
+      },
+      trend: {
+        granularity: "Granularity",
+        totalResponses: "Responses in period",
+        latestNps: "Latest NPS point",
+        asOf: "As of",
+        points: "Data points",
+      },
+      top: {
+        splitTitle: "Score split over time",
+        splitSubtitle: "Promoter / passive / detractor split using the same global filters.",
+      },
+      wordcloud: {
+        title: "Word cloud",
+        subtitle: "Word cloud filtered by the same period and bucket.",
+      },
+      responses: {
+        none: "No verbatims stored for this response.",
+      },
 
       next: {
         title: "Coming next on this page",
@@ -5247,11 +5280,36 @@ export const TRANSLATIONS = {
       },
 
       filters: {
+        title: "Filtres globaux",
+        subtitle:
+          "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires.",
         label: "Filtrer :",
+        mode: "Mode",
+        rolling: "Glissant",
+        range: "Plage de dates",
+        all: "Tous",
         promoters: "Promoteurs",
         passives: "Passifs",
         detractors: "Détracteurs",
         noneSelected: "Aucun filtre sélectionné - affichage de tout",
+      },
+
+      metrics: {
+        title: "Entonnoir & temps de complétion",
+        subtitle:
+          "Dérivé de l’export des stats Intercom (affiché → complété), puis synthétisé pour un reporting rapide.",
+        shown: "Affiché",
+        shownSub: "Enquête affichée aux utilisateurs",
+        completed: "Complété",
+        completedSub: "Enquête complétée entièrement",
+        responseRate: "Taux de réponse",
+        responseRateSub: "Complété ÷ affiché",
+        medianCompletion: "Temps médian de complétion",
+        medianAnswerSub: "Temps médian avant première réponse :",
+        firstAnswer: "Première réponse",
+        firstAnswerFallback: "Première réponse : —",
+        note:
+          "Astuce : lancez l’ingest export-stats régulièrement pour garder le taux de réponse et les temps à jour.",
       },
 
       live: {
@@ -5271,22 +5329,6 @@ export const TRANSLATIONS = {
         meta: "ID enquête : 189616",
         earlyNote:
           "Note : échantillon précoce. Le NPS se stabilise à mesure que le volume de réponses augmente.",
-      },
-
-      metrics: {
-        title: "Entonnoir & temps de complétion",
-        subtitle:
-          "Dérivé de l’export des stats Intercom (affiché → complété), puis synthétisé pour un reporting rapide.",
-        shown: "Affiché",
-        shownSub: "Enquête affichée aux utilisateurs",
-        completed: "Complété",
-        completedSub: "Enquête complétée entièrement",
-        responseRate: "Taux de réponse",
-        responseRateSub: "Complété ÷ affiché",
-        medianCompletion: "Temps médian de complétion",
-        medianAnswerSub: "Temps médian avant première réponse :",
-        note:
-          "Astuce : lancez l’ingest export-stats régulièrement pour garder le taux de réponse et les temps à jour.",
       },
 
       themes: {
@@ -5352,6 +5394,37 @@ export const TRANSLATIONS = {
         contentId: "content_id",
         error: "Erreur",
         duplicatesRemovedSuffix: "doublons supprimés",
+      },
+      performance: {
+        seoTitle: "Envola — Performance | NPS Me",
+        seoDesc: "Tableau de bord privé Envola avec des filtres globaux cohérents.",
+        title: "Envola — Performance",
+        subtitle:
+          "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les KPI et graphiques.",
+        kpiNps: "NPS",
+      },
+
+      trend: {
+        granularity: "Granularité",
+        totalResponses: "Réponses sur la période",
+        latestNps: "Dernier point NPS",
+        asOf: "Au",
+        points: "Points de données",
+      },
+
+      top: {
+        splitTitle: "Répartition des scores dans le temps",
+        splitSubtitle:
+          "Répartition promoteurs / passifs / détracteurs avec les mêmes filtres globaux.",
+      },
+
+      wordcloud: {
+        title: "Nuage de mots",
+        subtitle: "Nuage de mots filtré par la même période et le même bucket.",
+      },
+
+      responses: {
+        none: "Aucun verbatim enregistré pour cette réponse.",
       },
 
       next: {

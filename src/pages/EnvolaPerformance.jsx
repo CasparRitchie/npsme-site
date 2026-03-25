@@ -164,9 +164,9 @@ export default function EnvolaPerformance() {
 
   const dateParams = useMemo(() => {
     if (filters.mode === "range") {
-      return `from=${encodeURIComponent(filters.from)}&to=${encodeURIComponent(filters.to)}`;
+      return `mode=range&from=${encodeURIComponent(filters.from)}&to=${encodeURIComponent(filters.to)}`;
     }
-    return `days=${encodeURIComponent(filters.days)}`;
+    return `mode=rolling&days=${encodeURIComponent(filters.days)}`;
   }, [filters.mode, filters.from, filters.to, filters.days]);
 
   const bucketParams = useMemo(() => {
@@ -623,28 +623,22 @@ export default function EnvolaPerformance() {
           />
 
           <StatCard
-            compact
             label={tr("envola.live.responses", "Responses")}
             value={
-              diagnostics.loading
+              summary.loading
                 ? "…"
-                : diagnostics.data?.total_canonical_rows == null
+                : summary.data?.completedResponses == null
                 ? "—"
-                : diagnostics.data.total_canonical_rows
+                : summary.data.completedResponses
             }
-            sub={
-              diagnostics.loading
-                ? tr("common.loading", "Loading…")
-                : diagnostics.data
-                ? `${diagnostics.data.raw_events_matching_content ?? "—"} ${tr(
-                    "envola.diagnostics.intercomCompletionEvents",
-                    "Intercom completion events"
-                  )} • ${diagnostics.data.dedupe_removed ?? "—"} ${tr(
-                    "envola.common.duplicatesRemovedSuffix",
-                    "duplicates removed"
-                  )}`
-                : tr("envola.live.responsesSub", "Survey completions")
-            }
+            sub={[
+              `${tr("common.window", "Window")}: ${activeWindowLabel}`,
+              filters.bucket !== "all"
+                ? `${tr("common.bucket", "Bucket")}: ${bucketLabel(filters.bucket, tr)}`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" • ")}
           />
 
           <StatCard

@@ -854,6 +854,8 @@ export function createEnvolaRouter() {
     }
   });
 
+  
+
   router.get("/diagnostics", async (req, res) => {
     try {
       const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();

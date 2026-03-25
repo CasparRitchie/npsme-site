@@ -2528,6 +2528,9 @@ export const TRANSLATIONS = {
       responses: {
         none: "No verbatims stored for this response.",
       },
+      exports: {
+        downloadCsv: "Download CSV",
+      },
 
       next: {
         title: "Coming next on this page",
@@ -5282,8 +5285,7 @@ export const TRANSLATIONS = {
 
       filters: {
         title: "Filtres globaux",
-        subtitle:
-          "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires.",
+        subtitle: "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires.",
         label: "Filtrer :",
         mode: "Mode",
         rolling: "Glissant",
@@ -5427,6 +5429,10 @@ export const TRANSLATIONS = {
 
       responses: {
         none: "Aucun verbatim enregistré pour cette réponse.",
+      },
+
+      exports: {
+        downloadCsv: "Télécharger le CSV",
       },
 
       next: {

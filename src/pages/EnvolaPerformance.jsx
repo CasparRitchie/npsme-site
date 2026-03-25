@@ -438,6 +438,12 @@ export default function EnvolaPerformance() {
       ? `${filters.from} → ${filters.to}`
       : `${filters.days}d`;
 
+  const exportCsvUrl = useMemo(() => {
+    return `/api/envola/responses-export.csv?content_id=${encodeURIComponent(
+      filters.contentId
+    )}&${dateParams}${bucketParams}`;
+  }, [filters.contentId, dateParams, bucketParams]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
@@ -485,14 +491,23 @@ export default function EnvolaPerformance() {
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white">
-                {tr("envola.filters.title", "Filtres globaux")}
+                {tr("envola.filters.title", "Global filters")}
               </h2>
               <p className="mt-1 text-sm text-slate-400">
                 {tr(
                   "envola.filters.subtitle",
-                  "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires."
+                  "These filters apply to the whole page: KPIs, trends, themes and comments."
                 )}
               </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <a
+                href={exportCsvUrl}
+                className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+              >
+                {tr("envola.exports.downloadCsv", "Download CSV")}
+              </a>
             </div>
           </div>
 

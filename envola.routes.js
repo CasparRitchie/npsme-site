@@ -735,6 +735,71 @@ export function createEnvolaRouter() {
     }
   });
 
+  router.get("/responses-for-point", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const bucket = String(req.query.bucket || "all").trim().toLowerCase();
+      const granularity = String(req.query.granularity || "week").trim().toLowerCase();
+      const date = String(req.query.date || "").trim();
+      const limit = clampInt(req.query.limit, 200, 1, 2000);
+
+      if (!["day", "week", "month"].includes(granularity)) {
+        return res.status(400).json({ ok: false, error: "Invalid granularity" });
+      }
+
+      if (!date) {
+        return res.status(400).json({ ok: false, error: "Missing date" });
+      }
+
+      const bucketStartMs = Date.parse(`${date}T00:00:00.000Z`);
+      if (!Number.isFinite(bucketStartMs)) {
+        return res.status(400).json({ ok: false, error: "Invalid date" });
+      }
+
+      let bucketEndMs;
+      if (granularity === "day") {
+        bucketEndMs = bucketStartMs + 24 * 60 * 60 * 1000;
+      } else if (granularity === "week") {
+        bucketEndMs = bucketStartMs + 7 * 24 * 60 * 60 * 1000;
+      } else {
+        const d = new Date(bucketStartMs);
+        bucketEndMs = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+      }
+
+      const allRows = await getCanonicalResponses();
+
+      const filtered = (allRows || [])
+        .filter((r) => String(r?.content_id || "") === String(contentId))
+        .map((r) => {
+          const submittedMs = Date.parse(r?.submitted_at || "");
+          return { ...r, _submittedMs: submittedMs };
+        })
+        .filter((r) => Number.isFinite(r._submittedMs))
+        .filter((r) => r._submittedMs >= bucketStartMs && r._submittedMs < bucketEndMs)
+        .filter((r) => {
+          if (!bucket || bucket === "all") return true;
+          return scoreBucket(r?.score_0_10) === bucket;
+        })
+        .sort((a, b) =>
+          String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
+        )
+        .slice(0, limit);
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        granularity,
+        date,
+        bucket,
+        returned: filtered.length,
+        rows: filtered,
+      });
+    } catch (err) {
+      console.error("[envola] responses-for-point error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   router.get("/responses", async (req, res) => {
     try {
       const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();

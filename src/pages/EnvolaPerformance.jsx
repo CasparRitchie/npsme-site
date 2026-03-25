@@ -179,11 +179,8 @@ export default function EnvolaPerformance() {
   const [themes, setThemes] = useState({ loading: true, data: null, error: null });
   const [comments, setComments] = useState({ loading: true, data: null, error: null });
   const [selectedPoint, setSelectedPoint] = useState(null);
-  const [bucketResponses, setBucketResponses] = useState({
-    loading: false,
-    data: null,
-    error: null,
-  });
+  const [bucketResponses, setBucketResponses] = useState({loading: false, data: null, error: null });
+  const [diagnostics, setDiagnostics] = useState({loading: true, data: null, error: null });
 
   const dateParams = useMemo(() => {
     if (filters.mode === "range") {
@@ -194,20 +191,18 @@ export default function EnvolaPerformance() {
 
   const bucketParams = useMemo(() => {
     if (!filters.bucket || filters.bucket === "all") return "";
-    return `&buckets=${encodeURIComponent(filters.bucket)}`;
+    return `&bucket=${encodeURIComponent(filters.bucket)}`;
   }, [filters.bucket]);
 
   const trendUrl = useMemo(() => {
-    return `/api/intercom/public/nps-timeseries?content_id=${encodeURIComponent(
+    return `/api/envola/timeseries?content_id=${encodeURIComponent(
       filters.contentId
-    )}&granularity=${encodeURIComponent(filters.granularity)}&${dateParams}`;
-  }, [filters.contentId, filters.granularity, dateParams]);
+    )}&granularity=${encodeURIComponent(filters.granularity)}&${dateParams}${bucketParams}`;
+  }, [filters.contentId, filters.granularity, dateParams, bucketParams]);
 
   useEffect(() => {
     let cancelled = false;
-
     setTrend({ loading: true, data: null, error: null });
-
     (async () => {
       try {
         const r = await fetch(trendUrl);
@@ -239,7 +234,7 @@ export default function EnvolaPerformance() {
     (async () => {
       try {
         const r = await fetch(
-          `/api/intercom/public/nps-summary?content_id=${encodeURIComponent(
+          `/api/envola/summary?content_id=${encodeURIComponent(
             filters.contentId
           )}&${dateParams}${bucketParams}`
         );
@@ -359,13 +354,49 @@ export default function EnvolaPerformance() {
     };
   }, [filters.contentId, dateParams, bucketParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    setDiagnostics({ loading: true, data: null, error: null });
+
+    (async () => {
+      try {
+        const r = await fetch(
+          `/api/envola/diagnostics?content_id=${encodeURIComponent(filters.contentId)}`,
+          { credentials: "include" }
+        );
+        const j = await r.json();
+
+        if (!cancelled) {
+          setDiagnostics({
+            loading: false,
+            data: j,
+            error: r.ok ? null : j?.error || "Error",
+          });
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setDiagnostics({
+            loading: false,
+            data: null,
+            error: e.message,
+          });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.contentId]);
+
   async function loadBucketResponses(point) {
     setSelectedPoint(point);
     setBucketResponses({ loading: true, data: null, error: null });
 
     try {
       const r = await fetch(
-        `/api/intercom/public/nps-responses?content_id=${encodeURIComponent(
+        `/api/envola/responses-for-point?content_id=${encodeURIComponent(
           filters.contentId
         )}&granularity=${encodeURIComponent(filters.granularity)}&date=${encodeURIComponent(
           point.date
@@ -584,16 +615,19 @@ export default function EnvolaPerformance() {
           <StatCard
             label={tr("envola.live.responses", "Responses")}
             value={
-              summary.loading
+              diagnostics.loading
                 ? "…"
-                : summary.data?.responses == null
+                : diagnostics.data?.total_canonical_rows == null
                 ? "—"
-                : summary.data.responses
+                : diagnostics.data.total_canonical_rows
             }
-            sub={[
-              tr("envola.live.responsesSub", "Survey completions"),
-              `${tr("common.window", "Window")}: ${activeWindowLabel}`,
-            ].join(" • ")}
+            sub={
+              diagnostics.loading
+                ? tr("common.loading", "Loading…")
+                : diagnostics.data
+                ? `${diagnostics.data.raw_events_matching_content ?? "—"} Intercom completion events • ${diagnostics.data.dedupe_removed ?? "—"} duplicates removed`
+                : tr("envola.live.responsesSub", "Survey completions")
+            }
           />
 
           <StatCard
@@ -624,6 +658,67 @@ export default function EnvolaPerformance() {
                 : tr("envola.metrics.firstAnswerFallback", "First answer: —")
             }
           />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                Survey diagnostics
+              </h2>
+              <p className="mt-2 text-sm text-slate-300">
+                Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Pill>content_id: {filters.contentId}</Pill>
+            </div>
+          </div>
+
+          {diagnostics.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+
+          {!diagnostics.loading && diagnostics.error && (
+            <p className="mt-6 text-sm text-red-300">Error: {diagnostics.error}</p>
+          )}
+
+          {!diagnostics.loading && !diagnostics.error && diagnostics.data && (
+            <>
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                <StatCard
+                  label="Raw completion events"
+                  value={diagnostics.data.raw_events_matching_content ?? "—"}
+                />
+                <StatCard
+                  label="Unique responses"
+                  value={diagnostics.data.total_canonical_rows ?? "—"}
+                />
+                <StatCard
+                  label="Duplicates removed"
+                  value={diagnostics.data.dedupe_removed ?? "—"}
+                />
+                <StatCard
+                  label="Scored responses"
+                  value={diagnostics.data.total_scored_rows ?? "—"}
+                />
+                <StatCard
+                  label="Missing scores"
+                  value={diagnostics.data.missing_score_total ?? "—"}
+                />
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-slate-300">
+                Latest response:{" "}
+                <span className="font-medium text-white">
+                  {prettyDate(diagnostics.data.latest_submitted_at)}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -878,7 +973,7 @@ export default function EnvolaPerformance() {
 
             {!bucketResponses.loading && bucketResponses.data?.ok && (
               <div className="mt-4 space-y-3">
-                {(bucketResponses.data.items || []).map((r) => (
+                {(bucketResponses.data.rows || []).map((r) => (
                   <div
                     key={r.response_id || `${r.submitted_at}-${r.contact_id}`}
                     className="rounded-2xl border border-white/10 bg-black/20 p-4"
@@ -889,7 +984,10 @@ export default function EnvolaPerformance() {
                           r.bucket
                         )}`}
                       >
-                        {bucketLabel(r.bucket, tr)} • {r.score_0_10}/10
+                        {bucketLabel(
+                          r.score_0_10 >= 9 ? "promoter" : r.score_0_10 >= 7 ? "passive" : "detractor",
+                          tr
+                        )} • {r.score_0_10}/10
                       </span>
                       <span className="text-slate-400">{prettyDate(r.submitted_at)}</span>
                     </div>

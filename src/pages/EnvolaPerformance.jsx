@@ -674,72 +674,7 @@ export default function EnvolaPerformance() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="text-xl md:text-2xl font-semibold text-white">
-                {tr("envola.diagnostics.title", "Survey diagnostics")}
-              </h2>
-              <p className="mt-2 text-sm text-slate-300">
-                {tr(
-                  "envola.diagnostics.subtitle",
-                  "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page."
-                )}
-              </p>
-            </div>
-          </div>
 
-          {diagnostics.loading && (
-            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
-          )}
-
-          {!diagnostics.loading && diagnostics.error && (
-            <p className="mt-6 text-sm text-red-300">
-              {tr("envola.common.error", "Error")}: {diagnostics.error}
-            </p>
-          )}
-
-          {!diagnostics.loading && !diagnostics.error && diagnostics.data && (
-            <>
-              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                <StatCard
-                  compact
-                  label={tr("envola.diagnostics.rawCompletionEvents", "Raw completion events")}
-                  value={diagnostics.data.raw_events_matching_content ?? "—"}
-                />
-                <StatCard
-                  compact
-                  label={tr("envola.diagnostics.uniqueResponses", "Unique responses")}
-                  value={diagnostics.data.total_canonical_rows ?? "—"}
-                />
-                <StatCard
-                  compact
-                  label={tr("envola.diagnostics.duplicatesRemoved", "Duplicates removed")}
-                  value={diagnostics.data.dedupe_removed ?? "—"}
-                />
-                <StatCard
-                  compact
-                  label={tr("envola.diagnostics.scoredResponses", "Scored responses")}
-                  value={diagnostics.data.total_scored_rows ?? "—"}
-                />
-                <StatCard
-                  compact
-                  label={tr("envola.diagnostics.missingScores", "Missing scores")}
-                  value={diagnostics.data.missing_score_total ?? "—"}
-                />
-              </div>
-
-              <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm text-slate-300">
-                {tr("envola.diagnostics.latestResponse", "Latest response")}:{" "}
-                <span className="font-medium text-white">
-                  {prettyDate(diagnostics.data.latest_submitted_at)}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-10">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -1172,6 +1107,73 @@ export default function EnvolaPerformance() {
           </div>
         </div>
       )}
+
+      <section className="mx-auto max-w-7xl px-6 pb-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-white">
+                {tr("envola.diagnostics.title", "Survey diagnostics")}
+              </h2>
+              <p className="mt-2 text-sm text-slate-300">
+                {tr(
+                  "envola.diagnostics.subtitle",
+                  "All-time reconciliation between raw Intercom completion events and the deduplicated response dataset behind this survey."
+                )}
+              </p>
+            </div>
+          </div>
+
+          {diagnostics.loading && (
+            <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
+          )}
+
+          {!diagnostics.loading && diagnostics.error && (
+            <p className="mt-6 text-sm text-red-300">
+              {tr("envola.common.error", "Error")}: {diagnostics.error}
+            </p>
+          )}
+
+          {!diagnostics.loading && !diagnostics.error && diagnostics.data && (
+            <>
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                <StatCard
+                  compact
+                  label={tr("envola.diagnostics.rawCompletionEvents", "Raw completion events")}
+                  value={diagnostics.data.raw_events_matching_content ?? "—"}
+                />
+                <StatCard
+                  compact
+                  label={tr("envola.diagnostics.uniqueResponses", "Unique responses")}
+                  value={diagnostics.data.total_canonical_rows ?? "—"}
+                />
+                <StatCard
+                  compact
+                  label={tr("envola.diagnostics.duplicatesRemoved", "Duplicates removed")}
+                  value={diagnostics.data.dedupe_removed ?? "—"}
+                />
+                <StatCard
+                  compact
+                  label={tr("envola.diagnostics.scoredResponses", "Scored responses")}
+                  value={diagnostics.data.total_scored_rows ?? "—"}
+                />
+                <StatCard
+                  compact
+                  label={tr("envola.diagnostics.missingScores", "Missing scores")}
+                  value={diagnostics.data.missing_score_total ?? "—"}
+                />
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm text-slate-300">
+                {tr("envola.diagnostics.latestResponse", "Latest response")}:{" "}
+                <span className="font-medium text-white">
+                  {prettyDate(diagnostics.data.latest_submitted_at)}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

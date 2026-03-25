@@ -853,15 +853,30 @@ export default function EnvolaPerformance() {
                     {tr("envola.responsesPanel.count", "response(s)")}
                   </div>
 
-                  {(bucketResponses.data.rows?.length || 0) > 3 ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllResponsesModal(true)}
-                      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
-                    >
-                      {tr("envola.responsesPanel.viewAll", "View all")}
-                    </button>
-                  ) : null}
+                  <div className="flex items-center gap-2">
+                    {selectedPoint?.date ? (
+                      <a
+                        href={`/api/envola/responses-export.csv?content_id=${encodeURIComponent(
+                          filters.contentId
+                        )}&granularity=${encodeURIComponent(
+                          filters.granularity
+                        )}&date=${encodeURIComponent(selectedPoint.date)}${bucketParams}`}
+                        className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                      >
+                        {tr("envola.exports.downloadCsv", "Download CSV")}
+                      </a>
+                    ) : null}
+
+                    {(bucketResponses.data.rows?.length || 0) > 3 ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllResponsesModal(true)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                      >
+                        {tr("envola.responsesPanel.viewAll", "View all")}
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div className="mt-4 max-h-[560px] space-y-3 overflow-y-auto pr-2">

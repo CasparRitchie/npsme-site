@@ -2471,6 +2471,30 @@ export const TRANSLATIONS = {
         tookTime: "Took time to write",
       },
 
+      diagnostics: {
+      title: "Survey diagnostics",
+      subtitle:
+        "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.",
+      rawCompletionEvents: "Raw completion events",
+      uniqueResponses: "Unique responses",
+      duplicatesRemoved: "Duplicates removed",
+      scoredResponses: "Scored responses",
+      missingScores: "Missing scores",
+      latestResponse: "Latest response",
+      intercomCompletionEvents: "Intercom completion events",
+    },
+    responsesPanel: {
+      count: "response(s)",
+      viewAll: "View all",
+      allResponses: "All responses",
+      selectedPeriod: "Selected period",
+    },
+    common: {
+      contentId: "content_id",
+      error: "Error",
+      duplicatesRemovedSuffix: "duplicates removed",
+    },
+
       next: {
         title: "Coming next on this page",
         a: "Response rate (shown vs completed) and completion time from export reconciliation",
@@ -5304,6 +5328,30 @@ export const TRANSLATIONS = {
         redactionNote:
           "Les commentaires sont anonymisés automatiquement (emails, téléphones, liens, identifiants).",
         tookTime: "A pris le temps d’écrire",
+      },
+
+      diagnostics: {
+      title: "Diagnostic de l’enquête",
+      subtitle:
+        "Rapprochement entre les événements bruts de complétion Intercom et le jeu de réponses dédupliqué utilisé par cette page.",
+      rawCompletionEvents: "Événements bruts de complétion",
+      uniqueResponses: "Réponses uniques",
+      duplicatesRemoved: "Doublons supprimés",
+      scoredResponses: "Réponses avec note",
+      missingScores: "Notes manquantes",
+      latestResponse: "Dernière réponse",
+      intercomCompletionEvents: "Événements de complétion Intercom",
+      },
+      responsesPanel: {
+        count: "réponse(s)",
+        viewAll: "Voir tout",
+        allResponses: "Toutes les réponses",
+        selectedPeriod: "Période sélectionnée",
+      },
+      common: {
+        contentId: "content_id",
+        error: "Erreur",
+        duplicatesRemovedSuffix: "doublons supprimés",
       },
 
       next: {

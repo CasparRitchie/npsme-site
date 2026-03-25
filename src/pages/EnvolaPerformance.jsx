@@ -212,7 +212,7 @@ export default function EnvolaPerformance() {
           setTrend({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -244,7 +244,7 @@ export default function EnvolaPerformance() {
           setSummary({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -276,7 +276,7 @@ export default function EnvolaPerformance() {
           setRate({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -308,7 +308,7 @@ export default function EnvolaPerformance() {
           setThemes({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -340,7 +340,7 @@ export default function EnvolaPerformance() {
           setComments({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -372,7 +372,7 @@ export default function EnvolaPerformance() {
           setDiagnostics({
             loading: false,
             data: j,
-            error: r.ok ? null : j?.error || "Error",
+            error: r.ok ? null : j?.error || tr("envola.common.error", "Error"),
           });
         }
       } catch (e) {
@@ -465,7 +465,7 @@ export default function EnvolaPerformance() {
           <p className="mt-3 max-w-3xl text-slate-300">
             {tr(
               "envola.performance.subtitle",
-              "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les indicateurs et graphiques."
+                "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts."
             )}
           </p>
 
@@ -491,7 +491,7 @@ export default function EnvolaPerformance() {
             <div className="flex flex-wrap gap-2">
               <Pill>{tr("common.window", "Window")}: {activeWindowLabel}</Pill>
               <Pill>{tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}</Pill>
-              <Pill>content_id: {filters.contentId}</Pill>
+              <Pill>{tr("envola.common.contentId", "content_id")}: {filters.contentId}</Pill>
             </div>
           </div>
 
@@ -631,7 +631,13 @@ export default function EnvolaPerformance() {
               diagnostics.loading
                 ? tr("common.loading", "Loading…")
                 : diagnostics.data
-                ? `${diagnostics.data.raw_events_matching_content ?? "—"} Intercom completion events • ${diagnostics.data.dedupe_removed ?? "—"} duplicates removed`
+                ? `${diagnostics.data.raw_events_matching_content ?? "—"} ${tr(
+                    "envola.diagnostics.intercomCompletionEvents",
+                    "Intercom completion events"
+                  )} • ${diagnostics.data.dedupe_removed ?? "—"} ${tr(
+                    "envola.common.duplicatesRemovedSuffix",
+                    "duplicates removed"
+                  )}`
                 : tr("envola.live.responsesSub", "Survey completions")
             }
           />
@@ -672,15 +678,18 @@ export default function EnvolaPerformance() {
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-xl md:text-2xl font-semibold text-white">
-                Survey diagnostics
+                {tr("envola.diagnostics.title", "Survey diagnostics")}
               </h2>
               <p className="mt-2 text-sm text-slate-300">
-                Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.
+                {tr(
+                  "envola.diagnostics.subtitle",
+                  "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page."
+                )}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Pill>content_id: {filters.contentId}</Pill>
+              <Pill>{tr("envola.common.contentId", "content_id")}: {filters.contentId}</Pill>
             </div>
           </div>
 
@@ -689,36 +698,38 @@ export default function EnvolaPerformance() {
           )}
 
           {!diagnostics.loading && diagnostics.error && (
-            <p className="mt-6 text-sm text-red-300">Error: {diagnostics.error}</p>
+            <p className="mt-6 text-sm text-red-300">
+              {tr("envola.common.error", "Error")}: {diagnostics.error}
+            </p>
           )}
 
           {!diagnostics.loading && !diagnostics.error && diagnostics.data && (
             <>
               <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                 <StatCard
-                  label="Raw completion events"
+                  label={tr("envola.diagnostics.rawCompletionEvents", "Raw completion events")}
                   value={diagnostics.data.raw_events_matching_content ?? "—"}
                 />
                 <StatCard
-                  label="Unique responses"
+                  label={tr("envola.diagnostics.uniqueResponses", "Unique responses")}
                   value={diagnostics.data.total_canonical_rows ?? "—"}
                 />
                 <StatCard
-                  label="Duplicates removed"
+                  label={tr("envola.diagnostics.duplicatesRemoved", "Duplicates removed")}
                   value={diagnostics.data.dedupe_removed ?? "—"}
                 />
                 <StatCard
-                  label="Scored responses"
+                  label={tr("envola.diagnostics.scoredResponses", "Scored responses")}
                   value={diagnostics.data.total_scored_rows ?? "—"}
                 />
                 <StatCard
-                  label="Missing scores"
+                  label={tr("envola.diagnostics.missingScores", "Missing scores")}
                   value={diagnostics.data.missing_score_total ?? "—"}
                 />
               </div>
 
               <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-slate-300">
-                Latest response:{" "}
+                {tr("envola.diagnostics.latestResponse", "Latest response")}:{" "}
                 <span className="font-medium text-white">
                   {prettyDate(diagnostics.data.latest_submitted_at)}
                 </span>
@@ -753,7 +764,9 @@ export default function EnvolaPerformance() {
             <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
           )}
           {!trend.loading && trend.error && (
-            <p className="mt-6 text-sm text-red-300">Error: {trend.error}</p>
+            <p className="mt-6 text-sm text-red-300">
+              {tr("envola.common.error", "Error")}: {trend.error}
+            </p>
           )}
 
           {!trend.loading && !trend.error && trendPoints.length > 0 && (
@@ -815,14 +828,17 @@ export default function EnvolaPerformance() {
               <p className="mt-4 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
             )}
             {!bucketResponses.loading && bucketResponses.error && (
-              <p className="mt-4 text-sm text-red-300">Error: {bucketResponses.error}</p>
+              <p className="mt-6 text-sm text-red-300">
+                {tr("envola.common.error", "Error")}: {bucketResponses.error}
+              </p>
             )}
 
             {!bucketResponses.loading && bucketResponses.data?.ok && (
               <>
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <div className="text-sm text-slate-300">
-                    {bucketResponses.data.returned ?? bucketResponses.data.rows?.length ?? 0} response(s)
+                    {bucketResponses.data.returned ?? bucketResponses.data.rows?.length ?? 0}{" "}
+                    {tr("envola.responsesPanel.count", "response(s)")}
                   </div>
 
                   {(bucketResponses.data.rows?.length || 0) > 3 ? (
@@ -831,7 +847,7 @@ export default function EnvolaPerformance() {
                       onClick={() => setShowAllResponsesModal(true)}
                       className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
                     >
-                      View all
+                      {tr("envola.responsesPanel.viewAll", "View all")}
                     </button>
                   ) : null}
                 </div>
@@ -921,7 +937,9 @@ export default function EnvolaPerformance() {
             <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
           )}
           {!themes.loading && themes.error && (
-            <p className="mt-6 text-sm text-red-300">Error: {themes.error}</p>
+            <p className="mt-6 text-sm text-red-300">
+              {tr("envola.common.error", "Error")}: {themes.error}
+            </p>
           )}
 
           {!themes.loading && !themes.error && (
@@ -1000,7 +1018,7 @@ export default function EnvolaPerformance() {
             <p className="mt-6 text-sm text-slate-300">{tr("common.loading", "Loading…")}</p>
           )}
           {!comments.loading && comments.error && (
-            <p className="mt-6 text-sm text-red-300">Error: {comments.error}</p>
+            <p className="mt-6 text-sm text-red-300">{tr("envola.common.error", "Error")}: {comments.error}</p>
           )}
 
           {!comments.loading && !comments.error && (
@@ -1048,9 +1066,13 @@ export default function EnvolaPerformance() {
           <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0F172A] shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">All responses</h3>
+                <h3 className="text-lg font-semibold text-white">
+                  {tr("envola.responsesPanel.allResponses", "All responses")}
+                </h3>
                 <p className="text-sm text-slate-400">
-                  {selectedPoint?.date ? `Selected period: ${selectedPoint.date}` : ""}
+                  {selectedPoint?.date
+                  ? `${tr("envola.responsesPanel.selectedPeriod", "Selected period")}: ${selectedPoint.date}`
+                  : ""}
                 </p>
               </div>
 
@@ -1059,7 +1081,7 @@ export default function EnvolaPerformance() {
                 onClick={() => setShowAllResponsesModal(false)}
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
               >
-                Close
+                {tr("common.close", "Close")}
               </button>
             </div>
 

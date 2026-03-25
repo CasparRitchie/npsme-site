@@ -1,6 +1,6 @@
 // src/pages/EnvolaPerformance.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
@@ -8,7 +8,6 @@ import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 import WordCloud from "../components/WordCloud";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
-import { localizePath } from "../i18n/pathHelpers";
 import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
 const DEFAULT_CONTENT_ID = "189616";
@@ -43,23 +42,32 @@ function daysAgoYmd(days) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-function StatCard({ label, value, sub }) {
+function StatCard({ label, value, sub, compact = false }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/10 p-5">
-      <div className="text-xs text-slate-400">{label}</div>
-      <div className="mt-2 text-3xl font-semibold text-white">{value}</div>
-      {sub ? <div className="mt-2 text-sm text-slate-300">{sub}</div> : null}
+    <div
+      className={`rounded-2xl border border-white/10 bg-black/10 ${
+        compact ? "p-4" : "p-5"
+      }`}
+    >
+      <div className={`${compact ? "text-[11px]" : "text-xs"} text-slate-400`}>
+        {label}
+      </div>
+      <div
+        className={`font-semibold text-white ${
+          compact ? "mt-1 text-2xl leading-none" : "mt-2 text-3xl"
+        }`}
+      >
+        {value}
+      </div>
+      {sub ? (
+        <div className={`${compact ? "mt-2 text-xs" : "mt-2 text-sm"} text-slate-300`}>
+          {sub}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function Pill({ children }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-200">
-      {children}
-    </span>
-  );
-}
 
 function useEnvolaFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -438,12 +446,17 @@ export default function EnvolaPerformance() {
             )}
           </p>
 
-          <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
         </div>
       </PageHeader>
 
-      <section className="mx-auto max-w-7xl px-6 pb-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+      <section className="sticky top-0 z-40 border-y border-white/10 bg-[#0B1220]/85 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6 py-3">
+          <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-6 pt-6">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white">
@@ -455,12 +468,6 @@ export default function EnvolaPerformance() {
                   "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires."
                 )}
               </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>{tr("common.window", "Window")}: {activeWindowLabel}</Pill>
-              <Pill>{tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}</Pill>
-              <Pill>{tr("envola.common.contentId", "content_id")}: {filters.contentId}</Pill>
             </div>
           </div>
 
@@ -568,9 +575,10 @@ export default function EnvolaPerformance() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="mx-auto max-w-7xl px-6 pb-8">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <StatCard
+            compact
             label={tr("envola.performance.kpiNps", "NPS")}
             value={
               summary.loading
@@ -590,6 +598,7 @@ export default function EnvolaPerformance() {
           />
 
           <StatCard
+            compact
             label={tr("envola.live.responses", "Responses")}
             value={
               diagnostics.loading
@@ -614,6 +623,7 @@ export default function EnvolaPerformance() {
           />
 
           <StatCard
+            compact
             label={tr("envola.metrics.responseRate", "Response rate")}
             value={
               rate.loading
@@ -629,6 +639,7 @@ export default function EnvolaPerformance() {
           />
 
           <StatCard
+            compact
             label={tr("envola.metrics.medianCompletion", "Median completion")}
             value={
               rate.loading
@@ -644,8 +655,8 @@ export default function EnvolaPerformance() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+      <section className="mx-auto max-w-7xl px-6 pb-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-xl md:text-2xl font-semibold text-white">
@@ -657,10 +668,6 @@ export default function EnvolaPerformance() {
                   "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page."
                 )}
               </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>{tr("envola.common.contentId", "content_id")}: {filters.contentId}</Pill>
             </div>
           </div>
 
@@ -676,30 +683,35 @@ export default function EnvolaPerformance() {
 
           {!diagnostics.loading && !diagnostics.error && diagnostics.data && (
             <>
-              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+              <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                 <StatCard
+                  compact
                   label={tr("envola.diagnostics.rawCompletionEvents", "Raw completion events")}
                   value={diagnostics.data.raw_events_matching_content ?? "—"}
                 />
                 <StatCard
+                  compact
                   label={tr("envola.diagnostics.uniqueResponses", "Unique responses")}
                   value={diagnostics.data.total_canonical_rows ?? "—"}
                 />
                 <StatCard
+                  compact
                   label={tr("envola.diagnostics.duplicatesRemoved", "Duplicates removed")}
                   value={diagnostics.data.dedupe_removed ?? "—"}
                 />
                 <StatCard
+                  compact
                   label={tr("envola.diagnostics.scoredResponses", "Scored responses")}
                   value={diagnostics.data.total_scored_rows ?? "—"}
                 />
                 <StatCard
+                  compact
                   label={tr("envola.diagnostics.missingScores", "Missing scores")}
                   value={diagnostics.data.missing_score_total ?? "—"}
                 />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-slate-300">
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 px-4 py-3 text-sm text-slate-300">
                 {tr("envola.diagnostics.latestResponse", "Latest response")}:{" "}
                 <span className="font-medium text-white">
                   {prettyDate(diagnostics.data.latest_submitted_at)}
@@ -724,11 +736,6 @@ export default function EnvolaPerformance() {
                 )}
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>{tr("common.window", "Window")}: {activeWindowLabel}</Pill>
-              <Pill>{tr("envola.trend.granularity", "Granularity")}: {filters.granularity}</Pill>
-            </div>
           </div>
 
           {trend.loading && (
@@ -750,12 +757,14 @@ export default function EnvolaPerformance() {
                 />
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="mt-6 grid gap-3 md:grid-cols-3">
                 <StatCard
+                  compact
                   label={tr("envola.trend.totalResponses", "Responses in period")}
                   value={trendTotals?.totalResponses ?? "—"}
                 />
                 <StatCard
+                  compact
                   label={tr("envola.trend.latestNps", "Latest NPS point")}
                   value={trendTotals?.lastNps == null ? "—" : trendTotals.lastNps}
                   sub={
@@ -765,6 +774,7 @@ export default function EnvolaPerformance() {
                   }
                 />
                 <StatCard
+                  compact
                   label={tr("envola.trend.points", "Data points")}
                   value={trendPoints.length}
                 />
@@ -903,10 +913,6 @@ export default function EnvolaPerformance() {
                 )}
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>{tr("common.bucket", "Bucket")}: {bucketLabel(filters.bucket, tr)}</Pill>
-            </div>
           </div>
 
           {themes.loading && (
@@ -984,10 +990,6 @@ export default function EnvolaPerformance() {
                 )}
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Pill>{tr("common.returned", "Returned")}: {comments.data?.returned ?? "—"}</Pill>
-            </div>
           </div>
 
           {comments.loading && (
@@ -1031,6 +1033,7 @@ export default function EnvolaPerformance() {
                       {c.question_text ? (
                         <div className="mt-3 text-xs text-slate-400">{c.question_text}</div>
                       ) : null}
+
 
                       <p className="mt-2 text-sm leading-relaxed text-slate-200">
                         “{c.comment}”

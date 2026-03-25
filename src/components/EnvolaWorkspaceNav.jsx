@@ -25,8 +25,8 @@ export default function EnvolaWorkspaceNav({ lang, currentPath }) {
   ];
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => {
+    <div className="flex w-full flex-wrap gap-2">
+        {items.map((item) => {
         const to = localizePath(item.path, lang);
         const active = currentPath === to;
 

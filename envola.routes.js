@@ -701,6 +701,16 @@ export function createEnvolaRouter() {
       });
 
       const summary = summarizeDataset(filtered);
+      console.log("[envola summary debug]", {
+        query: req.query,
+        window,
+        filteredCount: filtered.length,
+        filteredScores: filtered.map((r) => ({
+          submitted_at: r.submitted_at,
+          score_0_10: r.score_0_10,
+        })),
+        summary,
+      });
 
       return res.json({
         ok: true,

@@ -2584,20 +2584,20 @@ app.get("*", (req, res, next) => {
   const DEFAULT_META = {
     title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
     description:
-      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue—diagnose friction, prioritise fixes, ship measurable gains.",
+      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue-diagnose friction, prioritise fixes, ship measurable gains.",
   };
 
 const ROUTE_META = {
   "/": {
     title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
     description:
-      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue—diagnose friction, prioritise fixes, ship measurable gains.",
+      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue-diagnose friction, prioritise fixes, ship measurable gains.",
   },
 
   "/fr": {
     title: "Conseil CX & Amélioration du NPS | NPS Me",
     description:
-      "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance — diagnostiquer les frictions, prioriser, déployer et mesurer.",
+      "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance - diagnostiquer les frictions, prioriser, déployer et mesurer.",
   },
 
   "/book": {

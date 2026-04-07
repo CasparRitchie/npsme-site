@@ -32,9 +32,9 @@ export const REPORTS = [
     ],
 
     quotes: [
-      { src: "Google Reviews", txt: "Quote was itemised—no surprises this time." },
+      { src: "Google Reviews", txt: "Quote was itemised-no surprises this time." },
       { src: "X/Twitter",      txt: "Delivery ETA email helped me plan the handover." },
-      { src: "Reddit",         txt: "Checkout froze once—had to retry on desktop." },
+      { src: "Reddit",         txt: "Checkout froze once-had to retry on desktop." },
       { src: "Google Reviews", txt: "Agent actually read my note and solved it fast." }
     ],
 
@@ -79,7 +79,7 @@ export const REPORTS = [
     ],
 
     quotes: [
-      { src: "TripAdvisor",     txt: "Shorter wait than last month—host kept us updated." },
+      { src: "TripAdvisor",     txt: "Shorter wait than last month-host kept us updated." },
       { src: "Google Reviews",  txt: "Allergen labels made ordering stress-free." },
       { src: "X/Twitter",       txt: "Booking confirmation landed instantly this time." }
     ],

@@ -1753,7 +1753,7 @@ export function createIntercomRouter() {
 
       function bump(questionId, questionText, bucket) {
         const qid = questionId != null ? String(questionId) : "";
-        const qText = String(questionText || "").trim() || "—";
+        const qText = String(questionText || "").trim() || "-";
         const key = qid ? `id:${qid}` : `text:${qText}`;
 
         const cur =
@@ -1773,7 +1773,7 @@ export function createIntercomRouter() {
         cur.responses += 1;
 
         // Keep the nicest question text we’ve seen
-        if (cur.question === "—" && qText !== "—") cur.question = qText;
+        if (cur.question === "-" && qText !== "-") cur.question = qText;
 
         byQ.set(key, cur);
       }
@@ -1858,7 +1858,7 @@ export function createIntercomRouter() {
         if (!key) return null;
 
         const qid = a?.question_id != null ? Number(a.question_id) : null;
-        const qt = String(a?.question_text || "").trim() || "—";
+        const qt = String(a?.question_text || "").trim() || "-";
 
         const cur =
           byQ.get(key) || {
@@ -1871,7 +1871,7 @@ export function createIntercomRouter() {
           };
 
         // Keep best text
-        if (cur.question_text === "—" && qt !== "—") cur.question_text = qt;
+        if (cur.question_text === "-" && qt !== "-") cur.question_text = qt;
 
         byQ.set(key, cur);
         return cur;
@@ -2105,7 +2105,7 @@ router.get("/survey-export/start", async (req, res) => {
     }
   });
   // =======================================================
-  // PRIVATE — NPS RESPONSES EXPLORER
+  // PRIVATE - NPS RESPONSES EXPLORER
   // Uses the same clean Dropbox-backed JSONL store as the
   // existing private Intercom routes.
   // =======================================================
@@ -2186,19 +2186,19 @@ router.get("/survey-export/start", async (req, res) => {
               r?.name ||
               r?.email ||
               r?.external_id ||
-              (cid ? `Contact ${cid}` : "—"),
+              (cid ? `Contact ${cid}` : "-"),
 
             intercom_contact_url: cid ? intercomContactUrl(cid) : null,
 
             pioupiou:
               r?.pioupiou_label ||
               r?.custom_attributes?.pioupiou_label ||
-              "—",
+              "-",
 
             reader_serial:
               r?.reader_serial ||
               r?.custom_attributes?.reader_serial ||
-              "—",
+              "-",
 
             previous_response_dates: previousDates,
             previous_response_links: previousLinks,

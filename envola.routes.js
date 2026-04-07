@@ -568,11 +568,11 @@ function flattenResponseForTable(r, allRowsForContact = []) {
 
     contact_id: r?.contact_id || null,
     contact_name:
-      r?.name || r?.email || r?.external_id || (r?.contact_id ? `Contact ${r.contact_id}` : "—"),
+      r?.name || r?.email || r?.external_id || (r?.contact_id ? `Contact ${r.contact_id}` : "-"),
     intercom_contact_url: r?.contact_id ? intercomContactUrl(r.contact_id) : null,
 
-    pioupiou: r?.pioupiou_label || r?.custom_attributes?.pioupiou_label || "—",
-    reader_serial: r?.reader_serial || r?.custom_attributes?.reader_serial || "—",
+    pioupiou: r?.pioupiou_label || r?.custom_attributes?.pioupiou_label || "-",
+    reader_serial: r?.reader_serial || r?.custom_attributes?.reader_serial || "-",
 
     previous_response_dates: previousResponses
       .map((x) => x?.submitted_at)
@@ -823,7 +823,7 @@ export function createEnvolaRouter() {
             r?.name ||
             r?.email ||
             r?.external_id ||
-            (r?.contact_id ? `Contact ${r.contact_id}` : "—"),
+            (r?.contact_id ? `Contact ${r.contact_id}` : "-"),
           intercom_contact_url: r?.contact_id ? intercomContactUrl(r.contact_id) : null,
         }));
 
@@ -1007,7 +1007,7 @@ export function createEnvolaRouter() {
             r?.name ||
             r?.email ||
             r?.external_id ||
-            (r?.contact_id ? `Contact ${r.contact_id}` : "—");
+            (r?.contact_id ? `Contact ${r.contact_id}` : "-");
           const contactUrl = r?.contact_id ? intercomContactUrl(r.contact_id) : null;
 
           if (verbatims.length > 0) {

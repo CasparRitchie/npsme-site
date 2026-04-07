@@ -1753,7 +1753,7 @@ export function createIntercomRouter() {
 
       function bump(questionId, questionText, bucket) {
         const qid = questionId != null ? String(questionId) : "";
-        const qText = String(questionText || "").trim() || "—";
+        const qText = String(questionText || "").trim() || "-";
         const key = qid ? `id:${qid}` : `text:${qText}`;
 
         const cur =
@@ -1773,7 +1773,7 @@ export function createIntercomRouter() {
         cur.responses += 1;
 
         // Keep the nicest question text we’ve seen
-        if (cur.question === "—" && qText !== "—") cur.question = qText;
+        if (cur.question === "-" && qText !== "-") cur.question = qText;
 
         byQ.set(key, cur);
       }
@@ -1858,7 +1858,7 @@ export function createIntercomRouter() {
         if (!key) return null;
 
         const qid = a?.question_id != null ? Number(a.question_id) : null;
-        const qt = String(a?.question_text || "").trim() || "—";
+        const qt = String(a?.question_text || "").trim() || "-";
 
         const cur =
           byQ.get(key) || {
@@ -1871,7 +1871,7 @@ export function createIntercomRouter() {
           };
 
         // Keep best text
-        if (cur.question_text === "—" && qt !== "—") cur.question_text = qt;
+        if (cur.question_text === "-" && qt !== "-") cur.question_text = qt;
 
         byQ.set(key, cur);
         return cur;

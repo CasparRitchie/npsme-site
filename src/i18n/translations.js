@@ -763,7 +763,7 @@ export const TRANSLATIONS = {
           p3:
             "These discussions led to a second iteration of the system. The analytics layer was extended to group qualitative responses into recurring themes, allowing the team to identify patterns rather than reading individual comments one by one.",
           p4:
-            "This iterative process — designing the workflow, reviewing early feedback, and refining the analytics — helped transform the programme from a simple survey into a structured customer insight system.",
+            "This iterative process - designing the workflow, reviewing early feedback, and refining the analytics - helped transform the programme from a simple survey into a structured customer insight system.",
         },
 
         cxImpact: {
@@ -2415,7 +2415,7 @@ export const TRANSLATIONS = {
         medianCompletion: "Median completion time",
         medianAnswerSub: "Median time to first answer:",
         firstAnswer: "First answer",
-        firstAnswerFallback: "First answer: —",
+        firstAnswerFallback: "First answer: -",
         note:
           "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
       },
@@ -2504,9 +2504,9 @@ export const TRANSLATIONS = {
         duplicatesRemovedSuffix: "duplicates removed",
       },
       performance: {
-        seoTitle: "Envola — Performance | NPS Me",
+        seoTitle: "Envola - Performance | NPS Me",
         seoDesc: "Private Envola performance dashboard with consistent global filters.",
-        title: "Envola — Performance",
+        title: "Envola - Performance",
         subtitle: "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts.",
         kpiNps: "NPS",
       },
@@ -3587,7 +3587,7 @@ export const TRANSLATIONS = {
           p3:
             "Ces échanges ont conduit à une seconde itération du système. La couche d’analyse a été enrichie afin de regrouper les réponses qualitatives en thèmes récurrents, permettant d’identifier des tendances plutôt que de lire les commentaires un par un.",
           p4:
-            "Ce processus itératif — concevoir le workflow, analyser les premiers retours et affiner l’analyse — a transformé le programme d’une simple enquête en un véritable système d’intelligence client.",
+            "Ce processus itératif - concevoir le workflow, analyser les premiers retours et affiner l’analyse - a transformé le programme d’une simple enquête en un véritable système d’intelligence client.",
         },
 
         cxImpact: {
@@ -5315,7 +5315,7 @@ export const TRANSLATIONS = {
         medianCompletion: "Temps médian de complétion",
         medianAnswerSub: "Temps médian avant première réponse :",
         firstAnswer: "Première réponse",
-        firstAnswerFallback: "Première réponse : —",
+        firstAnswerFallback: "Première réponse : -",
         note:
           "Astuce : lancez l’ingest export-stats régulièrement pour garder le taux de réponse et les temps à jour.",
       },
@@ -5405,9 +5405,9 @@ export const TRANSLATIONS = {
         duplicatesRemovedSuffix: "doublons supprimés",
       },
       performance: {
-        seoTitle: "Envola — Performance | NPS Me",
+        seoTitle: "Envola - Performance | NPS Me",
         seoDesc: "Tableau de bord privé Envola avec des filtres globaux cohérents.",
-        title: "Envola — Performance",
+        title: "Envola - Performance",
         subtitle:
           "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les KPI et graphiques.",
         kpiNps: "NPS",

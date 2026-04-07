@@ -6,7 +6,7 @@ export const TRANSLATIONS = {
       bookDiscovery: "Book discovery",
       languageEn: "EN",
       languageFr: "FR",
-    
+
     admin: "Admin",
     logout: "Log out",
 },
@@ -22,7 +22,7 @@ export const TRANSLATIONS = {
       socialListening: "Social Listening",
       blog: "Blog",
       cxCockpit: "CX Cockpit",
-    
+
     closingTheLoop: "Closing the loop",
 },
     about: {
@@ -51,7 +51,7 @@ export const TRANSLATIONS = {
 
       why: {
         title: "Why work with me?",
-        subtitle: "Most consultants advise. I implement.",
+        subtitle: "Most consultants advise. NPS Me implements.",
         bullets: [
           "Less slides, more action: diagnose → prioritise → ship",
           "Feedback programmes that are statistically sound (and usable)",
@@ -1484,7 +1484,7 @@ export const TRANSLATIONS = {
             tail: "and enablement for teams using your existing tools.",
             accent: "Turn feedback into measurable growth.",
           },
-          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). I help you run a reliable NPS programme, extract insight from comments, prioritise the few fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
+          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). NPS Me helps you run a reliable NPS programme, extract insight from comments, prioritise the fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
           ctaPrimary: "Book a free discovery",
           ctaMethod: "See the method",
           ctaDemo: "View example insights",
@@ -1495,7 +1495,7 @@ export const TRANSLATIONS = {
           },
           chips: ["Consulting", "Workshops", "Speaking", "Intercom", "HubSpot", "Zendesk", "CSV"],
           chipsNote:
-            "Keep your survey tool. I focus on governance, analysis, prioritisation and action.",
+            "Keep your survey tool. NPS Me focuses on governance, analysis, prioritisation and action.",
         },
 
       method: {
@@ -1559,7 +1559,7 @@ export const TRANSLATIONS = {
       about: {
         title: "About Caspar",
         body:
-          "Practical CX. Measurable outcomes. Less theatre, more progress. I help teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
+          "Practical CX. Measurable outcomes. Less theatre, more progress. NPS Me helps teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
         bullets: [
           "Decision-grade programmes: sampling, bias, comparability (so the score means something)",
           "Verbatim → themes, drivers, and clear priorities",
@@ -1644,7 +1644,7 @@ export const TRANSLATIONS = {
         cards: [
           {
             title: "Consulting",
-            desc: "Most consultants advise. I implement - diagnose → prioritise → ship.",
+            desc: "Most consultants advise. NPS Me implements: diagnose → prioritise → ship.",
             bullets: [
               "NPS programme design (no survey spam, no bad data)",
               "Theme/driver analysis from real comments",
@@ -2615,7 +2615,7 @@ export const TRANSLATIONS = {
       bookDiscovery: "Prendre rendez-vous",
       languageEn: "EN",
       languageFr: "FR",
-    
+
     admin: "Admin",
     logout: "Déconnexion",
 },
@@ -2631,7 +2631,7 @@ export const TRANSLATIONS = {
       socialListening: "Social listening",
       blog: "Blog",
       cxCockpit: "Cockpit CX",
-    
+
     closingTheLoop: "Boucler la boucle",
 },
     about: {

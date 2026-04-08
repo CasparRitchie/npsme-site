@@ -28,7 +28,6 @@ export default function MilestoneNps() {
   const impactPath = localizePath("/impact", lang);
   const homeWithContactHash = `${localizePath("/", lang)}#contact`;
 
-  // Related insights links (keep this tight: 3–5 max)
   const relatedLinks = [
     {
       path: "/what-is-nps",
@@ -38,7 +37,6 @@ export default function MilestoneNps() {
         "What is NPS?"
       ),
     },
-
     {
       path: "/nps-survey-programme",
       label: translations(
@@ -47,7 +45,6 @@ export default function MilestoneNps() {
         "NPS survey programme"
       ),
     },
-
     {
       path: "/nps-intelligence-layer",
       label: translations(
@@ -56,7 +53,6 @@ export default function MilestoneNps() {
         "NPS intelligence layer"
       ),
     },
-
     {
       path: "/intercom-nps-analytics",
       label: translations(
@@ -65,7 +61,6 @@ export default function MilestoneNps() {
         "Intercom NPS analytics"
       ),
     },
-
     {
       path: "/social-listening",
       label: translations(
@@ -83,12 +78,12 @@ export default function MilestoneNps() {
         title={translations(
           lang,
           "milestonePage.seoTitle",
-          "Milestone (Transactional) NPS® & Survey Signals | NPS Me"
+          "Transactional NPS and milestone surveys | NPS Me"
         )}
         description={translations(
           lang,
           "milestonePage.seoDescription",
-          "Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX."
+          "Learn how transactional NPS and milestone surveys help teams measure customer sentiment at key journey moments and turn feedback into action."
         )}
         lang={lang}
       />
@@ -130,36 +125,30 @@ export default function MilestoneNps() {
               to={homeWithContactHash}
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              {translations(lang, "milestonePage.header.ctaBook", "Book discovery")}
+              {translations(lang, "milestonePage.header.ctaBook", "Book a free NPS review")}
             </Link>
           </div>
         </>
       </PageHeader>
 
-      {/* definition block */}
+      {/* Definition block */}
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl font-semibold text-white">
-            {lang === "fr"
-              ? "Qu’est-ce que le NPS transactionnel ?"
-              : "What is transactional NPS?"}
+            {translations(lang, "milestonePage.definition.title")}
           </h2>
 
           <p className="mt-4 text-slate-300 max-w-3xl">
-            {lang === "fr"
-              ? "Le NPS transactionnel, ou NPS par étape, mesure le ressenti client juste après un moment précis du parcours — par exemple après une commande, un onboarding ou une interaction de support."
-              : "Transactional NPS, or milestone NPS, measures customer sentiment immediately after a specific journey moment such as an order, onboarding step or support interaction."}
+            {translations(lang, "milestonePage.definition.p1")}
           </p>
 
           <p className="mt-3 text-slate-300 max-w-3xl">
-            {lang === "fr"
-              ? "Il complète le NPS relationnel en aidant les équipes à relier les scores aux frictions concrètes et aux actions correctives."
-              : "It complements relationship NPS by helping teams connect scores to specific friction points and improvement actions."}
+            {translations(lang, "milestonePage.definition.p2")}
           </p>
         </div>
       </section>
 
-      {/* 4-Stage method */}
+      {/* 4-stage method */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="max-w-2xl">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
@@ -177,14 +166,26 @@ export default function MilestoneNps() {
             )}
           </p>
           <p className="mt-3 text-slate-300">
-            {translations(lang, "milestonePage.method.linkPrefix", "If you want the bigger picture, start with the")}{" "}
+            {translations(
+              lang,
+              "milestonePage.method.linkPrefix",
+              "If you want the bigger picture, start with the"
+            )}{" "}
             <Link
               to={localizePath("/nps-intelligence-layer", lang)}
               className="text-link"
             >
-              {translations(lang, "milestonePage.method.linkText", "NPS intelligence layer")}
+              {translations(
+                lang,
+                "milestonePage.method.linkText",
+                "NPS intelligence layer"
+              )}
             </Link>
-            {translations(lang, "milestonePage.method.linkSuffix", ", then apply it here to milestone surveys.")}
+            {translations(
+              lang,
+              "milestonePage.method.linkSuffix",
+              ", then apply it here to milestone surveys."
+            )}
           </p>
         </div>
 
@@ -194,7 +195,10 @@ export default function MilestoneNps() {
             const Icon = icons[idx] || Star;
 
             return (
-              <div key={card.title || idx} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <div
+                key={card.title || idx}
+                className="rounded-2xl border border-white/10 bg-white/5 p-6"
+              >
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E] flex items-center justify-center">
                     <Icon className="h-5 w-5 text-white" />
@@ -215,19 +219,30 @@ export default function MilestoneNps() {
             {translations(lang, "milestonePage.fit.title", "Where milestone surveys fit")}
           </h3>
           <p className="mt-3 text-slate-300 max-w-3xl">
-            {translations(lang, "milestonePage.fit.linkPrefix", "If you run NPS in a tool like Intercom, see")}{" "}
+            {translations(
+              lang,
+              "milestonePage.fit.linkPrefix",
+              "If you run NPS in a tool like Intercom, see"
+            )}{" "}
             <Link
               to={localizePath("/intercom-nps-analytics", lang)}
               className="text-link"
             >
-              {translations(lang, "milestonePage.fit.linkText", "how we turn Intercom comments into prioritised actions")}
+              {translations(
+                lang,
+                "milestonePage.fit.linkText",
+                "how we turn Intercom comments into prioritised actions"
+              )}
             </Link>
             {translations(lang, "milestonePage.fit.linkSuffix", ".")}
           </p>
 
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             {fitCards.map((card, idx) => (
-              <div key={card.title || idx} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div
+                key={card.title || idx}
+                className="rounded-2xl border border-white/10 bg-black/20 p-5"
+              >
                 <div className="text-white font-semibold">{card.title}</div>
                 <div className="mt-2 text-sm text-slate-200">{card.q}</div>
                 <div className="mt-2 text-xs text-slate-400">{card.why}</div>
@@ -237,14 +252,18 @@ export default function MilestoneNps() {
         </div>
       </section>
 
-      {/* Implementation checklist + What we track */}
+      {/* Implementation checklist + what we track */}
       <section className="mx-auto max-w-7xl px-6 pb-8">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
             <div className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-white" />
               <h4 className="text-white font-semibold">
-                {translations(lang, "milestonePage.checklist.stepsTitle", "Implementation in 5 steps")}
+                {translations(
+                  lang,
+                  "milestonePage.checklist.stepsTitle",
+                  "Implementation in 5 steps"
+                )}
               </h4>
             </div>
 
@@ -272,20 +291,33 @@ export default function MilestoneNps() {
         </div>
       </section>
 
-      {/* Related insights (internal linking block) */}
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-2xl font-semibold text-white">
-            {translations(lang, "milestonePage.definition.title")}
-          </h2>
+      {/* Related insights */}
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
+          <h3 className="text-xl md:text-2xl font-semibold text-white">
+            {translations(lang, "milestonePage.related.title", "Related insights")}
+          </h3>
 
-          <p className="mt-4 text-slate-300 max-w-3xl">
-            {translations(lang, "milestonePage.definition.p1")}
+          <p className="mt-3 text-slate-300 max-w-3xl leading-relaxed">
+            {translations(
+              lang,
+              "milestonePage.related.intro",
+              "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action."
+            )}
           </p>
 
-          <p className="mt-3 text-slate-300 max-w-3xl">
-            {translations(lang, "milestonePage.definition.p2")}
-          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedLinks.map((item) => (
+              <Link
+                key={item.path}
+                to={localizePath(item.path, lang)}
+                className="group flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
+              >
+                <span className="font-medium">{item.label}</span>
+                <ArrowRight className="h-4 w-4 opacity-70 transition group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </div>

@@ -67,14 +67,16 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.hero.body1",
-              "If you already use Intercom, Medallia or another survey platform but still struggle to prioritise actions, explain scores or turn feedback into change, this page is for you."            )}
+              "If you already use Intercom, Medallia or another survey platform but still struggle to prioritise actions, explain scores or turn feedback into change, this page is for you."
+            )}
           </p>
 
           <p className="mt-3 text-slate-300 leading-relaxed">
             {translations(
               lang,
               "npsIntelligenceLayer.hero.body2",
-              "Most teams do not need another survey tool. They need a clearer way to interpret NPS, analyse comments, and decide what to do next."            )}
+              "Most teams do not need another survey tool. They need a clearer way to interpret NPS, analyse comments, and decide what to do next."
+            )}
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
@@ -241,6 +243,7 @@ export default function NpsIntelligenceLayer() {
             )}
           </p>
         </div>
+
         {/* Related insights */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-sm font-semibold text-slate-300">
@@ -288,17 +291,22 @@ export default function NpsIntelligenceLayer() {
             </li>
           </ul>
         </div>
+
         {/* Section: Medallia note */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.sections.medallia.title", "Where Medallia still needs interpretation and action")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.sections.medallia.title",
+              "Where Medallia still needs interpretation and action"
+            )}
           </h3>
 
           <p className="mt-3 text-slate-300 leading-relaxed">
             {translations(
               lang,
               "npsIntelligenceLayer.sections.medallia.body1",
-              "Medallia is powerful. In large organisations it can also become over-configured and under-interpreted."
+              "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that is harder to translate into everyday decisions."
             )}
           </p>
 
@@ -306,7 +314,7 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.sections.medallia.body2",
-              "Having access to everything does not guarantee clarity. NPS Me is built to make decisions easier, without adding complexity."
+              "Access to more data does not automatically create clarity. NPS Me is designed to help teams focus on what matters most: turning feedback into clear priorities and practical action, without unnecessary complexity."
             )}
           </p>
         </div>
@@ -355,10 +363,10 @@ export default function NpsIntelligenceLayer() {
           </ul>
         </div>
 
-        {/* Links */}
+        {/* Continue exploring */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-xl font-semibold text-white">
-            {lang === "fr" ? "Continuer l’exploration" : "Continue exploring"}
+            {translations(lang, "npsIntelligenceLayer.continueExploring.title")}
           </h3>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -366,28 +374,28 @@ export default function NpsIntelligenceLayer() {
               to={localizePath("/intercom-nps-analytics", lang)}
               className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
             >
-              {lang === "fr" ? "Intercom NPS analytics" : "Intercom NPS analytics"}
+              {translations(lang, "npsIntelligenceLayer.continueExploring.intercom")}
             </Link>
 
             <Link
               to={localizePath("/milestone-nps", lang)}
               className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
             >
-              {lang === "fr" ? "NPS transactionnel / par étape" : "Transactional / milestone NPS"}
+              {translations(lang, "npsIntelligenceLayer.continueExploring.milestone")}
             </Link>
 
             <Link
               to={localizePath("/what-is-nps", lang)}
               className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
             >
-              {lang === "fr" ? "Qu’est-ce que le NPS ?" : "What is NPS?"}
+              {translations(lang, "npsIntelligenceLayer.continueExploring.whatIsNps")}
             </Link>
 
             <Link
               to={localizePath("/nps-survey-programme", lang)}
               className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
             >
-              {lang === "fr" ? "Programme d’enquête NPS" : "NPS survey programme"}
+              {translations(lang, "npsIntelligenceLayer.continueExploring.surveyProgramme")}
             </Link>
           </div>
         </div>

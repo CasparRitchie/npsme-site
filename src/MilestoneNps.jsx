@@ -31,22 +31,6 @@ export default function MilestoneNps() {
   // Related insights links (keep this tight: 3–5 max)
   const relatedLinks = [
     {
-      path: "/nps-intelligence-layer",
-      label: translations(
-        lang,
-        "milestonePage.related.links.intelligenceLayer",
-        "NPS intelligence layer"
-      ),
-    },
-    {
-      path: "/intercom-nps-analytics",
-      label: translations(
-        lang,
-        "milestonePage.related.links.intercomNpsAnalytics",
-        "Intercom NPS analytics"
-      ),
-    },
-    {
       path: "/what-is-nps",
       label: translations(
         lang,
@@ -54,6 +38,7 @@ export default function MilestoneNps() {
         "What is NPS?"
       ),
     },
+
     {
       path: "/nps-survey-programme",
       label: translations(
@@ -62,6 +47,25 @@ export default function MilestoneNps() {
         "NPS survey programme"
       ),
     },
+
+    {
+      path: "/nps-intelligence-layer",
+      label: translations(
+        lang,
+        "milestonePage.related.links.intelligenceLayer",
+        "NPS intelligence layer"
+      ),
+    },
+
+    {
+      path: "/intercom-nps-analytics",
+      label: translations(
+        lang,
+        "milestonePage.related.links.intercomNpsAnalytics",
+        "Intercom NPS analytics"
+      ),
+    },
+
     {
       path: "/social-listening",
       label: translations(
@@ -102,7 +106,7 @@ export default function MilestoneNps() {
             {translations(
               lang,
               "milestonePage.header.title",
-              "Milestone (Transactional) NPS & Survey Signals"
+              "Transactional NPS and milestone survey signals"
             )}
           </h1>
 
@@ -110,7 +114,7 @@ export default function MilestoneNps() {
             {translations(
               lang,
               "milestonePage.header.intro",
-              "A practical framework to capture feedback at key journey moments, turn it into prioritised work, and measure lift. We reference Net Promoter Score (NPS)® descriptively alongside CSAT, CES and behavioral data."
+              "A practical framework for transactional NPS and milestone surveys. Capture feedback at key journey moments, turn it into prioritised work, and measure lift over time alongside CSAT, CES and behavioural data."
             )}
           </p>
 
@@ -131,6 +135,29 @@ export default function MilestoneNps() {
           </div>
         </>
       </PageHeader>
+
+      {/* definition block */}
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {lang === "fr"
+              ? "Qu’est-ce que le NPS transactionnel ?"
+              : "What is transactional NPS?"}
+          </h2>
+
+          <p className="mt-4 text-slate-300 max-w-3xl">
+            {lang === "fr"
+              ? "Le NPS transactionnel, ou NPS par étape, mesure le ressenti client juste après un moment précis du parcours — par exemple après une commande, un onboarding ou une interaction de support."
+              : "Transactional NPS, or milestone NPS, measures customer sentiment immediately after a specific journey moment such as an order, onboarding step or support interaction."}
+          </p>
+
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {lang === "fr"
+              ? "Il complète le NPS relationnel en aidant les équipes à relier les scores aux frictions concrètes et aux actions correctives."
+              : "It complements relationship NPS by helping teams connect scores to specific friction points and improvement actions."}
+          </p>
+        </div>
+      </section>
 
       {/* 4-Stage method */}
       <section className="mx-auto max-w-7xl px-6 py-12">
@@ -246,32 +273,19 @@ export default function MilestoneNps() {
       </section>
 
       {/* Related insights (internal linking block) */}
-      <section className="mx-auto max-w-7xl px-6 pb-16">
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
-          <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "milestonePage.related.title", "Related insights")}
-          </h3>
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {translations(lang, "milestonePage.definition.title")}
+          </h2>
 
-          <p className="mt-3 text-slate-300 max-w-3xl leading-relaxed">
-            {translations(
-              lang,
-              "milestonePage.related.intro",
-              "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action."
-            )}
+          <p className="mt-4 text-slate-300 max-w-3xl">
+            {translations(lang, "milestonePage.definition.p1")}
           </p>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {relatedLinks.map((item) => (
-              <Link
-                key={item.path}
-                to={localizePath(item.path, lang)}
-                className="group flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
-              >
-                <span className="font-medium">{item.label}</span>
-                <ArrowRight className="h-4 w-4 opacity-70 transition group-hover:translate-x-0.5" />
-              </Link>
-            ))}
-          </div>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {translations(lang, "milestonePage.definition.p2")}
+          </p>
         </div>
       </section>
     </div>

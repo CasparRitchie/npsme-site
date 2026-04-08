@@ -1552,18 +1552,26 @@ export const TRANSLATIONS = {
       },
     },
     milestonePage: {
-      seoTitle: "Milestone (Transactional) NPS® & Survey Signals | NPS Me",
+      seoTitle: "Transactional NPS and milestone surveys | NPS Me",
       seoDescription:
-        "Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX.",
+        "Learn how transactional NPS and milestone surveys help teams measure customer sentiment at key journey moments and turn feedback into action.",
 
       header: {
-        iconLabel: "Milestone / transactional NPS",
+        iconLabel: "Transactional / milestone NPS",
         tag: "NPS Me / Milestone NPS",
-        title: "Milestone (Transactional) NPS & Survey Signals",
+        title: "Transactional NPS and milestone survey signals",
         intro:
-          "A practical framework to capture feedback at key journey moments, turn it into prioritised work, and measure lift. We reference Net Promoter Score (NPS)® descriptively alongside CSAT, CES and behavioral data.",
+          "A practical framework for transactional NPS and milestone surveys. Capture feedback at key journey moments, turn it into prioritised work, and measure lift over time alongside CSAT, CES and behavioural data.",
         ctaImpact: "Estimate your impact",
-        ctaBook: "Book discovery",
+        ctaBook: "Book a free NPS review",
+      },
+
+      definition: {
+        title: "What is transactional NPS?",
+        p1:
+          "Transactional NPS, or milestone NPS, measures customer sentiment immediately after a specific journey moment such as an order, onboarding step or support interaction.",
+        p2:
+          "It complements relationship NPS by helping teams connect scores to specific friction points and improvement actions.",
       },
 
       method: {
@@ -2631,16 +2639,16 @@ export const TRANSLATIONS = {
       },
     },
     whatIsNps: {
-      seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
+      seoTitle: "What is NPS? Net Promoter Score explained properly | NPS Me",
       seoDescription:
-        "Plain English guide to Net Promoter Score (NPS): how it works, how to calculate it, where it helps, where it misleads, and how to act on feedback.",
+        "Learn what Net Promoter Score really measures, how NPS is calculated, the difference between relationship and transactional NPS, and how to use it properly.",
 
       header: {
         iconLabel: "What is NPS?",
-        tag: "Guide / Customer Experience",
-        title: "What is Net Promoter Score (NPS)?",
+        tag: "NPS Me / What is NPS?",
+        title: "What is Net Promoter Score (NPS®)?",
         subtitle:
-          "A practical explanation of how NPS works, where it is useful, where it can go wrong, and how to use it as a starting point for real customer improvement rather than just a number on a dashboard.",
+          "A practical explanation of what NPS measures, how it is calculated, and how to use it properly.",
       },
 
       core: {
@@ -2760,14 +2768,21 @@ export const TRANSLATIONS = {
           "Over time this builds trust. Customers see that feedback leads to change, teams see that insight leads to better results, and the NPS score becomes one useful signal in a wider customer health picture.",
       },
 
+      quickLinks: {
+        title: "Go deeper",
+        milestone: "Transactional / milestone NPS",
+        surveyProgramme: "NPS survey programme",
+        intelligenceLayer: "NPS intelligence layer",
+      },
+
       cta: {
-        title: "Want help designing an NPS program that actually drives change?",
+        title: "Want help turning NPS into action?",
         body:
-          "NPS Me works with teams to design fair surveys, realistic sampling, and practical follow-up so that every point of feedback has somewhere to go.",
-        explore: "Explore services",
-        book: "Book a discovery call",
+          "NPS Me helps teams design better programmes, interpret feedback properly, and turn NPS into practical improvements.",
+        explore: "Explore NPS consulting and analytics",
+        book: "Book a free NPS review",
         disclaimer:
-          "NPS and Net Promoter Score are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References on this page are descriptive only. NPS Me is independent and not affiliated with or endorsed by those parties.",
+          "NPS® and Net Promoter Score® are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References here are descriptive only.",
       },
     },
     whyNpsMe: {
@@ -4447,18 +4462,26 @@ export const TRANSLATIONS = {
       },
     },
     milestonePage: {
-      seoTitle: "NPS® transactionnel (milestones) & signaux d’enquête | NPS Me",
+      seoTitle: "NPS transactionnel et enquêtes par étape | NPS Me",
       seoDescription:
-        "Captez le sentiment client aux moments clés du parcours pour révéler les frictions en contexte. Mettez en place le close-the-loop et le suivi des thèmes pour une CX actionnable.",
+        "Découvrez comment le NPS transactionnel et les enquêtes par étape aident les équipes à mesurer le ressenti client aux moments clés du parcours et à transformer le feedback en action.",
 
       header: {
-        iconLabel: "NPS milestone / transactionnel",
-        tag: "NPS Me / NPS Milestone",
-        title: "NPS transactionnel (milestones) & signaux d’enquête",
+        iconLabel: "NPS transactionnel / par étape",
+        tag: "NPS Me / NPS par étape",
+        title: "NPS transactionnel et signaux d’enquêtes par étape",
         intro:
-          "Un cadre pratique pour capter le feedback aux moments clés du parcours, le transformer en plan d’action priorisé, et mesurer l’amélioration. Nous utilisons la référence Net Promoter Score (NPS)® de façon descriptive, aux côtés de la CSAT, du CES et des données comportementales.",
+          "Un cadre pratique pour le NPS transactionnel et les enquêtes par étape. Capturez le feedback aux moments clés du parcours, transformez-le en travail priorisé et mesurez les progrès dans le temps aux côtés du CSAT, du CES et des données comportementales.",
         ctaImpact: "Estimer votre impact",
-        ctaBook: "Prendre rendez-vous",
+        ctaBook: "Réserver une revue NPS gratuite",
+      },
+
+      definition: {
+        title: "Qu’est-ce que le NPS transactionnel ?",
+        p1:
+          "Le NPS transactionnel, ou NPS par étape, mesure le ressenti client juste après un moment précis du parcours, comme une commande, un onboarding ou une interaction de support.",
+        p2:
+          "Il complète le NPS relationnel en aidant les équipes à relier les scores à des frictions concrètes et à des actions d’amélioration.",
       },
 
       method: {
@@ -5545,17 +5568,18 @@ export const TRANSLATIONS = {
       },
     },
     whatIsNps: {
-      seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
+      seoTitle: "Qu’est-ce que le NPS ? Explication claire du Net Promoter Score | NPS Me",
       seoDescription:
-        "Guide en français sur le Net Promoter Score (NPS) : fonctionnement, calcul, cas d’usage, pièges courants et comment agir sur les verbatims.",
+        "Comprenez ce que mesure réellement le Net Promoter Score, comment il est calculé, la différence entre NPS relationnel et transactionnel, et comment bien l’utiliser.",
 
       header: {
         iconLabel: "Qu’est-ce que le NPS ?",
-        tag: "Guide / Expérience client",
-        title: "Qu’est-ce que le Net Promoter Score (NPS) ?",
+        tag: "NPS Me / Qu’est-ce que le NPS ?",
+        title: "Qu’est-ce que le Net Promoter Score (NPS®) ?",
         subtitle:
-          "Une explication pratique : comment le NPS fonctionne, quand il est utile, où il peut induire en erreur, et comment l’utiliser comme point de départ pour des améliorations concrètes - pas seulement comme un chiffre dans un dashboard.",
+          "Une explication pratique de ce que mesure le NPS, de son calcul et de la manière de bien l’utiliser.",
       },
+
 
       core: {
         title: "La question NPS de base",
@@ -5674,14 +5698,21 @@ export const TRANSLATIONS = {
           "Avec le temps, cela crée de la confiance. Les clients voient que leur feedback déclenche des changements, les équipes voient que l’insight améliore les résultats, et le NPS devient un signal utile parmi d’autres dans la santé client.",
       },
 
+      quickLinks: {
+        title: "Aller plus loin",
+        milestone: "NPS transactionnel / par étape",
+        surveyProgramme: "Programme d’enquête NPS",
+        intelligenceLayer: "Couche d’analyse NPS",
+      },
+
       cta: {
-        title: "Besoin d’aide pour concevoir un programme NPS qui génère de vrais changements ?",
+        title: "Besoin d’aide pour transformer le NPS en actions ?",
         body:
-          "NPS Me accompagne les équipes pour concevoir des enquêtes justes, un échantillonnage réaliste, et des boucles de suivi pratiques - afin que chaque feedback mène quelque part.",
-        explore: "Découvrir les offres",
-        book: "Prendre rendez-vous",
+          "NPS Me aide les équipes à concevoir de meilleurs programmes, interpréter correctement les retours et transformer le NPS en améliorations concrètes.",
+        explore: "Découvrir le conseil et les analytics NPS",
+        book: "Réserver une revue NPS gratuite",
         disclaimer:
-          "NPS et Net Promoter Score sont des marques de service déposées de Bain & Company, Inc., Fred Reichheld, et Satmetrix Systems, Inc. Les références sur cette page sont purement descriptives. NPS Me est indépendant et n’est ni affilié ni sponsorisé par ces parties.",
+          "NPS® et Net Promoter Score® sont des marques déposées de Bain & Company, Inc., Fred Reichheld et Satmetrix Systems, Inc. Les références ici sont purement descriptives.",
       },
     },
     whyNpsMe: {

@@ -34,9 +34,26 @@ export default function NpsSurveyProgramme() {
         iconLabel={tr("surveyProgramme.header.iconLabel")}
         tag={tr("surveyProgramme.header.tag")}
         accent={tr("surveyProgramme.header.accent")}
-        title=""
+        title={tr("surveyProgramme.header.title")}
         subtitle={tr("surveyProgramme.header.subtitle")}
       />
+
+      {/* Intro copy */}
+      <section className="mx-auto max-w-4xl px-6 pt-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {tr("surveyProgramme.introBox.title")}
+          </h2>
+
+          <p className="mt-4 text-slate-300">
+            {tr("surveyProgramme.introBox.p1")}
+          </p>
+
+          <p className="mt-3 text-slate-300">
+            {tr("surveyProgramme.introBox.p2")}
+          </p>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         {/* How it works */}
@@ -102,6 +119,36 @@ export default function NpsSurveyProgramme() {
                 <li key={b}>{b}</li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        {/* internal-link strip */}
+        <div className="mt-16 rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="text-xs uppercase tracking-widest text-slate-400">
+            {tr("surveyProgramme.related.title")}
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link
+              to={localizePath("/what-is-nps", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10 transition"
+            >
+              {tr("surveyProgramme.related.whatIsNps")}
+            </Link>
+
+            <Link
+              to={localizePath("/milestone-nps", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10 transition"
+            >
+              {tr("surveyProgramme.related.milestone")}
+            </Link>
+
+            <Link
+              to={localizePath("/intercom-nps-analytics", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10 transition"
+            >
+              {tr("surveyProgramme.related.intercom")}
+            </Link>
           </div>
         </div>
 

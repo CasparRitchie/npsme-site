@@ -24,14 +24,15 @@ import SocialListening from "./SocialListening";
 import SocialListeningIndex from "./pages/SocialListeningIndex";
 import SocialListeningReport from "./pages/SocialListeningReport";
 
-import BlogIndex from "./pages/BlogIndex";
+import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
+import BlogDataVisualisation from "./pages/BlogDataVisualisation";
 import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
 import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
-import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
-import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
+import BlogIndex from "./pages/BlogIndex";
+import BlogIntercomNpsBeyondTheScore from "./pages/BlogIntercomNpsBeyondTheScore";
 import BlogSendingNpsBeforeChristmas from "./pages/BlogSendingNpsBeforeChristmas";
+import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
 import BlogWhyNpsIsntImproving from "./pages/BlogWhyNpsIsntImproving";
-import BlogDataVisualisation from "./pages/BlogDataVisualisation";
 
 import DataAutomationPage from "./pages/DataAutomationPage";
 import DemoSurvey from "./pages/DemoSurvey";
@@ -49,7 +50,12 @@ import CxCockpit from "./pages/CxCockpit";
 
 import PrivateLogin from "./pages/PrivateLogin";
 import ClosingTheLoop from "./pages/ClosingTheLoop";
+import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
+
+import EnvolaPerformance from "./pages/EnvolaPerformance";
+import EnvolaResponses from "./pages/EnvolaResponses";
+import EnvolaInvitations from "./pages/EnvolaInvitations";
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -98,6 +104,15 @@ const COMPONENTS = {
   "/envola/questions/:questionId": EnvolaQuestionDetail,
   "/fr/exemple-envola/questions/:questionId": EnvolaQuestionDetail,
 
+  "/envola/performance": protect(EnvolaPerformance),
+  "/fr/envola/performance": protect(EnvolaPerformance),
+
+  "/envola/responses": protect(EnvolaResponses),
+  "/fr/envola/responses": protect(EnvolaResponses),
+
+  "/envola/invitations": protect(EnvolaInvitations),
+  "/fr/envola/invitations": protect(EnvolaInvitations),
+
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,
 
@@ -127,26 +142,29 @@ const COMPONENTS = {
   "/blog": BlogIndex,
   "/fr/blog": BlogIndex,
 
+  "/blog/closing-the-loop": BlogClosingTheLoop,
+  "/fr/blog/closing-the-loop": BlogClosingTheLoop,
+
+  "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
+  "/fr/blog/data-visualisation-cx-insights": BlogDataVisualisation,
+
   "/blog/ethical-surveys": BlogEthicalSurveys,
   "/fr/blog/ethical-surveys": BlogEthicalSurveys,
 
   "/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
   "/fr/blog/ethics-of-contact-selection": BlogEthicsOfContactSelection,
 
-  "/blog/closing-the-loop": BlogClosingTheLoop,
-  "/fr/blog/closing-the-loop": BlogClosingTheLoop,
-
-  "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
-  "/fr/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+  "/blog/intercom-nps-beyond-the-score": BlogIntercomNpsBeyondTheScore,
+  "/fr/blog/intercom-nps-beyond-the-score": BlogIntercomNpsBeyondTheScore,
 
   "/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
   "/fr/blog/sending-nps-before-christmas": BlogSendingNpsBeforeChristmas,
 
+  "/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+  "/fr/blog/what-to-do-with-nps-scores": BlogWhatToDoWithNpsScores,
+
   "/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
   "/fr/blog/why-nps-isnt-improving": BlogWhyNpsIsntImproving,
-
-  "/blog/data-visualisation-cx-insights": BlogDataVisualisation,
-  "/fr/blog/data-visualisation-cx-insights": BlogDataVisualisation,
 
   // CX data
   "/cx-pulse-sample": CxPulseSample,
@@ -189,6 +207,9 @@ const COMPONENTS = {
 
   "/private/closing-the-loop": protect(ClosingTheLoop),
   "/fr/private/closing-the-loop": protect(ClosingTheLoop),
+
+  "/private/nps-responses-explorer": protect(NpsResponsesExplorer),
+  "/fr/private/nps-responses-explorer": protect(NpsResponsesExplorer),
 };
 
 

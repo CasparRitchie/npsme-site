@@ -53,6 +53,16 @@ export const ROUTES_MANIFEST = [
   { path: "/private/closing-the-loop", label: "Closing the loop", labelKey: "routes.closingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/private/closing-the-loop", label: "Boucler la boucle", labelKey: "routes.closingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
+  // Envola private workspace
+  { path: "/envola/performance", label: "Envola Performance", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/envola/performance", label: "Performance Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/envola/responses", label: "Envola Responses", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/envola/responses", label: "Réponses Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/envola/invitations", label: "Envola Invitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/envola/invitations", label: "Invitations Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // Social listening (indexable)
   { path: "/social-listening",     label: "Social Listening",       labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/social-listening",  label: "Écoute sociale",         labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "fr" },
@@ -84,6 +94,12 @@ export const ROUTES_MANIFEST = [
 
   { path: "/blog/closing-the-loop",                  label: "Blog: Closing the Loop",                   labelKey: "routes.blogClosingTheLoop",            enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/blog/closing-the-loop",               label: "Blog : Boucler la boucle",                 labelKey: "routes.blogClosingTheLoop",            enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/private/nps-responses-explorer",         label: "NPS Explorer",                             labelKey: "routes.npsExplorer",enabled: true,indexable: false,inHeader: false,inFooter: true,lang: "en"},
+  { path: "/fr/private/nps-responses-explorer",      label: "Explorateur NPS",                          labelKey: "routes.npsExplorer",enabled: true,indexable: false,inHeader: false,inFooter: true,lang: "fr"},
+
+  { path: "/blog/intercom-nps-beyond-the-score",     label: "Blog: Intercom NPS Beyond the Score",      labelKey: "routes.blogIntercomNpsBeyondScore", enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/blog/intercom-nps-beyond-the-score",  label: "Blog : Intercom NPS au-delà du score",     labelKey: "routes.blogIntercomNpsBeyondScore", enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "fr" },
 
   { path: "/blog/what-to-do-with-nps-scores",        label: "Blog: What To Do With NPS Scores",         labelKey: "routes.blogWhatToDoWithNpsScores",     enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/blog/what-to-do-with-nps-scores",     label: "Blog : Que faire avec vos scores NPS",     labelKey: "routes.blogWhatToDoWithNpsScores",     enabled: true, indexable: true, inHeader: false, inFooter: false, lang: "fr" },

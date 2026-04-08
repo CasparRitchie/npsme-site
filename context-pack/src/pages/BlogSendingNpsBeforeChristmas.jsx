@@ -1,6 +1,6 @@
 // src/pages/BlogSendingNpsBeforeChristmas.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -8,6 +8,12 @@ import { translations } from "../i18n/translations";
 
 export default function BlogSendingNpsBeforeChristmas() {
   const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
+
+  const BASE = "blogSendingNpsBeforeChristmas";
+  const DATE_PUBLISHED = "2025-12-01";
+  const DATE_MODIFIED = "2025-12-01";
 
   const seoTitle = translations(lang, "blogSendingNpsBeforeChristmas.seo.title");
   const seoDescription = translations(
@@ -21,6 +27,28 @@ export default function BlogSendingNpsBeforeChristmas() {
         path="/blog/sending-nps-before-christmas"
         title={seoTitle}
         description={seoDescription}
+      />
+
+      {/* BlogPosting JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: tr(`${BASE}.h1`, tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post"))),
+            description: tr(`${BASE}.seo.description`, ""),
+            datePublished: DATE_PUBLISHED,
+            dateModified: DATE_MODIFIED,
+            inLanguage: lang,
+            author: { "@type": "Person", name: "Caspar Ritchie" },
+            publisher: { "@type": "Organization", name: "NPS Me" },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://npsme.com" + location.pathname,
+            },
+          }),
+        }}
       />
 
       {/* Header */}

@@ -142,7 +142,7 @@ function MilestoneNpsSection() {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
             <div className="text-white font-semibold">
               {tr("landing.milestone.stepsTitle")}
@@ -264,7 +264,10 @@ export default function NpsMeLanding() {
   const methodCards = translations(lang, "landing.method.cards", []);
   const platformCards = translations(lang, "landing.platform.cards", []);
   const aboutBullets = translations(lang, "landing.about.bullets", []);
-  const chips = translations(lang, "landing.hero.chips", []);
+  const chips = translations(lang, "landing.hero.chips", {
+    help: [],
+    worksWith: [],
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -328,27 +331,77 @@ export default function NpsMeLanding() {
               <div className="flex items-center gap-2"><LineChart className="h-4 w-4" /> {tr("landing.hero.proof.lift")}</div>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-2 text-xs">
-              {chips.map((chip) => (
-                <span
-                  key={chip}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300"
-                >
-                  {chip}
-                </span>
-              ))}
+            <div className="mt-6 space-y-4 text-xs">
+              <div>
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-500">
+                  {lang === "fr" ? "Comment j’aide" : "How I help"}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {chips.help?.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-500">
+                  {lang === "fr" ? "Compatible avec" : "Works with"}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {chips.worksWith?.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <p className="mt-2 text-[11px] text-slate-500 max-w-xl">
+            <p className="mt-3 text-[11px] text-slate-500 max-w-xl">
               {tr("landing.hero.chipsNote")}
             </p>
           </div>
         </div>
       </PageHeader>
 
+      {/* Platform */}
+      <section id="platform" className="mx-auto max-w-7xl px-6 py-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("landing.platform.title")}
+          </h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {tr("landing.platform.body")}{" "}
+            <Link
+              to={localizePath("/intercom-nps-analytics", lang)}
+              className="underline decoration-white/30 underline-offset-4 hover:text-white"
+            >
+              {tr("landing.platform.linkIntercomText")}
+            </Link>
+          </p>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {platformCards.map((card) => (
+              <div key={card.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+                <div className="text-white font-semibold">{card.title}</div>
+                <div className="mt-2 text-sm text-slate-300">{card.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Method */}
-      <section id="method" className="mx-auto max-w-7xl px-6 py-20">
-        <div className="max-w-2xl">
+      <section id="method" className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="max-w-3xl">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
             {tr("landing.method.title")}
           </h2>
@@ -411,32 +464,7 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
-      {/* Platform */}
-      <section id="platform" className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {tr("landing.platform.title")}
-          </h2>
-          <p className="mt-3 text-slate-300 max-w-3xl">
-            {tr("landing.platform.body")}{" "}
-            <Link
-              to={localizePath("/intercom-nps-analytics", lang)}
-              className="underline decoration-white/30 underline-offset-4 hover:text-white"
-            >
-              {tr("landing.platform.linkIntercomText")}
-            </Link>
-          </p>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {platformCards.map((card) => (
-              <div key={card.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                <div className="text-white font-semibold">{card.title}</div>
-                <div className="mt-2 text-sm text-slate-300">{card.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <ServicesSection />
       <NpsExplainer />

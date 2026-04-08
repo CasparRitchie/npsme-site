@@ -2104,6 +2104,149 @@ router.get("/survey-export/start", async (req, res) => {
       return res.status(500).json({ ok: false, error: err.message });
     }
   });
+  // =======================================================
+  // PRIVATE - NPS RESPONSES EXPLORER
+  // Uses the same clean Dropbox-backed JSONL store as the
+  // existing private Intercom routes.
+  // =======================================================
 
+  router.get(
+    "/private/nps-responses-explorer",
+    requirePrivateCookie,
+    async (req, res) => {
+      try {
+        const contentId = String(req.query.content_id || "189616").trim();
+        const days = clampInt(req.query.days, 120, 1, 3650);
+        const limit = clampInt(req.query.limit, 200, 1, 2000);
+
+        if (!contentId) {
+          return res.status(400).json({ ok: false, error: "content_id is required" });
+        }
+
+        console.log("[intercom] nps-responses-explorer start", {
+          contentId,
+          days,
+          limit,
+        });
+
+        const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
+        const allRows = parseJsonl(text);
+
+        const since = Date.now() - days * 24 * 60 * 60 * 1000;
+
+        const responses = allRows
+          .filter((r) => String(r?.content_id || "") === contentId)
+          .filter((r) => {
+            const t = Date.parse(r?.submitted_at || "");
+            return Number.isFinite(t) && t >= since;
+          })
+          .sort((a, b) => String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || "")))
+          .slice(0, limit);
+
+        // Build response history by contact
+        const historyByContact = new Map();
+        for (const r of responses) {
+          const cid = r?.contact_id ? String(r.contact_id) : "";
+          if (!cid) continue;
+          const arr = historyByContact.get(cid) || [];
+          arr.push(r);
+          historyByContact.set(cid, arr);
+        }
+
+        const explorerRows = [];
+
+        for (const r of responses) {
+          const cid = r?.contact_id ? String(r.contact_id) : "";
+
+          const previous = (historyByContact.get(cid) || [])
+            .filter((x) => String(x?.response_id || "") !== String(r?.response_id || ""))
+            .sort((a, b) =>
+              String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || ""))
+            );
+
+          const previousDates = previous.map((p) => p?.submitted_at).filter(Boolean);
+          const previousLinks = previous.map((p) => p?.response_id).filter(Boolean);
+
+          const answers = Array.isArray(r?.answers) ? r.answers : [];
+
+          // helper
+          const findAnswer = (qid) => {
+            const a = answers.find(x => Number(x?.question_id) === qid);
+            return a?.response ?? null;
+          };
+
+          explorerRows.push({
+            response_id: r?.response_id || null,
+            submitted_at: r?.submitted_at || null,
+            nps_score: r?.score_0_10 ?? null,
+            bucket: scoreBucket(r?.score_0_10),
+
+            contact_id: cid || null,
+            contact_name:
+              r?.name ||
+              r?.email ||
+              r?.external_id ||
+              (cid ? `Contact ${cid}` : "-"),
+
+            intercom_contact_url: cid ? intercomContactUrl(cid) : null,
+
+            pioupiou:
+              r?.pioupiou_label ||
+              r?.custom_attributes?.pioupiou_label ||
+              "-",
+
+            reader_serial:
+              r?.reader_serial ||
+              r?.custom_attributes?.reader_serial ||
+              "-",
+
+            previous_response_dates: previousDates,
+            previous_response_links: previousLinks,
+
+            // ⭐ flattened survey answers
+            q_recommend_score: findAnswer(612560),
+            q_recommend_comment: findAnswer(612565),
+
+            q_install_score: findAnswer(612566),
+            q_install_comment: findAnswer(612567),
+
+            q_daily_use_score: findAnswer(612568),
+
+            q_benefits: findAnswer(612570),
+
+            q_parent_relation_score: findAnswer(612600),
+            q_parent_relation_comment: findAnswer(612571),
+
+            q_support_score: findAnswer(612601),
+            q_final_comment: findAnswer(612603),
+
+            selected_options: Array.isArray(r?.selected_options) ? r.selected_options : [],
+          });
+        }
+
+        console.log("[intercom] nps-responses-explorer built", {
+          responses: responses.length,
+          rows: explorerRows.length,
+        });
+
+        return res.json({
+          ok: true,
+          content_id: contentId,
+          days,
+          rows: explorerRows,
+          summary: {
+            responses: responses.length,
+            rows: explorerRows.length,
+          },
+        });
+      } catch (e) {
+        console.error("[intercom] nps-responses-explorer error", e);
+        return res.status(500).json({
+          ok: false,
+          error: String(e?.message || e),
+        });
+      }
+    }
+  );
   return router;
 }

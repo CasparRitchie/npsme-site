@@ -5,6 +5,44 @@ import { translations } from "../i18n/translations";
 
 const DEFAULT_CONTENT_ID = "189616";
 
+const SURVEY_ORDER_BY_CONTENT_ID = {
+  "189616": [
+    "612560",
+    "612565",
+    "612566",
+    "612567",
+    "612568",
+    "612570",
+    "612600",
+    "612571",
+    "612601",
+    "612602",
+    "612603",
+  ],
+};
+
+function sortAnswersForSurvey({ contentId, answers }) {
+  const order = SURVEY_ORDER_BY_CONTENT_ID[String(contentId)] || [];
+  const idx = new Map(order.map((qid, i) => [String(qid), i]));
+
+  // stable sort: keep original order for ties (e.g. multi-select repeats)
+  return (Array.isArray(answers) ? answers : [])
+    .map((a, originalIndex) => ({ a, originalIndex }))
+    .sort((x, y) => {
+      const ax = String(x.a?.question_id ?? "");
+      const ay = String(y.a?.question_id ?? "");
+
+      const ix = idx.has(ax) ? idx.get(ax) : 9999;
+      const iy = idx.has(ay) ? idx.get(ay) : 9999;
+
+      if (ix !== iy) return ix - iy;
+
+      // fallback: keep Intercom’s original sequence
+      return x.originalIndex - y.originalIndex;
+    })
+    .map((x) => x.a);
+}
+
 function formatDate(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -41,6 +79,172 @@ function chipClass() {
   return "inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-200";
 }
 
+function Chip({ children, tone = "neutral", title }) {
+  const tones = {
+    neutral: "bg-white/10 text-slate-200 border-white/10",
+    indigo: "bg-indigo-500/15 text-indigo-100 border-indigo-500/25",
+    green: "bg-emerald-500/15 text-emerald-100 border-emerald-500/25",
+    amber: "bg-amber-500/15 text-amber-100 border-amber-500/25",
+    red: "bg-rose-500/15 text-rose-100 border-rose-500/25",
+  };
+
+  return (
+    <span
+      title={title}
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs ${
+        tones[tone] || tones.neutral
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function Disclosure({ title, right, children, defaultOpen = false }) {
+  return (
+    <details
+      className="group rounded-3xl border border-white/10 bg-white/5 p-5"
+      defaultOpen={defaultOpen}
+    >
+      <summary className="cursor-pointer list-none select-none flex items-center justify-between gap-3">
+        <div className="text-white font-semibold">{title}</div>
+        {right ? <div className="text-xs text-slate-400">{right}</div> : null}
+        <span className="ml-2 text-slate-400 group-open:rotate-180 transition">
+          ▾
+        </span>
+      </summary>
+      <div className="mt-4">{children}</div>
+    </details>
+  );
+}
+
+function AnswerTable({ rows, compact = false }) {
+  // Group answers by (qid + question_text) so multi-select becomes one row with multiple values.
+  const grouped = React.useMemo(() => {
+    const by = new Map();
+
+    for (const a of rows || []) {
+      const qid = a?.question_id != null ? String(a.question_id) : "";
+      const key = `${qid}::${a?.question_text || ""}`;
+
+      const item = by.get(key) || {
+        question_id: qid,
+        question_text: a?.question_text || "—",
+        answered_at: a?.answered_at || null,
+        values: [],
+      };
+
+      const raw = a?.response;
+      if (raw == null) continue;
+
+      const txt = typeof raw === "string" ? raw.trim() : String(raw);
+      if (!txt) continue;
+
+      item.values.push(txt);
+      by.set(key, item);
+    }
+
+    return Array.from(by.values())
+      .map((g) => ({
+        ...g,
+        values: Array.from(new Set(g.values)),
+        // store original position from rows array
+        _order: rows.findIndex(
+          (r) =>
+            String(r?.question_id) === String(g.question_id) &&
+            (r?.question_text || "") === (g.question_text || "")
+        ),
+      }))
+      .sort((a, b) => {
+        return a._order - b._order;
+      });
+  }, [rows]);
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-left text-sm">
+        <thead>
+          <tr className="text-xs text-slate-400">
+            <th className="py-2 pr-4">Question</th>
+            <th className="py-2 pr-4">Answer</th>
+            {!compact ? <th className="py-2">Answered</th> : null}
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-white/10">
+          {grouped.map((g, idx) => (
+            <tr key={`${g.question_id}-${idx}`}>
+              <td className="py-3 pr-4 align-top">
+                <div className="flex items-start gap-2">
+                  {g.question_id ? (
+                    <span className="mt-0.5 rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-slate-300">
+                      {g.question_id}
+                    </span>
+                  ) : null}
+                  <div className="text-slate-200 leading-snug">{g.question_text}</div>
+                </div>
+              </td>
+
+              <td className="py-3 pr-4 align-top">
+                <div className="flex flex-wrap gap-2">
+                  {g.values.map((v) => (
+                    <span
+                      key={v}
+                      className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-slate-200"
+                    >
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </td>
+
+              {!compact ? (
+                <td className="py-3 align-top text-xs text-slate-400 whitespace-nowrap">
+                  {formatDate(g.answered_at)}
+                </td>
+              ) : null}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Heuristic: guess which answer rows are “follow-ups”
+// (keeps your modal readable without hardcoding qids)
+function inferRelevantQuestionIds(detail) {
+  const answers = Array.isArray(detail?.answers) ? detail.answers : [];
+  if (!answers.length) return [];
+
+  const toNum0to10 = (v) => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    if (n < 0 || n > 10) return null;
+    return n;
+  };
+  const isText = (v) => typeof v === "string" && v.trim().length >= 2;
+
+  // Find the “main” scored question (first 0–10 score in answers)
+  const firstScoredIdx = answers.findIndex((a) => toNum0to10(a?.response) != null);
+  if (firstScoredIdx < 0) return [];
+
+  const scoredQid = answers[firstScoredIdx]?.question_id != null ? String(answers[firstScoredIdx].question_id) : null;
+
+  // Include the next 1–2 free-text answers as follow-ups (often “Pourquoi ?”, etc.)
+  const followQids = [];
+  for (let i = firstScoredIdx + 1; i < answers.length; i++) {
+    const raw = answers[i]?.response;
+    if (!isText(raw)) continue;
+    if (toNum0to10(raw) != null) continue;
+    const qid = answers[i]?.question_id != null ? String(answers[i].question_id) : null;
+    if (qid && !followQids.includes(qid)) followQids.push(qid);
+    if (followQids.length >= 2) break;
+  }
+
+  return [scoredQid, ...followQids].filter(Boolean);
+}
+
 function groupVerbatims(verbatims) {
   const out = new Map();
   for (const v of verbatims || []) {
@@ -74,6 +278,10 @@ export default function ClosingTheLoop() {
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [detailError, setDetailError] = React.useState("");
   const [detail, setDetail] = React.useState(null);
+  // Raw answers view (modal)
+  const [rawView, setRawView] = React.useState("all"); // relevant | all
+  const [rawShowJson, setRawShowJson] = React.useState(false);
+
 
   const closeModal = React.useCallback(() => {
     setOpenId(null);
@@ -175,6 +383,8 @@ export default function ClosingTheLoop() {
   const openResponse = React.useCallback(async (responseId) => {
     if (!responseId) return;
     setOpenId(responseId);
+    setRawView("all");
+    setRawShowJson(false);
     setDetail(null);
     setDetailError("");
     setDetailLoading(true);
@@ -604,15 +814,94 @@ export default function ClosingTheLoop() {
                     </div>
                   </div>
 
-                  {/* Raw answers (optional) */}
-                  <details className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <summary className="cursor-pointer select-none text-white font-semibold">
-                      {labels.modalRaw}
-                    </summary>
-                    <pre className="mt-4 overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-slate-200">
-                      {JSON.stringify(detail.answers || [], null, 2)}
-                    </pre>
-                  </details>
+                  {/* Raw answers (readable) */}
+                  {(() => {
+                    const allAnswers = Array.isArray(detail?.answers) ? detail.answers : [];
+                    const relevantQids = inferRelevantQuestionIds(detail);
+
+                    const relevantAnswers = allAnswers.filter((a) => {
+                      const qid = a?.question_id != null ? String(a.question_id) : "";
+                      return relevantQids.includes(qid);
+                    });
+
+                    const answersToShow = rawView === "all" ? allAnswers : relevantAnswers;
+                    const sortedAnswers = sortAnswersForSurvey({
+                      contentId: detail?.content_id || DEFAULT_CONTENT_ID,
+                      answers: answersToShow,
+                    });
+
+                    return (
+                      <Disclosure
+                        title={labels.modalRaw}
+                        right={`${sortedAnswers.length} shown`}
+                        defaultOpen={false}
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs text-slate-400">View:</span>
+
+                            <button
+                              type="button"
+                              onClick={() => setRawView("relevant")}
+                              className={
+                                rawView === "relevant"
+                                  ? "rounded-xl border border-indigo-500/25 bg-indigo-500/15 px-3 py-2 text-xs font-semibold text-indigo-100"
+                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
+                              }
+                            >
+                              Relevant only
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setRawView("all")}
+                              className={
+                                rawView === "all"
+                                  ? "rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-2 text-xs font-semibold text-emerald-100"
+                                  : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
+                              }
+                            >
+                              All questions
+                            </button>
+
+                            {relevantQids.length ? (
+                              <div className="ml-2 flex flex-wrap gap-2">
+                                {relevantQids.map((qid) => (
+                                  <Chip key={qid} tone="indigo" title="Inferred relevant question id">
+                                    QID {qid}
+                                  </Chip>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          <label className="inline-flex items-center gap-2 text-xs text-slate-300">
+                            <input
+                              type="checkbox"
+                              className="accent-indigo-500"
+                              checked={rawShowJson}
+                              onChange={(e) => setRawShowJson(e.target.checked)}
+                            />
+                            Show JSON
+                          </label>
+                        </div>
+
+                        <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                          {sortedAnswers.length ? (
+                            <AnswerTable rows={sortedAnswers} compact={false} />
+                          ) : (
+                            <div className="text-sm text-slate-300">No answers found.</div>
+                          )}
+                        </div>
+
+                        {rawShowJson ? (
+                          <pre className="mt-4 max-h-80 overflow-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-slate-200">
+                            {JSON.stringify(sortedAnswers, null, 2)}
+                          </pre>
+                        ) : null}
+                      </Disclosure>
+                    );
+                  })()}
                 </div>
               )}
             </div>

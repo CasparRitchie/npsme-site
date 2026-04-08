@@ -9,7 +9,7 @@ export const TRANSLATIONS = {
 
     admin: "Admin",
     logout: "Log out",
-},
+    },
     routes: {
       products: "Products",
       whyNpsMe: "Why NPS Me",
@@ -21,10 +21,10 @@ export const TRANSLATIONS = {
       dataAutomation: "Data & Automation",
       socialListening: "Social Listening",
       blog: "Blog",
+      blogIntercomNpsBeyondScore: "Intercom NPS: beyond the score",
       cxCockpit: "CX Cockpit",
-
-    closingTheLoop: "Closing the loop",
-},
+      closingTheLoop: "Closing the loop",
+    },
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
       seoDescription:
@@ -51,7 +51,7 @@ export const TRANSLATIONS = {
 
       why: {
         title: "Why work with me?",
-        subtitle: "Most consultants advise. NPS Me implements.",
+        subtitle: "Most consultants advise. I implement.",
         bullets: [
           "Less slides, more action: diagnose → prioritise → ship",
           "Feedback programmes that are statistically sound (and usable)",
@@ -214,6 +214,11 @@ export const TRANSLATIONS = {
           title: "Beyond the Score: Why Closing the Loop Builds Trust",
           excerpt:
             "NPS is more than a number. Learn why closing the loop with customers builds credibility and drives lasting improvement.",
+        },
+        intercomNps: {
+          title: "Intercom NPS: Beyond the Score",
+          excerpt:
+            "Intercom makes it easy to collect NPS - but most teams get stuck at dashboards and anecdotes. Here’s how to turn feedback into themes, drivers, and prioritised action.",
         },
         whatToDoWithNps: {
           title: "What To Do With Your NPS Scores",
@@ -688,6 +693,180 @@ export const TRANSLATIONS = {
           "NPS Me can design ethical sampling logic, DNS governance and communication frameworks that protect the integrity - and credibility - of your NPS programme.",
         btnServices: "Explore NPS Me services",
         btnBook: "Book a discovery call",
+      },
+    },
+    blogIntercomNps: {
+      seo: {
+        title: "Running NPS inside your customer messaging platform | NPS Me",
+        description:
+          "A practical approach to running Net Promoter Score inside a customer messaging platform. Learn how to capture feedback, analyse verbatims, and turn NPS into operational insight.",
+      },
+
+      header: {
+        tag: "CX Implementation",
+      },
+
+      h1: "Running Net Promoter Score inside your customer messaging platform",
+
+      intro: "Many organisations want to measure Net Promoter Score (NPS), but struggle with one simple question: where should the survey actually live? Traditional survey tools often feel disconnected from the product experience. Customers receive an email from a platform they do not recognise, open a separate survey page, and the feedback ends up in a reporting dashboard that operational teams rarely use. A growing number of companies are now running their Net Promoter Score programmes directly inside customer messaging platforms such as Intercom, where conversations with customers already take place. In this implementation, we explored that approach: running NPS directly inside the messaging platform used for daily communication, reducing friction for customers and allowing feedback to flow directly into operational workflows.",
+      ctaPrimary: "Explore Intercom NPS analytics",
+      ctaSecondary: "Book a CX consultation",
+      sections: {
+        context: {
+          title: "The context",
+          p1:
+            "Many NPS programmes start with a traditional survey tool. Customers receive an email, click a link, complete a form, and the results appear in a reporting dashboard.",
+          p2:
+            "While this approach works in theory, it often creates friction. The survey feels disconnected from the product experience, response rates remain low, and feedback rarely reaches operational teams quickly enough to make a difference.",
+        },
+
+        problem: {
+          title: "Why traditional NPS setups often struggle",
+          p1:
+            "In many organisations, NPS is implemented as a separate reporting system rather than an operational feedback loop.",
+          bullets: [
+            "Customers receive survey emails from unfamiliar platforms",
+            "Feedback is analysed in dashboards rather than operational tools",
+            "Teams react slowly to negative feedback",
+            "Insights rarely translate into product or service improvements",
+          ],
+          p2:
+            "The result is a programme that measures sentiment but struggles to drive meaningful change.",
+        },
+
+        approach: {
+          title: "A different approach: embed NPS into the messaging platform",
+          p1:
+            "Instead of introducing another survey tool, we explored integrating NPS directly into the messaging platform already used for customer communication.",
+          p2:
+            "Customers were already interacting with the company through in-app chat, lifecycle messages, and support conversations. By embedding the NPS question directly into this environment, feedback became a natural extension of the customer conversation.",
+        },
+
+        implementation: {
+          title: "Implementation example from a real CX programme",
+          p1:
+            "In one recent customer experience programme, we implemented this approach inside a company that was already using a customer messaging platform for daily interactions with users.",
+          p2:
+            "Rather than introducing a separate survey tool, the NPS question was embedded directly into the messaging workflow. Customers received the question inside the same environment where they were already communicating with support and product teams.",
+          p3:
+            "After selecting a score from 0 to 10, customers were immediately asked a follow-up question: 'What is the main reason for your score?' This generated short qualitative responses that provided the most valuable insights.",
+          p4:
+            "Each response was automatically captured and analysed. Promoters, passives, and detractors were routed into different operational workflows so that teams could respond quickly and close the feedback loop.",
+        },
+
+        iteration: {
+          title: "Iterating with the client team",
+          p1:
+            "The first version of the workflow focused on collecting the NPS score and the associated comment inside the messaging platform. This immediately reduced friction and increased the likelihood that customers would respond.",
+          p2:
+            "After reviewing the first results with the client team, additional questions emerged. Which types of customers were responding most frequently? Were promoters mentioning different themes than detractors? Could the feedback be grouped into meaningful categories that product and support teams could act on?",
+          p3:
+            "These discussions led to a second iteration of the system. The analytics layer was extended to group qualitative responses into recurring themes, allowing the team to identify patterns rather than reading individual comments one by one.",
+          p4:
+            "This iterative process - designing the workflow, reviewing early feedback, and refining the analytics - helped transform the programme from a simple survey into a structured customer insight system.",
+        },
+
+        cxImpact: {
+          title: "Connecting feedback to customer experience improvement",
+
+          p1:
+            "Collecting feedback is only useful if it leads to action. Once the analytics layer was in place, the feedback could be used to support broader customer experience improvements across the organisation.",
+
+          p2:
+            "Recurring themes in customer comments helped highlight areas where onboarding could be clearer, where product features created confusion, and where support interactions could be improved.",
+
+          p3:
+            "Because the feedback was captured directly inside the messaging platform, teams could quickly follow up with customers who had provided negative feedback. In many cases, issues could be resolved within the same conversation thread where the feedback had originally been given.",
+
+          p4:
+            "This type of operational feedback loop is where NPS becomes particularly powerful. Instead of waiting for periodic survey reports, teams receive continuous signals about what customers are experiencing.",
+
+          p5:
+            "Over time, this approach transforms NPS from a simple measurement tool into a structured customer intelligence system that supports product decisions, service improvements, and customer success strategies.",
+
+          p6:
+            "For organisations looking to improve their customer experience, the goal is not simply to measure sentiment but to create systems that continuously capture, analyse, and act on customer feedback. This type of work forms part of the broader customer experience consulting carried out by the NPS Me team.",
+        },
+
+        data: {
+          title: "From feedback messages to structured insight",
+
+          p1:
+            "Collecting feedback is only the first step. The real value of Net Promoter Score emerges when the qualitative responses are analysed and transformed into structured insight.",
+
+          p2:
+            "Each customer comment provides context behind the score. Some customers highlight product usability issues, others describe onboarding friction, and some mention positive experiences with support or specific features.",
+
+          p3:
+            "Rather than reviewing comments individually, the responses can be grouped into recurring themes. This makes it possible to identify patterns across the feedback dataset and understand what consistently drives promoters, passives, and detractors.",
+
+          p4:
+            "For example, comments may reveal that promoters frequently mention ease of use or responsiveness of the support team, while detractors may highlight confusion during onboarding or difficulty discovering certain features.",
+
+          p5:
+            "Once these themes are identified, teams can begin to measure how often they appear and whether improvements in the product or service reduce the frequency of negative feedback over time.",
+
+          p6:
+            "This is where NPS moves beyond a simple score. Instead of acting as a periodic measurement, it becomes a continuous source of customer insight that informs product development, onboarding improvements, and customer success strategies.",
+        },
+
+        outcomes: {
+          title: "What changed after implementation",
+          p1:
+            "Once feedback became part of the operational workflow, several improvements emerged.",
+          bullets: [
+            "Higher response rates due to lower survey friction",
+            "Faster follow-up with detractors",
+            "Better visibility of recurring product or service issues",
+            "Clearer prioritisation of improvement initiatives",
+          ],
+          p2:
+            "Instead of being just another dashboard metric, NPS became a practical decision-making tool.",
+        },
+        lessons: {
+          title: "Lessons learned from the implementation",
+          p1:
+            "Several lessons emerged as the programme evolved from a simple NPS question into a more structured feedback and analytics workflow.",
+          lesson1: {
+            title: "1. Timing matters more than survey frequency",
+            body:
+              "The quality of responses depended heavily on when the question was asked. Triggering NPS after a meaningful interaction created more relevant feedback than sending surveys on a fixed schedule.",
+          },
+          lesson2: {
+            title: "2. The comment matters as much as the score",
+            body:
+              "The numeric score provides a useful signal, but the most actionable insight came from the short text explanation that followed. These comments revealed the real reasons behind promoter, passive, and detractor behaviour.",
+          },
+          lesson3: {
+            title: "3. Feedback only becomes valuable when it connects to action",
+            body:
+              "Collecting responses is not enough. The real value appears when teams can review the feedback, identify themes, and use it to prioritise concrete improvements across product, onboarding, and support.",
+          },
+          p2:
+            "This is what turns NPS from a reporting exercise into a practical customer experience improvement system.",
+        },
+      },
+
+      callouts: {
+        insight: {
+          title: "Key insight",
+          body:
+            "The score itself is only the starting point. The real value comes from analysing the reasons behind the score and integrating that feedback into everyday decision-making.",
+        },
+
+        privacy: {
+          title: "Privacy and data protection",
+          body:
+            "Customer feedback programmes must respect privacy and data protection requirements. When sharing insights publicly, aggregated themes and anonymised examples ensure that customer data remains protected.",
+        },
+
+        next: {
+          title: "Want to see how this works in practice?",
+          body:
+            "NPS Me provides implementation frameworks for designing, analysing, and operationalising Net Promoter Score programmes.",
+          button1: "Explore Intercom NPS analytics",
+          button2: "Book a CX consultation",
+        },
       },
     },
     blogSendingNpsBeforeChristmas: {
@@ -1484,7 +1663,7 @@ export const TRANSLATIONS = {
             tail: "and enablement for teams using your existing tools.",
             accent: "Turn feedback into measurable growth.",
           },
-          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). NPS Me helps you run a reliable NPS programme, extract insight from comments, prioritise the fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
+          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). I help you run a reliable NPS programme, extract insight from comments, prioritise the few fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
           ctaPrimary: "Book a free discovery",
           ctaMethod: "See the method",
           ctaDemo: "View example insights",
@@ -1495,7 +1674,7 @@ export const TRANSLATIONS = {
           },
           chips: ["Consulting", "Workshops", "Speaking", "Intercom", "HubSpot", "Zendesk", "CSV"],
           chipsNote:
-            "Keep your survey tool. NPS Me focuses on governance, analysis, prioritisation and action.",
+            "Keep your survey tool. I focus on governance, analysis, prioritisation and action.",
         },
 
       method: {
@@ -1559,7 +1738,7 @@ export const TRANSLATIONS = {
       about: {
         title: "About Caspar",
         body:
-          "Practical CX. Measurable outcomes. Less theatre, more progress. NPS Me helps teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
+          "Practical CX. Measurable outcomes. Less theatre, more progress. I help teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
         bullets: [
           "Decision-grade programmes: sampling, bias, comparability (so the score means something)",
           "Verbatim → themes, drivers, and clear priorities",
@@ -1644,7 +1823,7 @@ export const TRANSLATIONS = {
         cards: [
           {
             title: "Consulting",
-            desc: "Most consultants advise. NPS Me implements: diagnose → prioritise → ship.",
+            desc: "Most consultants advise. I implement - diagnose → prioritise → ship.",
             bullets: [
               "NPS programme design (no survey spam, no bad data)",
               "Theme/driver analysis from real comments",
@@ -2210,30 +2389,17 @@ export const TRANSLATIONS = {
       },
 
       filters: {
+        title: "Global filters",
+        subtitle: "These filters apply to the whole page: KPIs, trends, themes, and comments.",
         label: "Filter:",
+        mode: "Mode",
+        rolling: "Rolling",
+        range: "Date range",
+        all: "All",
         promoters: "Promoters",
         passives: "Passives",
         detractors: "Detractors",
         noneSelected: "No filter selected - showing all",
-      },
-
-      live: {
-        title: "Live snapshot (last 30 days)",
-        subtitle:
-          "Aggregated only - no personal data. Data source: Intercom survey completions → NPS Me clean store.",
-        noData:
-          "No completions yet in the last 30 days. Once responses arrive, this panel updates automatically.",
-        kpiNps: "NPS (last 30 days)",
-        promoters: "Promoters",
-        promotersSub: "Scores 9–10",
-        passives: "Passives",
-        passivesSub: "Scores 7–8",
-        detractors: "Detractors",
-        detractorsSub: "Scores 0–6",
-        lastResponse: "Last response:",
-        meta: "Survey ID: 189616",
-        earlyNote:
-          "Note: early sample. NPS will stabilise as response volume increases.",
       },
 
       metrics: {
@@ -2248,8 +2414,29 @@ export const TRANSLATIONS = {
         responseRateSub: "Completed ÷ shown",
         medianCompletion: "Median completion time",
         medianAnswerSub: "Median time to first answer:",
+        firstAnswer: "First answer",
+        firstAnswerFallback: "First answer: -",
         note:
           "Tip: run the export-stats ingest periodically to keep response-rate and timing up to date.",
+      },
+
+      live: {
+        title: "Live snapshot",
+        subtitle:
+          "Aggregated only - no personal data. Data source: Intercom survey completions → NPS Me clean store.",
+        noData:
+          "No completions yet in the last 30 days. Once responses arrive, this panel updates automatically.",
+        kpiNps: "NPS",
+        promoters: "Promoters",
+        promotersSub: "Scores 9–10",
+        passives: "Passives",
+        passivesSub: "Scores 7–8",
+        detractors: "Detractors",
+        detractorsSub: "Scores 0–6",
+        lastResponse: "Last response:",
+        meta: "Survey ID: 189616",
+        earlyNote:
+          "Note: early sample. NPS will stabilise as response volume increases.",
       },
 
       themeLabels: {
@@ -2290,6 +2477,64 @@ export const TRANSLATIONS = {
         redactionNote:
           "Comments are redacted automatically (emails, phone numbers, links, IDs).",
         tookTime: "Took time to write",
+        openContact: "Open contact",
+      },
+
+      diagnostics: {
+        title: "Survey diagnostics",
+        subtitle:
+          "Reconciliation between raw Intercom completion events and the deduplicated response dataset used by this page.",
+        rawCompletionEvents: "Raw completion events",
+        uniqueResponses: "Unique responses",
+        duplicatesRemoved: "Duplicates removed",
+        scoredResponses: "Scored responses",
+        missingScores: "Missing scores",
+        latestResponse: "Latest response",
+        intercomCompletionEvents: "Intercom completion events",
+      },
+      responsesPanel: {
+        count: "response(s)",
+        viewAll: "View all",
+        allResponses: "All responses",
+        selectedPeriod: "Selected period",
+      },
+      common: {
+        contentId: "content_id",
+        error: "Error",
+        duplicatesRemovedSuffix: "duplicates removed",
+      },
+      performance: {
+        seoTitle: "Envola - Performance | NPS Me",
+        seoDesc: "Private Envola performance dashboard with consistent global filters.",
+        title: "Envola - Performance",
+        subtitle: "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts.",
+        kpiNps: "NPS",
+      },
+      trend: {
+        granularity: "Granularity",
+        totalResponses: "Responses in period",
+        latestNps: "Latest NPS point",
+        asOf: "As of",
+        points: "Data points",
+      },
+      top: {
+        splitTitle: "Score split over time",
+        splitSubtitle: "Promoter / passive / detractor split using the same global filters.",
+      },
+      wordcloud: {
+        title: "Word cloud",
+        subtitle: "Word cloud filtered by the same period and bucket.",
+      },
+      responses: {
+        none: "No verbatims stored for this response.",
+      },
+      exports: {
+        downloadCsv: "Download CSV",
+      },
+      responses: {
+        tableTitle: "Responses",
+        tableSubtitle: "Export the currently filtered response set as CSV.",
+        sortTip: "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling.",
       },
 
       next: {
@@ -2381,7 +2626,6 @@ export const TRANSLATIONS = {
         book: "Book discovery",
       },
     },
-
     whatIsNps: {
       seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
       seoDescription:
@@ -2618,7 +2862,7 @@ export const TRANSLATIONS = {
 
     admin: "Admin",
     logout: "Déconnexion",
-},
+    },
     routes: {
       products: "Produits",
       whyNpsMe: "Pourquoi NPS Me",
@@ -2630,10 +2874,10 @@ export const TRANSLATIONS = {
       dataAutomation: "Données & automatisation",
       socialListening: "Social listening",
       blog: "Blog",
+      blogIntercomNpsBeyondScore: "Intercom NPS : au-delà du score",
       cxCockpit: "Cockpit CX",
-
-    closingTheLoop: "Boucler la boucle",
-},
+      closingTheLoop: "Boucler la boucle",
+    },
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
       seoDescription:
@@ -2793,6 +3037,11 @@ export const TRANSLATIONS = {
             "Exploiter la data visualisation pour révéler des insights CX cachés",
           excerpt:
             "Aller au-delà des beaux tableaux de bord pour mettre en lumière les frictions et attentes clients.",
+        },
+        intercomNps: {
+          title: "Intercom NPS : au-delà du score",
+          excerpt:
+            "Intercom facilite la collecte du NPS - mais beaucoup d’équipes restent bloquées sur des dashboards et des anecdotes. Voici comment transformer le feedback en thèmes, drivers et actions prioritaires.",
         },
       },
     },
@@ -3267,6 +3516,182 @@ export const TRANSLATIONS = {
           "NPS Me peut concevoir une logique d’échantillonnage éthique, une gouvernance DNS et des cadres de communication qui protègent l’intégrité - et la crédibilité - de votre programme NPS.",
         btnServices: "Découvrir les services NPS Me",
         btnBook: "Réserver un appel découverte",
+      },
+    },
+    blogIntercomNps: {
+      seo: {
+        title: "Mettre en place le NPS dans une plateforme de messagerie client | NPS Me",
+        description:
+          "Une approche pratique pour déployer le Net Promoter Score dans une plateforme de messagerie client et transformer le feedback en intelligence opérationnelle.",
+      },
+
+      header: {
+        tag: "Implémentation CX",
+      },
+
+      h1: "Mettre en place le Net Promoter Score dans une plateforme de messagerie client",
+
+      intro: "De nombreuses organisations souhaitent mesurer le Net Promoter Score (NPS), mais se heurtent à une question simple : où l’enquête doit-elle réellement se situer ? Les outils d’enquête traditionnels sont souvent déconnectés de l’expérience produit. Les clients reçoivent un email provenant d’une plateforme qu’ils ne connaissent pas, ouvrent une page d’enquête séparée, et le feedback se retrouve dans un tableau de bord que les équipes opérationnelles utilisent rarement. De plus en plus d’entreprises exécutent aujourd’hui leur programme Net Promoter Score directement dans des plateformes de messagerie client comme Intercom, là où les conversations avec les utilisateurs ont déjà lieu. Dans cette implémentation, nous avons exploré cette approche : exécuter le NPS directement dans la plateforme de messagerie utilisée pour les échanges quotidiens avec les clients, afin de réduire la friction et de permettre au feedback de s’intégrer naturellement dans les workflows opérationnels.",
+      ctaPrimary: "Découvrir l’analyse NPS Intercom",
+      ctaSecondary: "Réserver un échange CX",
+
+      sections: {
+        context: {
+          title: "Le contexte",
+          p1:
+            "La plupart des programmes NPS commencent avec un outil d’enquête classique. Les clients reçoivent un email, cliquent sur un lien, remplissent un formulaire, et les résultats apparaissent dans un tableau de bord.",
+          p2:
+            "En pratique, cette approche crée souvent de la friction. L’enquête semble déconnectée de l’expérience produit, les taux de réponse restent faibles, et le feedback atteint rarement les équipes opérationnelles assez vite pour agir.",
+        },
+
+        problem: {
+          title: "Pourquoi les approches NPS traditionnelles montrent leurs limites",
+          p1:
+            "Dans beaucoup d’organisations, le NPS est utilisé comme un outil de reporting plutôt que comme un système opérationnel de feedback.",
+          bullets: [
+            "Les clients reçoivent des emails d’enquête provenant de plateformes inconnues",
+            "Le feedback est analysé dans des dashboards plutôt que dans les outils opérationnels",
+            "Les équipes réagissent lentement aux retours négatifs",
+            "Les insights se traduisent rarement en améliorations concrètes",
+          ],
+          p2:
+            "Le programme mesure alors le sentiment client, mais peine à produire un réel impact.",
+        },
+
+        approach: {
+          title: "Une approche différente : intégrer le NPS dans la messagerie client",
+          p1:
+            "Plutôt que d’ajouter un nouvel outil, nous avons exploré l’intégration du NPS directement dans la plateforme de messagerie déjà utilisée pour communiquer avec les clients.",
+          p2:
+            "Les clients interagissaient déjà via le chat in-app, les messages automatisés et les conversations support. En intégrant la question NPS dans cet environnement, le feedback devient une extension naturelle de la conversation.",
+        },
+
+        implementation: {
+          title: "Exemple d’implémentation dans un programme CX réel",
+          p1:
+            "Dans un programme d’expérience client récent, nous avons mis en place cette approche au sein d’une entreprise qui utilisait déjà une plateforme de messagerie pour communiquer quotidiennement avec ses utilisateurs.",
+          p2:
+            "Plutôt que d’introduire un outil d’enquête séparé, la question NPS a été intégrée directement dans le workflow de messagerie. Les clients recevaient la question dans le même environnement que celui utilisé pour les conversations avec le support ou les équipes produit.",
+          p3:
+            "Après avoir sélectionné un score de 0 à 10, les clients étaient immédiatement invités à répondre à une question de suivi : « Quelle est la principale raison de votre score ? ». Ces réponses qualitatives ont fourni les insights les plus précieux.",
+          p4:
+            "Chaque réponse était ensuite capturée et analysée automatiquement. Les promoteurs, passifs et détracteurs étaient orientés vers différents workflows opérationnels afin que les équipes puissent répondre rapidement et fermer la boucle de feedback.",
+        },
+
+        iteration: {
+          title: "Itérations avec l’équipe client",
+          p1:
+            "La première version du workflow visait principalement à collecter le score NPS et le commentaire associé directement dans la plateforme de messagerie. Cette approche a immédiatement réduit la friction et augmenté la probabilité de réponse des clients.",
+          p2:
+            "Après avoir analysé les premiers résultats avec l’équipe cliente, de nouvelles questions sont apparues. Quels types de clients répondaient le plus souvent ? Les promoteurs mentionnaient-ils des thèmes différents des détracteurs ? Le feedback pouvait-il être regroupé en catégories exploitables par les équipes produit et support ?",
+          p3:
+            "Ces échanges ont conduit à une seconde itération du système. La couche d’analyse a été enrichie afin de regrouper les réponses qualitatives en thèmes récurrents, permettant d’identifier des tendances plutôt que de lire les commentaires un par un.",
+          p4:
+            "Ce processus itératif - concevoir le workflow, analyser les premiers retours et affiner l’analyse - a transformé le programme d’une simple enquête en un véritable système d’intelligence client.",
+        },
+
+        cxImpact: {
+          title: "Relier le feedback à l’amélioration de l’expérience client",
+
+          p1:
+            "Collecter du feedback n’a de valeur que s’il conduit à des actions concrètes. Une fois la couche d’analyse mise en place, les retours clients peuvent alimenter des initiatives plus larges d’amélioration de l’expérience client.",
+
+          p2:
+            "Les thèmes récurrents dans les commentaires ont permis d’identifier des points d’amélioration dans l’onboarding, certaines fonctionnalités produit ou encore les interactions avec le support.",
+
+          p3:
+            "Comme le feedback était collecté directement dans la plateforme de messagerie, les équipes pouvaient également répondre rapidement aux clients ayant donné un retour négatif. Dans de nombreux cas, les problèmes pouvaient être résolus dans la même conversation.",
+
+          p4:
+            "Ce type de boucle de feedback opérationnelle est l’une des forces du NPS. Au lieu d’attendre des rapports d’enquête périodiques, les équipes reçoivent des signaux continus sur l’expérience client.",
+
+          p5:
+            "Avec le temps, cette approche transforme le NPS d’un simple indicateur en un véritable système structuré d’intelligence client.",
+
+          p6:
+            "Pour les organisations qui souhaitent améliorer leur expérience client, l’objectif n’est pas seulement de mesurer le sentiment client mais de créer des systèmes capables de collecter, analyser et exploiter le feedback en continu.",
+        },
+
+        data: {
+          title: "Du message de feedback à l’insight structuré",
+
+          p1:
+            "La collecte du feedback n’est que la première étape. La véritable valeur du Net Promoter Score apparaît lorsque les réponses qualitatives sont analysées et transformées en insight structuré.",
+
+          p2:
+            "Chaque commentaire client apporte un contexte au score. Certains clients mentionnent des problèmes d’utilisabilité du produit, d’autres décrivent des frictions dans l’onboarding, tandis que certains soulignent des expériences positives avec le support ou certaines fonctionnalités.",
+
+          p3:
+            "Plutôt que de lire les commentaires un par un, les réponses peuvent être regroupées en thèmes récurrents. Cela permet d’identifier des tendances dans l’ensemble du feedback et de comprendre ce qui génère réellement des promoteurs, des passifs ou des détracteurs.",
+
+          p4:
+            "Par exemple, les commentaires peuvent montrer que les promoteurs mentionnent fréquemment la facilité d’utilisation ou la réactivité du support, tandis que les détracteurs signalent une confusion lors de l’onboarding ou des difficultés à découvrir certaines fonctionnalités.",
+
+          p5:
+            "Une fois ces thèmes identifiés, les équipes peuvent mesurer leur fréquence et vérifier si les améliorations apportées au produit ou au service réduisent les retours négatifs au fil du temps.",
+
+          p6:
+            "C’est à ce moment que le NPS dépasse le simple indicateur. Au lieu d’être une mesure ponctuelle, il devient une source continue d’intelligence client qui éclaire les décisions produit, les améliorations d’onboarding et les stratégies de customer success.",
+        },
+
+        outcomes: {
+          title: "Ce qui change après l’implémentation",
+          p1:
+            "Lorsque le feedback devient opérationnel, plusieurs améliorations apparaissent rapidement.",
+          bullets: [
+            "Des taux de réponse plus élevés grâce à une expérience plus fluide",
+            "Une réaction plus rapide face aux détracteurs",
+            "Une meilleure visibilité sur les problèmes récurrents",
+            "Une priorisation plus claire des améliorations produit ou service",
+          ],
+          p2:
+            "Le NPS cesse d’être un simple indicateur et devient un outil concret d’aide à la décision.",
+        },
+
+        lessons: {
+          title: "Enseignements tirés de l’implémentation",
+          p1:
+            "Plusieurs enseignements sont apparus à mesure que le programme évoluait, passant d’une simple question NPS à un workflow plus structuré de feedback et d’analyse.",
+          lesson1: {
+            title: "1. Le timing compte plus que la fréquence d’envoi",
+            body:
+              "La qualité des réponses dépendait fortement du moment où la question était posée. Déclencher le NPS après une interaction significative produisait un feedback plus pertinent qu’un envoi selon un calendrier fixe.",
+          },
+          lesson2: {
+            title: "2. Le commentaire compte autant que le score",
+            body:
+              "Le score numérique reste un signal utile, mais les insights les plus actionnables venaient surtout de l’explication textuelle donnée juste après. Ces commentaires révélaient les vraies raisons derrière les promoteurs, passifs et détracteurs.",
+          },
+          lesson3: {
+            title: "3. Le feedback n’a de valeur que s’il mène à l’action",
+            body:
+              "Collecter des réponses ne suffit pas. La vraie valeur apparaît lorsque les équipes peuvent relire le feedback, identifier les thèmes récurrents et prioriser des améliorations concrètes sur le produit, l’onboarding ou le support.",
+          },
+          p2:
+            "C’est ce qui transforme le NPS d’un exercice de reporting en un véritable système d’amélioration de l’expérience client.",
+        },
+      },
+
+      callouts: {
+        insight: {
+          title: "L’idée clé",
+          body:
+            "Le score n’est qu’un point de départ. La vraie valeur vient de l’analyse des raisons derrière ce score et de l’intégration de ce feedback dans les décisions quotidiennes.",
+        },
+
+        privacy: {
+          title: "Confidentialité et protection des données",
+          body:
+            "Les programmes de feedback doivent respecter les règles de confidentialité. Lors de démonstrations publiques, les insights sont présentés sous forme agrégée afin de protéger les données individuelles.",
+        },
+
+        next: {
+          title: "Envie de voir cette approche en pratique ?",
+          body:
+            "NPS Me propose des frameworks pour concevoir, analyser et opérationnaliser les programmes Net Promoter Score.",
+          button1: "Découvrir l’analyse NPS Intercom",
+          button2: "Réserver un échange CX",
+        },
       },
     },
     blogSendingNpsBeforeChristmas: {
@@ -4580,7 +5005,7 @@ export const TRANSLATIONS = {
         button: "Voir un exemple →",
       },
     },
-     liveAdmin: {
+    liveAdmin: {
       seoTitle: "Admin enquête live | NPS Me",
       seoDescription:
         "Gérez et envoyez des invitations NPS en direct depuis votre liste clients Envola.",
@@ -4864,30 +5289,17 @@ export const TRANSLATIONS = {
       },
 
       filters: {
+        title: "Filtres globaux",
+        subtitle: "Ces filtres s’appliquent à toute la page : KPI, tendances, thèmes et commentaires.",
         label: "Filtrer :",
+        mode: "Mode",
+        rolling: "Glissant",
+        range: "Plage de dates",
+        all: "Tous",
         promoters: "Promoteurs",
         passives: "Passifs",
         detractors: "Détracteurs",
         noneSelected: "Aucun filtre sélectionné - affichage de tout",
-      },
-
-      live: {
-        title: "Instantané live (30 derniers jours)",
-        subtitle:
-          "Données agrégées uniquement - aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
-        noData:
-          "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
-        kpiNps: "NPS (30 derniers jours)",
-        promoters: "Promoteurs",
-        promotersSub: "Notes 9–10",
-        passives: "Passifs",
-        passivesSub: "Notes 7–8",
-        detractors: "Détracteurs",
-        detractorsSub: "Notes 0–6",
-        lastResponse: "Dernière réponse :",
-        meta: "ID enquête : 189616",
-        earlyNote:
-          "Note : échantillon précoce. Le NPS se stabilise à mesure que le volume de réponses augmente.",
       },
 
       metrics: {
@@ -4902,8 +5314,29 @@ export const TRANSLATIONS = {
         responseRateSub: "Complété ÷ affiché",
         medianCompletion: "Temps médian de complétion",
         medianAnswerSub: "Temps médian avant première réponse :",
+        firstAnswer: "Première réponse",
+        firstAnswerFallback: "Première réponse : -",
         note:
           "Astuce : lancez l’ingest export-stats régulièrement pour garder le taux de réponse et les temps à jour.",
+      },
+
+      live: {
+        title: "Instantané live NPS",
+        subtitle:
+          "Données agrégées uniquement - aucune donnée personnelle. Source : complétions d’enquête Intercom → store NPS Me.",
+        noData:
+          "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
+        kpiNps: "NPS",
+        promoters: "Promoteurs",
+        promotersSub: "Notes 9–10",
+        passives: "Passifs",
+        passivesSub: "Notes 7–8",
+        detractors: "Détracteurs",
+        detractorsSub: "Notes 0–6",
+        lastResponse: "Dernière réponse :",
+        meta: "ID enquête : 189616",
+        earlyNote:
+          "Note : échantillon précoce. Le NPS se stabilise à mesure que le volume de réponses augmente.",
       },
 
       themes: {
@@ -4945,6 +5378,72 @@ export const TRANSLATIONS = {
         redactionNote:
           "Les commentaires sont anonymisés automatiquement (emails, téléphones, liens, identifiants).",
         tookTime: "A pris le temps d’écrire",
+        openContact: "Ouvrir le contact",
+      },
+
+      diagnostics: {
+      title: "Diagnostic de l’enquête",
+      subtitle:
+        "Rapprochement entre les événements bruts de complétion Intercom et le jeu de réponses dédupliqué utilisé par cette page.",
+      rawCompletionEvents: "Événements bruts de complétion",
+      uniqueResponses: "Réponses uniques",
+      duplicatesRemoved: "Doublons supprimés",
+      scoredResponses: "Réponses avec note",
+      missingScores: "Notes manquantes",
+      latestResponse: "Dernière réponse",
+      intercomCompletionEvents: "Événements de complétion Intercom",
+      },
+      responsesPanel: {
+        count: "réponse(s)",
+        viewAll: "Voir tout",
+        allResponses: "Toutes les réponses",
+        selectedPeriod: "Période sélectionnée",
+      },
+      common: {
+        contentId: "content_id",
+        error: "Erreur",
+        duplicatesRemovedSuffix: "doublons supprimés",
+      },
+      performance: {
+        seoTitle: "Envola - Performance | NPS Me",
+        seoDesc: "Tableau de bord privé Envola avec des filtres globaux cohérents.",
+        title: "Envola - Performance",
+        subtitle:
+          "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les KPI et graphiques.",
+        kpiNps: "NPS",
+      },
+
+      trend: {
+        granularity: "Granularité",
+        totalResponses: "Réponses sur la période",
+        latestNps: "Dernier point NPS",
+        asOf: "Au",
+        points: "Points de données",
+      },
+
+      top: {
+        splitTitle: "Répartition des scores dans le temps",
+        splitSubtitle:
+          "Répartition promoteurs / passifs / détracteurs avec les mêmes filtres globaux.",
+      },
+
+      wordcloud: {
+        title: "Nuage de mots",
+        subtitle: "Nuage de mots filtré par la même période et le même bucket.",
+      },
+
+      responses: {
+        none: "Aucun verbatim enregistré pour cette réponse.",
+      },
+
+      exports: {
+        downloadCsv: "Télécharger le CSV",
+      },
+
+      responses: {
+        tableTitle: "Réponses",
+        tableSubtitle: "Exporter en CSV l’ensemble des réponses correspondant aux filtres actuels.",
+        sortTip: "Astuce : cliquez sur un en-tête de colonne pour trier. Les en-têtes et les premières colonnes restent visibles pendant le défilement.",
       },
 
       next: {
@@ -5036,7 +5535,6 @@ export const TRANSLATIONS = {
         book: "Prendre rendez-vous",
       },
     },
-
     whatIsNps: {
       seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
       seoDescription:

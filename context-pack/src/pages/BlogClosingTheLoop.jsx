@@ -1,13 +1,18 @@
 // src/pages/BlogClosingTheLoop.jsx
 import React from "react";
 import Seo from "../components/Seo";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 
 export default function BlogClosingTheLoop() {
   const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
+  const BASE = "blogClosingTheLoop";
+  const DATE_PUBLISHED = "2025-11-04";
+  const DATE_MODIFIED = "2025-11-04";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -15,6 +20,28 @@ export default function BlogClosingTheLoop() {
         path="/blog/closing-the-loop"
         title={translations(lang, "blogClosingLoop.seo.title")}
         description={translations(lang, "blogClosingLoop.seo.description")}
+      />
+      
+      {/* BlogPosting JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: tr(`${BASE}.h1`, tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post"))),
+            description: tr(`${BASE}.seo.description`, ""),
+            datePublished: DATE_PUBLISHED,
+            dateModified: DATE_MODIFIED,
+            inLanguage: lang,
+            author: { "@type": "Person", name: "Caspar Ritchie" },
+            publisher: { "@type": "Organization", name: "NPS Me" },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://npsme.com" + location.pathname,
+            },
+          }),
+        }}
       />
 
       <PageHeader

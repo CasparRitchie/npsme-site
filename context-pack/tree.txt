@@ -9,10 +9,12 @@
 │   └── settings.json
 ├── context-pack
 │   └── tree.txt
+├── envola.routes.js
 ├── envola.txt
 ├── index.html
 ├── intercom-test.html
 ├── intercom.routes.js
+├── intercom.routes.working-backup.js
 ├── invitations.csv
 ├── Makefile
 ├── note
@@ -52,6 +54,7 @@
 │   │   │   └── RequireAuth.jsx
 │   │   ├── DemoResultsPanel.jsx
 │   │   ├── EnvolaLayout.jsx
+│   │   ├── EnvolaWorkspaceNav.jsx
 │   │   ├── Navbar.jsx
 │   │   ├── NpsBucketStackedColumns.jsx
 │   │   ├── NpsTimeseriesChart.jsx
@@ -81,6 +84,7 @@
 │   │   ├── BlogEthicalSurveys.jsx
 │   │   ├── BlogEthicsOfContactSelection.jsx
 │   │   ├── BlogIndex.jsx
+│   │   ├── BlogIntercomNpsBeyondTheScore.jsx
 │   │   ├── BlogSendingNpsBeforeChristmas.jsx
 │   │   ├── BlogWhatToDoWithNpsScores.jsx
 │   │   ├── BlogWhyNpsIsntImproving.jsx
@@ -92,7 +96,10 @@
 │   │   ├── DemoSurveyPage.jsx
 │   │   ├── DemoThankYou.jsx
 │   │   ├── EnvolaExample.jsx
+│   │   ├── EnvolaInvitations.jsx
+│   │   ├── EnvolaPerformance.jsx
 │   │   ├── EnvolaQuestionDetail.jsx
+│   │   ├── EnvolaResponses.jsx
 │   │   ├── IntercomNpsAnalytics.jsx
 │   │   ├── LiveInvitationSurvey.jsx
 │   │   ├── LiveResultsPanel.jsx
@@ -100,6 +107,7 @@
 │   │   ├── LiveSurveyPage.jsx
 │   │   ├── LiveThankYou.jsx
 │   │   ├── NpsIntelligenceLayer.jsx
+│   │   ├── NpsResponsesExplorer.jsx
 │   │   ├── PrivateLogin.jsx
 │   │   ├── SocialListeningIndex.jsx
 │   │   ├── SocialListeningReport.jsx
@@ -119,4 +127,4 @@
 │   └── nps.js
 └── vite.config.js
 
-14 directories, 106 files
+14 directories, 114 files

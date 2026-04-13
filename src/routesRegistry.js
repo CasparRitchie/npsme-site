@@ -58,6 +58,7 @@ import RequireAuth from "./components/auth/RequireAuth";
 import EnvolaPerformance from "./pages/EnvolaPerformance";
 import EnvolaResponses from "./pages/EnvolaResponses";
 import EnvolaInvitations from "./pages/EnvolaInvitations";
+import EnvolaClosingTheLoop from "./pages/EnvolaClosingTheLoop";
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -120,6 +121,9 @@ const COMPONENTS = {
 
   "/envola/invitations": protect(EnvolaInvitations),
   "/fr/envola/invitations": protect(EnvolaInvitations),
+
+  "/envola/closing-the-loop": EnvolaClosingTheLoop,
+  "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

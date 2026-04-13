@@ -76,6 +76,24 @@ const INTERCOM_SURVEY_STATS_PATH =
   process.env.DROPBOX_INTERCOM_SURVEY_STATS_PATH || "/npsme/intercom/survey-stats.jsonl";
 
 // -----------------------
+// Closing the loop consts
+// -----------------------
+const CTL_BASE_PATH = "/npsme/intercom/closing-the-loop";
+const CTL_CASES_PATH = `${CTL_BASE_PATH}/ctl_cases.jsonl`;
+const CTL_ACTIONS_PATH = `${CTL_BASE_PATH}/ctl_actions.jsonl`;
+const CTL_PAUSE_EVENTS_PATH = `${CTL_BASE_PATH}/ctl_pause_events.jsonl`;
+const CTL_CONTACT_EVENTS_PATH = `${CTL_BASE_PATH}/ctl_contact_events.jsonl`;
+const CTL_IMPACT_CHECKS_PATH = `${CTL_BASE_PATH}/ctl_impact_checks.jsonl`;
+const CTL_AUDIT_LOG_PATH = `${CTL_BASE_PATH}/ctl_case_audit_log.jsonl`;
+
+import {
+  createCaseFromQueueItem,
+  createAuditEvent,
+  calculateCaseDurations,
+  buildLatestMapFromJsonlRows,
+} from "./closingTheLoopSchema.js";
+
+// -----------------------
 // In-memory caches (per Node process)
 // -----------------------
 // Avoid re-downloading + re-parsing large JSONL files for endpoints that are called many times

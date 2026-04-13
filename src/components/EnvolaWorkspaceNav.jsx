@@ -22,6 +22,12 @@ export default function EnvolaWorkspaceNav({ lang, currentPath }) {
       labelFr: "Invitations",
       path: "/envola/invitations",
     },
+    {
+      key: "closingtheloop",
+      labelEn: "Closing the loop",
+      labelFr: "Boucler la boucle",
+      path: "/envola/closing-the-loop",
+    },
   ];
 
   return (

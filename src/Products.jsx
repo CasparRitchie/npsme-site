@@ -155,7 +155,7 @@ export default function Products() {
             </a>
 
             <Link
-              to={localizePath("/book", lang)}
+              to={`${localizePath("/book", lang)}?topic=consulting`}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
               {translations(lang, "products.cta.book")}

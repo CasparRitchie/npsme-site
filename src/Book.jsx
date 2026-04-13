@@ -6,33 +6,102 @@ import { useLocation } from "react-router-dom";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 
+const BOOK_TOPICS = {
+  consulting: {
+    key: "consulting",
+    fallbackTitle: "Book a consulting discussion",
+    fallbackSubtitle:
+      "Share a bit about your current CX and NPS setup and NPS Me will explore where consulting support could help most.",
+    fallbackPrefill:
+      "We’d like to discuss consulting support for our CX / NPS setup, especially around ",
+    fallbackSubject: "Consulting booking request (npsme.com)",
+  },
+  training: {
+    key: "training",
+    fallbackTitle: "Book a training discussion",
+    fallbackSubtitle:
+      "Share a bit about your team and training needs and NPS Me will suggest the most relevant workshop or session format.",
+    fallbackPrefill:
+      "We’d like to discuss a workshop or training session, especially around ",
+    fallbackSubject: "Training booking request (npsme.com)",
+  },
+  speaking: {
+    key: "speaking",
+    fallbackTitle: "Book a speaking discussion",
+    fallbackSubtitle:
+      "Share a bit about your audience and event and NPS Me will explore whether a speaking session is a good fit.",
+    fallbackPrefill:
+      "We’d like to discuss a speaking session for our event, especially around ",
+    fallbackSubject: "Speaking booking request (npsme.com)",
+  },
+  insight: {
+    key: "insight",
+    fallbackTitle: "Book an ongoing insight discussion",
+    fallbackSubtitle:
+      "Share a bit about your current setup and NPS Me will explore the best ongoing insight option for your team.",
+    fallbackPrefill:
+      "We’d like to discuss ongoing insight support, especially around ",
+    fallbackSubject: "Insight booking request (npsme.com)",
+  },
+  discovery: {
+    key: "discovery",
+    fallbackTitle: "Book a free discovery call",
+    fallbackSubtitle:
+      "Share a bit about your current CX and NPS setup and NPS Me will explore where support could help most - no obligation.",
+    fallbackPrefill: "",
+    fallbackSubject: "Discovery booking request (npsme.com)",
+  },
+};
+
 export default function Book() {
   const location = useLocation();
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
 
-  const [status, setStatus] = React.useState("idle"); // idle | sending | success | error
+  const params = new URLSearchParams(location.search);
+  const topicParam = params.get("topic") || "discovery";
+  const topicConfig = BOOK_TOPICS[topicParam] || BOOK_TOPICS.discovery;
+
+  const initialContext =
+    tr(`book.topics.${topicConfig.key}.prefill`, topicConfig.fallbackPrefill) || "";
+
+  const [status, setStatus] = React.useState("idle");
   const [form, setForm] = React.useState({
     name: "",
     email: "",
     date: "",
     time: "",
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-    context: "",
-    company: "", // honeypot
+    context: initialContext,
+    company: "",
   });
+
+  React.useEffect(() => {
+    setForm((f) => ({
+      ...f,
+      context:
+        f.context && f.context.trim().length > 0
+          ? f.context
+          : tr(`book.topics.${topicConfig.key}.prefill`, topicConfig.fallbackPrefill),
+    }));
+  }, [lang, topicConfig.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const disabled = status === "success";
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (form.company) return; // bot trap
+    if (form.company) return;
     setStatus("sending");
+
     try {
       const payload = {
-        _subject: "Discovery booking request (npsme.com)",
+        _subject: tr(
+          `book.topics.${topicConfig.key}.subject`,
+          topicConfig.fallbackSubject
+        ),
         _source: "booking-page",
+        booking_topic: topicConfig.key,
         name: form.name,
         email: form.email,
         preferred_date: form.date,
@@ -56,31 +125,32 @@ export default function Book() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path={location.pathname}
-        title={tr("book.seo.title", "Book a discovery session | NPS Me")}
+        path={location.pathname + location.search}
+        title={tr("book.seo.title", "Book a discussion | NPS Me")}
         description={tr(
           "book.seo.description",
-          "Pick a time that works for you and we’ll confirm a 30-minute discovery call to discuss CX and NPS improvement."
+          "Book a discussion with NPS Me about consulting, training, speaking or ongoing insight."
         )}
       />
 
       <PageHeader
-        iconLabel={tr("book.header.iconLabel", "Discovery call")}
+        iconLabel={tr("book.header.iconLabel", "Discussion")}
         tag={tr("book.header.tag", "NPS Me / Book")}
-        title={tr("book.header.title", "Book a free discovery call")}
+        title={tr(`book.topics.${topicConfig.key}.title`, topicConfig.fallbackTitle)}
         subtitle={tr(
-          "book.header.subtitle",
-          "Share a bit about your current CX and NPS setup and we’ll explore where we can help - no obligation."
+          `book.topics.${topicConfig.key}.subtitle`,
+          topicConfig.fallbackSubtitle
         )}
       />
 
       <section className="mx-auto max-w-3xl px-6 pt-14 pb-20">
         <form
           onSubmit={onSubmit}
-          className={`mt-8 grid gap-4 text-left transition ${disabled ? "opacity-60 pointer-events-none" : ""}`}
+          className={`mt-8 grid gap-4 text-left transition ${
+            disabled ? "opacity-60 pointer-events-none" : ""
+          }`}
           aria-disabled={disabled}
         >
-          {/* Honeypot */}
           <input
             tabIndex="-1"
             autoComplete="off"
@@ -150,7 +220,7 @@ export default function Book() {
             rows={5}
             placeholder={tr(
               "book.form.context",
-              "What would you like to focus on? (e.g., survey design, close-the-loop, onboarding friction, support response time, etc.)"
+              "What would you like to focus on?"
             )}
             value={form.context}
             onChange={(e) => update("context", e.target.value)}
@@ -169,9 +239,13 @@ export default function Book() {
 
           {status === "success" && (
             <p className="mt-2 text-sm text-[#22C55E]">
-              {tr("book.form.success", "Thanks! I’ll confirm shortly and send a calendar invite.")}
+              {tr(
+                "book.form.success",
+                "Thanks! NPS Me will confirm shortly and send a calendar invite."
+              )}
             </p>
           )}
+
           {status === "error" && (
             <p className="mt-2 text-sm text-red-400">
               {tr("book.form.errorPrefix", "Sorry-something went wrong. Please email")}{" "}

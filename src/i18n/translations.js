@@ -184,6 +184,43 @@ export const TRANSLATIONS = {
         dateAria: "Preferred date",
         timeAria: "Preferred time",
       },
+      topics: {
+        discovery: {
+          title: "Book a free discovery call",
+          subtitle:
+            "Share a bit about your current CX and NPS setup and NPS Me will explore where support could help most - no obligation.",
+          prefill: "",
+          subject: "Discovery booking request (npsme.com)",
+        },
+        consulting: {
+          title: "Book a consulting discussion",
+          subtitle:
+            "Share a bit about your current CX and NPS setup and NPS Me will explore where consulting support could help most.",
+          prefill: "We’d like to discuss consulting support for our CX / NPS setup, especially around ",
+          subject: "Consulting booking request (npsme.com)",
+        },
+        training: {
+          title: "Book a training discussion",
+          subtitle:
+            "Share a bit about your team and training needs and NPS Me will suggest the most relevant workshop or session format.",
+          prefill: "We’d like to discuss a workshop or training session, especially around ",
+          subject: "Training booking request (npsme.com)",
+        },
+        speaking: {
+          title: "Book a speaking discussion",
+          subtitle:
+            "Share a bit about your audience and event and NPS Me will explore whether a speaking session is a good fit.",
+          prefill: "We’d like to discuss a speaking session for our event, especially around ",
+          subject: "Speaking booking request (npsme.com)",
+        },
+        insight: {
+          title: "Book an ongoing insight discussion",
+          subtitle:
+            "Share a bit about your current setup and NPS Me will explore the best ongoing insight option for your team.",
+          prefill: "We’d like to discuss ongoing insight support, especially around ",
+          subject: "Insight booking request (npsme.com)",
+        },
+      },
     },
     blog: {
       seo: {
@@ -4574,6 +4611,43 @@ export const TRANSLATIONS = {
         errorPrefix: "Désolé, une erreur est survenue. Vous pouvez écrire à",
         dateAria: "Date souhaitée",
         timeAria: "Heure souhaitée",
+      },
+      topics: {
+        discovery: {
+          title: "Réserver un échange découverte gratuit",
+          subtitle:
+            "Partagez quelques éléments sur votre setup CX et NPS actuel et NPS Me explorera où un accompagnement pourrait être utile - sans engagement.",
+          prefill: "",
+          subject: "Demande d’échange découverte (npsme.com)",
+        },
+        consulting: {
+          title: "Réserver un échange conseil",
+          subtitle:
+            "Partagez quelques éléments sur votre setup CX et NPS actuel et NPS Me explorera où un accompagnement conseil pourrait aider le plus.",
+          prefill: "Nous aimerions discuter d’un accompagnement conseil pour notre setup CX / NPS, notamment autour de ",
+          subject: "Demande d’échange conseil (npsme.com)",
+        },
+        training: {
+          title: "Réserver un échange formation",
+          subtitle:
+            "Partagez quelques éléments sur votre équipe et vos besoins de formation et NPS Me proposera le format d’atelier ou de session le plus pertinent.",
+          prefill: "Nous aimerions discuter d’un atelier ou d’une session de formation, notamment autour de ",
+          subject: "Demande d’échange formation (npsme.com)",
+        },
+        speaking: {
+          title: "Réserver un échange conférence",
+          subtitle:
+            "Partagez quelques éléments sur votre audience et votre événement et NPS Me explorera si une intervention est pertinente.",
+          prefill: "Nous aimerions discuter d’une intervention pour notre événement, notamment autour de ",
+          subject: "Demande d’échange conférence (npsme.com)",
+        },
+        insight: {
+          title: "Réserver un échange sur les insights récurrents",
+          subtitle:
+            "Partagez quelques éléments sur votre setup actuel et NPS Me explorera l’option d’insights récurrents la plus pertinente pour votre équipe.",
+          prefill: "Nous aimerions discuter d’un accompagnement en insights récurrents, notamment autour de ",
+          subject: "Demande d’échange insights récurrents (npsme.com)",
+        },
       },
     },
     dataAutomation: {

@@ -69,6 +69,9 @@ export const ROUTES_MANIFEST = [
   { path: "/envola/invitations", label: "Envola Invitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/envola/invitations", label: "Invitations Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
+  { path: "/envola/closing-the-loop", label: "Envola Closing the Loop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/envola/closing-the-loop", label: "Boucle de feedback Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // Social listening (indexable)
   { path: "/social-listening",     label: "Social Listening",       labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/social-listening",  label: "Écoute sociale",         labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "fr" },

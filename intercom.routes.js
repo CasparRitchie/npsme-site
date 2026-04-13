@@ -91,6 +91,8 @@ import {
   createAuditEvent,
   calculateCaseDurations,
   buildLatestMapFromJsonlRows,
+  transitionCaseStatus,
+  validateCase,
 } from "./closingTheLoopSchema.js";
 
 // -----------------------
@@ -305,6 +307,39 @@ async function appendDropboxJsonl(path, obj) {
   const line = JSON.stringify(obj) + "\n";
   const next = existing ? (existing.replace(/\n*$/, "") + "\n" + line) : line;
   await writeDropboxFile(path, next);
+}
+
+async function readCtlJsonl(path) {
+  const text = await readDropboxFile(path).catch(() => null);
+  return parseJsonl(text);
+}
+
+async function appendCtlJsonl(path, obj) {
+  await appendDropboxJsonl(path, obj);
+}
+
+async function loadCtlState() {
+  const [cases, actions, pauseEvents, contactEvents, impactChecks] = await Promise.all([
+    readCtlJsonl(CTL_CASES_PATH),
+    readCtlJsonl(CTL_ACTIONS_PATH),
+    readCtlJsonl(CTL_PAUSE_EVENTS_PATH),
+    readCtlJsonl(CTL_CONTACT_EVENTS_PATH),
+    readCtlJsonl(CTL_IMPACT_CHECKS_PATH),
+  ]);
+
+  return { cases, actions, pauseEvents, contactEvents, impactChecks };
+}
+
+function groupByCaseId(rows) {
+  const map = new Map();
+  for (const row of rows || []) {
+    const caseId = row?.case_id ? String(row.case_id) : "";
+    if (!caseId) continue;
+    const arr = map.get(caseId) || [];
+    arr.push(row);
+    map.set(caseId, arr);
+  }
+  return map;
 }
 
 // Cached reader for the clean NPS responses JSONL store.
@@ -1668,6 +1703,185 @@ export function createIntercomRouter() {
     }
   });
 
+  router.get("/private/closing-the-loop/cases", requirePrivateCookie, async (req, res) => {
+  try {
+    const contentId = String(req.query.content_id || "").trim();
+    if (!contentId) {
+      return res.status(400).json({ ok: false, error: "content_id is required" });
+    }
+
+    const statusFilter = String(req.query.status || "").trim();
+    const includeClosed = String(req.query.include_closed || "").trim() === "1";
+    const limit = clampInt(req.query.limit, 200, 1, 2000);
+
+    const { cases, actions, pauseEvents, contactEvents, impactChecks } = await loadCtlState();
+
+    const actionMap = groupByCaseId(actions);
+    const pauseMap = groupByCaseId(pauseEvents);
+    const contactMap = groupByCaseId(contactEvents);
+    const impactMap = groupByCaseId(impactChecks);
+
+    let items = cases
+      .filter((c) => String(c?.content_id || "") === contentId)
+      .filter((c) => (includeClosed ? true : c?.status !== "closed"))
+      .filter((c) => (statusFilter ? String(c?.status || "") === statusFilter : true))
+      .map((c) => {
+        const caseId = String(c.case_id);
+        const caseActions = actionMap.get(caseId) || [];
+        const casePauses = pauseMap.get(caseId) || [];
+        const caseContacts = contactMap.get(caseId) || [];
+        const caseImpact = impactMap.get(caseId) || [];
+
+        return {
+          ...c,
+          durations: calculateCaseDurations(c, casePauses),
+          actions_count: caseActions.length,
+          pause_events_count: casePauses.length,
+          contact_events_count: caseContacts.length,
+          impact_checks_count: caseImpact.length,
+          actions: caseActions,
+          pause_events: casePauses,
+          contact_events: caseContacts,
+          impact_checks: caseImpact,
+        };
+      });
+
+    items.sort((a, b) => {
+      const ap = Number(a?.risk_score || 0);
+      const bp = Number(b?.risk_score || 0);
+      if (bp !== ap) return bp - ap;
+      return String(b?.survey_received_at || "").localeCompare(String(a?.survey_received_at || ""));
+    });
+
+    return res.json({
+      ok: true,
+      content_id: contentId,
+      returned: Math.min(limit, items.length),
+      cases: items.slice(0, limit),
+    });
+  } catch (e) {
+    console.error("[intercom] private closing-the-loop cases error", e);
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
+  }
+});
+
+router.post("/private/closing-the-loop/cases", requirePrivateCookie, express.json(), async (req, res) => {
+  try {
+    const contentId = String(req.body?.content_id || "").trim();
+    const queueItem = req.body?.queue_item || null;
+    const accountId = req.body?.account_id || null;
+    const customerId = req.body?.customer_id || null;
+    const journeyStage = req.body?.journey_stage || null;
+    const createdBy = req.body?.created_by || "private_user";
+
+    if (!contentId) {
+      return res.status(400).json({ ok: false, error: "content_id is required" });
+    }
+    if (!queueItem || !queueItem.contact_id) {
+      return res.status(400).json({ ok: false, error: "queue_item with contact_id is required" });
+    }
+
+    const existingCases = await readCtlJsonl(CTL_CASES_PATH);
+
+    const duplicate = existingCases.find((c) => {
+      return (
+        String(c?.content_id || "") === contentId &&
+        String(c?.contact_id || "") === String(queueItem.contact_id || "") &&
+        String(c?.response_id || "") === String(queueItem.response_id || "") &&
+        !["closed", "cancelled"].includes(String(c?.status || ""))
+      );
+    });
+
+    if (duplicate) {
+      return res.json({
+        ok: true,
+        already_exists: true,
+        case: duplicate,
+      });
+    }
+
+    const newCase = createCaseFromQueueItem({
+      contentId,
+      queueItem,
+      accountId,
+      customerId,
+      journeyStage,
+      createdBy,
+    });
+
+    validateCase(newCase);
+
+    const audit = createAuditEvent({
+      caseId: newCase.case_id,
+      contentId,
+      eventType: "case_created",
+      changedBy: createdBy,
+      notes: "Case created from closing-the-loop queue",
+    });
+
+    await appendCtlJsonl(CTL_CASES_PATH, newCase);
+    await appendCtlJsonl(CTL_AUDIT_LOG_PATH, audit);
+
+    return res.json({
+      ok: true,
+      created: true,
+      case: newCase,
+    });
+  } catch (e) {
+    console.error("[intercom] private closing-the-loop create case error", e);
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
+  }
+});
+
+router.post("/private/closing-the-loop/cases/:caseId/status", requirePrivateCookie, express.json(), async (req, res) => {
+  try {
+    const caseId = String(req.params.caseId || "").trim();
+    const toStatus = String(req.body?.status || "").trim();
+    const changedBy = req.body?.changed_by || "private_user";
+    const at = req.body?.at || null;
+    const notes = String(req.body?.notes || "").trim();
+
+    if (!caseId) {
+      return res.status(400).json({ ok: false, error: "caseId is required" });
+    }
+    if (!toStatus) {
+      return res.status(400).json({ ok: false, error: "status is required" });
+    }
+
+    const cases = await readCtlJsonl(CTL_CASES_PATH);
+    const latestMap = buildLatestMapFromJsonlRows(cases, "case_id");
+    const currentCase = latestMap.get(caseId);
+
+    if (!currentCase) {
+      return res.status(404).json({ ok: false, error: "Case not found" });
+    }
+
+    const updatedCase = transitionCaseStatus(currentCase, toStatus, { at });
+    validateCase(updatedCase);
+
+    const audit = createAuditEvent({
+      caseId,
+      contentId: currentCase.content_id,
+      eventType: toStatus === "closed" ? "case_closed" : "status_changed",
+      fromValue: currentCase.status,
+      toValue: updatedCase.status,
+      changedBy,
+      notes,
+    });
+
+    await appendCtlJsonl(CTL_CASES_PATH, updatedCase);
+    await appendCtlJsonl(CTL_AUDIT_LOG_PATH, audit);
+
+    return res.json({
+      ok: true,
+      case: updatedCase,
+    });
+  } catch (e) {
+    console.error("[intercom] private closing-the-loop update status error", e);
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
+  }
+});
+
   router.get("/private/nps-response", requirePrivateCookie, async (req, res) => {
     try {
       const responseId = String(req.query.response_id || "").trim();
@@ -2128,8 +2342,7 @@ router.get("/survey-export/start", async (req, res) => {
   // existing private Intercom routes.
   // =======================================================
 
-  router.get(
-    "/private/nps-responses-explorer",
+  router.get("/private/nps-responses-explorer",
     requirePrivateCookie,
     async (req, res) => {
       try {

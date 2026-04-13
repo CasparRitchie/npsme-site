@@ -162,7 +162,7 @@ export default function About() {
                 "Practical training to help teams run NPS well: survey design, sampling, analysis, close-the-loop, and action planning."
               )}
               ctaLabel={translations(lang, "about.work.training.cta", "View training")}
-              ctaHref={localizePath("/products", lang)}
+              ctaHref={localizePath("/training", lang)}
               featured
             />
 
@@ -175,7 +175,7 @@ export default function About() {
                 "Keynotes and talks on practical customer experience: what actually moves NPS, and how to build momentum across teams."
               )}
               ctaLabel={translations(lang, "about.work.speaking.cta", "View speaking")}
-              ctaHref={localizePath("/products", lang)}
+              ctaHref={localizePath("/speaking", lang)}
             />
 
             <OfferCard

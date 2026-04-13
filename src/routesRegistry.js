@@ -5,6 +5,8 @@ import { ROUTES_MANIFEST } from "./routesManifest";
 // React components (browser-only)
 import NpsMeLanding from "./NpsMeLanding";
 import Products from "./Products";
+import Training from "./Training";
+import Speaking from "./Speaking";
 import WhatIsNps from "./pages/WhatIsNps";
 import ImpactPage from "./ImpactPage";
 import About from "./About";
@@ -76,6 +78,12 @@ const COMPONENTS = {
   // Core
   "/products": Products,
   "/fr/products": Products,
+
+  "/training": Training,
+  "/fr/training": Training,
+
+  "/speaking": Speaking,
+  "/fr/speaking": Speaking,
 
   "/impact": ImpactPage,
   "/fr/impact": ImpactPage,

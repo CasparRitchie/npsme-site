@@ -10,7 +10,6 @@ import { localizePath } from "./i18n/pathHelpers.js";
 export default function Products() {
   const { lang } = useLanguage();
   const location = useLocation();
-
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   const cards = dict?.products?.cards || {};
@@ -76,7 +75,7 @@ export default function Products() {
             examples={cards?.training?.examples || []}
             cta={{
               label: cards?.training?.cta,
-              href: localizePath("/book", lang),
+              href: localizePath("/training", lang),
             }}
           />
 
@@ -90,7 +89,7 @@ export default function Products() {
             examples={cards?.speaking?.examples || []}
             cta={{
               label: cards?.speaking?.cta,
-              href: localizePath("/book", lang),
+              href: localizePath("/speaking", lang),
             }}
           />
 

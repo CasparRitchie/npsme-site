@@ -24,6 +24,8 @@ export const TRANSLATIONS = {
       blogIntercomNpsBeyondScore: "Intercom NPS: beyond the score",
       cxCockpit: "CX Cockpit",
       closingTheLoop: "Closing the loop",
+      training: "Training",
+      speaking: "Speaking",
     },
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
@@ -2716,6 +2718,142 @@ export const TRANSLATIONS = {
         book: "Book discovery",
       },
     },
+    speaking: {
+      seoTitle: "NPS Me speaking",
+      seoDescription:
+        "Practical CX and NPS speaking from NPS Me for leadership sessions, offsites and team events.",
+
+      header: {
+        iconLabel: "NPS Me speaking",
+        tag: "NPS Me / Speaking",
+        accent: "Practical CX",
+        title: "speaking",
+        subtitle:
+          "Useful talks for leadership groups, team events and offsites: grounded, commercially relevant, and focused on what actually matters.",
+      },
+
+      intro: {
+        title: "Speaking that helps teams think more clearly about CX",
+        body:
+          "NPS Me speaking sessions are designed to move beyond generic inspiration. The aim is to help teams see customer experience more clearly, understand what really moves NPS, and focus on better decisions.",
+      },
+
+      audiences: {
+        title: "Who speaking is for",
+        items: [
+          "Leadership teams",
+          "Offsites and internal events",
+          "Customer success and CX communities",
+          "Organisations that want practical, commercially grounded content",
+        ],
+      },
+
+      topics: {
+        title: "Typical speaking topics",
+        items: [
+          "Why NPS stalls even when CX looks better",
+          "How to make customer feedback more useful",
+          "What leaders should look at beyond dashboards",
+          "How to create momentum around CX improvement",
+        ],
+      },
+
+      formats: {
+        title: "Typical formats",
+        items: [
+          "Keynotes",
+          "Leadership sessions",
+          "Panels and fireside-style discussions",
+          "Internal team talks and offsite sessions",
+        ],
+      },
+
+      outcomes: {
+        title: "What audiences get",
+        items: [
+          "Clearer thinking about what really drives customer outcomes",
+          "Practical, memorable ideas rather than generic slogans",
+          "Better links between CX, delivery and business priorities",
+          "Useful prompts for what to do next",
+        ],
+      },
+
+      cta: {
+        title: "Want to explore a speaking session?",
+        body:
+          "NPS Me can shape a talk or session around your audience, your event, and the practical questions you want people thinking about afterwards.",
+        primary: "Book a discussion",
+        secondary: "Back to services",
+      },
+    },
+    training: {
+      seoTitle: "NPS Me workshops and training",
+      seoDescription:
+        "Practical NPS and CX training from NPS Me: survey design, sampling, interpretation, close-the-loop and action planning.",
+
+      header: {
+        iconLabel: "NPS Me training",
+        tag: "NPS Me / Training",
+        accent: "Workshops &",
+        title: "training",
+        subtitle:
+          "Practical sessions to help teams run NPS properly, interpret feedback well, and turn insight into action.",
+      },
+
+      intro: {
+        title: "Training that improves capability, not just confidence",
+        body:
+          "NPS Me training is designed for teams that want practical capability in survey design, sampling, interpretation, close-the-loop, and action planning. The focus is always on making the next decision clearer.",
+      },
+
+      audiences: {
+        title: "Who training is for",
+        items: [
+          "CX and customer success teams",
+          "Product and operations teams working on customer journeys",
+          "Leaders who want a better understanding of how to use NPS properly",
+          "Teams that want to improve internal capability without a heavy consulting dependency",
+        ],
+      },
+
+      topics: {
+        title: "Common workshop topics",
+        items: [
+          "How to design a decision-grade NPS programme",
+          "How to improve sampling, cadence and comparability",
+          "How to interpret customer comments and themes properly",
+          "How to turn NPS into practical actions across teams",
+        ],
+      },
+
+      formats: {
+        title: "Typical formats",
+        items: [
+          "Half-day workshops",
+          "Full-day training sessions",
+          "Leadership briefings",
+          "Tailored team sessions built around your current programme",
+        ],
+      },
+
+      outcomes: {
+        title: "What teams leave with",
+        items: [
+          "A clearer understanding of how to run NPS properly",
+          "Better judgement around survey design and interpretation",
+          "Practical templates, thinking tools and next steps",
+          "More confidence turning feedback into action",
+        ],
+      },
+
+      cta: {
+        title: "Want to discuss training for your team?",
+        body:
+          "NPS Me can shape a workshop or training session around your current setup, your team, and the decisions you need to make next.",
+        primary: "Book a discussion",
+        secondary: "Back to services",
+      },
+    },
     whatIsNps: {
       seoTitle: "What is NPS? Net Promoter Score explained properly | NPS Me",
       seoDescription:
@@ -2974,6 +3112,8 @@ export const TRANSLATIONS = {
       blogIntercomNpsBeyondScore: "Intercom NPS : au-delà du score",
       cxCockpit: "Cockpit CX",
       closingTheLoop: "Boucler la boucle",
+      training: "Formation",
+      speaking: "Conférences",
     },
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
@@ -5720,6 +5860,142 @@ export const TRANSLATIONS = {
       ctas: {
         products: "Découvrir les offres packagées",
         book: "Prendre rendez-vous",
+      },
+    },
+    speaking: {
+      seoTitle: "Conférences NPS Me",
+      seoDescription:
+        "Interventions pratiques CX et NPS par NPS Me pour sessions de direction, offsites et événements d’équipe.",
+
+      header: {
+        iconLabel: "Conférences NPS Me",
+        tag: "NPS Me / Conférences",
+        accent: "Une CX pragmatique en",
+        title: "conférences",
+        subtitle:
+          "Des interventions utiles pour équipes de direction, événements internes et offsites : concrètes, pertinentes commercialement, et centrées sur ce qui compte vraiment.",
+      },
+
+      intro: {
+        title: "Des interventions qui aident les équipes à penser plus clairement la CX",
+        body:
+          "Les interventions NPS Me vont au-delà de l’inspiration générique. L’objectif est d’aider les équipes à voir plus clairement l’expérience client, comprendre ce qui fait vraiment bouger le NPS, et se concentrer sur de meilleures décisions.",
+      },
+
+      audiences: {
+        title: "Pour qui ces interventions sont faites",
+        items: [
+          "Équipes de direction",
+          "Offsites et événements internes",
+          "Communautés CX et customer success",
+          "Organisations qui veulent un contenu pratique et ancré dans la réalité business",
+        ],
+      },
+
+      topics: {
+        title: "Sujets typiques",
+        items: [
+          "Pourquoi le NPS stagne même quand la CX semble meilleure",
+          "Comment rendre le feedback client plus utile",
+          "Ce que les dirigeants devraient regarder au-delà des dashboards",
+          "Comment créer de la dynamique autour de l’amélioration CX",
+        ],
+      },
+
+      formats: {
+        title: "Formats typiques",
+        items: [
+          "Keynotes",
+          "Sessions de direction",
+          "Panels et discussions de type fireside",
+          "Interventions internes et sessions offsite",
+        ],
+      },
+
+      outcomes: {
+        title: "Ce que le public en retire",
+        items: [
+          "Une vision plus claire de ce qui influence vraiment les résultats clients",
+          "Des idées pratiques et mémorables plutôt que des slogans génériques",
+          "De meilleurs liens entre CX, delivery et priorités business",
+          "Des pistes utiles sur quoi faire ensuite",
+        ],
+      },
+
+      cta: {
+        title: "Envie d’explorer une intervention ?",
+        body:
+          "NPS Me peut construire une intervention ou une session autour de votre audience, de votre événement, et des questions pratiques que vous voulez laisser aux participants.",
+        primary: "Prendre rendez-vous",
+        secondary: "Retour aux services",
+      },
+    },
+    training: {
+      seoTitle: "Ateliers et formation NPS Me",
+      seoDescription:
+        "Formation pratique NPS et CX par NPS Me : design d’enquête, échantillonnage, interprétation, close-the-loop et plans d’action.",
+
+      header: {
+        iconLabel: "Formation NPS Me",
+        tag: "NPS Me / Formation",
+        accent: "Ateliers &",
+        title: "formation",
+        subtitle:
+          "Des sessions pratiques pour aider les équipes à bien faire du NPS, bien interpréter le feedback, et transformer les insights en action.",
+      },
+
+      intro: {
+        title: "Une formation qui renforce la capacité, pas seulement la confiance",
+        body:
+          "La formation NPS Me est conçue pour les équipes qui veulent une vraie capacité pratique sur le design d’enquête, l’échantillonnage, l’interprétation, le close-the-loop et les plans d’action. L’objectif reste toujours de rendre la prochaine décision plus claire.",
+      },
+
+      audiences: {
+        title: "À qui s’adresse la formation",
+        items: [
+          "Équipes CX et customer success",
+          "Équipes produit et opérations travaillant sur les parcours clients",
+          "Dirigeants qui veulent mieux comprendre comment bien utiliser le NPS",
+          "Équipes qui veulent renforcer leur capacité interne sans dépendre d’un gros dispositif de conseil",
+        ],
+      },
+
+      topics: {
+        title: "Thèmes fréquents d’atelier",
+        items: [
+          "Comment concevoir un programme NPS decision-grade",
+          "Comment améliorer échantillonnage, cadence et comparabilité",
+          "Comment bien interpréter les verbatims et les thèmes",
+          "Comment transformer le NPS en actions concrètes inter-équipes",
+        ],
+      },
+
+      formats: {
+        title: "Formats typiques",
+        items: [
+          "Ateliers d’une demi-journée",
+          "Sessions de formation d’une journée",
+          "Briefings de direction",
+          "Sessions sur mesure construites autour de votre programme actuel",
+        ],
+      },
+
+      outcomes: {
+        title: "Ce que les équipes obtiennent",
+        items: [
+          "Une compréhension plus claire de ce qu’est un bon programme NPS",
+          "Un meilleur jugement sur le design d’enquête et l’interprétation",
+          "Des templates, outils de réflexion et prochaines étapes concrètes",
+          "Plus de confiance pour transformer le feedback en action",
+        ],
+      },
+
+      cta: {
+        title: "Envie de discuter d’une formation pour votre équipe ?",
+        body:
+          "NPS Me peut construire un atelier ou une session de formation autour de votre setup actuel, de votre équipe, et des décisions que vous devez prendre ensuite.",
+        primary: "Prendre rendez-vous",
+        secondary: "Retour aux services",
       },
     },
     whatIsNps: {

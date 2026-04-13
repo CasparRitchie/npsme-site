@@ -8,6 +8,12 @@ export const ROUTES_MANIFEST = [
   { path: "/products",    label: "Products",             labelKey: "routes.products",             enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/products", label: "Produits",             labelKey: "routes.products",             enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "fr" },
 
+  { path: "/training",     label: "Training",     labelKey: "routes.training", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/training",  label: "Formation",    labelKey: "routes.training", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "fr" },
+
+  { path: "/speaking",     label: "Speaking",     labelKey: "routes.speaking", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/speaking",  label: "Conférences",  labelKey: "routes.speaking", enabled: true, indexable: true, inHeader: false, inFooter: true, lang: "fr" },
+
   { path: "/impact",      label: "Impact",               labelKey: "routes.impact",               enabled: true,  indexable: true,  inHeader: false, inFooter: true,  lang: "en" },
   { path: "/fr/impact",   label: "Impact",               labelKey: "routes.impact",               enabled: true,  indexable: true,  inHeader: false, inFooter: true,  lang: "fr" },
 

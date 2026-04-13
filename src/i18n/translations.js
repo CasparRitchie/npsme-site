@@ -1991,92 +1991,142 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle:
-        "Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me",
+      seoTitle: "NPS Me services: consulting, training, speaking and ongoing insight",
       seoDescription:
-        "Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports.",
+        "Explore the four ways to work with NPS Me: consulting, workshops and training, speaking, and ongoing insight for teams improving NPS and customer experience.",
 
       header: {
-        iconLabel: "Productized CX services",
+        iconLabel: "NPS Me services",
         tag: "NPS Me / Services",
-        accent: "Productized services",
-        title: "that turn feedback into growth",
+        accent: "Four ways to work with",
+        title: "NPS Me",
         subtitle:
-          "Pick the package that fits your stage-from foundations, to enablement, to a weekly CX intelligence feed you can act on.",
+          "Choose the format that fits your stage: consulting, workshops and training, speaking, or ongoing insight.",
+      },
+
+      intro: {
+        title: "How NPS Me works with teams",
+        body:
+          "The landing page introduces the four main ways to work with NPS Me. This page turns those into concrete offers, examples and delivery formats so it is easier to choose the right starting point.",
       },
 
       cards: {
-        foundations: {
-          title: "Feedback Foundations",
-          price: "from £450",
+        consulting: {
+          title: "Consulting",
+          price: "Scoped to the work",
+          hint: "Best for: teams that want practical change, not just advice",
           bullets: [
-            "Customer journey & review analysis (support tickets, reviews, NPS)",
-            "Baseline NPS®, CSAT & friction map",
-            "Prioritised 90-day action roadmap",
-            "Executive summary PDF + live walkthrough",
+            "NPS programme design and reset work",
+            "Customer feedback analysis and friction diagnosis",
+            "Prioritised action roadmaps with owners and sequencing",
+            "Hands-on implementation support across CX, ops and product",
           ],
-          cta: "Request audit",
-          hint: "Best for: teams starting (or restarting) NPS",
-        },
-        momentum: {
-          title: "Momentum Program",
-          price: "from £850/mo (implementation)",
-          bullets: [
-            "Hands-on implementation & enablement",
-            "Monthly review cycles & dashboards",
-            "Measured lift on key outcomes",
+          examplesTitle: "Typical consulting work",
+          examples: [
+            "Feedback Foundations audit",
+            "Momentum implementation support",
+            "Close-the-loop workflow design",
+            "Journey friction and verbatim analysis",
           ],
-          cta: "Book discovery",
-          hint: "Best for: teams who want results, not dashboards",
+          cta: "Book a consulting review",
         },
 
-        intercom: {
-          title: "CX Intelligence Layer (Intercom NPS)",
-          price: "from £290/mo",
+        training: {
+          title: "Workshops & training",
+          price: "Half-day, full-day or tailored sessions",
+          hint: "Best for: teams that want stronger internal capability",
           bullets: [
-            "Live NPS insights from Intercom (auto-updated)",
-            "Themes, delighters & risk flags grounded in real comments",
-            "Segmented actions for Detractors, Passives & Promoters",
-            "Ready-to-send “close the loop” response templates",
+            "Practical training on how to run NPS properly",
+            "Survey design, sampling and comparability",
+            "Comment analysis, prioritisation and action planning",
+            "Close-the-loop templates, scripts and facilitation",
           ],
-          cta: "View Intercom example",
-          footnote: "Optional: expert-led Intercom NPS survey design & setup (£450 one-off).",
-          hint: "Best for: teams already using Intercom NPS",
+          examplesTitle: "Typical workshop themes",
+          examples: [
+            "How to design a decision-grade NPS programme",
+            "How to interpret comments and themes properly",
+            "How to turn NPS into action across teams",
+            "How to avoid survey fatigue and bad data",
+          ],
+          cta: "Discuss a workshop",
         },
-        pulse: {
-          title: "CX Pulse Report (weekly)",
-          price: "from £190/mo",
+
+        speaking: {
+          title: "Speaking",
+          price: "Tailored to the event",
+          hint: "Best for: leadership sessions, offsites and team events",
           bullets: [
-            "Social listening across X/LinkedIn/Reddit/Reviews",
-            "Top themes, sentiment & competitor pulse",
-            "1-page actionable summary + next steps",
+            "Talks on practical CX and what really moves NPS",
+            "Leadership sessions that connect insight to delivery",
+            "Content grounded in real programme experience",
+            "Clear takeaways rather than generic inspiration",
           ],
-          cta: "See sample report",
-          footnote: "Starts manual, scales with automation. Cancel anytime.",
-          hint: "Best for: a weekly external signal you can act on",
+          examplesTitle: "Typical speaking topics",
+          examples: [
+            "Why NPS stalls even when CX looks better",
+            "How to make customer feedback more useful",
+            "How to build momentum around CX improvement",
+            "What leaders should focus on beyond dashboards",
+          ],
+          cta: "Enquire about speaking",
+        },
+
+        insight: {
+          title: "Ongoing insight",
+          price: "From monthly support to recurring feeds",
+          hint: "Best for: teams that want a lighter ongoing intelligence layer",
+          bullets: [
+            "Recurring insight from NPS, comments and external signals",
+            "CX Pulse reporting and trend interpretation",
+            "Intercom NPS intelligence layer support",
+            "Clear next steps, priorities and risk flags",
+          ],
+          examplesTitle: "Typical ongoing insight offers",
+          examples: [
+            "Weekly or monthly CX Pulse",
+            "Intercom NPS intelligence layer",
+            "Theme and driver tracking",
+            "Executive-ready summaries and action prompts",
+          ],
+          cta: "See ongoing insight options",
         },
       },
 
-      pulseExplainer: {
-        title: "What you get in the weekly CX Pulse",
-        left: [
-          "Sentiment pulse (WoW change, drivers)",
-          "Emerging topics (3-5 themes with examples)",
-          "Competitor comparison (optional)",
-        ],
-        right: [
-          "Plain-English insight summary (what to do next)",
-          "Lightweight dashboard (rolling trends)",
-          "Delivery on the same weekday, every week",
-        ],
+      detailSections: {
+        consulting: {
+          title: "Consulting: from diagnosis to implementation",
+          body:
+            "NPS Me helps teams move from raw feedback to practical change. That can include programme design, friction diagnosis, roadmap building, close-the-loop workflows, and hands-on implementation support.",
+        },
+        training: {
+          title: "Workshops & training: build stronger internal capability",
+          body:
+            "NPS Me provides practical training so teams can run NPS better, interpret feedback with more confidence, and make better decisions without becoming dependent on heavy consulting support.",
+        },
+        speaking: {
+          title: "Speaking: practical CX content for real teams",
+          body:
+            "NPS Me speaking sessions are designed to be useful, grounded and commercially relevant. They work well for leadership groups, offsites, internal events and customer experience communities.",
+        },
+        insight: {
+          title: "Ongoing insight: a lighter intelligence layer",
+          body:
+            "For teams that do not need a full consulting programme, NPS Me can provide a lighter ongoing insight service through CX Pulse reporting, Intercom-based analysis, and recurring feedback interpretation.",
+        },
+      },
+
+      comparison: {
+        title: "How to choose the right starting point",
+        body:
+          "Start with consulting when the programme needs fixing or redesigning. Choose workshops when the team needs stronger capability. Choose speaking for leadership or event settings. Choose ongoing insight when the team wants a lighter recurring feed of priorities and action prompts.",
       },
 
       cta: {
-        title: "Ready for a sample?",
+        title: "Not sure where to start?",
         body:
-          "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.",
+          "NPS Me can review your current setup and recommend the best starting point across consulting, training, speaking or ongoing insight.",
         email: "Email hello@npsme.com",
-        book: "Book discovery",
+        book: "Book a free NPS review",
       },
     },
     socialListening: {
@@ -4937,92 +4987,142 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle:
-        "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",
+      seoTitle: "Services NPS Me : conseil, formation, conférences et insights récurrents",
       seoDescription:
-        "Choisissez une offre CX pour améliorer le NPS®, réduire la charge support et augmenter la rétention : Feedback Foundations, Momentum Program et rapports CX Pulse hebdomadaires.",
+        "Découvrez les quatre façons de travailler avec NPS Me : conseil, ateliers et formation, conférences, et insights récurrents pour les équipes qui veulent améliorer le NPS et l’expérience client.",
 
       header: {
-        iconLabel: "Offres CX packagées",
+        iconLabel: "Services NPS Me",
         tag: "NPS Me / Services",
-        accent: "Offres packagées",
-        title: "qui transforment le feedback en croissance",
+        accent: "Quatre façons de travailler avec",
+        title: "NPS Me",
         subtitle:
-          "Choisissez le pack adapté à votre étape : bases, accompagnement, ou un flux hebdomadaire d’insights CX actionnables.",
+          "Choisissez le format adapté à votre étape : conseil, ateliers et formation, conférences, ou insights récurrents.",
+      },
+
+      intro: {
+        title: "Comment NPS Me travaille avec les équipes",
+        body:
+          "La landing page présente les quatre grandes façons de travailler avec NPS Me. Cette page les transforme en offres concrètes, exemples et formats de delivery pour faciliter le choix du bon point de départ.",
       },
 
       cards: {
-        foundations: {
-          title: "Feedback Foundations",
-          price: "à partir de 450 £",
+        consulting: {
+          title: "Conseil",
+          price: "Périmètre défini selon le besoin",
+          hint: "Idéal pour : les équipes qui veulent des changements concrets, pas seulement des recommandations",
           bullets: [
-            "Analyse du parcours client & des avis (support, reviews, NPS)",
-            "NPS®, CSAT & cartographie des frictions",
-            "Roadmap priorisée sur 90 jours",
-            "Synthèse exécutive + restitution en visio",
+            "Design ou refonte de programme NPS",
+            "Analyse des retours clients et diagnostic des frictions",
+            "Roadmaps priorisées avec responsables et séquencement",
+            "Accompagnement opérationnel sur la mise en œuvre CX, ops et produit",
           ],
-          cta: "Demander un audit",
-          hint: "Idéal pour : démarrer (ou relancer) un programme NPS",
-        },
-        momentum: {
-          title: "Momentum Program",
-          price: "à partir de 850 £/mois (accompagnement)",
-          bullets: [
-            "Mise en œuvre & accompagnement",
-            "Cycles mensuels & dashboards",
-            "Amélioration mesurée des résultats",
+          examplesTitle: "Exemples de missions conseil",
+          examples: [
+            "Audit Feedback Foundations",
+            "Accompagnement Momentum",
+            "Design de workflows close-the-loop",
+            "Analyse de parcours et de verbatims",
           ],
-          cta: "Prendre rendez-vous",
-          hint: "Idéal pour : obtenir des résultats, pas juste des dashboards",
+          cta: "Réserver une revue conseil",
         },
 
-        intercom: {
-          title: "Couche d’intelligence CX (Intercom NPS)",
-          price: "à partir de 290 £/mois",
+        training: {
+          title: "Ateliers & formation",
+          price: "Demi-journée, journée ou format sur mesure",
+          hint: "Idéal pour : les équipes qui veulent monter en compétence en interne",
           bullets: [
-            "Insights NPS en continu depuis Intercom (mise à jour auto)",
-            "Thèmes, leviers & signaux de risque basés sur les verbatims",
-            "Actions par segment : Détracteurs, Passifs, Promoteurs",
-            "Modèles de réponses “close the loop” prêts à envoyer",
+            "Formation pratique pour bien faire du NPS",
+            "Design d’enquête, échantillonnage et comparabilité",
+            "Analyse des verbatims, priorisation et plans d’action",
+            "Templates, scripts close-the-loop et facilitation",
           ],
-          cta: "Voir l’exemple Intercom",
-          footnote: "Option : atelier expert pour concevoir et paramétrer le NPS Intercom (450 £, ponctuel).",
-          hint: "Idéal pour : les équipes déjà sur Intercom NPS",
+          examplesTitle: "Exemples de thèmes d’atelier",
+          examples: [
+            "Comment concevoir un programme NPS decision-grade",
+            "Comment bien interpréter les verbatims et les thèmes",
+            "Comment transformer le NPS en action inter-équipes",
+            "Comment éviter la fatigue d’enquête et les mauvaises données",
+          ],
+          cta: "Discuter d’un atelier",
         },
-        pulse: {
-          title: "Rapport CX Pulse (hebdo)",
-          price: "à partir de 190 £/mois",
+
+        speaking: {
+          title: "Conférences",
+          price: "Selon l’événement",
+          hint: "Idéal pour : sessions leadership, offsites et événements internes",
           bullets: [
-            "Social listening (X/LinkedIn/Reddit/Avis)",
-            "Thèmes clés, sentiment & pouls concurrentiel",
-            "Synthèse actionnable (1 page) + prochaines étapes",
+            "Interventions sur une CX pragmatique et ce qui fait vraiment bouger le NPS",
+            "Sessions leadership reliant insight et exécution",
+            "Contenus ancrés dans des programmes réels",
+            "Des messages utiles plutôt qu’une inspiration générique",
           ],
-          cta: "Voir un exemple",
-          footnote: "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
-          hint: "Idéal pour : un signal externe hebdo, actionnable",
+          examplesTitle: "Exemples de sujets",
+          examples: [
+            "Pourquoi le NPS stagne même quand la CX semble meilleure",
+            "Comment rendre le feedback client plus utile",
+            "Comment créer de la dynamique autour de l’amélioration CX",
+            "Ce que les dirigeants doivent regarder au-delà des dashboards",
+          ],
+          cta: "Demander une intervention",
+        },
+
+        insight: {
+          title: "Insights récurrents",
+          price: "À partir d’un accompagnement mensuel léger",
+          hint: "Idéal pour : les équipes qui veulent une couche d’intelligence récurrente plus légère",
+          bullets: [
+            "Insights récurrents à partir du NPS, des verbatims et des signaux externes",
+            "CX Pulse et lecture des tendances",
+            "Couche d’intelligence Intercom NPS",
+            "Prochaines étapes, priorités et signaux de risque",
+          ],
+          examplesTitle: "Exemples d’offres récurrentes",
+          examples: [
+            "CX Pulse hebdo ou mensuel",
+            "Couche d’intelligence Intercom NPS",
+            "Suivi des thèmes et drivers",
+            "Synthèses exécutives et prompts d’action",
+          ],
+          cta: "Voir les options d’insights récurrents",
         },
       },
 
-      pulseExplainer: {
-        title: "Ce que vous recevez dans le CX Pulse hebdomadaire",
-        left: [
-          "Baromètre de sentiment (évolution semaine/semaine, causes)",
-          "Sujets émergents (3–5 thèmes avec exemples)",
-          "Comparaison concurrentielle (option)",
-        ],
-        right: [
-          "Synthèse claire (quoi faire ensuite)",
-          "Dashboard léger (tendances)",
-          "Livraison le même jour chaque semaine",
-        ],
+      detailSections: {
+        consulting: {
+          title: "Conseil : du diagnostic à la mise en œuvre",
+          body:
+            "NPS Me aide les équipes à passer du feedback brut au changement concret. Cela peut inclure le design du programme, le diagnostic des frictions, la construction de la roadmap, les workflows close-the-loop et l’accompagnement opérationnel.",
+        },
+        training: {
+          title: "Ateliers & formation : renforcer la capacité interne",
+          body:
+            "NPS Me propose des formations pratiques pour aider les équipes à mieux faire du NPS, interpréter le feedback avec plus de confiance et prendre de meilleures décisions sans dépendre d’un gros dispositif de conseil.",
+        },
+        speaking: {
+          title: "Conférences : des contenus CX utiles pour des équipes réelles",
+          body:
+            "Les interventions NPS Me sont conçues pour être utiles, concrètes et commercialement pertinentes. Elles fonctionnent bien pour des équipes de direction, des offsites, des événements internes et des communautés CX.",
+        },
+        insight: {
+          title: "Insights récurrents : une couche d’intelligence plus légère",
+          body:
+            "Pour les équipes qui n’ont pas besoin d’un programme conseil complet, NPS Me peut fournir un service d’insights récurrents plus léger via le CX Pulse, l’analyse Intercom et l’interprétation continue du feedback.",
+        },
+      },
+
+      comparison: {
+        title: "Comment choisir le bon point de départ",
+        body:
+          "Commencez par le conseil si le programme doit être réparé ou repensé. Choisissez les ateliers si l’équipe a besoin de renforcer ses compétences. Choisissez les conférences pour un contexte leadership ou événementiel. Choisissez les insights récurrents pour un flux plus léger de priorités et d’actions.",
       },
 
       cta: {
-        title: "Prêt pour un exemple ?",
+        title: "Vous ne savez pas par où commencer ?",
         body:
-          "Je réalise un CX Pulse ponctuel sur votre marque et je vous envoie le PDF sous quelques jours.",
+          "NPS Me peut revoir votre dispositif actuel et recommander le meilleur point de départ entre conseil, formation, conférences et insights récurrents.",
         email: "Écrire à hello@npsme.com",
-        book: "Prendre rendez-vous",
+        book: "Réserver une revue NPS gratuite",
       },
     },
     socialListening: {

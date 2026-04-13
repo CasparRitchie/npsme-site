@@ -28,24 +28,7 @@ export default function MilestoneNps() {
   const impactPath = localizePath("/impact", lang);
   const homeWithContactHash = `${localizePath("/", lang)}#contact`;
 
-  // Related insights links (keep this tight: 3–5 max)
   const relatedLinks = [
-    {
-      path: "/nps-intelligence-layer",
-      label: translations(
-        lang,
-        "milestonePage.related.links.intelligenceLayer",
-        "NPS intelligence layer"
-      ),
-    },
-    {
-      path: "/intercom-nps-analytics",
-      label: translations(
-        lang,
-        "milestonePage.related.links.intercomNpsAnalytics",
-        "Intercom NPS analytics"
-      ),
-    },
     {
       path: "/what-is-nps",
       label: translations(
@@ -60,6 +43,22 @@ export default function MilestoneNps() {
         lang,
         "milestonePage.related.links.npsSurveyProgramme",
         "NPS survey programme"
+      ),
+    },
+    {
+      path: "/nps-intelligence-layer",
+      label: translations(
+        lang,
+        "milestonePage.related.links.intelligenceLayer",
+        "NPS intelligence layer"
+      ),
+    },
+    {
+      path: "/intercom-nps-analytics",
+      label: translations(
+        lang,
+        "milestonePage.related.links.intercomNpsAnalytics",
+        "Intercom NPS analytics"
       ),
     },
     {
@@ -79,12 +78,12 @@ export default function MilestoneNps() {
         title={translations(
           lang,
           "milestonePage.seoTitle",
-          "Milestone (Transactional) NPS® & Survey Signals | NPS Me"
+          "Transactional NPS and milestone surveys | NPS Me"
         )}
         description={translations(
           lang,
           "milestonePage.seoDescription",
-          "Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX."
+          "Learn how transactional NPS and milestone surveys help teams measure customer sentiment at key journey moments and turn feedback into action."
         )}
         lang={lang}
       />
@@ -102,7 +101,7 @@ export default function MilestoneNps() {
             {translations(
               lang,
               "milestonePage.header.title",
-              "Milestone (Transactional) NPS & Survey Signals"
+              "Transactional NPS and milestone survey signals"
             )}
           </h1>
 
@@ -110,7 +109,7 @@ export default function MilestoneNps() {
             {translations(
               lang,
               "milestonePage.header.intro",
-              "A practical framework to capture feedback at key journey moments, turn it into prioritised work, and measure lift. We reference Net Promoter Score (NPS)® descriptively alongside CSAT, CES and behavioral data."
+              "A practical framework for transactional NPS and milestone surveys. Capture feedback at key journey moments, turn it into prioritised work, and measure lift over time alongside CSAT, CES and behavioural data."
             )}
           </p>
 
@@ -126,13 +125,30 @@ export default function MilestoneNps() {
               to={homeWithContactHash}
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
-              {translations(lang, "milestonePage.header.ctaBook", "Book discovery")}
+              {translations(lang, "milestonePage.header.ctaBook", "Book a free NPS review")}
             </Link>
           </div>
         </>
       </PageHeader>
 
-      {/* 4-Stage method */}
+      {/* Definition block */}
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {translations(lang, "milestonePage.definition.title")}
+          </h2>
+
+          <p className="mt-4 text-slate-300 max-w-3xl">
+            {translations(lang, "milestonePage.definition.p1")}
+          </p>
+
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {translations(lang, "milestonePage.definition.p2")}
+          </p>
+        </div>
+      </section>
+
+      {/* 4-stage method */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="max-w-2xl">
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
@@ -150,14 +166,26 @@ export default function MilestoneNps() {
             )}
           </p>
           <p className="mt-3 text-slate-300">
-            {translations(lang, "milestonePage.method.linkPrefix", "If you want the bigger picture, start with the")}{" "}
+            {translations(
+              lang,
+              "milestonePage.method.linkPrefix",
+              "If you want the bigger picture, start with the"
+            )}{" "}
             <Link
               to={localizePath("/nps-intelligence-layer", lang)}
               className="text-link"
             >
-              {translations(lang, "milestonePage.method.linkText", "NPS intelligence layer")}
+              {translations(
+                lang,
+                "milestonePage.method.linkText",
+                "NPS intelligence layer"
+              )}
             </Link>
-            {translations(lang, "milestonePage.method.linkSuffix", ", then apply it here to milestone surveys.")}
+            {translations(
+              lang,
+              "milestonePage.method.linkSuffix",
+              ", then apply it here to milestone surveys."
+            )}
           </p>
         </div>
 
@@ -167,7 +195,10 @@ export default function MilestoneNps() {
             const Icon = icons[idx] || Star;
 
             return (
-              <div key={card.title || idx} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <div
+                key={card.title || idx}
+                className="rounded-2xl border border-white/10 bg-white/5 p-6"
+              >
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E] flex items-center justify-center">
                     <Icon className="h-5 w-5 text-white" />
@@ -188,19 +219,30 @@ export default function MilestoneNps() {
             {translations(lang, "milestonePage.fit.title", "Where milestone surveys fit")}
           </h3>
           <p className="mt-3 text-slate-300 max-w-3xl">
-            {translations(lang, "milestonePage.fit.linkPrefix", "If you run NPS in a tool like Intercom, see")}{" "}
+            {translations(
+              lang,
+              "milestonePage.fit.linkPrefix",
+              "If you run NPS in a tool like Intercom, see"
+            )}{" "}
             <Link
               to={localizePath("/intercom-nps-analytics", lang)}
               className="text-link"
             >
-              {translations(lang, "milestonePage.fit.linkText", "how we turn Intercom comments into prioritised actions")}
+              {translations(
+                lang,
+                "milestonePage.fit.linkText",
+                "how we turn Intercom comments into prioritised actions"
+              )}
             </Link>
             {translations(lang, "milestonePage.fit.linkSuffix", ".")}
           </p>
 
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             {fitCards.map((card, idx) => (
-              <div key={card.title || idx} className="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <div
+                key={card.title || idx}
+                className="rounded-2xl border border-white/10 bg-black/20 p-5"
+              >
                 <div className="text-white font-semibold">{card.title}</div>
                 <div className="mt-2 text-sm text-slate-200">{card.q}</div>
                 <div className="mt-2 text-xs text-slate-400">{card.why}</div>
@@ -210,14 +252,18 @@ export default function MilestoneNps() {
         </div>
       </section>
 
-      {/* Implementation checklist + What we track */}
+      {/* Implementation checklist + what we track */}
       <section className="mx-auto max-w-7xl px-6 pb-8">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
             <div className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-white" />
               <h4 className="text-white font-semibold">
-                {translations(lang, "milestonePage.checklist.stepsTitle", "Implementation in 5 steps")}
+                {translations(
+                  lang,
+                  "milestonePage.checklist.stepsTitle",
+                  "Implementation in 5 steps"
+                )}
               </h4>
             </div>
 
@@ -245,7 +291,7 @@ export default function MilestoneNps() {
         </div>
       </section>
 
-      {/* Related insights (internal linking block) */}
+      {/* Related insights */}
       <section className="mx-auto max-w-7xl px-6 pb-16">
         <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">

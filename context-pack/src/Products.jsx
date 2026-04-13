@@ -1,7 +1,6 @@
-// src/Products.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, LineChart, Search, Newspaper, Layers } from "lucide-react";
+import { ArrowRight, Briefcase, GraduationCap, Mic, LineChart } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
@@ -14,143 +13,145 @@ export default function Products() {
 
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-  const pulseLeft = dict?.products?.pulseExplainer?.left || [];
-  const pulseRight = dict?.products?.pulseExplainer?.right || [];
+  const cards = dict?.products?.cards || {};
+  const detailSections = dict?.products?.detailSections || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path={location.pathname}
         lang={lang}
-        title={translations(lang, "products.seoTitle", "Products | NPS Me")}
+        title={translations(lang, "products.seoTitle", "NPS Me services")}
         description={translations(
           lang,
           "products.seoDescription",
-          "Pick a CX package to improve outcomes."
+          "Explore the ways to work with NPS Me."
         )}
       />
 
       <PageHeader
-        iconLabel={translations(lang, "products.header.iconLabel", "Productized CX services")}
+        iconLabel={translations(lang, "products.header.iconLabel", "NPS Me services")}
         tag={translations(lang, "products.header.tag", "NPS Me / Services")}
-        accent={translations(lang, "products.header.accent", "Productized services")}
-        title={translations(lang, "products.header.title", "that turn feedback into growth")}
-        subtitle={translations(lang, "products.header.subtitle", "Pick the package that fits your stage.")}
+        accent={translations(lang, "products.header.accent", "Four ways to work with")}
+        title={translations(lang, "products.header.title", "NPS Me")}
+        subtitle={translations(
+          lang,
+          "products.header.subtitle",
+          "Choose the format that fits your stage."
+        )}
       />
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
-        {/* ✅ Updated grid for 4 cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* 1) Foundations (Start here) */}
-          <ProductCard
-            icon={<Search className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.foundations.title", "Feedback Foundations")}
-            price={translations(lang, "products.cards.foundations.price", "from £450")}
-            hint={translations(
-              lang,
-              "products.cards.foundations.hint",
-              "Best for: teams starting (or restarting) NPS"
-            )}
-            bullets={dict?.products?.cards?.foundations?.bullets || []}
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-white">
+            {translations(lang, "products.intro.title", "How NPS Me works with teams")}
+          </h2>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {translations(lang, "products.intro.body")}
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <OfferCard
+            icon={<Briefcase className="h-5 w-5 text-white" />}
+            title={cards?.consulting?.title}
+            price={cards?.consulting?.price}
+            hint={cards?.consulting?.hint}
+            bullets={cards?.consulting?.bullets || []}
+            examplesTitle={cards?.consulting?.examplesTitle}
+            examples={cards?.consulting?.examples || []}
             cta={{
-              label: translations(lang, "products.cards.foundations.cta", "Request audit"),
+              label: cards?.consulting?.cta,
               href: localizePath("/book", lang),
             }}
           />
 
-          {/* 2) Momentum (Featured / Primary offer) */}
-          <ProductCard
+          <OfferCard
+            icon={<GraduationCap className="h-5 w-5 text-white" />}
+            title={cards?.training?.title}
+            price={cards?.training?.price}
+            hint={cards?.training?.hint}
+            bullets={cards?.training?.bullets || []}
+            examplesTitle={cards?.training?.examplesTitle}
+            examples={cards?.training?.examples || []}
+            cta={{
+              label: cards?.training?.cta,
+              href: localizePath("/book", lang),
+            }}
+          />
+
+          <OfferCard
+            icon={<Mic className="h-5 w-5 text-white" />}
+            title={cards?.speaking?.title}
+            price={cards?.speaking?.price}
+            hint={cards?.speaking?.hint}
+            bullets={cards?.speaking?.bullets || []}
+            examplesTitle={cards?.speaking?.examplesTitle}
+            examples={cards?.speaking?.examples || []}
+            cta={{
+              label: cards?.speaking?.cta,
+              href: localizePath("/book", lang),
+            }}
+          />
+
+          <OfferCard
             featured
             icon={<LineChart className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.momentum.title", "Momentum Program")}
-            price={translations(lang, "products.cards.momentum.price", "from £850/mo")}
-            hint={translations(
-              lang,
-              "products.cards.momentum.hint",
-              "Best for: teams who want results, not dashboards"
-            )}
-            bullets={dict?.products?.cards?.momentum?.bullets || []}
+            title={cards?.insight?.title}
+            price={cards?.insight?.price}
+            hint={cards?.insight?.hint}
+            bullets={cards?.insight?.bullets || []}
+            examplesTitle={cards?.insight?.examplesTitle}
+            examples={cards?.insight?.examples || []}
             cta={{
-              label: translations(lang, "products.cards.momentum.cta", "Book discovery"),
-              href: localizePath("/book", lang),
-            }}
-          />
-
-          {/* 3) Intercom Intelligence (Subscription) */}
-          <ProductCard
-            icon={<Layers className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.intercom.title", "CX Intelligence Layer (Intercom NPS)")}
-            price={translations(lang, "products.cards.intercom.price", "from £290/mo")}
-            hint={translations(
-              lang,
-              "products.cards.intercom.hint",
-              "Best for: teams already using Intercom NPS"
-            )}
-            bullets={dict?.products?.cards?.intercom?.bullets || []}
-            cta={{
-              label: translations(lang, "products.cards.intercom.cta", "View Intercom example"),
-              href: localizePath("/intercom-nps-analytics", lang),
-            }}
-            footnote={translations(lang, "products.cards.intercom.footnote", "")}
-          />
-
-          {/* 4) Pulse (Weekly external signal) */}
-          <ProductCard
-            icon={<Newspaper className="h-5 w-5 text-white" />}
-            title={translations(lang, "products.cards.pulse.title", "CX Pulse Report (weekly)")}
-            price={translations(lang, "products.cards.pulse.price", "from £190/mo")}
-            hint={translations(
-              lang,
-              "products.cards.pulse.hint",
-              "Best for: a weekly external signal you can act on"
-            )}
-            bullets={dict?.products?.cards?.pulse?.bullets || []}
-            cta={{
-              label: translations(lang, "products.cards.pulse.cta", "See sample report"),
+              label: cards?.insight?.cta,
               href: localizePath("/cx-pulse-sample", lang),
             }}
-            footnote={translations(lang, "products.cards.pulse.footnote", "")}
           />
         </div>
 
+        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <DetailCard
+            title={detailSections?.consulting?.title}
+            body={detailSections?.consulting?.body}
+          />
+          <DetailCard
+            title={detailSections?.training?.title}
+            body={detailSections?.training?.body}
+          />
+          <DetailCard
+            title={detailSections?.speaking?.title}
+            body={detailSections?.speaking?.body}
+          />
+          <DetailCard
+            title={detailSections?.insight?.title}
+            body={detailSections?.insight?.body}
+          />
+        </div>
 
-        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
+        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "products.pulseExplainer.title", "What you get in the weekly CX Pulse")}
+            {translations(lang, "products.comparison.title")}
           </h2>
-
-          <div className="mt-4 grid md:grid-cols-2 gap-6 text-sm text-slate-300">
-            <ul className="space-y-2 list-disc pl-5">
-              {pulseLeft.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            <ul className="space-y-2 list-disc pl-5">
-              {pulseRight.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {translations(lang, "products.comparison.body")}
+          </p>
         </div>
 
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 text-center">
           <h3 className="text-2xl font-semibold text-white">
-            {translations(lang, "products.cta.title", "Ready for a sample?")}
+            {translations(lang, "products.cta.title")}
           </h3>
           <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-            {translations(
-              lang,
-              "products.cta.body",
-              "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days."
-            )}
+            {translations(lang, "products.cta.body")}
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:hello@npsme.com?subject=Sample%20CX%20Pulse%20request"
+              href="mailto:hello@npsme.com"
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
             >
-              {translations(lang, "products.cta.email", "Email hello@npsme.com")}
+              {translations(lang, "products.cta.email")}
               <ArrowRight className="h-4 w-4" />
             </a>
 
@@ -158,7 +159,7 @@ export default function Products() {
               to={localizePath("/book", lang)}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
             >
-              {translations(lang, "products.cta.book", "Book discovery")}
+              {translations(lang, "products.cta.book")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -168,7 +169,7 @@ export default function Products() {
   );
 }
 
-function ProductCard({ icon, title, price, bullets, cta, featured = false, footnote, hint }) {
+function OfferCard({ icon, title, price, hint, bullets, examplesTitle, examples, cta, featured = false }) {
   const isInternal = cta?.href && cta.href.startsWith("/") && !cta.href.startsWith("//");
   const CTA = isInternal ? Link : "a";
   const ctaProps = isInternal
@@ -204,6 +205,19 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
         ))}
       </ul>
 
+      {examplesTitle ? (
+        <div className="mt-5">
+          <div className="text-xs uppercase tracking-widest text-slate-500">
+            {examplesTitle}
+          </div>
+          <ul className="mt-2 space-y-2 text-sm text-slate-400 list-disc pl-5">
+            {(examples || []).map((e) => (
+              <li key={e}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <CTA
         {...ctaProps}
         className="mt-6 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
@@ -211,8 +225,15 @@ function ProductCard({ icon, title, price, bullets, cta, featured = false, footn
         {cta.label}
         <ArrowRight className="h-4 w-4" />
       </CTA>
+    </div>
+  );
+}
 
-      {footnote ? <p className="mt-3 text-[11px] text-slate-500">{footnote}</p> : null}
+function DetailCard({ title, body }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+      <h3 className="text-white font-semibold">{title}</h3>
+      <p className="mt-3 text-sm text-slate-300 leading-relaxed">{body}</p>
     </div>
   );
 }

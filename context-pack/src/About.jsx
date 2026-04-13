@@ -7,7 +7,14 @@ import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
 import { TRANSLATIONS, translations } from "./i18n/translations.js";
 import { localizePath } from "./i18n/pathHelpers.js";
-import { ArrowRight, GraduationCap, Mic, Briefcase, CheckCircle2, LineChart } from "lucide-react";
+import {
+  ArrowRight,
+  GraduationCap,
+  Mic,
+  Briefcase,
+  CheckCircle2,
+  LineChart,
+} from "lucide-react";
 
 export default function About() {
   const { lang } = useLanguage();
@@ -48,18 +55,12 @@ export default function About() {
         <div className="grid gap-8 lg:grid-cols-12 items-start mt-10">
           <div className="lg:col-span-5">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              {/* Photo placeholder */}
-              <div className="aspect-[4/5] rounded-2xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] flex items-center justify-center overflow-hidden">
-                {/* Replace with your actual image */}
-                {/* <img src="/caspar.jpg" alt="Caspar Ritchie" className="h-full w-full object-cover" /> */}
-                <div className="text-center px-6">
-                  <p className="text-sm text-slate-300">
-                    {translations(lang, "about.hero.photoHint", "Add a friendly headshot here")}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-2">
-                    {translations(lang, "about.hero.photoSub", "People buy people. This matters.")}
-                  </p>
-                </div>
+              <div className="aspect-[4/5] rounded-2xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] overflow-hidden">
+                <img
+                  src="/about1.png"
+                  alt="Caspar Ritchie, founder of NPS Me"
+                  className="h-full w-full object-cover"
+                />
               </div>
 
               <div className="mt-5">
@@ -67,7 +68,11 @@ export default function About() {
                   {translations(lang, "about.hero.kicker", "Caspar Ritchie")}
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">
-                  {translations(lang, "about.hero.headline", "Turn customer feedback into measurable growth")}
+                  {translations(
+                    lang,
+                    "about.hero.headline",
+                    "Turn customer feedback into measurable growth"
+                  )}
                 </h2>
                 <p className="mt-3 text-sm text-slate-300">
                   {translations(
@@ -77,9 +82,11 @@ export default function About() {
                   )}
                 </p>
                 <p className="mt-4 text-xs text-slate-500">
-                  {lang === "fr"
-                    ? "Faites défiler pour voir comment je peux vous aider →"
-                    : "Scroll to see how we can work together →"}
+                  {translations(
+                    lang,
+                    "about.hero.scrollNote",
+                    "Scroll to see how NPS Me can help →"
+                  )}
                 </p>
               </div>
             </div>
@@ -89,19 +96,31 @@ export default function About() {
           <div className="lg:col-span-7 space-y-6">
             <InfoCard
               title={translations(lang, "about.why.title", "Why work with me?")}
-              subtitle={translations(lang, "about.why.subtitle", "Most consultants advise. I implement.")}
+              subtitle={translations(
+                lang,
+                "about.why.subtitle",
+                "Most consultants advise. I implement."
+              )}
               bullets={bulletsWhy}
             />
 
             <InfoCard
               title={translations(lang, "about.unfair.title", "A rare mix of skills")}
-              subtitle={translations(lang, "about.unfair.subtitle", "Strategy + data + delivery + technical execution.")}
+              subtitle={translations(
+                lang,
+                "about.unfair.subtitle",
+                "Strategy + data + delivery + technical execution."
+              )}
               bullets={unfair}
             />
 
             <InfoCard
               title={translations(lang, "about.proof.title", "What teams bring me in for")}
-              subtitle={translations(lang, "about.proof.subtitle", "Concrete problems → practical outcomes.")}
+              subtitle={translations(
+                lang,
+                "about.proof.subtitle",
+                "Concrete problems → practical outcomes."
+              )}
               bullets={proof}
             />
           </div>
@@ -122,8 +141,6 @@ export default function About() {
           </p>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-
-            {/* Consulting */}
             <OfferCard
               icon={<Briefcase className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.consulting.title", "Consulting")}
@@ -136,7 +153,6 @@ export default function About() {
               ctaHref={localizePath("/products", lang)}
             />
 
-            {/* Training */}
             <OfferCard
               icon={<GraduationCap className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.training.title", "Workshops & training")}
@@ -146,11 +162,10 @@ export default function About() {
                 "Practical training to help teams run NPS well: survey design, sampling, analysis, close-the-loop, and action planning."
               )}
               ctaLabel={translations(lang, "about.work.training.cta", "View training")}
-              ctaHref={localizePath("/training", lang)}
+              ctaHref={localizePath("/products", lang)}
               featured
             />
 
-            {/* Speaking */}
             <OfferCard
               icon={<Mic className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.speaking.title", "Speaking")}
@@ -160,10 +175,9 @@ export default function About() {
                 "Keynotes and talks on practical customer experience: what actually moves NPS, and how to build momentum across teams."
               )}
               ctaLabel={translations(lang, "about.work.speaking.cta", "View speaking")}
-              ctaHref={localizePath("/speaking", lang)}
+              ctaHref={localizePath("/products", lang)}
             />
 
-            {/* Ongoing Insight */}
             <OfferCard
               icon={<LineChart className="h-5 w-5 text-white" />}
               title={translations(lang, "about.work.insight.title", "Ongoing insight")}
@@ -175,7 +189,6 @@ export default function About() {
               ctaLabel={translations(lang, "about.work.insight.cta", "View insight products")}
               ctaHref={localizePath("/products", lang)}
             />
-
           </div>
         </div>
 
@@ -186,9 +199,27 @@ export default function About() {
           </h3>
 
           <div className="mt-4 space-y-4 text-sm text-slate-300 leading-relaxed max-w-4xl">
-            <p>{translations(lang, "about.human.p1", "I’ve always been obsessed with why customers behave the way they do - and what teams can realistically change to improve outcomes.")}</p>
-            <p>{translations(lang, "about.human.p2", "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms.")}</p>
-            <p>{translations(lang, "about.human.p3", "I now help teams cut through dashboards and focus on the few actions that genuinely improve customers’ lives (and business results).")}</p>
+            <p>
+              {translations(
+                lang,
+                "about.human.p1",
+                "I’ve always been obsessed with why customers behave the way they do - and what teams can realistically change to improve outcomes."
+              )}
+            </p>
+            <p>
+              {translations(
+                lang,
+                "about.human.p2",
+                "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms."
+              )}
+            </p>
+            <p>
+              {translations(
+                lang,
+                "about.human.p3",
+                "I now help teams cut through dashboards and focus on the few actions that genuinely improve customers’ lives (and business results)."
+              )}
+            </p>
           </div>
         </div>
 
@@ -276,7 +307,12 @@ function OfferCard({ icon, title, body, ctaLabel, ctaHref, featured = false }) {
   );
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
       {Card}
     </motion.div>
   );

@@ -31,8 +31,10 @@ export default function WhatIsNps() {
         description={tr("whatIsNps.seoDescription")}
       />
 
-      {/* Hero */}
-      <PageHeader iconLabel={tr("whatIsNps.header.iconLabel")} tag={tr("whatIsNps.header.tag")}>
+      <PageHeader
+        iconLabel={tr("whatIsNps.header.iconLabel")}
+        tag={tr("whatIsNps.header.tag")}
+      >
         <>
           <h1 className="mt-3 text-3xl md:text-4xl font-semibold text-white leading-tight max-w-3xl">
             {tr("whatIsNps.header.title")}
@@ -43,8 +45,37 @@ export default function WhatIsNps() {
         </>
       </PageHeader>
 
-      {/* Content */}
       <section className="mx-auto max-w-4xl px-6 py-10 space-y-10 text-slate-300">
+        {/* Quick links */}
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-slate-300">
+          <div className="text-xs uppercase tracking-widest text-slate-400">
+            {tr("whatIsNps.quickLinks.title")}
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link
+              to={localizePath("/milestone-nps", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition"
+            >
+              {tr("whatIsNps.quickLinks.milestone")}
+            </Link>
+
+            <Link
+              to={localizePath("/nps-survey-programme", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition"
+            >
+              {tr("whatIsNps.quickLinks.surveyProgramme")}
+            </Link>
+
+            <Link
+              to={localizePath("/nps-intelligence-layer", lang)}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 transition"
+            >
+              {tr("whatIsNps.quickLinks.intelligenceLayer")}
+            </Link>
+          </div>
+        </div>
+
         {/* Core question */}
         <article className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl font-semibold text-white">{tr("whatIsNps.core.title")}</h2>

@@ -23,6 +23,7 @@
 ├── postcss.config.js
 ├── Procfile
 ├── public
+│   ├── about1.png
 │   ├── favicon-16.png
 │   ├── favicon-192.png
 │   ├── favicon-32.png
@@ -127,4 +128,4 @@
 │   └── nps.js
 └── vite.config.js
 
-14 directories, 114 files
+14 directories, 115 files

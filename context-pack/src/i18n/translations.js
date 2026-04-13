@@ -39,12 +39,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        photoHint: "Add a friendly headshot here",
-        photoSub: "People buy people. This matters.",
         kicker: "Caspar Ritchie",
         headline: "Turn customer feedback into measurable growth",
         body:
           "I help teams implement NPS®, uncover what really frustrates customers, and ship improvements that increase retention, referrals, and revenue.",
+        scrollNote: "Scroll to see how NPS Me can help →",
         ctaPrimary: "Book a call",
         ctaSecondary: "See services",
       },
@@ -1552,184 +1551,198 @@ export const TRANSLATIONS = {
       },
     },
     milestonePage: {
-      seoTitle: "Milestone (Transactional) NPS® & Survey Signals | NPS Me",
+      seoTitle: "Transactional NPS and milestone surveys | NPS Me",
       seoDescription:
-        "Capture customer sentiment at key journey moments to reveal friction in context. Implement close-the-loop and theme tracking for actionable CX.",
+        "Learn how transactional NPS and milestone surveys help teams measure customer sentiment at key journey moments and turn feedback into action.",
 
       header: {
         iconLabel: "Milestone / transactional NPS",
         tag: "NPS Me / Milestone NPS",
-        title: "Milestone (Transactional) NPS & Survey Signals",
+        title: "Transactional NPS and milestone survey signals",
         intro:
-          "A practical framework to capture feedback at key journey moments, turn it into prioritised work, and measure lift. We reference Net Promoter Score (NPS)® descriptively alongside CSAT, CES and behavioral data.",
+          "A practical framework for transactional NPS and milestone surveys. Capture feedback at key journey moments, turn it into prioritised work, and measure lift over time alongside CSAT, CES and behavioural data.",
         ctaImpact: "Estimate your impact",
-        ctaBook: "Book discovery",
+        ctaBook: "Book a free NPS review",
+      },
+
+      definition: {
+        title: "What is transactional NPS?",
+        p1:
+          "Transactional NPS, or milestone NPS, measures customer sentiment immediately after a specific journey moment such as an order, onboarding step or support interaction.",
+        p2:
+          "It complements relationship NPS by helping teams connect scores to specific friction points and improvement actions.",
       },
 
       method: {
         title: "The 4-stage method (simple, repeatable)",
         intro:
           "Clear steps, fast wins, and compounding improvements. We meet you where you are and prioritise what moves the needle.",
-        cards: [
-          {
-            title: "1) Discovery",
-            desc: "Audit reviews, surveys, tickets and flows. Map friction. Establish baseline metrics.",
-          },
-          {
-            title: "2) Recommend",
-            desc: "Prioritised playbook with owners, effort/impact scores and timelines.",
-          },
-          {
-            title: "3) Implement",
-            desc: "Hands-on enablement: scripts, templates, automation, training. Unblock fast.",
-          },
-          {
-            title: "4) Monitor",
-            desc: "Track NPS/CSAT/CES & review velocity. Iterate monthly. Celebrate and scale wins.",
-          },
-        ],
         linkPrefix: "If you want the bigger picture, start with the",
         linkText: "NPS intelligence layer",
         linkSuffix: ", then apply it here to milestone surveys.",
+        cards: [
+          {
+            title: "1) Identify the moments that matter",
+            desc: "Pinpoint the journey stages most closely linked to retention, adoption, cost-to-serve or churn risk.",
+          },
+          {
+            title: "2) Trigger at the right time",
+            desc: "Run milestone surveys after specific interactions, not on an arbitrary calendar schedule.",
+          },
+          {
+            title: "3) Interpret the feedback",
+            desc: "Analyse scores, comments and recurring themes in context so the causes of friction become clearer.",
+          },
+          {
+            title: "4) Turn insight into action",
+            desc: "Prioritise fixes, assign owners and track whether improvements change later-stage outcomes.",
+          },
+        ],
       },
 
       fit: {
         title: "Where milestone surveys fit",
-        cards: [
-          {
-            title: "Order placed",
-            q: "Based on your ordering experience, how likely are you to recommend us (0-10)?",
-            why: "Test checkout clarity, pricing transparency and payment reliability.",
-          },
-          {
-            title: "Onboarding finished",
-            q: "After onboarding, how likely are you to recommend us (0-10)?",
-            why: "Gauge setup friction, documentation gaps, enablement quality.",
-          },
-          {
-            title: "First delivery/use",
-            q: "After your first delivery/use, how likely are you to recommend us (0-10)?",
-            why: "Reveal fulfilment speed/accuracy, product readiness, first-use UX.",
-          },
-        ],
         linkPrefix: "If you run NPS in a tool like Intercom, see",
         linkText: "how we turn Intercom comments into prioritised actions",
         linkSuffix: ".",
+        cards: [
+          {
+            title: "After first order",
+            q: "How likely are you to recommend us based on your first purchase?",
+            why: "Early friction here is often a strong predictor of churn.",
+          },
+          {
+            title: "After onboarding",
+            q: "How easy was it to get started?",
+            why: "Onboarding quality strongly influences long-term adoption.",
+          },
+          {
+            title: "After first meaningful use",
+            q: "Did the product meet your expectations?",
+            why: "This often shapes long-term value perception.",
+          },
+        ],
       },
 
       checklist: {
         stepsTitle: "Implementation in 5 steps",
         steps: [
-          "Map milestones (checkout, onboarding, first value, renewal, support closure).",
-          "Trigger surveys via your existing stack (ESP, product, helpdesk, CDP).",
-          "Ask 0-10 + one open text; keep it short.",
-          "Pipe results into a central view and tag by milestone.",
-          "Close the loop and run monthly root-cause reviews.",
+          "Define the journey moments that matter most",
+          "Trigger the survey at the right point in the journey",
+          "Segment responses by milestone, cohort or customer type",
+          "Interpret the themes behind promoter, passive and detractor scores",
+          "Prioritise actions and measure whether later-stage sentiment improves",
         ],
       },
 
       track: {
         title: "What we track",
         items: [
-          "Score distribution by milestone (Promoters/Passives/Detractors).",
-          "Themes by frequency & impact (effort vs. volume).",
-          "Time-to-contact & close-the-loop rates.",
-          "Downstream effects (repeat tickets, churn risk, review velocity).",
+          "NPS movement by milestone",
+          "Drivers of promoters, passives and detractors",
+          "Recurring friction themes across the journey",
+          "Impact of fixes on later-stage sentiment and behaviour",
         ],
       },
+
       related: {
         title: "Related insights",
-        intro: "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action.",
+        intro:
+          "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action.",
         links: {
-          intelligenceLayer: "NPS intelligence layer",
-          intercomNpsAnalytics: "Intercom NPS analytics",
           whatIsNps: "What is NPS?",
           npsSurveyProgramme: "NPS survey programme",
+          intelligenceLayer: "NPS intelligence layer",
+          intercomNpsAnalytics: "Intercom NPS analytics",
           socialListening: "Social listening",
         },
       },
     },
     landing: {
-        seo: {
-          title: "NPS & CX Consulting, Training and Insights | NPS Me",
-          description:
-            "I help teams run NPS properly and turn feedback into measurable growth-strategy, implementation, enablement and insight, alongside Intercom/HubSpot/Zendesk or CSV.",
-        },
+      seo: {
+        title: "NPS Consulting & Analytics for Intercom, HubSpot and Zendesk | NPS Me",
+        description:
+          "NPS Me helps teams run NPS properly using Intercom, HubSpot, Zendesk or CSV. Improve survey design, analyse feedback, prioritise actions and embed close-the-loop workflows that lift retention and revenue.",
+      },
 
         hero: {
           h1: {
-            lead: "NPS done properly:",
-            nps: "strategy, implementation",
-            tail: "and enablement for teams using your existing tools.",
-            accent: "Turn feedback into measurable growth.",
+            lead: "NPS consulting and analytics",
+            nps: "for teams using",
+            tail: "Intercom, HubSpot, Zendesk or CSV.",
+            accent: "Run NPS properly with the tools you already use.",
           },
-          body: "Keep your survey tool (Intercom, HubSpot, Zendesk or CSV). I help you run a reliable NPS programme, extract insight from comments, prioritise the few fixes that matter, and embed close-the-loop workflows that improve retention and revenue.",
-          ctaPrimary: "Book a free discovery",
-          ctaMethod: "See the method",
+          body: "Keep your survey tool. NPS Me helps you run a reliable NPS programme, analyse customer feedback and comments, prioritise the fixes that matter, and embed close-the-loop workflows that improve retention, referrals and revenue.",
+          ctaPrimary: "Book a free NPS review",
+          ctaMethod: "See how it works",
           ctaDemo: "View example insights",
           proof: {
-            mining: "Insight from comments",
-            enablement: "Enablement & workflows",
-            lift: "Measured impact",
+            mining: "Insight from customer comments",
+            enablement: "Close-the-loop workflows",
+            lift: "Measured CX impact",
           },
-          chips: ["Consulting", "Workshops", "Speaking", "Intercom", "HubSpot", "Zendesk", "CSV"],
+          chips: {
+            help: ["Consulting", "Workshops", "Speaking", "Ongoing insight"],
+            worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
+          },
           chipsNote:
-            "Keep your survey tool. I focus on governance, analysis, prioritisation and action.",
+            "Keep your survey platform. NPS Me focuses on NPS governance, feedback analysis, prioritisation and action.",
         },
 
-      method: {
-        title: "A simple, repeatable CX method to lift NPS®",
-        body:
-          "Clear steps, fast wins, and compounding improvements. We meet you where you are and prioritise what moves the needle.",
-        cards: [
-          {
-            title: "1) Discovery",
-            desc: "Audit reviews, surveys, and internal flows. Map friction. Establish baseline metrics.",
-          },
-          {
-            title: "2) Recommend",
-            desc: "Prioritised playbook of fixes and experiments with owners, effort/impact scoring, and timelines.",
-          },
-          {
-            title: "3) Implement",
-            desc: "Embed changes with teams: scripts, templates, automation, training. Hands-on support to unblock fast.",
-          },
-          {
-            title: "4) Monitor",
-            desc: "Track NPS/CSAT/CES and review velocity. Iterate monthly. Celebrate wins and scale what works.",
-          },
-        ],
-      },
+        method: {
+          title: "A simple, repeatable method to improve NPS",
+          body:
+            "Clear steps, quick wins and steady improvement. NPS Me helps you diagnose what is going wrong, prioritise the right fixes and build momentum over time.",
+          cards: [
+            {
+              title: "1) Diagnose",
+              desc: "Audit surveys, customer feedback and internal journeys. Map friction and establish baseline metrics.",
+            },
+            {
+              title: "2) Prioritise",
+              desc: "Build a practical action plan with owners, effort/impact scoring and clear sequencing.",
+            },
+            {
+              title: "3) Implement",
+              desc: "Put changes into practice with scripts, templates, automation, training and hands-on support.",
+            },
+            {
+              title: "4) Improve",
+              desc: "Track NPS, milestone feedback and action velocity. Review regularly and scale what works.",
+            },
+          ],
+        },
 
       demoBlock: {
-        title: "Try the NPS®-style demo (close-the-loop ready)",
+        title: "Try the live NPS demo and explore example insights",
         body:
-          "The demo shows how invitations, survey responses, and NPS metrics link together. In real deployments, targeting and sending often stay in your CS platform and NPS Me ingests responses to drive analysis and action. These numbers are live from the demo environment.",
-        cta: "Run the live demo & see full results",
+          "See how invitations, survey responses, NPS scores and milestone views connect together. In real deployments, survey sending can stay in Intercom or your existing platform while NPS Me adds analysis, prioritisation and action.",
+        cta: "Open the live NPS demo",
         note:
-          "Opens the dedicated demo page where you can send yourself an invitation, complete the survey, and explore NPS & milestone scores.",
+          "Send yourself an invitation, complete the survey, and explore how responses turn into NPS metrics, milestone scores and action-ready insight.",
       },
+
       demo: {
         label: "Live demo NPS®",
         basedOn: "Based on {count} responses",
       },
 
       platform: {
-        title: "Analytics on top of your surveys",
+        title: "NPS analytics on top of your existing survey tools",
         body:
-          "Most teams already have ways to send surveys. NPS Me helps you run a fair, consistent, decision-grade programme across whatever tools you use.",
+          "Most teams already have a way to send surveys. NPS Me helps you run a fair, consistent, decision-grade NPS programme across Intercom, HubSpot, Zendesk or CSV-based setups, so your scores are usable and your next actions are clearer.",
         cards: [
           {
-            title: "Governance",
-            desc: "Sampling, cadence, anti-gaming, and comparability over time so the score means something.",
+            title: "NPS governance",
+            desc: "Sampling, cadence, anti-bias and comparability over time so your NPS score actually means something.",
           },
           {
-            title: "Interpretation",
-            desc: "Theme and driver analysis, confidence checks, and clear prioritisation so action is obvious.",
+            title: "Feedback analysis",
+            desc: "Theme and driver analysis from real comments, with confidence checks and clear prioritisation.",
           },
           {
-            title: "Close the loop",
-            desc: "Follow-up workflows and outcome tracking so responses lead to measurable changes.",
+            title: "Close-the-loop action",
+            desc: "Follow-up workflows, ownership and outcome tracking so survey responses lead to measurable improvements.",
           },
         ],
         linkIntercomText: "See how this works with Intercom NPS.",
@@ -1738,28 +1751,28 @@ export const TRANSLATIONS = {
       about: {
         title: "About Caspar",
         body:
-          "Practical CX. Measurable outcomes. Less theatre, more progress. I help teams run NPS properly and turn customer feedback into actions that improve retention, referrals and revenue.",
+          "Practical CX, measurable outcomes, less theatre and more progress. I help teams design better NPS programmes, analyse customer feedback properly and turn insight into actions that improve retention, referrals and revenue.",
         bullets: [
-          "Decision-grade programmes: sampling, bias, comparability (so the score means something)",
-          "Verbatim → themes, drivers, and clear priorities",
+          "Decision-grade NPS programmes with better sampling, bias control and comparability",
+          "Customer comments translated into themes, drivers and priorities",
           "Roadmaps with owners and effort/impact scoring",
-          "Enablement: playbooks, scripts, templates, training",
-          "Close-the-loop workflows that actually change outcomes",
+          "Playbooks, templates, scripts and training for teams",
+          "Close-the-loop workflows linked to real outcomes",
         ],
         cta: "Read more about me",
       },
 
       contact: {
-        title: "Ready to turn feedback into growth?",
+        title: "Ready to improve NPS and turn feedback into growth?",
         body:
-          "Book a free 30-minute discovery session. We’ll review your current scores and identify quick wins.",
+          "Book a free 30-minute NPS review. We’ll look at your current setup, identify opportunities for improvement, and find practical opportunities to improve results.",
         emailCta: "Email hello@npsme.com",
-        bookCta: "Request a discovery call",
+        bookCta: "Book a free NPS review",
       },
+
       explainer: {
-        title: "What Net Promoter Score (NPS®) really measures",
-        intro:
-          "Net Promoter Score is a simple metric designed to capture customer sentiment and loyalty. It asks one core question and groups respondents into three categories.",
+        title: "What Net Promoter Score (NPS®) actually measures",
+        intro: "Net Promoter Score is a simple metric designed to capture customer sentiment and loyalty. It asks one core question and groups respondents into three categories.",
         promoters: "Promoters",
         passives: "Passives",
         detractors: "Detractors",
@@ -1783,9 +1796,9 @@ export const TRANSLATIONS = {
       },
 
       milestone: {
-        title: "Milestone NPS: measure what actually matters",
+        title: "Milestone NPS: measure sentiment at the moments that matter",
         intro:
-          "Instead of relying on a single, generic score, milestone NPS measures sentiment at critical points in the customer journey.",
+          "Instead of relying on one broad score, milestone NPS helps you track customer sentiment at critical points in the journey such as onboarding, first order or first meaningful use.",
         examples: {
           order: {
             title: "After first order",
@@ -1872,9 +1885,25 @@ export const TRANSLATIONS = {
       header: {
         iconLabel: "NPS survey programme",
         tag: "NPS Me / Survey Programme",
-        accent: "Your personalised NPS Survey Programme",
+        accent: "Build a better",
+        title: "NPS survey programme",
         subtitle:
           "Provide us with a file of your customers' contact information and we'll run a structured NPS programme for you - invitations, reminders, dashboards and export-ready data - so you can focus on acting on the insight, not wrestling with tools.",
+      },
+
+      introBox: {
+        title: "What a good NPS survey programme should do",
+        p1:
+          "A good NPS survey programme is not just about sending a survey. It should produce an interpretable score, actionable comments and clear next steps.",
+        p2:
+          "That means better targeting, better cadence, comparability over time, and close-the-loop workflows that turn responses into improvement.",
+      },
+
+      related: {
+        title: "Related pages",
+        whatIsNps: "What is NPS?",
+        milestone: "Transactional NPS",
+        intercom: "Intercom NPS analytics",
       },
 
       howItWorks: {
@@ -1961,92 +1990,142 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle:
-        "Productized CX Services: Audits, Momentum Program & Weekly CX Pulse | NPS Me",
+      seoTitle: "NPS Me services: consulting, training, speaking and ongoing insight",
       seoDescription:
-        "Pick a CX package to improve NPS®, reduce support load, and grow retention: Feedback Foundations, Momentum Program, and weekly CX Pulse reports.",
+        "Explore the four ways to work with NPS Me: consulting, workshops and training, speaking, and ongoing insight for teams improving NPS and customer experience.",
 
       header: {
-        iconLabel: "Productized CX services",
+        iconLabel: "NPS Me services",
         tag: "NPS Me / Services",
-        accent: "Productized services",
-        title: "that turn feedback into growth",
+        accent: "Four ways to work with",
+        title: "NPS Me",
         subtitle:
-          "Pick the package that fits your stage-from foundations, to enablement, to a weekly CX intelligence feed you can act on.",
+          "Choose the format that fits your stage: consulting, workshops and training, speaking, or ongoing insight.",
+      },
+
+      intro: {
+        title: "How NPS Me works with teams",
+        body:
+          "The landing page introduces the four main ways to work with NPS Me. This page turns those into concrete offers, examples and delivery formats so it is easier to choose the right starting point.",
       },
 
       cards: {
-        foundations: {
-          title: "Feedback Foundations",
-          price: "from £450",
+        consulting: {
+          title: "Consulting",
+          price: "Scoped to the work",
+          hint: "Best for: teams that want practical change, not just advice",
           bullets: [
-            "Customer journey & review analysis (support tickets, reviews, NPS)",
-            "Baseline NPS®, CSAT & friction map",
-            "Prioritised 90-day action roadmap",
-            "Executive summary PDF + live walkthrough",
+            "NPS programme design and reset work",
+            "Customer feedback analysis and friction diagnosis",
+            "Prioritised action roadmaps with owners and sequencing",
+            "Hands-on implementation support across CX, ops and product",
           ],
-          cta: "Request audit",
-          hint: "Best for: teams starting (or restarting) NPS",
-        },
-        momentum: {
-          title: "Momentum Program",
-          price: "from £850/mo (implementation)",
-          bullets: [
-            "Hands-on implementation & enablement",
-            "Monthly review cycles & dashboards",
-            "Measured lift on key outcomes",
+          examplesTitle: "Typical consulting work",
+          examples: [
+            "Feedback Foundations audit",
+            "Momentum implementation support",
+            "Close-the-loop workflow design",
+            "Journey friction and verbatim analysis",
           ],
-          cta: "Book discovery",
-          hint: "Best for: teams who want results, not dashboards",
+          cta: "Book a consulting review",
         },
 
-        intercom: {
-          title: "CX Intelligence Layer (Intercom NPS)",
-          price: "from £290/mo",
+        training: {
+          title: "Workshops & training",
+          price: "Half-day, full-day or tailored sessions",
+          hint: "Best for: teams that want stronger internal capability",
           bullets: [
-            "Live NPS insights from Intercom (auto-updated)",
-            "Themes, delighters & risk flags grounded in real comments",
-            "Segmented actions for Detractors, Passives & Promoters",
-            "Ready-to-send “close the loop” response templates",
+            "Practical training on how to run NPS properly",
+            "Survey design, sampling and comparability",
+            "Comment analysis, prioritisation and action planning",
+            "Close-the-loop templates, scripts and facilitation",
           ],
-          cta: "View Intercom example",
-          footnote: "Optional: expert-led Intercom NPS survey design & setup (£450 one-off).",
-          hint: "Best for: teams already using Intercom NPS",
+          examplesTitle: "Typical workshop themes",
+          examples: [
+            "How to design a decision-grade NPS programme",
+            "How to interpret comments and themes properly",
+            "How to turn NPS into action across teams",
+            "How to avoid survey fatigue and bad data",
+          ],
+          cta: "Discuss a workshop",
         },
-        pulse: {
-          title: "CX Pulse Report (weekly)",
-          price: "from £190/mo",
+
+        speaking: {
+          title: "Speaking",
+          price: "Tailored to the event",
+          hint: "Best for: leadership sessions, offsites and team events",
           bullets: [
-            "Social listening across X/LinkedIn/Reddit/Reviews",
-            "Top themes, sentiment & competitor pulse",
-            "1-page actionable summary + next steps",
+            "Talks on practical CX and what really moves NPS",
+            "Leadership sessions that connect insight to delivery",
+            "Content grounded in real programme experience",
+            "Clear takeaways rather than generic inspiration",
           ],
-          cta: "See sample report",
-          footnote: "Starts manual, scales with automation. Cancel anytime.",
-          hint: "Best for: a weekly external signal you can act on",
+          examplesTitle: "Typical speaking topics",
+          examples: [
+            "Why NPS stalls even when CX looks better",
+            "How to make customer feedback more useful",
+            "How to build momentum around CX improvement",
+            "What leaders should focus on beyond dashboards",
+          ],
+          cta: "Enquire about speaking",
+        },
+
+        insight: {
+          title: "Ongoing insight",
+          price: "From monthly support to recurring feeds",
+          hint: "Best for: teams that want a lighter ongoing intelligence layer",
+          bullets: [
+            "Recurring insight from NPS, comments and external signals",
+            "CX Pulse reporting and trend interpretation",
+            "Intercom NPS intelligence layer support",
+            "Clear next steps, priorities and risk flags",
+          ],
+          examplesTitle: "Typical ongoing insight offers",
+          examples: [
+            "Weekly or monthly CX Pulse",
+            "Intercom NPS intelligence layer",
+            "Theme and driver tracking",
+            "Executive-ready summaries and action prompts",
+          ],
+          cta: "See ongoing insight options",
         },
       },
 
-      pulseExplainer: {
-        title: "What you get in the weekly CX Pulse",
-        left: [
-          "Sentiment pulse (WoW change, drivers)",
-          "Emerging topics (3-5 themes with examples)",
-          "Competitor comparison (optional)",
-        ],
-        right: [
-          "Plain-English insight summary (what to do next)",
-          "Lightweight dashboard (rolling trends)",
-          "Delivery on the same weekday, every week",
-        ],
+      detailSections: {
+        consulting: {
+          title: "Consulting: from diagnosis to implementation",
+          body:
+            "NPS Me helps teams move from raw feedback to practical change. That can include programme design, friction diagnosis, roadmap building, close-the-loop workflows, and hands-on implementation support.",
+        },
+        training: {
+          title: "Workshops & training: build stronger internal capability",
+          body:
+            "NPS Me provides practical training so teams can run NPS better, interpret feedback with more confidence, and make better decisions without becoming dependent on heavy consulting support.",
+        },
+        speaking: {
+          title: "Speaking: practical CX content for real teams",
+          body:
+            "NPS Me speaking sessions are designed to be useful, grounded and commercially relevant. They work well for leadership groups, offsites, internal events and customer experience communities.",
+        },
+        insight: {
+          title: "Ongoing insight: a lighter intelligence layer",
+          body:
+            "For teams that do not need a full consulting programme, NPS Me can provide a lighter ongoing insight service through CX Pulse reporting, Intercom-based analysis, and recurring feedback interpretation.",
+        },
+      },
+
+      comparison: {
+        title: "How to choose the right starting point",
+        body:
+          "Start with consulting when the programme needs fixing or redesigning. Choose workshops when the team needs stronger capability. Choose speaking for leadership or event settings. Choose ongoing insight when the team wants a lighter recurring feed of priorities and action prompts.",
       },
 
       cta: {
-        title: "Ready for a sample?",
+        title: "Not sure where to start?",
         body:
-          "I’ll run a one-off CX Pulse on your brand and send you the PDF within a few days.",
+          "NPS Me can review your current setup and recommend the best starting point across consulting, training, speaking or ongoing insight.",
         email: "Email hello@npsme.com",
-        book: "Book discovery",
+        book: "Book a free NPS review",
       },
     },
     socialListening: {
@@ -2200,9 +2279,9 @@ export const TRANSLATIONS = {
       },
     },
     npsIntelligenceLayer: {
-      seoTitle: "The NPS Intelligence Layer for Intercom, Medallia & CX Tools | NPS Me",
+      seoTitle: "NPS Analytics Layer for Intercom, Medallia and CX Tools | NPS Me",
       seoDescription:
-        "Already using Intercom or Medallia? NPS Me adds a strategic CX intelligence layer that turns NPS and feedback data into clear priorities and action.",
+        "Already using Intercom or Medallia? NPS Me adds NPS analytics, reporting and prioritisation on top of your existing tools to turn feedback into action.",
 
       header: {
         iconLabel: "NPS Me / CX Intelligence",
@@ -2213,10 +2292,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        title: "The CX intelligence layer your tools don’t provide",
+        title: "NPS analytics and prioritisation on top of your existing tools",
         body1:
-          "If you already use Intercom, Medallia, NPS surveys or social listening tools but still struggle to prioritise actions, explain results, or drive change, you are not alone.",
-        body2: "Most organisations do not have a data problem. They have an interpretation and direction problem.",
+          "If you already use Intercom, Medallia or another survey platform but still struggle to prioritise actions, explain scores or turn feedback into change, this page is for you.",
+        body2:
+          "Most teams do not need another survey tool. They need a clearer way to interpret NPS, analyse comments, and decide what to do next.",
         ctaPrimary: "Book a CX review",
         ctaSecondary: "See a sample CX Pulse",
       },
@@ -2224,7 +2304,8 @@ export const TRANSLATIONS = {
       sections: {
         pain: {
           title: "Why teams still feel stuck with Intercom or Medallia",
-          body: "These platforms are strong at collecting signals. The gap is turning those signals into clear priorities and decisions.",
+          body:
+            "These platforms are strong at collecting signals. The gap is turning those signals into clear priorities and decisions.",
           bullets: [
             "Plenty of dashboards, but little clarity",
             "NPS scores without meaningful context",
@@ -2267,11 +2348,11 @@ export const TRANSLATIONS = {
         },
 
         medallia: {
-          title: "A note on enterprise CX platforms",
+          title: "Where Medallia still needs interpretation and action",
           body1:
-            "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that’s harder to translate into everyday decisions.",
+            "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that is harder to translate into everyday decisions.",
           body2:
-            "Access to more data doesn’t automatically create clarity. NPS Me is designed to help teams focus on what matters most - turning feedback into clear priorities and practical action, without adding unnecessary complexity.",
+            "Access to more data does not automatically create clarity. NPS Me is designed to help teams focus on what matters most: turning feedback into clear priorities and practical action, without unnecessary complexity.",
         },
 
         deliver: {
@@ -2298,14 +2379,6 @@ export const TRANSLATIONS = {
         },
       },
 
-      cta: {
-        title: "Ready to add clarity on top of your tools?",
-        body:
-          "We start with your current setup, the questions you struggle to answer, and the decisions you need to make. Then we build a simple, action-focused layer on top.",
-        primary: "Book a CX review",
-        secondary: "See a sample CX Pulse",
-        note: "No platform switch required. No survey rebuild required.",
-      },
       related: {
         title: "Related insights",
         links: {
@@ -2313,6 +2386,23 @@ export const TRANSLATIONS = {
           milestone: "Milestone NPS: measure friction across the journey",
           pulse: "See a sample CX Pulse (what leaders actually read)",
         },
+      },
+
+      continueExploring: {
+        title: "Continue exploring",
+        intercom: "Intercom NPS analytics",
+        milestone: "Transactional / milestone NPS",
+        whatIsNps: "What is NPS?",
+        surveyProgramme: "NPS survey programme",
+      },
+
+      cta: {
+        title: "Ready to add clarity on top of your tools?",
+        body:
+          "We start with your current setup, the questions you struggle to answer, and the decisions you need to make. Then we build a simple, action-focused layer on top.",
+        primary: "Book a CX review",
+        secondary: "See a sample CX Pulse",
+        note: "No platform switch required. No survey rebuild required.",
       },
     },
     intercomNps: {
@@ -2627,16 +2717,16 @@ export const TRANSLATIONS = {
       },
     },
     whatIsNps: {
-      seoTitle: "What is Net Promoter Score (NPS)? | NPS Me",
+      seoTitle: "What is NPS? Net Promoter Score explained properly | NPS Me",
       seoDescription:
-        "Plain English guide to Net Promoter Score (NPS): how it works, how to calculate it, where it helps, where it misleads, and how to act on feedback.",
+        "Learn what Net Promoter Score really measures, how NPS is calculated, the difference between relationship and transactional NPS, and how to use it properly.",
 
       header: {
         iconLabel: "What is NPS?",
-        tag: "Guide / Customer Experience",
-        title: "What is Net Promoter Score (NPS)?",
+        tag: "NPS Me / What is NPS?",
+        title: "What is Net Promoter Score (NPS®)?",
         subtitle:
-          "A practical explanation of how NPS works, where it is useful, where it can go wrong, and how to use it as a starting point for real customer improvement rather than just a number on a dashboard.",
+          "A practical explanation of what NPS measures, how it is calculated, and how to use it properly.",
       },
 
       core: {
@@ -2756,14 +2846,21 @@ export const TRANSLATIONS = {
           "Over time this builds trust. Customers see that feedback leads to change, teams see that insight leads to better results, and the NPS score becomes one useful signal in a wider customer health picture.",
       },
 
+      quickLinks: {
+        title: "Go deeper",
+        milestone: "Transactional / milestone NPS",
+        surveyProgramme: "NPS survey programme",
+        intelligenceLayer: "NPS intelligence layer",
+      },
+
       cta: {
-        title: "Want help designing an NPS program that actually drives change?",
+        title: "Want help turning NPS into action?",
         body:
-          "NPS Me works with teams to design fair surveys, realistic sampling, and practical follow-up so that every point of feedback has somewhere to go.",
-        explore: "Explore services",
-        book: "Book a discovery call",
+          "NPS Me helps teams design better programmes, interpret feedback properly, and turn NPS into practical improvements.",
+        explore: "Explore NPS consulting and analytics",
+        book: "Book a free NPS review",
         disclaimer:
-          "NPS and Net Promoter Score are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References on this page are descriptive only. NPS Me is independent and not affiliated with or endorsed by those parties.",
+          "NPS® and Net Promoter Score® are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References here are descriptive only.",
       },
     },
     whyNpsMe: {
@@ -2892,12 +2989,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        photoHint: "Ajoutez une photo portrait ici",
-        photoSub: "On achète une personne, pas un logo.",
         kicker: "Caspar Ritchie",
         headline: "Transformer le feedback client en croissance mesurable",
         body:
           "J’aide les équipes à mettre en place le NPS®, comprendre les vraies frictions, et déployer des améliorations qui augmentent la rétention, la recommandation et le chiffre d’affaires.",
+        scrollNote: "Faites défiler pour voir comment NPS Me peut aider →",
         ctaPrimary: "Prendre rendez-vous",
         ctaSecondary: "Voir les offres",
       },
@@ -4443,213 +4539,227 @@ export const TRANSLATIONS = {
       },
     },
     milestonePage: {
-      seoTitle: "NPS® transactionnel (milestones) & signaux d’enquête | NPS Me",
+      seoTitle: "NPS transactionnel et enquêtes par étape | NPS Me",
       seoDescription:
-        "Captez le sentiment client aux moments clés du parcours pour révéler les frictions en contexte. Mettez en place le close-the-loop et le suivi des thèmes pour une CX actionnable.",
+        "Découvrez comment le NPS transactionnel et les enquêtes par étape aident les équipes à mesurer le ressenti client aux moments clés du parcours et à transformer le feedback en action.",
 
       header: {
-        iconLabel: "NPS milestone / transactionnel",
-        tag: "NPS Me / NPS Milestone",
-        title: "NPS transactionnel (milestones) & signaux d’enquête",
+        iconLabel: "NPS transactionnel / par étape",
+        tag: "NPS Me / NPS par étape",
+        title: "NPS transactionnel et signaux d’enquêtes par étape",
         intro:
-          "Un cadre pratique pour capter le feedback aux moments clés du parcours, le transformer en plan d’action priorisé, et mesurer l’amélioration. Nous utilisons la référence Net Promoter Score (NPS)® de façon descriptive, aux côtés de la CSAT, du CES et des données comportementales.",
+          "Un cadre pratique pour le NPS transactionnel et les enquêtes par étape. Capturez le feedback aux moments clés du parcours, transformez-le en travail priorisé et mesurez les progrès dans le temps aux côtés du CSAT, du CES et des données comportementales.",
         ctaImpact: "Estimer votre impact",
-        ctaBook: "Prendre rendez-vous",
+        ctaBook: "Réserver une revue NPS gratuite",
+      },
+
+      definition: {
+        title: "Qu’est-ce que le NPS transactionnel ?",
+        p1:
+          "Le NPS transactionnel, ou NPS par étape, mesure le ressenti client juste après un moment précis du parcours, comme une commande, un onboarding ou une interaction de support.",
+        p2:
+          "Il complète le NPS relationnel en aidant les équipes à relier les scores à des frictions concrètes et à des actions d’amélioration.",
       },
 
       method: {
-        title: "La méthode en 4 étapes (simple, répétable)",
+        title: "La méthode en 4 étapes (simple et reproductible)",
         intro:
-          "Des étapes claires, des quick wins, et des améliorations qui se cumulent. On part de votre réalité et on priorise ce qui fait bouger les résultats.",
+          "Des étapes claires, des quick wins et une progression cumulative. On part de votre réalité terrain et on priorise ce qui fera vraiment bouger les choses.",
+        linkPrefix: "Si vous voulez la vue d’ensemble, commencez par la",
+        linkText: "couche d’analyse NPS",
+        linkSuffix: ", puis appliquez-la ici aux enquêtes par étape.",
         cards: [
           {
-            title: "1) Diagnostic",
-            desc: "Audit des avis, enquêtes, tickets et parcours. Cartographie des frictions. Définition d’une baseline.",
+            title: "1) Identifier les moments clés",
+            desc: "Repérez les étapes du parcours les plus liées à la rétention, à l’adoption, au coût de service ou au risque de churn.",
           },
           {
-            title: "2) Recommandations",
-            desc: "Playbook priorisé avec responsables, scores effort/impact et calendrier.",
+            title: "2) Déclencher au bon moment",
+            desc: "Lancez les enquêtes au bon moment du parcours, et non selon un calendrier arbitraire.",
           },
           {
-            title: "3) Mise en œuvre",
-            desc: "Accompagnement terrain : scripts, templates, automatisations, formation. Déblocage rapide.",
+            title: "3) Interpréter le feedback",
+            desc: "Analysez les scores, les verbatims et les thèmes récurrents dans leur contexte pour mieux comprendre les causes des frictions.",
           },
           {
-            title: "4) Pilotage",
-            desc: "Suivi NPS/CSAT/CES & dynamique des avis. Itérations mensuelles. On consolide et on scale ce qui marche.",
+            title: "4) Transformer l’insight en action",
+            desc: "Priorisez les corrections, attribuez les responsabilités et mesurez si les améliorations changent les résultats ultérieurs.",
           },
         ],
-        linkPrefix: "Pour la vue d’ensemble, commencez par la",
-        linkText: "couche d’intelligence NPS",
-        linkSuffix: ", puis appliquez-la ici aux enquêtes par étapes.",
       },
 
       fit: {
-        title: "Où placer les enquêtes “milestone”",
+        title: "Où les enquêtes par étape sont utiles",
+        linkPrefix: "Si vous utilisez le NPS dans un outil comme Intercom, voyez",
+        linkText: "comment nous transformons les commentaires Intercom en actions priorisées",
+        linkSuffix: ".",
         cards: [
           {
-            title: "Commande passée",
-            q: "Suite à votre expérience de commande, quelle est la probabilité que vous nous recommandiez (0–10) ?",
-            why: "Tester la clarté du checkout, la transparence des prix et la fiabilité du paiement.",
+            title: "Après la première commande",
+            q: "Quelle est la probabilité que vous nous recommandiez après votre premier achat ?",
+            why: "Les frictions à ce stade sont souvent fortement corrélées au churn.",
           },
           {
-            title: "Onboarding terminé",
-            q: "Après l’onboarding, quelle est la probabilité que vous nous recommandiez (0–10) ?",
-            why: "Mesurer les frictions de mise en route, les trous de documentation et la qualité d’activation.",
+            title: "Après l’onboarding",
+            q: "Avez-vous trouvé la prise en main simple et fluide ?",
+            why: "La qualité de l’onboarding influence fortement l’adoption à long terme.",
           },
           {
-            title: "Première utilisation / livraison",
-            q: "Après votre première utilisation/livraison, quelle est la probabilité que vous nous recommandiez (0–10) ?",
-            why: "Révéler la vitesse/précision, la maturité produit et la qualité de la première expérience.",
+            title: "Après la première utilisation significative",
+            q: "Le produit a-t-il répondu à vos attentes ?",
+            why: "Ce moment façonne souvent la perception de valeur durable.",
           },
         ],
-      linkPrefix: "Si vous faites du NPS via un outil comme Intercom, voyez",
-      linkText: "comment nous transformons les verbatims Intercom en actions priorisées",
-      linkSuffix: ".",
       },
 
       checklist: {
         stepsTitle: "Mise en œuvre en 5 étapes",
         steps: [
-          "Définir les milestones (checkout, onboarding, premier bénéfice, renouvellement, clôture support).",
-          "Déclencher les enquêtes via votre stack existant (ESP, produit, helpdesk, CDP).",
-          "Poser la question 0–10 + une question ouverte ; rester court.",
-          "Centraliser les résultats et taguer par milestone.",
-          "Boucler la boucle (close-the-loop) et mener une revue mensuelle des causes racines.",
+          "Définir les moments du parcours qui comptent le plus",
+          "Déclencher l’enquête au bon moment du parcours",
+          "Segmenter les réponses par étape, cohorte ou type de client",
+          "Interpréter les thèmes derrière les scores promoteurs, passifs et détracteurs",
+          "Prioriser les actions et mesurer si le ressenti s’améliore ensuite",
         ],
       },
 
       track: {
         title: "Ce que nous suivons",
         items: [
-          "Distribution des scores par milestone (Promoteurs/Passifs/Détracteurs).",
-          "Thèmes par fréquence & impact (effort vs volume).",
-          "Délais de recontact & taux de close-the-loop.",
-          "Effets aval (répétition des tickets, risque de churn, dynamique des avis).",
+          "L’évolution du NPS par étape",
+          "Les drivers des promoteurs, passifs et détracteurs",
+          "Les frictions récurrentes sur le parcours",
+          "L’impact des corrections sur le ressenti et les comportements ultérieurs",
         ],
       },
-        related: {
-          title: "À lire ensuite",
-          intro: "Si vous mettez en place un NPS par étapes, ces pages vous aident à relier la mesure à l’interprétation, la priorisation et l’action.",
-          links: {
-            intelligenceLayer: "Couche d’intelligence NPS",
-            intercomNpsAnalytics: "Analyse NPS Intercom",
-            whatIsNps: "Qu’est-ce que le NPS ?",
-            npsSurveyProgramme: "Programme NPS",
-            socialListening: "Écoute sociale",
-          },
-        },
 
+      related: {
+        title: "À lire ensuite",
+        intro:
+          "Si vous mettez en place un NPS par étape, ces pages vous aideront à relier la mesure à l’interprétation, à la priorisation et à l’action.",
+        links: {
+          whatIsNps: "Qu’est-ce que le NPS ?",
+          npsSurveyProgramme: "Programme d’enquête NPS",
+          intelligenceLayer: "Couche d’analyse NPS",
+          intercomNpsAnalytics: "Intercom NPS analytics",
+          socialListening: "Social listening",
+        },
+      },
     },
     landing: {
-          seo: {
-            title: "Conseil, formation et insights NPS/CX | NPS Me",
-            description:
-              "J’aide les équipes à opérer un NPS fiable et à transformer le feedback en croissance mesurable - stratégie, mise en œuvre, enablement et insights, avec Intercom/HubSpot/Zendesk ou CSV.",
-          },
+      seo: {
+        title: "Conseil & analytics NPS pour Intercom, HubSpot et Zendesk | NPS Me",
+        description:
+          "NPS Me aide les équipes à faire du NPS correctement avec Intercom, HubSpot, Zendesk ou CSV. Améliorez le design d’enquête, analysez les retours, priorisez les actions et déployez des workflows de close-the-loop qui améliorent rétention et revenus.",
+      },
 
-          hero: {
-            h1: {
-              lead: "Un NPS bien fait :",
-              nps: "stratégie, mise en œuvre",
-              tail: "et enablement au-dessus de vos outils existants.",
-              accent: "Du feedback à la croissance mesurable.",
-            },
-            body: "Gardez votre outil d’envoi (Intercom, HubSpot, Zendesk ou CSV). Je vous aide à opérer un programme NPS fiable, extraire des insights des verbatims, prioriser les actions utiles, et déployer des workflows de close-the-loop qui améliorent rétention et revenus.",
-            ctaPrimary: "Réserver un échange",
-            ctaMethod: "Voir la méthode",
-            ctaDemo: "Voir des exemples",
-            proof: {
-              mining: "Insights à partir des verbatims",
-              enablement: "Enablement & workflows",
-              lift: "Impact mesuré",
-            },
-            chips: ["Conseil", "Ateliers", "Conférences", "Intercom", "HubSpot", "Zendesk", "Import CSV"],
-            chipsNote:
-              "Gardez votre outil d’envoi. Je me concentre sur la gouvernance, l’analyse, la priorisation et la mise en action.",
-          },
+      hero: {
+      h1: {
+        lead: "Conseil et analytics NPS",
+        nps: "pour les équipes qui utilisent",
+        tail: "Intercom, HubSpot, Zendesk ou CSV.",
+        accent: "Faites du NPS correctement avec les outils que vous utilisez déjà.",
+      },
+      body: "Gardez votre outil d’envoi. NPS Me vous aide à opérer un programme NPS fiable, analyser les retours clients et les verbatims, prioriser les corrections qui comptent, et déployer des workflows de close-the-loop qui améliorent rétention, recommandation et chiffre d’affaires.",
+      ctaPrimary: "Réserver une revue NPS gratuite",
+      ctaMethod: "Voir comment ça marche",
+      ctaDemo: "Voir des exemples d’insights",
+      proof: {
+        mining: "Insights à partir des verbatims",
+        enablement: "Workflows de close-the-loop",
+        lift: "Impact CX mesuré",
+      },
+      chips: {
+        help: ["Conseil", "Ateliers", "Conférences", "Insights récurrents"],
+        worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
+      },
+      chipsNote:
+        "Gardez votre plateforme d’envoi de sondage. NPS Me se focalise à la gouvernance NPS, l’analyse des retours, la priorisation et la mise en action.",
+      },
 
       method: {
-        title: "Une méthode CX simple et reproductible pour faire progresser le NPS®",
+        title: "Une méthode simple et reproductible pour améliorer le NPS",
         body:
-          "Étapes claires, quick wins et amélioration continue. On s’adapte à votre contexte et on priorise ce qui a le plus d’impact.",
+          "Des étapes claires, des quick wins et une progression durable. NPS Me vous aide à diagnostiquer ce qui bloque, prioriser les bons leviers et créer de la dynamique dans le temps.",
         cards: [
           {
-            title: "1) Diagnostic",
-            desc: "Analyse des avis, enquêtes et parcours internes. Cartographie des frictions. Baseline des indicateurs.",
+            title: "1) Diagnostiquer",
+            desc: "Audit des enquêtes, des retours clients et des parcours internes. Cartographie des frictions et baseline des indicateurs.",
           },
           {
-            title: "2) Recommandations",
-            desc: "Plan d’actions priorisé (impact/effort), responsables, séquencement et hypothèses de gains.",
+            title: "2) Prioriser",
+            desc: "Plan d’actions concret avec responsables, scoring impact/effort et séquencement clair.",
           },
           {
-            title: "3) Mise en œuvre",
-            desc: "Outillage, automatisations, scripts et formation. Accompagnement opérationnel pour livrer vite.",
+            title: "3) Mettre en œuvre",
+            desc: "Déploiement avec scripts, templates, automatisations, formation et accompagnement opérationnel.",
           },
           {
-            title: "4) Pilotage",
-            desc: "Suivi NPS/CSAT/CES et vélocité d’avis. Itérations mensuelles, arbitrages et passage à l’échelle.",
+            title: "4) Améliorer",
+            desc: "Suivi du NPS, des feedbacks par étape et de la vélocité d’action. Revues régulières et passage à l’échelle de ce qui fonctionne.",
           },
         ],
       },
 
       demoBlock: {
-        title: "Tester la démo NPS® (prête pour le close-the-loop)",
+        title: "Tester la démo NPS en direct et explorer des insights",
         body:
-          "La démo montre le lien entre invitations, réponses et indicateurs NPS. En production, le ciblage et l’envoi restent souvent dans votre plateforme CS ; NPS Me ingère les retours pour analyser, prioriser et déclencher des actions. Les chiffres affichés ici proviennent de l’environnement de démo.",
-        cta: "Lancer la démo et voir les résultats",
+          "Voyez comment les invitations, les réponses aux enquêtes, les scores NPS et les vues par étape s’articulent. En production, l’envoi peut rester dans Intercom ou votre plateforme existante pendant que NPS Me ajoute l’analyse, la priorisation et l’action.",
+        cta: "Ouvrir la démo NPS en direct",
         note:
-          "Ouvre la page dédiée : vous pouvez vous envoyer une invitation, répondre, puis explorer le NPS et les scores par étape.",
+          "Envoyez-vous une invitation, répondez à l’enquête, puis explorez comment les réponses deviennent des métriques NPS, des scores par étape et des insights actionnables.",
       },
+
       demo: {
         label: "Démo NPS® en direct",
         basedOn: "Basé sur {count} réponses",
       },
 
       platform: {
-        title: "Une couche d’analyse au-dessus de vos enquêtes",
+        title: "Des analytics NPS au-dessus de vos outils d’enquête existants",
         body:
-          "La plupart des équipes ont déjà un outil d’envoi. NPS Me vous aide à opérer un programme fiable, comparable dans le temps et utile pour décider - quel que soit votre stack.",
+          "La plupart des équipes ont déjà un moyen d’envoyer des enquêtes. NPS Me vous aide à opérer un programme NPS juste, cohérent et decision-grade sur Intercom, HubSpot, Zendesk ou des dispositifs basés sur CSV, pour que vos scores soient exploitables et vos prochaines actions plus claires.",
         cards: [
           {
-            title: "Gouvernance",
-            desc: "Échantillonnage, cadence, anti-biais et comparabilité pour que le score soit interprétable.",
+            title: "Gouvernance NPS",
+            desc: "Échantillonnage, cadence, anti-biais et comparabilité dans le temps pour que votre score NPS veuille vraiment dire quelque chose.",
           },
           {
-            title: "Interprétation",
-            desc: "Analyse des thèmes et drivers, contrôles de robustesse et priorisation claire des actions.",
+            title: "Analyse des retours",
+            desc: "Analyse des thèmes et drivers à partir des verbatims, avec contrôles de robustesse et priorisation claire.",
           },
           {
-            title: "Close the loop",
-            desc: "Workflows de suivi et mesure d’impact pour relier feedback → actions → résultats.",
+            title: "Action de close-the-loop",
+            desc: "Workflows de suivi, ownership et mesure des résultats pour que les réponses mènent à des améliorations mesurables.",
           },
         ],
-        linkIntercomText: "Voir un exemple avec Intercom NPS.",
+        linkIntercomText: "Voir comment cela fonctionne avec Intercom NPS.",
       },
 
       about: {
         title: "À propos de Caspar",
         body:
-          "CX pragmatique. Impact mesurable. Moins de théâtre, plus d’actions. J’aide les équipes à faire du NPS correctement et à transformer le feedback en actions qui améliorent rétention, recommandation et CA.",
+          "CX pragmatique, résultats mesurables, moins de théâtre et plus de progrès. J’aide les équipes à concevoir de meilleurs programmes NPS, analyser correctement les retours clients et transformer les insights en actions qui améliorent rétention, recommandation et chiffre d’affaires.",
         bullets: [
-          "Programmes “decision-grade” : échantillonnage, biais, comparabilité (pour que le score soit interprétable)",
-          "Verbatims → thèmes, drivers, priorités claires",
-          "Roadmaps avec responsables + impact/effort",
-          "Enablement : playbooks, scripts, templates, formation",
-          "Workflows de close-the-loop qui changent les résultats",
+          "Programmes NPS decision-grade avec meilleur échantillonnage, contrôle des biais et comparabilité",
+          "Verbatims clients traduits en thèmes, drivers et priorités",
+          "Roadmaps avec responsables et scoring impact/effort",
+          "Playbooks, templates, scripts et formation pour les équipes",
+          "Workflows de close-the-loop reliés à des résultats concrets",
         ],
-        cta: "En savoir plus",
+        cta: "En savoir plus sur moi",
       },
 
       contact: {
-        title: "Prêt à transformer le feedback en croissance ?",
+        title: "Prêt à améliorer le NPS et transformer le feedback en croissance ?",
         body:
-          "Réservez un échange de 30 minutes. On passe en revue vos scores et on identifie des quick wins concrets.",
+          "Réservez une revue NPS gratuite de 30 minutes. Nous regarderons votre configuration actuelle, identifierons les opportunités d'amélioration et repérerons des opportunités concrètes d’amélioration.",
         emailCta: "Écrire à hello@npsme.com",
-        bookCta: "Demander un rendez-vous",
+        bookCta: "Réserver une revue NPS gratuite",
       },
+
       explainer: {
-        title: "Que mesure réellement le Net Promoter Score (NPS®)",
+        title: "Ce que le Net Promoter Score (NPS®) mesure réellement",
         intro:
           "Le Net Promoter Score est un indicateur simple visant à mesurer le ressenti et la fidélité des clients. Il repose sur une question unique et classe les répondants en trois catégories.",
         promoters: "Promoteurs",
@@ -4675,9 +4785,9 @@ export const TRANSLATIONS = {
       },
 
       milestone: {
-        title: "Le NPS par étape : mesurer ce qui compte vraiment",
+        title: "NPS par étape : mesurer le ressenti aux moments qui comptent",
         intro:
-          "Plutôt qu’un score unique et générique, le NPS par étape mesure le ressenti aux moments critiques du parcours client.",
+          "Au lieu de s’appuyer sur un score global trop large, le NPS par étape permet de suivre le ressenti client aux moments critiques du parcours, comme l’onboarding, la première commande ou le premier usage significatif.",
         examples: {
           order: {
             title: "Après la première commande",
@@ -4770,9 +4880,25 @@ export const TRANSLATIONS = {
       header: {
         iconLabel: "Programme d’enquête NPS",
         tag: "NPS Me / Programme d’enquête",
-        accent: "Votre programme d’enquête NPS personnalisé",
+        accent: "Construire un meilleur",
+        title: "programme d’enquête NPS",
         subtitle:
           "Fournissez un fichier de contacts clients et nous déployons pour vous un programme NPS structuré - invitations, relances, dashboards et données prêtes à exporter - pour que vous puissiez vous concentrer sur l’action, pas sur les outils.",
+      },
+
+      introBox: {
+        title: "Ce qu’un bon programme NPS doit faire",
+        p1:
+          "Un bon programme NPS ne consiste pas seulement à envoyer une enquête. Il doit produire un score interprétable, des verbatims exploitables et des actions concrètes.",
+        p2:
+          "Cela veut dire : meilleur ciblage, meilleure cadence, comparabilité dans le temps, et workflows de close-the-loop qui transforment les réponses en amélioration.",
+      },
+
+      related: {
+        title: "Pages liées",
+        whatIsNps: "Qu’est-ce que le NPS ?",
+        milestone: "NPS transactionnel",
+        intercom: "Intercom NPS analytics",
       },
 
       howItWorks: {
@@ -4859,92 +4985,142 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle:
-        "Offres CX packagées : audits, programme Momentum & CX Pulse hebdo | NPS Me",
+      seoTitle: "Services NPS Me : conseil, formation, conférences et insights récurrents",
       seoDescription:
-        "Choisissez une offre CX pour améliorer le NPS®, réduire la charge support et augmenter la rétention : Feedback Foundations, Momentum Program et rapports CX Pulse hebdomadaires.",
+        "Découvrez les quatre façons de travailler avec NPS Me : conseil, ateliers et formation, conférences, et insights récurrents pour les équipes qui veulent améliorer le NPS et l’expérience client.",
 
       header: {
-        iconLabel: "Offres CX packagées",
+        iconLabel: "Services NPS Me",
         tag: "NPS Me / Services",
-        accent: "Offres packagées",
-        title: "qui transforment le feedback en croissance",
+        accent: "Quatre façons de travailler avec",
+        title: "NPS Me",
         subtitle:
-          "Choisissez le pack adapté à votre étape : bases, accompagnement, ou un flux hebdomadaire d’insights CX actionnables.",
+          "Choisissez le format adapté à votre étape : conseil, ateliers et formation, conférences, ou insights récurrents.",
+      },
+
+      intro: {
+        title: "Comment NPS Me travaille avec les équipes",
+        body:
+          "La landing page présente les quatre grandes façons de travailler avec NPS Me. Cette page les transforme en offres concrètes, exemples et formats de delivery pour faciliter le choix du bon point de départ.",
       },
 
       cards: {
-        foundations: {
-          title: "Feedback Foundations",
-          price: "à partir de 450 £",
+        consulting: {
+          title: "Conseil",
+          price: "Périmètre défini selon le besoin",
+          hint: "Idéal pour : les équipes qui veulent des changements concrets, pas seulement des recommandations",
           bullets: [
-            "Analyse du parcours client & des avis (support, reviews, NPS)",
-            "NPS®, CSAT & cartographie des frictions",
-            "Roadmap priorisée sur 90 jours",
-            "Synthèse exécutive + restitution en visio",
+            "Design ou refonte de programme NPS",
+            "Analyse des retours clients et diagnostic des frictions",
+            "Roadmaps priorisées avec responsables et séquencement",
+            "Accompagnement opérationnel sur la mise en œuvre CX, ops et produit",
           ],
-          cta: "Demander un audit",
-          hint: "Idéal pour : démarrer (ou relancer) un programme NPS",
-        },
-        momentum: {
-          title: "Momentum Program",
-          price: "à partir de 850 £/mois (accompagnement)",
-          bullets: [
-            "Mise en œuvre & accompagnement",
-            "Cycles mensuels & dashboards",
-            "Amélioration mesurée des résultats",
+          examplesTitle: "Exemples de missions conseil",
+          examples: [
+            "Audit Feedback Foundations",
+            "Accompagnement Momentum",
+            "Design de workflows close-the-loop",
+            "Analyse de parcours et de verbatims",
           ],
-          cta: "Prendre rendez-vous",
-          hint: "Idéal pour : obtenir des résultats, pas juste des dashboards",
+          cta: "Réserver une revue conseil",
         },
 
-        intercom: {
-          title: "Couche d’intelligence CX (Intercom NPS)",
-          price: "à partir de 290 £/mois",
+        training: {
+          title: "Ateliers & formation",
+          price: "Demi-journée, journée ou format sur mesure",
+          hint: "Idéal pour : les équipes qui veulent monter en compétence en interne",
           bullets: [
-            "Insights NPS en continu depuis Intercom (mise à jour auto)",
-            "Thèmes, leviers & signaux de risque basés sur les verbatims",
-            "Actions par segment : Détracteurs, Passifs, Promoteurs",
-            "Modèles de réponses “close the loop” prêts à envoyer",
+            "Formation pratique pour bien faire du NPS",
+            "Design d’enquête, échantillonnage et comparabilité",
+            "Analyse des verbatims, priorisation et plans d’action",
+            "Templates, scripts close-the-loop et facilitation",
           ],
-          cta: "Voir l’exemple Intercom",
-          footnote: "Option : atelier expert pour concevoir et paramétrer le NPS Intercom (450 £, ponctuel).",
-          hint: "Idéal pour : les équipes déjà sur Intercom NPS",
+          examplesTitle: "Exemples de thèmes d’atelier",
+          examples: [
+            "Comment concevoir un programme NPS decision-grade",
+            "Comment bien interpréter les verbatims et les thèmes",
+            "Comment transformer le NPS en action inter-équipes",
+            "Comment éviter la fatigue d’enquête et les mauvaises données",
+          ],
+          cta: "Discuter d’un atelier",
         },
-        pulse: {
-          title: "Rapport CX Pulse (hebdo)",
-          price: "à partir de 190 £/mois",
+
+        speaking: {
+          title: "Conférences",
+          price: "Selon l’événement",
+          hint: "Idéal pour : sessions leadership, offsites et événements internes",
           bullets: [
-            "Social listening (X/LinkedIn/Reddit/Avis)",
-            "Thèmes clés, sentiment & pouls concurrentiel",
-            "Synthèse actionnable (1 page) + prochaines étapes",
+            "Interventions sur une CX pragmatique et ce qui fait vraiment bouger le NPS",
+            "Sessions leadership reliant insight et exécution",
+            "Contenus ancrés dans des programmes réels",
+            "Des messages utiles plutôt qu’une inspiration générique",
           ],
-          cta: "Voir un exemple",
-          footnote: "Démarre en manuel, évolue vers l’automatisation. Résiliable à tout moment.",
-          hint: "Idéal pour : un signal externe hebdo, actionnable",
+          examplesTitle: "Exemples de sujets",
+          examples: [
+            "Pourquoi le NPS stagne même quand la CX semble meilleure",
+            "Comment rendre le feedback client plus utile",
+            "Comment créer de la dynamique autour de l’amélioration CX",
+            "Ce que les dirigeants doivent regarder au-delà des dashboards",
+          ],
+          cta: "Demander une intervention",
+        },
+
+        insight: {
+          title: "Insights récurrents",
+          price: "À partir d’un accompagnement mensuel léger",
+          hint: "Idéal pour : les équipes qui veulent une couche d’intelligence récurrente plus légère",
+          bullets: [
+            "Insights récurrents à partir du NPS, des verbatims et des signaux externes",
+            "CX Pulse et lecture des tendances",
+            "Couche d’intelligence Intercom NPS",
+            "Prochaines étapes, priorités et signaux de risque",
+          ],
+          examplesTitle: "Exemples d’offres récurrentes",
+          examples: [
+            "CX Pulse hebdo ou mensuel",
+            "Couche d’intelligence Intercom NPS",
+            "Suivi des thèmes et drivers",
+            "Synthèses exécutives et prompts d’action",
+          ],
+          cta: "Voir les options d’insights récurrents",
         },
       },
 
-      pulseExplainer: {
-        title: "Ce que vous recevez dans le CX Pulse hebdomadaire",
-        left: [
-          "Baromètre de sentiment (évolution semaine/semaine, causes)",
-          "Sujets émergents (3–5 thèmes avec exemples)",
-          "Comparaison concurrentielle (option)",
-        ],
-        right: [
-          "Synthèse claire (quoi faire ensuite)",
-          "Dashboard léger (tendances)",
-          "Livraison le même jour chaque semaine",
-        ],
+      detailSections: {
+        consulting: {
+          title: "Conseil : du diagnostic à la mise en œuvre",
+          body:
+            "NPS Me aide les équipes à passer du feedback brut au changement concret. Cela peut inclure le design du programme, le diagnostic des frictions, la construction de la roadmap, les workflows close-the-loop et l’accompagnement opérationnel.",
+        },
+        training: {
+          title: "Ateliers & formation : renforcer la capacité interne",
+          body:
+            "NPS Me propose des formations pratiques pour aider les équipes à mieux faire du NPS, interpréter le feedback avec plus de confiance et prendre de meilleures décisions sans dépendre d’un gros dispositif de conseil.",
+        },
+        speaking: {
+          title: "Conférences : des contenus CX utiles pour des équipes réelles",
+          body:
+            "Les interventions NPS Me sont conçues pour être utiles, concrètes et commercialement pertinentes. Elles fonctionnent bien pour des équipes de direction, des offsites, des événements internes et des communautés CX.",
+        },
+        insight: {
+          title: "Insights récurrents : une couche d’intelligence plus légère",
+          body:
+            "Pour les équipes qui n’ont pas besoin d’un programme conseil complet, NPS Me peut fournir un service d’insights récurrents plus léger via le CX Pulse, l’analyse Intercom et l’interprétation continue du feedback.",
+        },
+      },
+
+      comparison: {
+        title: "Comment choisir le bon point de départ",
+        body:
+          "Commencez par le conseil si le programme doit être réparé ou repensé. Choisissez les ateliers si l’équipe a besoin de renforcer ses compétences. Choisissez les conférences pour un contexte leadership ou événementiel. Choisissez les insights récurrents pour un flux plus léger de priorités et d’actions.",
       },
 
       cta: {
-        title: "Prêt pour un exemple ?",
+        title: "Vous ne savez pas par où commencer ?",
         body:
-          "Je réalise un CX Pulse ponctuel sur votre marque et je vous envoie le PDF sous quelques jours.",
+          "NPS Me peut revoir votre dispositif actuel et recommander le meilleur point de départ entre conseil, formation, conférences et insights récurrents.",
         email: "Écrire à hello@npsme.com",
-        book: "Prendre rendez-vous",
+        book: "Réserver une revue NPS gratuite",
       },
     },
     socialListening: {
@@ -5100,9 +5276,9 @@ export const TRANSLATIONS = {
       },
     },
     npsIntelligenceLayer: {
-      seoTitle: "La couche d’intelligence NPS pour Intercom, Medallia et vos outils CX | NPS Me",
+      seoTitle: "Couche analytics NPS pour Intercom, Medallia et vos outils CX | NPS Me",
       seoDescription:
-        "Vous utilisez déjà Intercom ou Medallia ? NPS Me ajoute une couche d’intelligence CX qui transforme vos données NPS et feedback en priorités claires et actions.",
+        "Vous utilisez déjà Intercom ou Medallia ? NPS Me ajoute de l’analytics NPS, du reporting et de la priorisation au-dessus de vos outils existants pour transformer le feedback en action.",
 
       header: {
         iconLabel: "NPS Me / Intelligence CX",
@@ -5113,11 +5289,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        title: "La couche d’intelligence CX que vos outils ne fournissent pas",
+        title: "Des analytics NPS et de la priorisation au-dessus de vos outils existants",
         body1:
-          "Si vous utilisez déjà Intercom, Medallia, des enquêtes NPS ou des outils de social listening, mais que vous avez encore du mal à prioriser, expliquer les résultats ou déclencher le changement, vous n’êtes pas seul.",
+          "Si vous utilisez déjà Intercom, Medallia ou une autre plateforme d’enquête mais que vous avez encore du mal à prioriser les actions, expliquer les scores ou transformer le feedback en changement concret, cette page est pour vous.",
         body2:
-          "La plupart des organisations n’ont pas un problème de données. Elles ont un problème d’interprétation et de direction.",
+          "La plupart des équipes n’ont pas besoin d’un outil d’enquête supplémentaire. Elles ont besoin d’une manière plus claire d’interpréter le NPS, d’analyser les verbatims et de décider quoi faire ensuite.",
         ctaPrimary: "Réserver une revue CX",
         ctaSecondary: "Voir un exemple de CX Pulse",
       },
@@ -5140,7 +5316,7 @@ export const TRANSLATIONS = {
         layer: {
           title: "La couche d’intelligence NPS Me",
           body:
-            "Nous nous plaçons au-dessus de vos outils existants. Nous ne remplaçons pas Intercom, Medallia ou vos enquêtes. Nous connectons, interprétons et valorisons ce que vos outils captent déjà.",
+            "Nous nous plaçons au-dessus de vos outils existants. Nous ne remplaçons pas Intercom, Medallia ou votre plateforme d’enquête. Nous connectons, interprétons et valorisons ce que vos outils captent déjà.",
           bullets: [
             "Interpréter les signaux entre plusieurs outils",
             "Ajouter du contexte comportemental et stratégique",
@@ -5167,13 +5343,15 @@ export const TRANSLATIONS = {
             "Exemple de boucle : Intercom capte le feedback → NPS Me ajoute l’intelligence → décisions → actions de retour dans Intercom.",
           footer: "Au lieu d’un dashboard de plus, vous obtenez clarté, récit et priorités.",
         },
+
         medallia: {
-          title: "À propos des plateformes CX enterprise",
+          title: "Là où Medallia a encore besoin d’interprétation et d’action",
           body1:
-            "Les plateformes CX enterprise sont puissantes et très riches. Dans les grandes organisations, cette flexibilité peut parfois entraîner des configurations complexes et des insights plus difficiles à traduire en décisions quotidiennes.",
+            "Les plateformes CX enterprise sont puissantes et très riches. Dans les grandes organisations, cette flexibilité peut parfois entraîner des configurations complexes et des insights plus difficiles à traduire en décisions du quotidien.",
           body2:
-            "Avoir accès à plus de données ne garantit pas la clarté. NPS Me aide les équipes à se concentrer sur l’essentiel : transformer le feedback en priorités claires et actions concrètes, sans complexité inutile.",
+            "Avoir accès à plus de données ne crée pas automatiquement de la clarté. NPS Me aide les équipes à se concentrer sur l’essentiel : transformer le feedback en priorités claires et en actions concrètes, sans complexité inutile.",
         },
+
         deliver: {
           title: "Ce que délivre la couche d’intelligence",
           bullets: [
@@ -5198,14 +5376,6 @@ export const TRANSLATIONS = {
         },
       },
 
-      cta: {
-        title: "Envie d’ajouter de la clarté au-dessus de vos outils ?",
-        body:
-          "On commence par votre setup actuel, les questions qui restent sans réponse, et les décisions que vous devez prendre. Ensuite, on construit une couche simple et orientée action au-dessus.",
-        primary: "Réserver une revue CX",
-        secondary: "Voir un exemple de CX Pulse",
-        note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
-      },
       related: {
         title: "À lire ensuite",
         links: {
@@ -5213,6 +5383,23 @@ export const TRANSLATIONS = {
           milestone: "NPS par étapes : mesurer les frictions du parcours",
           pulse: "Voir un exemple de CX Pulse (lisible par la direction)",
         },
+      },
+
+      continueExploring: {
+        title: "Continuer l’exploration",
+        intercom: "Intercom NPS analytics",
+        milestone: "NPS transactionnel / par étape",
+        whatIsNps: "Qu’est-ce que le NPS ?",
+        surveyProgramme: "Programme d’enquête NPS",
+      },
+
+      cta: {
+        title: "Envie d’ajouter de la clarté au-dessus de vos outils ?",
+        body:
+          "On commence par votre setup actuel, les questions qui restent sans réponse, et les décisions que vous devez prendre. Ensuite, on construit une couche simple et orientée action au-dessus.",
+        primary: "Réserver une revue CX",
+        secondary: "Voir un exemple de CX Pulse",
+        note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
       },
     },
     intercomNps: {
@@ -5536,17 +5723,18 @@ export const TRANSLATIONS = {
       },
     },
     whatIsNps: {
-      seoTitle: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
+      seoTitle: "Qu’est-ce que le NPS ? Explication claire du Net Promoter Score | NPS Me",
       seoDescription:
-        "Guide en français sur le Net Promoter Score (NPS) : fonctionnement, calcul, cas d’usage, pièges courants et comment agir sur les verbatims.",
+        "Comprenez ce que mesure réellement le Net Promoter Score, comment il est calculé, la différence entre NPS relationnel et transactionnel, et comment bien l’utiliser.",
 
       header: {
         iconLabel: "Qu’est-ce que le NPS ?",
-        tag: "Guide / Expérience client",
-        title: "Qu’est-ce que le Net Promoter Score (NPS) ?",
+        tag: "NPS Me / Qu’est-ce que le NPS ?",
+        title: "Qu’est-ce que le Net Promoter Score (NPS®) ?",
         subtitle:
-          "Une explication pratique : comment le NPS fonctionne, quand il est utile, où il peut induire en erreur, et comment l’utiliser comme point de départ pour des améliorations concrètes - pas seulement comme un chiffre dans un dashboard.",
+          "Une explication pratique de ce que mesure le NPS, de son calcul et de la manière de bien l’utiliser.",
       },
+
 
       core: {
         title: "La question NPS de base",
@@ -5665,14 +5853,21 @@ export const TRANSLATIONS = {
           "Avec le temps, cela crée de la confiance. Les clients voient que leur feedback déclenche des changements, les équipes voient que l’insight améliore les résultats, et le NPS devient un signal utile parmi d’autres dans la santé client.",
       },
 
+      quickLinks: {
+        title: "Aller plus loin",
+        milestone: "NPS transactionnel / par étape",
+        surveyProgramme: "Programme d’enquête NPS",
+        intelligenceLayer: "Couche d’analyse NPS",
+      },
+
       cta: {
-        title: "Besoin d’aide pour concevoir un programme NPS qui génère de vrais changements ?",
+        title: "Besoin d’aide pour transformer le NPS en actions ?",
         body:
-          "NPS Me accompagne les équipes pour concevoir des enquêtes justes, un échantillonnage réaliste, et des boucles de suivi pratiques - afin que chaque feedback mène quelque part.",
-        explore: "Découvrir les offres",
-        book: "Prendre rendez-vous",
+          "NPS Me aide les équipes à concevoir de meilleurs programmes, interpréter correctement les retours et transformer le NPS en améliorations concrètes.",
+        explore: "Découvrir le conseil et les analytics NPS",
+        book: "Réserver une revue NPS gratuite",
         disclaimer:
-          "NPS et Net Promoter Score sont des marques de service déposées de Bain & Company, Inc., Fred Reichheld, et Satmetrix Systems, Inc. Les références sur cette page sont purement descriptives. NPS Me est indépendant et n’est ni affilié ni sponsorisé par ces parties.",
+          "NPS® et Net Promoter Score® sont des marques déposées de Bain & Company, Inc., Fred Reichheld et Satmetrix Systems, Inc. Les références ici sont purement descriptives.",
       },
     },
     whyNpsMe: {

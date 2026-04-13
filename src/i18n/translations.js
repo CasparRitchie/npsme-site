@@ -39,12 +39,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        photoHint: "Add a friendly headshot here",
-        photoSub: "People buy people. This matters.",
         kicker: "Caspar Ritchie",
         headline: "Turn customer feedback into measurable growth",
         body:
           "I help teams implement NPS®, uncover what really frustrates customers, and ship improvements that increase retention, referrals, and revenue.",
+        scrollNote: "Scroll to see how NPS Me can help →",
         ctaPrimary: "Book a call",
         ctaSecondary: "See services",
       },
@@ -1687,7 +1686,7 @@ export const TRANSLATIONS = {
             worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
           },
           chipsNote:
-            "Keep your survey platform. I focus on NPS governance, feedback analysis, prioritisation and action.",
+            "Keep your survey platform. NPS Me focuses on NPS governance, feedback analysis, prioritisation and action.",
         },
 
         method: {
@@ -1766,7 +1765,7 @@ export const TRANSLATIONS = {
       contact: {
         title: "Ready to improve NPS and turn feedback into growth?",
         body:
-          "Book a free 30-minute NPS review. We’ll look at your current setup, identify weak points and find practical opportunities to improve results.",
+          "Book a free 30-minute NPS review. We’ll look at your current setup, identify opportunities for improvement, and find practical opportunities to improve results.",
         emailCta: "Email hello@npsme.com",
         bookCta: "Book a free NPS review",
       },
@@ -2990,12 +2989,11 @@ export const TRANSLATIONS = {
       },
 
       hero: {
-        photoHint: "Ajoutez une photo portrait ici",
-        photoSub: "On achète une personne, pas un logo.",
         kicker: "Caspar Ritchie",
         headline: "Transformer le feedback client en croissance mesurable",
         body:
           "J’aide les équipes à mettre en place le NPS®, comprendre les vraies frictions, et déployer des améliorations qui augmentent la rétention, la recommandation et le chiffre d’affaires.",
+        scrollNote: "Faites défiler pour voir comment NPS Me peut aider →",
         ctaPrimary: "Prendre rendez-vous",
         ctaSecondary: "Voir les offres",
       },
@@ -4676,7 +4674,7 @@ export const TRANSLATIONS = {
         worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
       },
       chipsNote:
-        "Gardez votre plateforme d’envoi. Je me concentre sur la gouvernance NPS, l’analyse des retours, la priorisation et la mise en action.",
+        "Gardez votre plateforme d’envoi de sondage. NPS Me se focalise à la gouvernance NPS, l’analyse des retours, la priorisation et la mise en action.",
       },
 
       method: {
@@ -4755,7 +4753,7 @@ export const TRANSLATIONS = {
       contact: {
         title: "Prêt à améliorer le NPS et transformer le feedback en croissance ?",
         body:
-          "Réservez une revue NPS gratuite de 30 minutes. Nous regarderons votre configuration actuelle, identifierons les points faibles et repérerons des opportunités concrètes d’amélioration.",
+          "Réservez une revue NPS gratuite de 30 minutes. Nous regarderons votre configuration actuelle, identifierons les opportunités d'amélioration et repérerons des opportunités concrètes d’amélioration.",
         emailCta: "Écrire à hello@npsme.com",
         bookCta: "Réserver une revue NPS gratuite",
       },

@@ -27,12 +27,12 @@ export default function NpsIntelligenceLayer() {
         title={translations(
           lang,
           "npsIntelligenceLayer.seoTitle",
-          "The NPS Intelligence Layer for Intercom, Medallia & CX Tools | NPS Me"
+          "NPS Analytics Layer for Intercom, Medallia and CX Tools | NPS Me"
         )}
         description={translations(
           lang,
           "npsIntelligenceLayer.seoDescription",
-          "Already using Intercom or Medallia? NPS Me adds a strategic CX intelligence layer that turns NPS and feedback data into clear priorities and action."
+          "Already using Intercom or Medallia? NPS Me adds NPS analytics, reporting and prioritisation on top of your existing tools to turn feedback into action."
         )}
       />
 
@@ -59,7 +59,7 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.hero.title",
-              "The CX intelligence layer your tools don’t provide"
+              "NPS analytics and prioritisation on top of your existing tools"
             )}
           </h2>
 
@@ -67,7 +67,7 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.hero.body1",
-              "If you already use Intercom, Medallia, NPS surveys or social listening tools but still struggle to prioritise actions, explain results, or drive change, you are not alone."
+              "If you already use Intercom, Medallia or another survey platform but still struggle to prioritise actions, explain scores or turn feedback into change, this page is for you."
             )}
           </p>
 
@@ -75,7 +75,7 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.hero.body2",
-              "Most organisations do not have a data problem. They have an interpretation and direction problem."
+              "Most teams do not need another survey tool. They need a clearer way to interpret NPS, analyse comments, and decide what to do next."
             )}
           </p>
 
@@ -243,6 +243,7 @@ export default function NpsIntelligenceLayer() {
             )}
           </p>
         </div>
+
         {/* Related insights */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-sm font-semibold text-slate-300">
@@ -290,17 +291,22 @@ export default function NpsIntelligenceLayer() {
             </li>
           </ul>
         </div>
+
         {/* Section: Medallia note */}
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h3 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "npsIntelligenceLayer.sections.medallia.title", "A note on Medallia")}
+            {translations(
+              lang,
+              "npsIntelligenceLayer.sections.medallia.title",
+              "Where Medallia still needs interpretation and action"
+            )}
           </h3>
 
           <p className="mt-3 text-slate-300 leading-relaxed">
             {translations(
               lang,
               "npsIntelligenceLayer.sections.medallia.body1",
-              "Medallia is powerful. In large organisations it can also become over-configured and under-interpreted."
+              "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that is harder to translate into everyday decisions."
             )}
           </p>
 
@@ -308,7 +314,7 @@ export default function NpsIntelligenceLayer() {
             {translations(
               lang,
               "npsIntelligenceLayer.sections.medallia.body2",
-              "Having access to everything does not guarantee clarity. NPS Me is built to make decisions easier, without adding complexity."
+              "Access to more data does not automatically create clarity. NPS Me is designed to help teams focus on what matters most: turning feedback into clear priorities and practical action, without unnecessary complexity."
             )}
           </p>
         </div>
@@ -355,6 +361,43 @@ export default function NpsIntelligenceLayer() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Continue exploring */}
+        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h3 className="text-xl font-semibold text-white">
+            {translations(lang, "npsIntelligenceLayer.continueExploring.title")}
+          </h3>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link
+              to={localizePath("/intercom-nps-analytics", lang)}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
+            >
+              {translations(lang, "npsIntelligenceLayer.continueExploring.intercom")}
+            </Link>
+
+            <Link
+              to={localizePath("/milestone-nps", lang)}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
+            >
+              {translations(lang, "npsIntelligenceLayer.continueExploring.milestone")}
+            </Link>
+
+            <Link
+              to={localizePath("/what-is-nps", lang)}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
+            >
+              {translations(lang, "npsIntelligenceLayer.continueExploring.whatIsNps")}
+            </Link>
+
+            <Link
+              to={localizePath("/nps-survey-programme", lang)}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 hover:bg-white/10 transition"
+            >
+              {translations(lang, "npsIntelligenceLayer.continueExploring.surveyProgramme")}
+            </Link>
+          </div>
         </div>
 
         {/* CTA */}

@@ -1,4 +1,4 @@
-// src/pages/ClosingTheLoop.jsx
+// src/pages/EnvolaClosingTheLoop.jsx
 import React from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
@@ -532,7 +532,7 @@ export default function ClosingTheLoop() {
         setQueueActionLoadingId(null);
       }
     },
-    [contentId, fetchCases]
+    [contentId, fetchCases, fetchQueue]
   );
 
   const updateCaseStatus = React.useCallback(
@@ -846,16 +846,25 @@ export default function ClosingTheLoop() {
                         </td>
 
                         <td className="px-4 py-3">
-                          <button
-                            type="button"
-                            onClick={() => createCaseFromQueue(it)}
-                            disabled={queueActionLoadingId === String(it.contact_id)}
-                            className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
-                          >
-                            {queueActionLoadingId === String(it.contact_id)
-                              ? "Starting…"
-                              : "Start loop"}
-                          </button>
+                          {it.active_case ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs text-slate-400">Loop active</span>
+                              <span className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-indigo-500/15 text-indigo-100 border border-indigo-500/25">
+                                {prettyStatus(it.active_case.status)}
+                              </span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => createCaseFromQueue(it)}
+                              disabled={queueActionLoadingId === String(it.contact_id)}
+                              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
+                            >
+                              {queueActionLoadingId === String(it.contact_id)
+                                ? "Starting…"
+                                : "Start loop"}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

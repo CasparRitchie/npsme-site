@@ -1596,8 +1596,7 @@ export function createIntercomRouter() {
       const ctlCases = await readCtlJsonl(CTL_CASES_PATH);
         const latestCtlCaseMap = buildLatestMapFromJsonlRows(ctlCases, "case_id");
         const latestCtlCases = Array.from(latestCtlCaseMap.values())
-          .filter((c) => String(c?.content_id || "") === contentId)
-          .filter((c) => !["closed", "cancelled"].includes(String(c?.status || "")));
+          .filter((c) => String(c?.content_id || "") === contentId);
 
         const activeCaseByResponseKey = new Map();
         const activeCaseByContactKey = new Map();
@@ -1714,14 +1713,15 @@ export function createIntercomRouter() {
           recommendation: recommendAction(latestBucket, risk_score),
 
           active_case: linkedCase
-            ? {
-                case_id: linkedCase.case_id,
-                status: linkedCase.status,
-                owner_team: linkedCase.owner_team || null,
-                owner_user: linkedCase.owner_user || null,
-                is_paused: !!linkedCase.is_paused,
-              }
-            : null,
+          ? {
+              case_id: linkedCase.case_id,
+              status: linkedCase.status,
+              owner_team: linkedCase.owner_team || null,
+              owner_user: linkedCase.owner_user || null,
+              is_paused: !!linkedCase.is_paused,
+              is_closed: ["closed", "cancelled"].includes(String(linkedCase.status || "")),
+            }
+          : null,
         });
       }
 

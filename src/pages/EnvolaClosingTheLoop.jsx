@@ -473,7 +473,7 @@ export default function ClosingTheLoop() {
     try {
       const qs = new URLSearchParams({
         content_id: String(contentId || "").trim(),
-        include_closed: "0",
+        include_closed: "1",
         limit: "500",
       });
 
@@ -912,8 +912,17 @@ export default function ClosingTheLoop() {
                         <td className="px-4 py-3">
                           {it.active_case ? (
                             <div className="flex flex-col gap-1">
-                              <span className="text-xs text-slate-400">Loop active</span>
-                              <span className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-indigo-500/15 text-indigo-100 border border-indigo-500/25">
+                              <span className="text-xs text-slate-400">
+                                {it.active_case.is_closed ? "Loop completed" : "Loop active"}
+                              </span>
+
+                              <span
+                                className={
+                                  it.active_case.is_closed
+                                    ? "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-100 border border-emerald-500/25"
+                                    : "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-indigo-500/15 text-indigo-100 border border-indigo-500/25"
+                                }
+                              >
                                 {prettyStatus(it.active_case.status)}
                               </span>
                             </div>

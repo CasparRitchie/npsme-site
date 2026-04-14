@@ -5,6 +5,15 @@ import AdmZip from "adm-zip";
 import { parse } from "csv-parse/sync";
 import crypto from "crypto";
 
+import {
+  createCaseFromQueueItem,
+  createAuditEvent,
+  calculateCaseDurations,
+  buildLatestMapFromJsonlRows,
+  transitionCaseStatus,
+  validateCase,
+} from "./closingTheLoopSchema.js";
+
 // --- Private auth (shared password cookie) ---
 // Mirrors server.js: cookie name "npsme_private", value = HMAC(secret, "npsme_private_v1")
 const PRIVATE_COOKIE_NAME = "npsme_private";
@@ -86,14 +95,7 @@ const CTL_CONTACT_EVENTS_PATH = `${CTL_BASE_PATH}/ctl_contact_events.jsonl`;
 const CTL_IMPACT_CHECKS_PATH = `${CTL_BASE_PATH}/ctl_impact_checks.jsonl`;
 const CTL_AUDIT_LOG_PATH = `${CTL_BASE_PATH}/ctl_case_audit_log.jsonl`;
 
-import {
-  createCaseFromQueueItem,
-  createAuditEvent,
-  calculateCaseDurations,
-  buildLatestMapFromJsonlRows,
-  transitionCaseStatus,
-  validateCase,
-} from "./closingTheLoopSchema.js";
+
 
 // -----------------------
 // In-memory caches (per Node process)
@@ -1590,6 +1592,23 @@ export function createIntercomRouter() {
       const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
       const rows = parseJsonl(text);
 
+      const ctlCases = await readCtlJsonl(CTL_CASES_PATH);
+        const latestCtlCaseMap = buildLatestMapFromJsonlRows(ctlCases, "case_id");
+        const latestCtlCases = Array.from(latestCtlCaseMap.values())
+          .filter((c) => String(c?.content_id || "") === contentId)
+          .filter((c) => !["closed", "cancelled"].includes(String(c?.status || "")));
+
+        const activeCaseByResponseKey = new Map();
+        const activeCaseByContactKey = new Map();
+
+        for (const c of latestCtlCases) {
+          const responseKey = `${String(c?.content_id || "")}::${String(c?.response_id || "")}`;
+          const contactKey = `${String(c?.content_id || "")}::${String(c?.contact_id || "")}`;
+
+          if (c?.response_id) activeCaseByResponseKey.set(responseKey, c);
+          if (c?.contact_id) activeCaseByContactKey.set(contactKey, c);
+        }
+
       const since = Date.now() - days * 24 * 60 * 60 * 1000;
 
       // Group by contact_id
@@ -1670,6 +1689,13 @@ export function createIntercomRouter() {
           hasSubstantive,
         });
 
+        const responseKey = `${contentId}::${String(latest.response_id || "")}`;
+        const contactKey = `${contentId}::${String(contact_id || "")}`;
+        const linkedCase =
+          activeCaseByResponseKey.get(responseKey) ||
+          activeCaseByContactKey.get(contactKey) ||
+          null;
+
         queue.push({
           contact_id,
           response_id: latest.response_id || null,
@@ -1685,6 +1711,16 @@ export function createIntercomRouter() {
           themes,
           risk_score,
           recommendation: recommendAction(latestBucket, risk_score),
+
+          active_case: linkedCase
+            ? {
+                case_id: linkedCase.case_id,
+                status: linkedCase.status,
+                owner_team: linkedCase.owner_team || null,
+                owner_user: linkedCase.owner_user || null,
+                is_paused: !!linkedCase.is_paused,
+              }
+            : null,
         });
       }
 
@@ -1721,9 +1757,12 @@ export function createIntercomRouter() {
     const contactMap = groupByCaseId(contactEvents);
     const impactMap = groupByCaseId(impactChecks);
 
-    let items = cases
+    const latestCaseMap = buildLatestMapFromJsonlRows(cases, "case_id");
+    const latestCases = Array.from(latestCaseMap.values());
+
+    let items = latestCases
       .filter((c) => String(c?.content_id || "") === contentId)
-      .filter((c) => (includeClosed ? true : c?.status !== "closed"))
+      .filter((c) => includeClosed ? true : !["closed", "cancelled"].includes(String(c?.status || "")))
       .filter((c) => (statusFilter ? String(c?.status || "") === statusFilter : true))
       .map((c) => {
         const caseId = String(c.case_id);
@@ -1782,8 +1821,10 @@ router.post("/private/closing-the-loop/cases", requirePrivateCookie, express.jso
     }
 
     const existingCases = await readCtlJsonl(CTL_CASES_PATH);
+    const latestCaseMap = buildLatestMapFromJsonlRows(existingCases, "case_id");
+    const latestCases = Array.from(latestCaseMap.values());
 
-    const duplicate = existingCases.find((c) => {
+    const duplicate = latestCases.find((c) => {
       return (
         String(c?.content_id || "") === contentId &&
         String(c?.contact_id || "") === String(queueItem.contact_id || "") &&

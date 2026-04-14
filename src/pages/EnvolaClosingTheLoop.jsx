@@ -380,6 +380,10 @@ function stageClassName({ state, clickable }) {
 export default function EnvolaClosingTheLoop() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
+  const location = useLocation();
+
+  const navAnchorRef = React.useRef(null);
+  const [isNavPinned, setIsNavPinned] = React.useState(false);
 
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
   const [days, setDays] = React.useState(30);
@@ -391,9 +395,6 @@ export default function EnvolaClosingTheLoop() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [data, setData] = React.useState(null);
-
-  const location = useLocation();
-  const isNavPinned = false;
 
   const [casesLoading, setCasesLoading] = React.useState(false);
   const [casesError, setCasesError] = React.useState("");
@@ -411,6 +412,24 @@ export default function EnvolaClosingTheLoop() {
   const [detail, setDetail] = React.useState(null);
   const [rawView, setRawView] = React.useState("all");
   const [rawShowJson, setRawShowJson] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      const el = navAnchorRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      setIsNavPinned(rect.top <= 0);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   const closeModal = React.useCallback(() => {
     setOpenId(null);
@@ -696,44 +715,50 @@ export default function EnvolaClosingTheLoop() {
     modalOpenIntercom: tr("closingTheLoop.modal.openIntercom", "Open contact in Intercom"),
   };
 
-  return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <div className="flex items-start justify-between gap-6 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-semibold text-white">{title}</h1>
-          <section
-            className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
-              isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
-            }`}
-          >
-            <div className="mx-auto max-w-7xl px-6 py-3">
-              <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
-            </div>
-          </section>
-          <p className="mt-3 text-slate-300">{subtitle}</p>
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-semibold text-white">{title}</h1>
+            <p className="mt-3 text-slate-300">{subtitle}</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={fetchQueue}
+              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              disabled={loading}
+            >
+              {loading ? labels.refreshing : labels.refresh}
+            </button>
+
+            <button
+              type="button"
+              onClick={fetchCases}
+              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              disabled={casesLoading}
+            >
+              {casesLoading ? "Refreshing cases…" : "Refresh cases"}
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={fetchQueue}
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
-            disabled={loading}
-          >
-            {loading ? labels.refreshing : labels.refresh}
-          </button>
+        <div ref={navAnchorRef} className="mt-6 h-px w-full" />
 
-          <button
-            type="button"
-            onClick={fetchCases}
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
-            disabled={casesLoading}
-          >
-            {casesLoading ? "Refreshing cases…" : "Refresh cases"}
-          </button>
-        </div>
-      </div>
+        {isNavPinned && <div className="h-[66px]" />}
 
+        <section
+          className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
+            isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
+          }`}
+        >
+          <div className="mx-auto max-w-7xl px-6 py-3">
+            <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+          </div>
+        </section>
+
+        
       {/* Controls */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-3">
         <div className="md:col-span-4">

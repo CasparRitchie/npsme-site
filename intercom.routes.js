@@ -321,15 +321,16 @@ async function appendCtlJsonl(path, obj) {
 }
 
 async function loadCtlState() {
-  const [cases, actions, pauseEvents, contactEvents, impactChecks] = await Promise.all([
+  const [cases, actions, pauseEvents, contactEvents, impactChecks, auditLog] = await Promise.all([
     readCtlJsonl(CTL_CASES_PATH),
     readCtlJsonl(CTL_ACTIONS_PATH),
     readCtlJsonl(CTL_PAUSE_EVENTS_PATH),
     readCtlJsonl(CTL_CONTACT_EVENTS_PATH),
     readCtlJsonl(CTL_IMPACT_CHECKS_PATH),
+    readCtlJsonl(CTL_AUDIT_LOG_PATH),
   ]);
 
-  return { cases, actions, pauseEvents, contactEvents, impactChecks };
+  return { cases, actions, pauseEvents, contactEvents, impactChecks, auditLog };
 }
 
 function groupByCaseId(rows) {
@@ -1750,12 +1751,13 @@ export function createIntercomRouter() {
     const includeClosed = String(req.query.include_closed || "").trim() === "1";
     const limit = clampInt(req.query.limit, 200, 1, 2000);
 
-    const { cases, actions, pauseEvents, contactEvents, impactChecks } = await loadCtlState();
-
+    const { cases, actions, pauseEvents, contactEvents, impactChecks, auditLog } = await loadCtlState();
     const actionMap = groupByCaseId(actions);
     const pauseMap = groupByCaseId(pauseEvents);
     const contactMap = groupByCaseId(contactEvents);
     const impactMap = groupByCaseId(impactChecks);
+    const auditMap = groupByCaseId(auditLog);
+
 
     const latestCaseMap = buildLatestMapFromJsonlRows(cases, "case_id");
     const latestCases = Array.from(latestCaseMap.values());
@@ -1770,6 +1772,7 @@ export function createIntercomRouter() {
         const casePauses = pauseMap.get(caseId) || [];
         const caseContacts = contactMap.get(caseId) || [];
         const caseImpact = impactMap.get(caseId) || [];
+        const caseAudit = auditMap.get(caseId) || [];
 
         return {
           ...c,
@@ -1778,10 +1781,12 @@ export function createIntercomRouter() {
           pause_events_count: casePauses.length,
           contact_events_count: caseContacts.length,
           impact_checks_count: caseImpact.length,
+          audit_log_count: caseAudit.length,
           actions: caseActions,
           pause_events: casePauses,
           contact_events: caseContacts,
           impact_checks: caseImpact,
+          audit_log: caseAudit,
         };
       });
 

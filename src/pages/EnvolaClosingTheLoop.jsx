@@ -2,6 +2,8 @@
 import React from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import { useLocation } from "react-router-dom";
+import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
 const DEFAULT_CONTENT_ID = "189616";
 
@@ -375,7 +377,7 @@ function stageClassName({ state, clickable }) {
   return `${base} border-white/10 bg-white/5 text-slate-400`;
 }
 
-export default function ClosingTheLoop() {
+export default function EnvolaClosingTheLoop() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
 
@@ -389,6 +391,9 @@ export default function ClosingTheLoop() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [data, setData] = React.useState(null);
+
+  const location = useLocation();
+  const isNavPinned = false;
 
   const [casesLoading, setCasesLoading] = React.useState(false);
   const [casesError, setCasesError] = React.useState("");
@@ -696,6 +701,15 @@ export default function ClosingTheLoop() {
       <div className="flex items-start justify-between gap-6 flex-wrap">
         <div>
           <h1 className="text-3xl font-semibold text-white">{title}</h1>
+          <section
+            className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
+              isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
+            }`}
+          >
+            <div className="mx-auto max-w-7xl px-6 py-3">
+              <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+            </div>
+          </section>
           <p className="mt-3 text-slate-300">{subtitle}</p>
         </div>
 

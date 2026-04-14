@@ -1,8 +1,9 @@
 // src/pages/EnvolaClosingTheLoop.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import { useLocation } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
 const DEFAULT_CONTENT_ID = "189616";
@@ -273,40 +274,28 @@ function nextStatusOptions(currentStatus) {
   switch (currentStatus) {
     case "new":
       return ["triaged"];
-
     case "triaged":
       return ["customer_followup_planned"];
-
     case "customer_followup_planned":
       return ["customer_followup_completed"];
-
     case "customer_followup_completed":
       return ["owner_assigned"];
-
     case "owner_assigned":
       return ["improvement_planned"];
-
     case "improvement_planned":
       return ["improvement_scheduled", "improvement_in_progress"];
-
     case "improvement_scheduled":
       return ["improvement_in_progress"];
-
     case "improvement_in_progress":
       return ["improvement_completed"];
-
     case "improvement_completed":
       return ["customer_informed", "impact_check_pending"];
-
     case "customer_informed":
       return ["impact_check_pending", "impact_checked", "closed"];
-
     case "impact_check_pending":
       return ["impact_checked", "closed"];
-
     case "impact_checked":
       return ["closed"];
-
     default:
       return [];
   }
@@ -338,13 +327,11 @@ function prettyStatus(status) {
 
 function formatActionType(action) {
   if (!action) return "Update";
-
   if (action.event_type === "case_created") return "Case created";
   if (action.event_type === "case_closed") return "Case closed";
   if (action.event_type === "status_changed") {
     return action.to_value ? prettyStatus(action.to_value) : "Status changed";
   }
-
   return prettyStatus(action.event_type || "update");
 }
 
@@ -413,21 +400,18 @@ export default function EnvolaClosingTheLoop() {
   const [rawView, setRawView] = React.useState("all");
   const [rawShowJson, setRawShowJson] = React.useState(false);
 
-  React.useEffect(() => {
-    const onScroll = () => {
-      const el = navAnchorRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
+  useEffect(() => {
+    function handleScroll() {
+      if (!navAnchorRef.current) return;
+      const rect = navAnchorRef.current.getBoundingClientRect();
       setIsNavPinned(rect.top <= 0);
-    };
+    }
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -715,15 +699,19 @@ export default function EnvolaClosingTheLoop() {
     modalOpenIntercom: tr("closingTheLoop.modal.openIntercom", "Open contact in Intercom"),
   };
 
-    return (
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <div>
-            <h1 className="text-3xl font-semibold text-white">{title}</h1>
-            <p className="mt-3 text-slate-300">{subtitle}</p>
-          </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace / Envola")}>
+        <div className="pt-4">
+          <h1 className="text-3xl md:text-4xl font-semibold text-white">
+            {title}
+          </h1>
 
-          <div className="flex items-center gap-3">
+          <p className="mt-3 max-w-3xl text-slate-300">
+            {subtitle}
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={fetchQueue}
@@ -743,95 +731,97 @@ export default function EnvolaClosingTheLoop() {
             </button>
           </div>
         </div>
+      </PageHeader>
 
-        <div ref={navAnchorRef} className="mt-6 h-px w-full" />
+      <div ref={navAnchorRef} className="h-px w-full" />
 
-        {isNavPinned && <div className="h-[66px]" />}
+      {isNavPinned && <div className="h-[66px]" />}
 
-        <section
-          className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
-            isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
-          }`}
-        >
-          <div className="mx-auto max-w-7xl px-6 py-3">
-            <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+      <section
+        className={`border-y border-white/10 bg-[#0B1220]/95 backdrop-blur-md ${
+          isNavPinned ? "fixed inset-x-0 top-0 z-[80]" : "relative"
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-6 py-3">
+          <EnvolaWorkspaceNav lang={lang} currentPath={location.pathname} />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-6 pt-6">
+        {/* Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div className="md:col-span-4">
+            <label className="text-xs text-slate-400">{labels.contentId}</label>
+            <input
+              value={contentId}
+              onChange={(e) => setContentId(e.target.value)}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              placeholder="e.g. 189616"
+            />
           </div>
-        </section>
 
-        
-      {/* Controls */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-3">
-        <div className="md:col-span-4">
-          <label className="text-xs text-slate-400">{labels.contentId}</label>
-          <input
-            value={contentId}
-            onChange={(e) => setContentId(e.target.value)}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            placeholder="e.g. 189616"
-          />
+          <div className="md:col-span-2">
+            <label className="text-xs text-slate-400">{labels.days}</label>
+            <input
+              type="number"
+              min={1}
+              max={3650}
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value || 30))}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-xs text-slate-400">{labels.limit}</label>
+            <input
+              type="number"
+              min={1}
+              max={2000}
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value || 50))}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-xs text-slate-400">{labels.bucket}</label>
+            <select
+              value={bucket}
+              onChange={(e) => setBucket(e.target.value)}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            >
+              <option value="all">{labels.all}</option>
+              <option value="detractor">{labels.detractors}</option>
+              <option value="passive">{labels.passives}</option>
+              <option value="promoter">{labels.promoters}</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-xs text-slate-400">{labels.sort}</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            >
+              <option value="risk">{labels.risk}</option>
+              <option value="date">{labels.latestDate}</option>
+              <option value="score">{labels.score}</option>
+            </select>
+          </div>
         </div>
 
-        <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">{labels.days}</label>
-          <input
-            type="number"
-            min={1}
-            max={3650}
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value || 30))}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">{labels.limit}</label>
-          <input
-            type="number"
-            min={1}
-            max={2000}
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value || 50))}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">{labels.bucket}</label>
-          <select
-            value={bucket}
-            onChange={(e) => setBucket(e.target.value)}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-          >
-            <option value="all">{labels.all}</option>
-            <option value="detractor">{labels.detractors}</option>
-            <option value="passive">{labels.passives}</option>
-            <option value="promoter">{labels.promoters}</option>
-          </select>
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="text-xs text-slate-400">{labels.sort}</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-          >
-            <option value="risk">{labels.risk}</option>
-            <option value="date">{labels.latestDate}</option>
-            <option value="score">{labels.score}</option>
-          </select>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
-          <div className="font-medium">{labels.errorTitle}</div>
-          <div className="mt-1 text-sm opacity-90">{error}</div>
-        </div>
-      )}
+        {error && (
+          <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
+            <div className="font-medium">{labels.errorTitle}</div>
+            <div className="mt-1 text-sm opacity-90">{error}</div>
+          </div>
+        )}
+      </section>
 
       {/* Queue */}
-      <section className="mt-8">
+      <section className="mx-auto max-w-7xl px-6 pb-10">
         <div className="flex items-center justify-between gap-3 mb-3">
           <button
             type="button"

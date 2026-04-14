@@ -1014,38 +1014,73 @@ export default function ClosingTheLoop() {
                         ))}
                       </div>
 
-                      <div className="mt-3 grid gap-1 text-xs text-slate-400">
-                        <div>
-                          Customer follow-up completed:{" "}
-                          <span className="text-white">{formatDate(c.customer_followup_completed_at)}</span>
-                        </div>
-                        <div>
-                          Owner assigned:{" "}
-                          <span className="text-white">{formatDate(c.owner_assigned_at)}</span>
-                        </div>
-                        <div>
-                          Improvement planned:{" "}
-                          <span className="text-white">{formatDate(c.improvement_planned_at)}</span>
-                        </div>
-                        <div>
-                          Improvement completed:{" "}
-                          <span className="text-white">{formatDate(c.improvement_completed_at)}</span>
-                        </div>
-                        <div>
-                          Customer informed:{" "}
-                          <span className="text-white">{formatDate(c.customer_informed_at)}</span>
-                        </div>
-                        <div>
-                          Impact checked:{" "}
-                          <span className="text-white">{formatDate(c.impact_checked_at)}</span>
-                        </div>
-                        <div>
-                          Closed:{" "}
-                          <span className="text-white">{formatDate(c.closed_at)}</span>
-                        </div>
-                      </div>
+                      {(() => {
+                        const auditByToValue = new Map(
+                          (Array.isArray(c.audit_log) ? c.audit_log : [])
+                            .filter((a) => a?.to_value)
+                            .sort((a, b) =>
+                              String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
+                            )
+                            .map((a) => [a.to_value, a])
+                        );
 
-                      {Array.isArray(c.audit_log) && c.audit_log.some((a) => a?.notes) && (
+                        const renderStageRow = (label, dateValue, statusKey) => {
+                          const audit = auditByToValue.get(statusKey);
+                          const note = audit?.notes?.trim();
+
+                          return (
+                            <div className="flex flex-wrap gap-x-2 gap-y-1">
+                              <span>{label}:</span>
+                              <span className="text-white">{formatDate(dateValue)}</span>
+                              {note ? (
+                                <span className="text-slate-300 italic">— {note}</span>
+                              ) : null}
+                            </div>
+                          );
+                        };
+
+                        return (
+                          <div className="mt-3 grid gap-1 text-xs text-slate-400">
+                            {renderStageRow(
+                              "Customer follow-up completed",
+                              c.customer_followup_completed_at,
+                              "customer_followup_completed"
+                            )}
+                            {renderStageRow(
+                              "Owner assigned",
+                              c.owner_assigned_at,
+                              "owner_assigned"
+                            )}
+                            {renderStageRow(
+                              "Improvement planned",
+                              c.improvement_planned_at,
+                              "improvement_planned"
+                            )}
+                            {renderStageRow(
+                              "Improvement completed",
+                              c.improvement_completed_at,
+                              "improvement_completed"
+                            )}
+                            {renderStageRow(
+                              "Customer informed",
+                              c.customer_informed_at,
+                              "customer_informed"
+                            )}
+                            {renderStageRow(
+                              "Impact checked",
+                              c.impact_checked_at,
+                              "impact_checked"
+                            )}
+                            {renderStageRow(
+                              "Closed",
+                              c.closed_at,
+                              "closed"
+                            )}
+                          </div>
+                        );
+                      })()}
+
+                      {/* {Array.isArray(c.audit_log) && c.audit_log.some((a) => a?.notes) && (
                         <div className="mt-4">
                           <div className="text-xs text-slate-400 mb-2">Progress notes</div>
                           <div className="space-y-2">
@@ -1071,7 +1106,7 @@ export default function ClosingTheLoop() {
                               ))}
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     <div className="text-sm text-slate-300 space-y-1 min-w-[240px]">

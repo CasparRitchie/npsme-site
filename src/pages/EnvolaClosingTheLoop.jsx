@@ -334,6 +334,31 @@ function prettyStatus(status) {
     .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
+function getStageState(caseStatus, stage) {
+  const currentIndex = CASE_STAGES.indexOf(caseStatus);
+  const stageIndex = CASE_STAGES.indexOf(stage);
+
+  if (currentIndex === -1 || stageIndex === -1) return "future";
+  if (stageIndex < currentIndex) return "done";
+  if (stageIndex === currentIndex) return "current";
+  return "future";
+}
+
+function stageClassName(state) {
+  const base =
+    "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition";
+
+  if (state === "current") {
+    return `${base} border-[#22C55E] bg-[#22C55E]/10 text-[#DCFCE7]`;
+  }
+
+  if (state === "done") {
+    return `${base} border-[#7C3AED] bg-[#7C3AED]/10 text-[#E9D5FF]`;
+  }
+
+  return `${base} border-white/10 bg-white/5 text-slate-400`;
+}
+
 export default function ClosingTheLoop() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
@@ -938,6 +963,7 @@ export default function ClosingTheLoop() {
               const bucket = c.latest_bucket || scoreBucket(c.latest_score_0_10);
               const nextStatuses = nextStatusOptions(c.status);
               const durations = c.durations || {};
+              const currentStageIndex = CASE_STAGES.indexOf(c.status);
 
               return (
                 <div
@@ -1050,25 +1076,48 @@ export default function ClosingTheLoop() {
                     />
                   </div>
 
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {nextStatuses.length > 0 ? (
-                      nextStatuses.map((status) => (
-                        <button
-                          key={status}
-                          type="button"
-                          onClick={() => updateCaseStatus(c.case_id, status)}
-                          disabled={caseActionLoadingId === c.case_id}
-                          className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition disabled:opacity-60"
-                        >
-                          {caseActionLoadingId === c.case_id
-                            ? "Updating…"
-                            : prettyStatus(status)}
-                        </button>
-                      ))
-                    ) : (
-                      <span className="text-xs text-slate-400">
-                        No next status actions available
-                      </span>
+                  <div className="mt-5">
+                    <div className="mb-2 text-xs text-slate-400">Workflow stages</div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {CASE_STAGES.map((stage) => {
+                        const state = getStageState(c.status, stage);
+                        const isCurrent = stage === c.status;
+                        const isNext = nextStatuses.includes(stage);
+                        const isClosed = c.status === "closed";
+                        const clickable = !isClosed && isNext;
+
+                        return (
+                          <button
+                            key={stage}
+                            type="button"
+                            onClick={() => clickable && updateCaseStatus(c.case_id, stage)}
+                            disabled={caseActionLoadingId === c.case_id || !clickable}
+                            className={`${stageClassName(state)} ${
+                              clickable ? "hover:bg-white/10 cursor-pointer" : "cursor-default"
+                            } disabled:opacity-60`}
+                            title={
+                              isCurrent
+                                ? "Current stage"
+                                : state === "done"
+                                ? "Completed stage"
+                                : clickable
+                                ? "Click to move to this stage"
+                                : "Not available yet"
+                            }
+                          >
+                            {caseActionLoadingId === c.case_id && clickable
+                              ? "Updating…"
+                              : prettyStatus(stage)}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {c.status === "closed" && (
+                      <div className="mt-3 text-xs text-emerald-300">
+                        This loop has been closed. It will no longer appear as an active case in the queue.
+                      </div>
                     )}
                   </div>
                 </div>

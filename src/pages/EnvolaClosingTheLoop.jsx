@@ -1045,33 +1045,33 @@ export default function ClosingTheLoop() {
                         </div>
                       </div>
 
-                      {Array.isArray(c.actions) && c.actions.length > 0 && (
-                      <div className="mt-4">
-                        <div className="text-xs text-slate-400 mb-2">Progress notes</div>
-                        <div className="space-y-2">
-                          {c.actions
-                            .filter((a) => a?.notes)
-                            .sort((a, b) =>
-                              String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
-                            )
-                            .map((a, idx) => (
-                              <div
-                                key={`${a.case_id || c.case_id}-action-${idx}`}
-                                className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3"
-                              >
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                                  <span className="text-slate-200">{formatActionType(a)}</span>
-                                  <span>•</span>
-                                  <span>{formatDate(a.created_at)}</span>
+                      {Array.isArray(c.audit_log) && c.audit_log.some((a) => a?.notes) && (
+                        <div className="mt-4">
+                          <div className="text-xs text-slate-400 mb-2">Progress notes</div>
+                          <div className="space-y-2">
+                            {c.audit_log
+                              .filter((a) => a?.notes)
+                              .sort((a, b) =>
+                                String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
+                              )
+                              .map((a, idx) => (
+                                <div
+                                  key={`${a.case_id || c.case_id}-audit-${idx}`}
+                                  className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3"
+                                >
+                                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                                    <span className="text-slate-200">{formatActionType(a)}</span>
+                                    <span>•</span>
+                                    <span>{formatDate(a.created_at)}</span>
+                                  </div>
+                                  <div className="mt-2 text-sm text-slate-200 whitespace-pre-wrap">
+                                    {a.notes}
+                                  </div>
                                 </div>
-                                <div className="mt-2 text-sm text-slate-200 whitespace-pre-wrap">
-                                  {a.notes}
-                                </div>
-                              </div>
-                            ))}
+                              ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                     </div>
 
                     <div className="text-sm text-slate-300 space-y-1 min-w-[240px]">

@@ -334,6 +334,18 @@ function prettyStatus(status) {
     .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
+function formatActionType(action) {
+  if (!action) return "Update";
+
+  if (action.event_type === "case_created") return "Case created";
+  if (action.event_type === "case_closed") return "Case closed";
+  if (action.event_type === "status_changed") {
+    return action.to_value ? prettyStatus(action.to_value) : "Status changed";
+  }
+
+  return prettyStatus(action.event_type || "update");
+}
+
 function getStageState(caseStatus, stage) {
   const currentIndex = CASE_STAGES.indexOf(caseStatus);
   const stageIndex = CASE_STAGES.indexOf(stage);
@@ -344,12 +356,16 @@ function getStageState(caseStatus, stage) {
   return "future";
 }
 
-function stageClassName(state) {
+function stageClassName({ state, clickable }) {
   const base =
     "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition";
 
+  if (clickable) {
+    return `${base} border-[#22C55E] bg-[#22C55E]/15 text-[#DCFCE7] hover:bg-[#22C55E] hover:text-[#0B0F19] hover:border-[#4ADE80]`;
+  }
+
   if (state === "current") {
-    return `${base} border-[#22C55E] bg-[#22C55E]/10 text-[#DCFCE7]`;
+    return `${base} border-slate-400/30 bg-slate-500/15 text-slate-200`;
   }
 
   if (state === "done") {
@@ -1028,6 +1044,34 @@ export default function ClosingTheLoop() {
                           <span className="text-white">{formatDate(c.closed_at)}</span>
                         </div>
                       </div>
+
+                      {Array.isArray(c.actions) && c.actions.length > 0 && (
+                      <div className="mt-4">
+                        <div className="text-xs text-slate-400 mb-2">Progress notes</div>
+                        <div className="space-y-2">
+                          {c.actions
+                            .filter((a) => a?.notes)
+                            .sort((a, b) =>
+                              String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
+                            )
+                            .map((a, idx) => (
+                              <div
+                                key={`${a.case_id || c.case_id}-action-${idx}`}
+                                className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3"
+                              >
+                                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                                  <span className="text-slate-200">{formatActionType(a)}</span>
+                                  <span>•</span>
+                                  <span>{formatDate(a.created_at)}</span>
+                                </div>
+                                <div className="mt-2 text-sm text-slate-200 whitespace-pre-wrap">
+                                  {a.notes}
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                     </div>
 
                     <div className="text-sm text-slate-300 space-y-1 min-w-[240px]">
@@ -1060,7 +1104,7 @@ export default function ClosingTheLoop() {
 
                   <div className="mt-5">
                     <label className="block text-xs text-slate-400 mb-2">
-                      Comment for next step
+                      Add note before moving to the next stage
                     </label>
                     <textarea
                       value={caseComments[c.case_id] || ""}
@@ -1093,8 +1137,8 @@ export default function ClosingTheLoop() {
                             type="button"
                             onClick={() => clickable && updateCaseStatus(c.case_id, stage)}
                             disabled={caseActionLoadingId === c.case_id || !clickable}
-                            className={`${stageClassName(state)} ${
-                              clickable ? "hover:bg-white/10 cursor-pointer" : "cursor-default"
+                            className={`${stageClassName({ state, clickable })} ${
+                              clickable ? "cursor-pointer" : "cursor-default"
                             } disabled:opacity-60`}
                             title={
                               isCurrent

@@ -352,6 +352,7 @@ export default function ClosingTheLoop() {
   const [casesLoading, setCasesLoading] = React.useState(false);
   const [casesError, setCasesError] = React.useState("");
   const [casesData, setCasesData] = React.useState([]);
+  const [caseComments, setCaseComments] = React.useState({});
 
   const [caseActionLoadingId, setCaseActionLoadingId] = React.useState(null);
   const [queueActionLoadingId, setQueueActionLoadingId] = React.useState(null);
@@ -558,7 +559,7 @@ export default function ClosingTheLoop() {
             body: JSON.stringify({
               status,
               changed_by: "envola_user",
-              notes: comment,
+              notes: caseComments[caseId] || "",
             }),
           }
         );
@@ -570,6 +571,11 @@ export default function ClosingTheLoop() {
           throw new Error(j?.error || `Request failed (${r.status})`);
         }
 
+        setCaseComments((prev) => ({
+          ...prev,
+          [caseId]: "",
+        }));
+
         await Promise.all([fetchCases(), fetchQueue()]);
       } catch (e) {
         alert(String(e?.message || e));
@@ -577,7 +583,7 @@ export default function ClosingTheLoop() {
         setCaseActionLoadingId(null);
       }
     },
-    [fetchCases, fetchQueue]
+    [caseComments, fetchCases, fetchQueue]
   );
 
   React.useEffect(() => {
@@ -1024,6 +1030,24 @@ export default function ClosingTheLoop() {
                         <span className="text-white">{c.contact_events_count ?? 0}</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <label className="block text-xs text-slate-400 mb-2">
+                      Comment for next step
+                    </label>
+                    <textarea
+                      value={caseComments[c.case_id] || ""}
+                      onChange={(e) =>
+                        setCaseComments((prev) => ({
+                          ...prev,
+                          [c.case_id]: e.target.value,
+                        }))
+                      }
+                      rows={3}
+                      placeholder="Add context, outcome, owner notes, customer update, etc."
+                      className="w-full rounded-2xl bg-black/20 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+                    />
                   </div>
 
                   <div className="mt-5 flex flex-wrap gap-2">

@@ -251,12 +251,18 @@ function groupVerbatims(verbatims) {
   return Array.from(out.entries());
 }
 
-const STATUS_FLOW = [
+const CASE_STAGES = [
+  "new",
+  "triaged",
+  "customer_followup_planned",
   "customer_followup_completed",
   "owner_assigned",
   "improvement_planned",
+  "improvement_scheduled",
+  "improvement_in_progress",
   "improvement_completed",
   "customer_informed",
+  "impact_check_pending",
   "impact_checked",
   "closed",
 ];
@@ -349,6 +355,8 @@ export default function ClosingTheLoop() {
 
   const [caseActionLoadingId, setCaseActionLoadingId] = React.useState(null);
   const [queueActionLoadingId, setQueueActionLoadingId] = React.useState(null);
+
+  const [queueCollapsed, setQueueCollapsed] = React.useState(false);
 
   const [openId, setOpenId] = React.useState(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
@@ -550,6 +558,7 @@ export default function ClosingTheLoop() {
             body: JSON.stringify({
               status,
               changed_by: "envola_user",
+              notes: comment,
             }),
           }
         );
@@ -738,6 +747,13 @@ export default function ClosingTheLoop() {
       {/* Queue */}
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3 mb-3">
+          <button
+            type="button"
+            onClick={() => setQueueCollapsed((v) => !v)}
+            className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+          >
+            {queueCollapsed ? "Show queue" : "Hide queue"}
+          </button>
           <h2 className="text-xl font-semibold text-white">Queue</h2>
           <div className="text-xs text-slate-400">
             Prioritised from recent survey responses
@@ -759,6 +775,7 @@ export default function ClosingTheLoop() {
         {!error && !loading && queue.length > 0 && (
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0B0F19]/40">
             <div className="overflow-x-auto">
+              {!queueCollapsed && (
               <table className="min-w-full text-sm">
                 <thead className="bg-white/5 text-slate-300">
                   <tr>
@@ -871,6 +888,7 @@ export default function ClosingTheLoop() {
                   })}
                 </tbody>
               </table>
+              )}
             </div>
 
             <div className="px-4 py-3 text-xs text-slate-400 border-t border-white/10">

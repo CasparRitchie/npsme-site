@@ -264,32 +264,66 @@ const STATUS_FLOW = [
 function nextStatusOptions(currentStatus) {
   switch (currentStatus) {
     case "new":
+      return ["triaged"];
+
     case "triaged":
+      return ["customer_followup_planned"];
+
     case "customer_followup_planned":
       return ["customer_followup_completed"];
+
     case "customer_followup_completed":
       return ["owner_assigned"];
+
     case "owner_assigned":
       return ["improvement_planned"];
+
     case "improvement_planned":
+      return ["improvement_scheduled", "improvement_in_progress"];
+
     case "improvement_scheduled":
+      return ["improvement_in_progress"];
+
     case "improvement_in_progress":
       return ["improvement_completed"];
+
     case "improvement_completed":
       return ["customer_informed", "impact_check_pending"];
+
     case "customer_informed":
-      return ["impact_checked", "closed"];
+      return ["impact_check_pending", "impact_checked", "closed"];
+
     case "impact_check_pending":
       return ["impact_checked", "closed"];
+
     case "impact_checked":
       return ["closed"];
+
     default:
       return [];
   }
 }
 
 function prettyStatus(status) {
-  return String(status || "")
+  const labels = {
+    new: "New",
+    triaged: "Triaged",
+    customer_followup_planned: "Follow-up planned",
+    customer_followup_completed: "Follow-up completed",
+    owner_assigned: "Owner assigned",
+    improvement_planned: "Improvement planned",
+    improvement_scheduled: "Improvement scheduled",
+    improvement_in_progress: "Improvement in progress",
+    improvement_completed: "Improvement completed",
+    customer_informed: "Customer informed",
+    impact_check_pending: "Impact check pending",
+    impact_checked: "Impact checked",
+    closed: "Closed",
+    paused: "Paused",
+    cancelled: "Cancelled",
+  };
+
+  return labels[status] || String(status || "")
     .replaceAll("_", " ")
     .replace(/\b\w/g, (m) => m.toUpperCase());
 }

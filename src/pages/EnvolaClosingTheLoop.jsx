@@ -491,8 +491,7 @@ export default function ClosingTheLoop() {
         if (!r.ok || !j?.ok) {
           throw new Error(j?.error || `Request failed (${r.status})`);
         }
-
-        await fetchCases();
+        await Promise.all([fetchCases(), fetchQueue()]);
       } catch (e) {
         alert(String(e?.message || e));
       } finally {
@@ -522,18 +521,20 @@ export default function ClosingTheLoop() {
         );
 
         const j = await r.json().catch(() => null);
+        console.log("status update response", j);
+
         if (!r.ok || !j?.ok) {
           throw new Error(j?.error || `Request failed (${r.status})`);
         }
 
-        await fetchCases();
+        await Promise.all([fetchCases(), fetchQueue()]);
       } catch (e) {
         alert(String(e?.message || e));
       } finally {
         setCaseActionLoadingId(null);
       }
     },
-    [fetchCases]
+    [fetchCases, fetchQueue]
   );
 
   React.useEffect(() => {
@@ -879,12 +880,13 @@ export default function ClosingTheLoop() {
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs text-slate-400">Current status</span>
                         <Chip tone="indigo">{prettyStatus(c.status)}</Chip>
                         <Chip tone={c.priority === "high" || c.priority === "critical" ? "red" : "amber"}>
                           Priority: {c.priority || "—"}
                         </Chip>
-                        <span className={bucketPill(bucket)}>
-                          {bucket || "unknown"}
+                        <span className={bucketPill(c.latest_bucket || scoreBucket(c.latest_score_0_10))}>
+                          {c.latest_bucket || scoreBucket(c.latest_score_0_10)}
                         </span>
                       </div>
 
@@ -901,6 +903,37 @@ export default function ClosingTheLoop() {
                         {(c.theme_secondary || []).map((t) => (
                           <Chip key={t}>{t}</Chip>
                         ))}
+                      </div>
+
+                      <div className="mt-3 grid gap-1 text-xs text-slate-400">
+                        <div>
+                          Customer follow-up completed:{" "}
+                          <span className="text-white">{formatDate(c.customer_followup_completed_at)}</span>
+                        </div>
+                        <div>
+                          Owner assigned:{" "}
+                          <span className="text-white">{formatDate(c.owner_assigned_at)}</span>
+                        </div>
+                        <div>
+                          Improvement planned:{" "}
+                          <span className="text-white">{formatDate(c.improvement_planned_at)}</span>
+                        </div>
+                        <div>
+                          Improvement completed:{" "}
+                          <span className="text-white">{formatDate(c.improvement_completed_at)}</span>
+                        </div>
+                        <div>
+                          Customer informed:{" "}
+                          <span className="text-white">{formatDate(c.customer_informed_at)}</span>
+                        </div>
+                        <div>
+                          Impact checked:{" "}
+                          <span className="text-white">{formatDate(c.impact_checked_at)}</span>
+                        </div>
+                        <div>
+                          Closed:{" "}
+                          <span className="text-white">{formatDate(c.closed_at)}</span>
+                        </div>
                       </div>
                     </div>
 

@@ -67,6 +67,9 @@ const ENVOLA_RESPONSES_PATH =
 const INTERCOM_SURVEY_EVENTS_PATH =
   process.env.DROPBOX_INTERCOM_SURVEY_EVENTS_PATH || "/npsme/intercom/survey-events.jsonl";
 
+const INTERCOM_SURVEY_STATS_PATH =
+  process.env.DROPBOX_INTERCOM_SURVEY_STATS_PATH || "/npsme/intercom/survey-stats.jsonl";
+
 const DEFAULT_CONTENT_ID = process.env.ENVOLA_CONTENT_ID || "189616";
 const ENVOLA_INTERCOM_APP_ID = process.env.ENVOLA_INTERCOM_APP_ID || "";
 

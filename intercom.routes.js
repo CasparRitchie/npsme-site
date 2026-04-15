@@ -12,7 +12,11 @@ import {
   buildLatestMapFromJsonlRows,
   transitionCaseStatus,
   validateCase,
+  pauseCase,
+  resumeCase,
 } from "./closingTheLoopSchema.js";
+
+
 
 // --- Private auth (shared password cookie) ---
 // Mirrors server.js: cookie name "npsme_private", value = HMAC(secret, "npsme_private_v1")
@@ -1937,6 +1941,133 @@ router.post("/private/closing-the-loop/cases/:caseId/status", requirePrivateCook
     return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
+
+router.post("/private/closing-the-loop/cases/:caseId/pause", requirePrivateCookie, express.json(),  async (req, res) => {
+    try {
+      const caseId = String(req.params.caseId || "").trim();
+      const changedBy = req.body?.changed_by || "private_user";
+      const notes = String(req.body?.notes || "").trim();
+
+      const reasonCode = String(req.body?.reason_code || "").trim();
+      const reasonLabel = req.body?.reason_label || null;
+      const category = String(req.body?.category || "").trim();
+      const countsAgainstSla = !!req.body?.counts_against_sla;
+      const startedAt = req.body?.started_at || null;
+
+      if (!caseId) {
+        return res.status(400).json({ ok: false, error: "caseId is required" });
+      }
+
+      const cases = await readCtlJsonl(CTL_CASES_PATH);
+      const latestMap = buildLatestMapFromJsonlRows(cases, "case_id");
+      const currentCase = latestMap.get(caseId);
+
+      if (!currentCase) {
+        return res.status(404).json({ ok: false, error: "Case not found" });
+      }
+
+      const { updatedCase, pauseEvent } = pauseCase(currentCase, {
+        reasonCode,
+        reasonLabel,
+        category,
+        countsAgainstSla,
+        notes,
+        createdBy: changedBy,
+        startedAt,
+      });
+
+      validateCase(updatedCase);
+
+      const audit = createAuditEvent({
+        caseId,
+        contentId: currentCase.content_id,
+        eventType: "pause_started",
+        fromValue: currentCase.status,
+        toValue: "paused",
+        changedBy,
+        notes,
+      });
+
+      await appendCtlJsonl(CTL_CASES_PATH, updatedCase);
+      await appendCtlJsonl(CTL_PAUSE_EVENTS_PATH, pauseEvent);
+      await appendCtlJsonl(CTL_AUDIT_LOG_PATH, audit);
+
+      return res.json({
+        ok: true,
+        case: updatedCase,
+        pause_event: pauseEvent,
+      });
+    } catch (e) {
+      console.error("[intercom] private closing-the-loop pause case error", e);
+      return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+  }
+);
+
+router.post("/private/closing-the-loop/cases/:caseId/resume", requirePrivateCookie, express.json(), async (req, res) => {
+    try {
+      const caseId = String(req.params.caseId || "").trim();
+      const changedBy = req.body?.changed_by || "private_user";
+      const notes = String(req.body?.notes || "").trim();
+      const resumedAt = req.body?.resumed_at || null;
+
+      if (!caseId) {
+        return res.status(400).json({ ok: false, error: "caseId is required" });
+      }
+
+      const { cases, pauseEvents } = await loadCtlState();
+      const latestCaseMap = buildLatestMapFromJsonlRows(cases, "case_id");
+      const currentCase = latestCaseMap.get(caseId);
+
+      if (!currentCase) {
+        return res.status(404).json({ ok: false, error: "Case not found" });
+      }
+
+      if (!currentCase.is_paused || !currentCase.current_pause_event_id) {
+        return res.status(400).json({ ok: false, error: "Case is not paused" });
+      }
+
+      const matchingPause = (pauseEvents || [])
+        .filter((p) => String(p.case_id || "") === caseId)
+        .find((p) => String(p.pause_id || "") === String(currentCase.current_pause_event_id));
+
+      if (!matchingPause) {
+        return res.status(404).json({ ok: false, error: "Pause event not found" });
+      }
+
+      const { updatedCase, pauseEvent } = resumeCase(
+        currentCase,
+        matchingPause,
+        resumedAt
+      );
+
+      validateCase(updatedCase);
+
+      const audit = createAuditEvent({
+        caseId,
+        contentId: currentCase.content_id,
+        eventType: "pause_ended",
+        fromValue: "paused",
+        toValue: updatedCase.status,
+        changedBy,
+        notes,
+      });
+
+      await appendCtlJsonl(CTL_CASES_PATH, updatedCase);
+      await appendCtlJsonl(CTL_PAUSE_EVENTS_PATH, pauseEvent);
+      await appendCtlJsonl(CTL_AUDIT_LOG_PATH, audit);
+
+      return res.json({
+        ok: true,
+        case: updatedCase,
+        pause_event: pauseEvent,
+      });
+    } catch (e) {
+      console.error("[intercom] private closing-the-loop resume case error", e);
+      return res.status(500).json({ ok: false, error: e?.message || String(e) });
+    }
+  }
+);
 
   router.get("/private/nps-response", requirePrivateCookie, async (req, res) => {
     try {

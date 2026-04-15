@@ -272,7 +272,9 @@ function groupVerbatims(verbatims) {
 }
 
 function nextStatusOptions(currentStatus) {
-  return STATUS_TRANSITIONS[currentStatus] || [];
+  return (STATUS_TRANSITIONS[currentStatus] || []).filter(
+    (status) => status !== "paused" && status !== "cancelled"
+  );
 }
 
 
@@ -340,6 +342,8 @@ export default function EnvolaClosingTheLoop() {
   const [caseFilter, setCaseFilter] = React.useState("all");
   const caseRefs = React.useRef({});
   const [lastUpdatedCaseId, setLastUpdatedCaseId] = React.useState(null);
+  const [pauseActionLoadingId, setPauseActionLoadingId] = React.useState(null);
+  const [pauseReasonByCase, setPauseReasonByCase] = React.useState({});
 
   const [caseActionLoadingId, setCaseActionLoadingId] = React.useState(null);
   const [queueActionLoadingId, setQueueActionLoadingId] = React.useState(null);
@@ -605,6 +609,96 @@ export default function EnvolaClosingTheLoop() {
         alert(String(e?.message || e));
       } finally {
         setCaseActionLoadingId(null);
+      }
+    },
+    [caseComments, fetchCases, fetchQueue]
+  );
+
+  const pauseCaseById = React.useCallback(
+    async (caseId) => {
+      if (!caseId) return;
+
+      setLastUpdatedCaseId(caseId);
+      setPauseActionLoadingId(caseId);
+
+      try {
+        const reasonCode = pauseReasonByCase[caseId] || "awaiting_customer_confirmation";
+
+        const r = await fetch(
+          `/api/intercom/private/closing-the-loop/cases/${encodeURIComponent(caseId)}/pause`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              changed_by: "envola_user",
+              reason_code: reasonCode,
+              reason_label: reasonCode,
+              category: "external",
+              counts_against_sla: false,
+              notes: caseComments[caseId] || "",
+            }),
+          }
+        );
+
+        const j = await r.json().catch(() => null);
+
+        if (!r.ok || !j?.ok) {
+          throw new Error(j?.error || `Request failed (${r.status})`);
+        }
+
+        setCaseComments((prev) => ({
+          ...prev,
+          [caseId]: "",
+        }));
+
+        await Promise.all([fetchCases(), fetchQueue()]);
+      } catch (e) {
+        alert(String(e?.message || e));
+      } finally {
+        setPauseActionLoadingId(null);
+      }
+    },
+    [pauseReasonByCase, caseComments, fetchCases, fetchQueue]
+  );
+
+  const resumeCaseById = React.useCallback(
+    async (caseId) => {
+      if (!caseId) return;
+
+      setLastUpdatedCaseId(caseId);
+      setPauseActionLoadingId(caseId);
+
+      try {
+        const r = await fetch(
+          `/api/intercom/private/closing-the-loop/cases/${encodeURIComponent(caseId)}/resume`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              changed_by: "envola_user",
+              notes: caseComments[caseId] || "",
+            }),
+          }
+        );
+
+        const j = await r.json().catch(() => null);
+
+        if (!r.ok || !j?.ok) {
+          throw new Error(j?.error || `Request failed (${r.status})`);
+        }
+
+        setCaseComments((prev) => ({
+          ...prev,
+          [caseId]: "",
+        }));
+
+        await Promise.all([fetchCases(), fetchQueue()]);
+      } catch (e) {
+        alert(String(e?.message || e));
+      } finally {
+        setPauseActionLoadingId(null);
       }
     },
     [caseComments, fetchCases, fetchQueue]
@@ -1337,6 +1431,74 @@ export default function EnvolaClosingTheLoop() {
                     />
                   </div>
 
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    {!c.is_paused && c.status !== "closed" && c.status !== "cancelled" && (
+                      <>
+                        <select
+                          value={pauseReasonByCase[c.case_id] || "awaiting_customer_confirmation"}
+                          onChange={(e) =>
+                            setPauseReasonByCase((prev) => ({
+                              ...prev,
+                              [c.case_id]: e.target.value,
+                            }))
+                          }
+                          className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-white outline-none focus:border-white/20"
+                        >
+                          <option value="awaiting_customer_confirmation">
+                            Awaiting customer confirmation
+                          </option>
+                          <option value="customer_requested_delay">
+                            Customer requested delay
+                          </option>
+                          <option value="customer_unavailable">
+                            Customer unavailable
+                          </option>
+                          <option value="awaiting_owner_assignment">
+                            Awaiting owner assignment
+                          </option>
+                          <option value="awaiting_release_cycle">
+                            Awaiting release cycle
+                          </option>
+                          <option value="technical_dependency">
+                            Technical dependency
+                          </option>
+                          <option value="resource_constraint">
+                            Resource constraint
+                          </option>
+                          <option value="awaiting_more_evidence">
+                            Awaiting more evidence
+                          </option>
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => pauseCaseById(c.case_id)}
+                          disabled={pauseActionLoadingId === c.case_id}
+                          className="inline-flex items-center rounded-xl border border-amber-500/25 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100 transition hover:bg-amber-500/25 disabled:opacity-60"
+                        >
+                          {pauseActionLoadingId === c.case_id ? "Pausing…" : "Pause"}
+                        </button>
+                      </>
+                    )}
+
+                    {c.is_paused && (
+                      <>
+                        <span className="inline-flex items-center rounded-xl border border-amber-500/25 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100">
+                          Paused: {c.pause_reason_current || "No reason"}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => resumeCaseById(c.case_id)}
+                          disabled={pauseActionLoadingId === c.case_id}
+                          className="inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-100 transition hover:bg-emerald-500/25 disabled:opacity-60"
+                        >
+                          {pauseActionLoadingId === c.case_id ? "Resuming…" : "Resume"}
+                        </button>
+                      </>
+                    )}
+                  </div>
+
                   <div className="mt-5">
                     <div className="mb-2 text-xs text-slate-400">{labels.workflowStages}</div>
 
@@ -1374,7 +1536,11 @@ export default function EnvolaClosingTheLoop() {
                         );
                       })}
                     </div>
-
+                    {c.is_paused && (
+                      <div className="mt-3 text-xs text-amber-300">
+                        This case is paused and can be resumed later.
+                      </div>
+                    )}
                     {c.status === "closed" && (
                       <div className="mt-3 text-xs text-emerald-300">
                         {labels.closedHint}

@@ -1333,8 +1333,31 @@ export default function EnvolaClosingTheLoop() {
                         {c.comment_excerpt || labels.noCommentExcerpt}
                       </div>
 
-                      <div className="mt-2 text-sm text-slate-300">
-                        {labels.caseId}: <span className="font-mono">{c.case_id}</span>
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-300">
+                        <div>
+                          {labels.caseId}: <span className="font-mono">{c.case_id}</span>
+                        </div>
+
+                        {c.response_id ? (
+                          <button
+                            type="button"
+                            onClick={() => openResponse(c.response_id)}
+                            className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
+                          >
+                            {labels.thResponse}
+                          </button>
+                        ) : null}
+
+                        {c.source_url ? (
+                          <a
+                            href={c.source_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
+                          >
+                            {labels.thIntercom}
+                          </a>
+                        ) : null}
                       </div>
 
                       <div className="mt-2 flex flex-wrap gap-2">

@@ -10,7 +10,7 @@ import {
   CASE_STAGE_ORDER,
   STATUS_TRANSITIONS,
   CASE_TIMELINE_FIELDS,
-} from "../../shared/closingTheLoopConfig";
+} from "../../shared/closingTheLoopConfig.js";
 
 const DEFAULT_CONTENT_ID = "189616";
 

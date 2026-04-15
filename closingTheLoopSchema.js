@@ -2,7 +2,7 @@
 import {
   STATUS_TRANSITIONS,
   CASE_TIMELINE_FIELDS,
-} from "./shared/closingTheLoopConfig";
+} from "./shared/closingTheLoopConfig.js";
 
 function nowIso() {
   return new Date().toISOString();

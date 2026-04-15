@@ -803,6 +803,18 @@ export default function EnvolaClosingTheLoop() {
       "envola.closingTheLoop.timeline.improvementPlanned",
       "Improvement planned"
     ),
+    improvementScheduled: tr(
+      "envola.closingTheLoop.timeline.improvementScheduled",
+      "Improvement scheduled"
+    ),
+    improvementInProgress: tr(
+      "envola.closingTheLoop.timeline.improvementInProgress",
+      "Improvement in progress"
+    ),
+    impactCheckPending: tr(
+      "envola.closingTheLoop.timeline.impactCheckPending",
+      "Impact check pending"
+    ),
     improvementCompleted: tr(
       "envola.closingTheLoop.timeline.improvementCompleted",
       "Improvement completed"
@@ -1303,6 +1315,16 @@ export default function EnvolaClosingTheLoop() {
                               "improvement_planned"
                             )}
                             {renderStageRow(
+                              labels.improvementScheduled,
+                              c.improvement_scheduled_at,
+                              "improvement_scheduled"
+                            )}
+                            {renderStageRow(
+                              labels.improvementInProgress,
+                              c.improvement_in_progress_at,
+                              "improvement_in_progress"
+                            )}
+                            {renderStageRow(
                               labels.improvementCompleted,
                               c.improvement_completed_at,
                               "improvement_completed"
@@ -1311,6 +1333,11 @@ export default function EnvolaClosingTheLoop() {
                               labels.customerInformed,
                               c.customer_informed_at,
                               "customer_informed"
+                            )}
+                            {renderStageRow(
+                              labels.impactCheckPending,
+                              c.impact_check_pending_at,
+                              "impact_check_pending"
                             )}
                             {renderStageRow(
                               labels.impactChecked,

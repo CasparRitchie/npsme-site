@@ -2687,6 +2687,9 @@ export const TRANSLATIONS = {
           detractors: "Detractors",
           passives: "Passives",
           promoters: "Promoters",
+          caseFilterAll: "All",
+          caseFilterActive: "Active",
+          caseFilterCompleted: "Completed",
         },
 
         sortOptions: {
@@ -2725,6 +2728,8 @@ export const TRANSLATIONS = {
           response: "Response",
           intercom: "Intercom",
           loop: "Loop",
+          showingItems: "Showing",
+          items: "items",
         },
 
         actions: {
@@ -2741,6 +2746,10 @@ export const TRANSLATIONS = {
           updating: "Updating…",
           showQueue: "Show queue",
           hideQueue: "Hide queue",
+          currentStage: "Current stage",
+          completedStage: "Completed stage",
+          clickToMove: "Click to move to this stage",
+          notAvailableYet: "Not available yet",
         },
 
         case: {
@@ -2779,8 +2788,11 @@ export const TRANSLATIONS = {
           customerFollowupCompleted: "Customer follow-up completed",
           ownerAssigned: "Owner assigned",
           improvementPlanned: "Improvement planned",
+          improvementScheduled: "Improvement scheduled",
+          improvementInProgress: "Improvement in progress",
           improvementCompleted: "Improvement completed",
           customerInformed: "Customer informed",
+          impactCheckPending: "Impact check pending",
           impactChecked: "Impact checked",
           closed: "Closed",
         },
@@ -2807,17 +2819,6 @@ export const TRANSLATIONS = {
           answer: "Answer",
           answered: "Answered",
           inferredRelevantQuestionId: "Inferred relevant question id",
-          showingItems: "Showing",
-          items: "items",
-
-          currentStage: "Current stage",
-          completedStage: "Completed stage",
-          clickToMove: "Click to move to this stage",
-          notAvailableYet: "Not available yet",
-
-          caseFilterAll: "All",
-          caseFilterActive: "Active",
-          caseFilterCompleted: "Completed",
         },
       },
 
@@ -6024,6 +6025,9 @@ export const TRANSLATIONS = {
           detractors: "Détracteurs",
           passives: "Passifs",
           promoters: "Promoteurs",
+          caseFilterAll: "Tous",
+          caseFilterActive: "Actifs",
+          caseFilterCompleted: "Terminés",
         },
 
         sortOptions: {
@@ -6036,9 +6040,11 @@ export const TRANSLATIONS = {
           loadingQueue: "Chargement de la file…",
           noResults: "Aucun résultat pour ce filtre / cette période.",
           errorTitle: "Erreur",
-          notAuthHint: "Si vous voyez « Not authorised », reconnectez-vous via /private/login.",
+          notAuthHint:
+            "Si vous voyez « Not authorised », reconnectez-vous via /private/login.",
           loadingCases: "Chargement des cas actifs…",
-          noCases: "Aucun cas actif pour le moment. Démarrez une boucle depuis la file ci-dessus.",
+          noCases:
+            "Aucun cas actif pour le moment. Démarrez une boucle depuis la file ci-dessus.",
           casesError: "Erreur sur les cas",
         },
 
@@ -6062,6 +6068,8 @@ export const TRANSLATIONS = {
           response: "Réponse",
           intercom: "Intercom",
           loop: "Boucle",
+          showingItems: "Affichage de",
+          items: "éléments",
         },
 
         actions: {
@@ -6078,6 +6086,10 @@ export const TRANSLATIONS = {
           updating: "Mise à jour…",
           showQueue: "Afficher la file",
           hideQueue: "Masquer la file",
+          currentStage: "Étape actuelle",
+          completedStage: "Étape terminée",
+          clickToMove: "Cliquer pour passer à cette étape",
+          notAvailableYet: "Pas encore disponible",
         },
 
         case: {
@@ -6116,8 +6128,11 @@ export const TRANSLATIONS = {
           customerFollowupCompleted: "Relance client effectuée",
           ownerAssigned: "Responsable assigné",
           improvementPlanned: "Amélioration planifiée",
+          improvementScheduled: "Amélioration programmée",
+          improvementInProgress: "Amélioration en cours",
           improvementCompleted: "Amélioration terminée",
           customerInformed: "Client informé",
+          impactCheckPending: "Vérification d’impact en attente",
           impactChecked: "Impact vérifié",
           closed: "Clôturé",
         },
@@ -6144,17 +6159,6 @@ export const TRANSLATIONS = {
           answer: "Réponse",
           answered: "Répondu le",
           inferredRelevantQuestionId: "Identifiant de question pertinent déduit",
-          showingItems: "Affichage de",
-          items: "éléments",
-
-          currentStage: "Étape actuelle",
-          completedStage: "Étape terminée",
-          clickToMove: "Cliquer pour passer à cette étape",
-          notAvailableYet: "Pas encore disponible",
-
-          caseFilterAll: "Tous",
-          caseFilterActive: "Actifs",
-          caseFilterCompleted: "Terminés",
         },
       },
 

@@ -177,7 +177,9 @@ export default function EnvolaPerformance() {
   const trendUrl = useMemo(() => {
     return `/api/envola/timeseries?content_id=${encodeURIComponent(
       filters.contentId
-    )}&granularity=${encodeURIComponent(filters.granularity)}&${dateParams}${bucketParams}`;
+    )}&granularity=${encodeURIComponent(
+      filters.granularity
+    )}&include_empty=1&${dateParams}${bucketParams}`;
   }, [filters.contentId, filters.granularity, dateParams, bucketParams]);
 
   useEffect(() => {

@@ -2665,6 +2665,146 @@ export const TRANSLATIONS = {
         tableSubtitle: "Export the currently filtered response set as CSV.",
         sortTip: "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling.",
       },
+      closingTheLoop: {
+        title: "Closing the loop",
+        subtitle:
+          "Track follow-up, ownership, improvements and impact for Envola survey responses.",
+
+        controls: {
+          refresh: "Refresh",
+          refreshing: "Refreshing…",
+          refreshCases: "Refresh cases",
+          refreshingCases: "Refreshing cases…",
+          contentId: "content_id",
+          days: "days",
+          limit: "limit",
+          bucket: "bucket",
+          sort: "sort",
+        },
+
+        filters: {
+          all: "All",
+          detractors: "Detractors",
+          passives: "Passives",
+          promoters: "Promoters",
+        },
+
+        sortOptions: {
+          risk: "Risk",
+          date: "Latest date",
+          score: "Score",
+        },
+
+        state: {
+          loadingQueue: "Loading queue…",
+          noResults: "No results for this filter/window.",
+          errorTitle: "Error",
+          notAuthHint: "If you see “Not authorised”, log in again at /private/login.",
+          loadingCases: "Loading active cases…",
+          noCases: "No active cases yet. Start a loop from the queue above.",
+          casesError: "Cases error",
+        },
+
+        sections: {
+          queue: "Queue",
+          queueSubtitle: "Prioritised from recent survey responses",
+          activeCases: "Active cases",
+          activeCasesSubtitle: "Persisted close-the-loop workflow cases",
+          globalFilters: "Global filters",
+          globalFiltersSubtitle:
+            "These filters apply to the queue and case view for this page.",
+        },
+
+        table: {
+          risk: "Risk",
+          latest: "Latest",
+          score: "Score",
+          bucket: "Bucket",
+          themes: "Themes",
+          recommendation: "Recommendation",
+          response: "Response",
+          intercom: "Intercom",
+          loop: "Loop",
+        },
+
+        actions: {
+          open: "Open",
+          view: "View",
+          startLoop: "Start loop",
+          starting: "Starting…",
+          loopActive: "Loop active",
+          loopCompleted: "Loop completed",
+          addNote: "Add note before moving to the next stage",
+          addNotePlaceholder:
+            "Add context, outcome, owner notes, customer update, etc.",
+          workflowStages: "Workflow stages",
+          updating: "Updating…",
+          showQueue: "Show queue",
+          hideQueue: "Hide queue",
+        },
+
+        case: {
+          currentStatus: "Current status",
+          priority: "Priority",
+          noCommentExcerpt: "No comment excerpt",
+          caseId: "Case ID",
+          surveyReceived: "Survey received",
+          activeCloseDays: "Active close days",
+          pausedDays: "Paused days",
+          actions: "Actions",
+          contacts: "Contacts",
+          closedHint:
+            "This loop has been closed. It will no longer appear as an active case in the queue.",
+        },
+
+        stages: {
+          new: "New",
+          triaged: "Triaged",
+          customer_followup_planned: "Follow-up planned",
+          customer_followup_completed: "Follow-up completed",
+          owner_assigned: "Owner assigned",
+          improvement_planned: "Improvement planned",
+          improvement_scheduled: "Improvement scheduled",
+          improvement_in_progress: "Improvement in progress",
+          improvement_completed: "Improvement completed",
+          customer_informed: "Customer informed",
+          impact_check_pending: "Impact check pending",
+          impact_checked: "Impact checked",
+          closed: "Closed",
+          paused: "Paused",
+          cancelled: "Cancelled",
+        },
+
+        timeline: {
+          customerFollowupCompleted: "Customer follow-up completed",
+          ownerAssigned: "Owner assigned",
+          improvementPlanned: "Improvement planned",
+          improvementCompleted: "Improvement completed",
+          customerInformed: "Customer informed",
+          impactChecked: "Impact checked",
+          closed: "Closed",
+        },
+
+        modal: {
+          title: "Survey response",
+          close: "Close",
+          loading: "Loading response…",
+          error: "Couldn’t load this response.",
+          score: "Score",
+          submitted: "Submitted",
+          receipt: "Receipt",
+          selectedOptions: "Selected options",
+          verbatims: "Verbatims",
+          rawAnswers: "Raw answers",
+          openIntercom: "Open contact in Intercom",
+          relevantOnly: "Relevant only",
+          allQuestions: "All questions",
+          showJson: "Show JSON",
+          noAnswers: "No answers found.",
+          view: "View:",
+          shownSuffix: "shown",
+        },
+      },
 
       next: {
         title: "Coming next on this page",
@@ -5845,6 +5985,147 @@ export const TRANSLATIONS = {
         tableTitle: "Réponses",
         tableSubtitle: "Exporter en CSV l’ensemble des réponses correspondant aux filtres actuels.",
         sortTip: "Astuce : cliquez sur un en-tête de colonne pour trier. Les en-têtes et les premières colonnes restent visibles pendant le défilement.",
+      },
+
+      closingTheLoop: {
+        title: "Boucler la boucle",
+        subtitle:
+          "Suivez les relances, les responsables, les améliorations et leur impact pour les réponses Envola.",
+
+        controls: {
+          refresh: "Rafraîchir",
+          refreshing: "Rafraîchissement…",
+          refreshCases: "Rafraîchir les cas",
+          refreshingCases: "Rafraîchissement des cas…",
+          contentId: "content_id",
+          days: "jours",
+          limit: "limite",
+          bucket: "segment",
+          sort: "tri",
+        },
+
+        filters: {
+          all: "Tous",
+          detractors: "Détracteurs",
+          passives: "Passifs",
+          promoters: "Promoteurs",
+        },
+
+        sortOptions: {
+          risk: "Risque",
+          date: "Date la plus récente",
+          score: "Score",
+        },
+
+        state: {
+          loadingQueue: "Chargement de la file…",
+          noResults: "Aucun résultat pour ce filtre / cette période.",
+          errorTitle: "Erreur",
+          notAuthHint: "Si vous voyez « Not authorised », reconnectez-vous via /private/login.",
+          loadingCases: "Chargement des cas actifs…",
+          noCases: "Aucun cas actif pour le moment. Démarrez une boucle depuis la file ci-dessus.",
+          casesError: "Erreur sur les cas",
+        },
+
+        sections: {
+          queue: "File",
+          queueSubtitle: "Priorisée à partir des réponses récentes à l’enquête",
+          activeCases: "Cas actifs",
+          activeCasesSubtitle: "Cas persistés du workflow de close-the-loop",
+          globalFilters: "Filtres globaux",
+          globalFiltersSubtitle:
+            "Ces filtres s’appliquent à la file et à la vue des cas sur cette page.",
+        },
+
+        table: {
+          risk: "Risque",
+          latest: "Dernier retour",
+          score: "Score",
+          bucket: "Segment",
+          themes: "Thèmes",
+          recommendation: "Recommandation",
+          response: "Réponse",
+          intercom: "Intercom",
+          loop: "Boucle",
+        },
+
+        actions: {
+          open: "Ouvrir",
+          view: "Voir",
+          startLoop: "Démarrer la boucle",
+          starting: "Démarrage…",
+          loopActive: "Boucle active",
+          loopCompleted: "Boucle terminée",
+          addNote: "Ajouter une note avant de passer à l’étape suivante",
+          addNotePlaceholder:
+            "Ajoutez du contexte, un résultat, des notes du responsable, une mise à jour client, etc.",
+          workflowStages: "Étapes du workflow",
+          updating: "Mise à jour…",
+          showQueue: "Afficher la file",
+          hideQueue: "Masquer la file",
+        },
+
+        case: {
+          currentStatus: "Statut actuel",
+          priority: "Priorité",
+          noCommentExcerpt: "Aucun extrait de commentaire",
+          caseId: "ID du cas",
+          surveyReceived: "Enquête reçue",
+          activeCloseDays: "Jours actifs de traitement",
+          pausedDays: "Jours en pause",
+          actions: "Actions",
+          contacts: "Contacts",
+          closedHint:
+            "Cette boucle a été clôturée. Elle n’apparaîtra plus comme un cas actif dans la file.",
+        },
+
+        stages: {
+          new: "Nouveau",
+          triaged: "Trié",
+          customer_followup_planned: "Relance planifiée",
+          customer_followup_completed: "Relance effectuée",
+          owner_assigned: "Responsable assigné",
+          improvement_planned: "Amélioration planifiée",
+          improvement_scheduled: "Amélioration programmée",
+          improvement_in_progress: "Amélioration en cours",
+          improvement_completed: "Amélioration terminée",
+          customer_informed: "Client informé",
+          impact_check_pending: "Vérification d’impact en attente",
+          impact_checked: "Impact vérifié",
+          closed: "Clôturé",
+          paused: "En pause",
+          cancelled: "Annulé",
+        },
+
+        timeline: {
+          customerFollowupCompleted: "Relance client effectuée",
+          ownerAssigned: "Responsable assigné",
+          improvementPlanned: "Amélioration planifiée",
+          improvementCompleted: "Amélioration terminée",
+          customerInformed: "Client informé",
+          impactChecked: "Impact vérifié",
+          closed: "Clôturé",
+        },
+
+        modal: {
+          title: "Réponse à l’enquête",
+          close: "Fermer",
+          loading: "Chargement de la réponse…",
+          error: "Impossible de charger cette réponse.",
+          score: "Score",
+          submitted: "Envoyée le",
+          receipt: "Reçu",
+          selectedOptions: "Options sélectionnées",
+          verbatims: "Verbatims",
+          rawAnswers: "Réponses brutes",
+          openIntercom: "Ouvrir le contact dans Intercom",
+          relevantOnly: "Pertinentes uniquement",
+          allQuestions: "Toutes les questions",
+          showJson: "Afficher le JSON",
+          noAnswers: "Aucune réponse trouvée.",
+          view: "Vue :",
+          shownSuffix: "affichées",
+        },
       },
 
       next: {

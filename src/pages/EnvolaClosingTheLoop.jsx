@@ -59,12 +59,15 @@ function formatDate(iso) {
 function bucketPill(bucket) {
   const base =
     "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border";
-  if (bucket === "detractor")
+  if (bucket === "detractor") {
     return `${base} border-rose-400/30 bg-rose-500/10 text-rose-200`;
-  if (bucket === "passive")
+  }
+  if (bucket === "passive") {
     return `${base} border-amber-400/30 bg-amber-500/10 text-amber-200`;
-  if (bucket === "promoter")
+  }
+  if (bucket === "promoter") {
     return `${base} border-emerald-400/30 bg-emerald-500/10 text-emerald-200`;
+  }
   return `${base} border-white/10 bg-white/5 text-slate-200`;
 }
 
@@ -109,7 +112,7 @@ function Disclosure({ title, right, children, defaultOpen = false }) {
       <summary className="cursor-pointer list-none select-none flex items-center justify-between gap-3">
         <div className="text-white font-semibold">{title}</div>
         {right ? <div className="text-xs text-slate-400">{right}</div> : null}
-        <span className="ml-2 text-slate-400 group-open:rotate-180 transition">
+        <span className="ml-2 text-slate-400 transition group-open:rotate-180">
           ▾
         </span>
       </summary>
@@ -118,7 +121,7 @@ function Disclosure({ title, right, children, defaultOpen = false }) {
   );
 }
 
-function AnswerTable({ rows, compact = false }) {
+function AnswerTable({ rows, compact = false, tr }) {
   const grouped = React.useMemo(() => {
     const by = new Map();
 
@@ -161,9 +164,17 @@ function AnswerTable({ rows, compact = false }) {
       <table className="min-w-full text-left text-sm">
         <thead>
           <tr className="text-xs text-slate-400">
-            <th className="py-2 pr-4">Question</th>
-            <th className="py-2 pr-4">Answer</th>
-            {!compact ? <th className="py-2">Answered</th> : null}
+            <th className="py-2 pr-4">
+              {tr("envola.closingTheLoop.modal.question", "Question")}
+            </th>
+            <th className="py-2 pr-4">
+              {tr("envola.closingTheLoop.modal.answer", "Answer")}
+            </th>
+            {!compact ? (
+              <th className="py-2">
+                {tr("envola.closingTheLoop.modal.answered", "Answered")}
+              </th>
+            ) : null}
           </tr>
         </thead>
 
@@ -177,7 +188,7 @@ function AnswerTable({ rows, compact = false }) {
                       {g.question_id}
                     </span>
                   ) : null}
-                  <div className="text-slate-200 leading-snug">{g.question_text}</div>
+                  <div className="leading-snug text-slate-200">{g.question_text}</div>
                 </div>
               </td>
 
@@ -195,7 +206,7 @@ function AnswerTable({ rows, compact = false }) {
               </td>
 
               {!compact ? (
-                <td className="py-3 align-top text-xs text-slate-400 whitespace-nowrap">
+                <td className="whitespace-nowrap py-3 align-top text-xs text-slate-400">
                   {formatDate(g.answered_at)}
                 </td>
               ) : null}
@@ -301,38 +312,13 @@ function nextStatusOptions(currentStatus) {
   }
 }
 
-function prettyStatus(status) {
-  const labels = {
-    new: "New",
-    triaged: "Triaged",
-    customer_followup_planned: "Follow-up planned",
-    customer_followup_completed: "Follow-up completed",
-    owner_assigned: "Owner assigned",
-    improvement_planned: "Improvement planned",
-    improvement_scheduled: "Improvement scheduled",
-    improvement_in_progress: "Improvement in progress",
-    improvement_completed: "Improvement completed",
-    customer_informed: "Customer informed",
-    impact_check_pending: "Impact check pending",
-    impact_checked: "Impact checked",
-    closed: "Closed",
-    paused: "Paused",
-    cancelled: "Cancelled",
-  };
-
-  return labels[status] || String(status || "")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (m) => m.toUpperCase());
-}
-
-function formatActionType(action) {
-  if (!action) return "Update";
-  if (action.event_type === "case_created") return "Case created";
-  if (action.event_type === "case_closed") return "Case closed";
-  if (action.event_type === "status_changed") {
-    return action.to_value ? prettyStatus(action.to_value) : "Status changed";
-  }
-  return prettyStatus(action.event_type || "update");
+function prettyStatus(status, tr) {
+  return tr(
+    `envola.closingTheLoop.statuses.${status}`,
+    String(status || "")
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (m) => m.toUpperCase())
+  );
 }
 
 function getStageState(caseStatus, stage) {
@@ -350,7 +336,7 @@ function stageClassName({ state, clickable }) {
     "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium border transition";
 
   if (clickable) {
-    return `${base} border-[#22C55E] bg-[#22C55E]/15 text-[#DCFCE7] hover:bg-[#22C55E] hover:text-[#0B0F19] hover:border-[#4ADE80]`;
+    return `${base} border-[#22C55E] bg-[#22C55E]/15 text-[#DCFCE7] hover:border-[#4ADE80] hover:bg-[#22C55E] hover:text-[#0B0F19]`;
   }
 
   if (state === "current") {
@@ -485,9 +471,12 @@ export default function EnvolaClosingTheLoop() {
         limit: "500",
       });
 
-      const r = await fetch(`/api/intercom/private/closing-the-loop/cases?${qs.toString()}`, {
-        credentials: "include",
-      });
+      const r = await fetch(
+        `/api/intercom/private/closing-the-loop/cases?${qs.toString()}`,
+        {
+          credentials: "include",
+        }
+      );
 
       const j = await r.json().catch(() => null);
       if (!r.ok || !j?.ok) {
@@ -523,8 +512,10 @@ export default function EnvolaClosingTheLoop() {
         return (Number.isFinite(bt) ? bt : 0) - (Number.isFinite(at) ? at : 0);
       }
       if (sortBy === "score") {
-        const as = typeof a?.latest?.score_0_10 === "number" ? a.latest.score_0_10 : -1;
-        const bs = typeof b?.latest?.score_0_10 === "number" ? b.latest.score_0_10 : -1;
+        const as =
+          typeof a?.latest?.score_0_10 === "number" ? a.latest.score_0_10 : -1;
+        const bs =
+          typeof b?.latest?.score_0_10 === "number" ? b.latest.score_0_10 : -1;
         return bs - as;
       }
       const ar = typeof a?.risk_score === "number" ? a.risk_score : -1;
@@ -614,7 +605,6 @@ export default function EnvolaClosingTheLoop() {
         );
 
         const j = await r.json().catch(() => null);
-        console.log("status update response", j);
 
         if (!r.ok || !j?.ok) {
           throw new Error(j?.error || `Request failed (${r.status})`);
@@ -644,78 +634,186 @@ export default function EnvolaClosingTheLoop() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openId, closeModal]);
 
-  const title = tr("closingTheLoop.title", "Closing the loop");
+  const title = tr("envola.closingTheLoop.title", "Closing the loop");
   const subtitle = tr(
-    "closingTheLoop.subtitle",
+    "envola.closingTheLoop.subtitle",
     "Track follow-up, ownership, improvements and impact for Envola survey responses."
   );
 
   const labels = {
-    refresh: tr("closingTheLoop.controls.refresh", "Refresh"),
-    refreshing: tr("closingTheLoop.controls.refreshing", "Refreshing…"),
-    contentId: tr("closingTheLoop.controls.contentId", "content_id"),
-    days: tr("closingTheLoop.controls.days", "days"),
-    limit: tr("closingTheLoop.controls.limit", "limit"),
-    bucket: tr("closingTheLoop.controls.bucket", "bucket"),
-    sort: tr("closingTheLoop.controls.sort", "sort"),
-    all: tr("closingTheLoop.filters.all", "All"),
-    detractors: tr("closingTheLoop.filters.detractors", "Detractors"),
-    passives: tr("closingTheLoop.filters.passives", "Passives"),
-    promoters: tr("closingTheLoop.filters.promoters", "Promoters"),
-    risk: tr("closingTheLoop.sort.risk", "Risk"),
-    latestDate: tr("closingTheLoop.sort.date", "Latest date"),
-    score: tr("closingTheLoop.sort.score", "Score"),
-    loadingQueue: tr("closingTheLoop.state.loading", "Loading queue…"),
-    noResults: tr("closingTheLoop.state.noResults", "No results for this filter/window."),
-    errorTitle: tr("closingTheLoop.state.errorTitle", "Error"),
+    refresh: tr("envola.closingTheLoop.controls.refresh", "Refresh"),
+    refreshing: tr("envola.closingTheLoop.controls.refreshing", "Refreshing…"),
+    refreshCases: tr("envola.closingTheLoop.controls.refreshCases", "Refresh cases"),
+    refreshingCases: tr("envola.closingTheLoop.controls.refreshingCases", "Refreshing cases…"),
+    contentId: tr("envola.closingTheLoop.controls.contentId", "content_id"),
+    days: tr("envola.closingTheLoop.controls.days", "days"),
+    limit: tr("envola.closingTheLoop.controls.limit", "limit"),
+    bucket: tr("envola.closingTheLoop.controls.bucket", "bucket"),
+    sort: tr("envola.closingTheLoop.controls.sort", "sort"),
+
+    all: tr("envola.closingTheLoop.filters.all", "All"),
+    detractors: tr("envola.closingTheLoop.filters.detractors", "Detractors"),
+    passives: tr("envola.closingTheLoop.filters.passives", "Passives"),
+    promoters: tr("envola.closingTheLoop.filters.promoters", "Promoters"),
+
+    risk: tr("envola.closingTheLoop.sort.risk", "Risk"),
+    latestDate: tr("envola.closingTheLoop.sort.date", "Latest date"),
+    score: tr("envola.closingTheLoop.sort.score", "Score"),
+
+    loadingQueue: tr("envola.closingTheLoop.state.loading", "Loading queue…"),
+    noResults: tr("envola.closingTheLoop.state.noResults", "No results for this filter/window."),
+    errorTitle: tr("envola.closingTheLoop.state.errorTitle", "Error"),
     notAuthHint: tr(
-      "closingTheLoop.state.notAuthHint",
+      "envola.closingTheLoop.state.notAuthHint",
       'If you see “Not authorised”, log in again at /private/login.'
     ),
+    showQueue: tr("envola.closingTheLoop.queue.show", "Show queue"),
+    hideQueue: tr("envola.closingTheLoop.queue.hide", "Hide queue"),
+    queueTitle: tr("envola.closingTheLoop.queue.title", "Queue"),
+    queueSubtitle: tr(
+      "envola.closingTheLoop.queue.subtitle",
+      "Prioritised from recent survey responses."
+    ),
+    showingItems: tr("envola.closingTheLoop.queue.showing", "Showing"),
+    items: tr("envola.closingTheLoop.queue.items", "items"),
 
-    thRisk: tr("closingTheLoop.table.risk", "Risk"),
-    thLatest: tr("closingTheLoop.table.latest", "Latest"),
-    thScore: tr("closingTheLoop.table.score", "Score"),
-    thBucket: tr("closingTheLoop.table.bucket", "Bucket"),
-    thThemes: tr("closingTheLoop.table.themes", "Themes"),
-    thRecommendation: tr("closingTheLoop.table.recommendation", "Recommendation"),
-    thResponse: tr("closingTheLoop.table.response", "Response"),
-    thIntercom: tr("closingTheLoop.table.intercom", "Intercom"),
-    thLoop: tr("closingTheLoop.table.loop", "Loop"),
-    open: tr("closingTheLoop.actions.open", "Open"),
-    view: tr("closingTheLoop.actions.view", "View"),
+    thRisk: tr("envola.closingTheLoop.table.risk", "Risk"),
+    thLatest: tr("envola.closingTheLoop.table.latest", "Latest"),
+    thScore: tr("envola.closingTheLoop.table.score", "Score"),
+    thBucket: tr("envola.closingTheLoop.table.bucket", "Bucket"),
+    thThemes: tr("envola.closingTheLoop.table.themes", "Themes"),
+    thRecommendation: tr("envola.closingTheLoop.table.recommendation", "Recommendation"),
+    thResponse: tr("envola.closingTheLoop.table.response", "Response"),
+    thIntercom: tr("envola.closingTheLoop.table.intercom", "Intercom"),
+    thLoop: tr("envola.closingTheLoop.table.loop", "Loop"),
+
+    open: tr("envola.closingTheLoop.actions.open", "Open"),
+    view: tr("envola.closingTheLoop.actions.view", "View"),
+    startLoop: tr("envola.closingTheLoop.actions.startLoop", "Start loop"),
+    starting: tr("envola.closingTheLoop.actions.starting", "Starting…"),
+    loopCompleted: tr("envola.closingTheLoop.actions.loopCompleted", "Loop completed"),
+    loopActive: tr("envola.closingTheLoop.actions.loopActive", "Loop active"),
     dash: tr("common.dash", "—"),
 
-    modalTitle: tr("closingTheLoop.modal.title", "Survey response"),
-    modalClose: tr("closingTheLoop.modal.close", "Close"),
-    modalLoading: tr("closingTheLoop.modal.loading", "Loading response…"),
-    modalError: tr("closingTheLoop.modal.error", "Couldn’t load this response."),
-    modalScore: tr("closingTheLoop.modal.score", "Score"),
-    modalSubmitted: tr("closingTheLoop.modal.submitted", "Submitted"),
-    modalReceipt: tr("closingTheLoop.modal.receipt", "Receipt"),
-    modalOptions: tr("closingTheLoop.modal.selectedOptions", "Selected options"),
-    modalVerbatims: tr("closingTheLoop.modal.verbatims", "Verbatims"),
-    modalRaw: tr("closingTheLoop.modal.rawAnswers", "Raw answers"),
-    modalOpenIntercom: tr("closingTheLoop.modal.openIntercom", "Open contact in Intercom"),
+    activeCasesTitle: tr("envola.closingTheLoop.cases.title", "Active cases"),
+    activeCasesSubtitle: tr(
+      "envola.closingTheLoop.cases.subtitle",
+      "Persisted close-the-loop workflow cases"
+    ),
+    casesError: tr("envola.closingTheLoop.cases.error", "Cases error"),
+    loadingActiveCases: tr(
+      "envola.closingTheLoop.cases.loading",
+      "Loading active cases…"
+    ),
+    noActiveCases: tr(
+      "envola.closingTheLoop.cases.none",
+      "No active cases yet. Start a loop from the queue above."
+    ),
+    currentStatus: tr("envola.closingTheLoop.cases.currentStatus", "Current status"),
+    priority: tr("envola.closingTheLoop.cases.priority", "Priority"),
+    noCommentExcerpt: tr(
+      "envola.closingTheLoop.cases.noCommentExcerpt",
+      "No comment excerpt"
+    ),
+    caseId: tr("envola.closingTheLoop.cases.caseId", "Case ID"),
+    surveyReceived: tr("envola.closingTheLoop.cases.surveyReceived", "Survey received"),
+    activeCloseDays: tr("envola.closingTheLoop.cases.activeCloseDays", "Active close days"),
+    pausedDays: tr("envola.closingTheLoop.cases.pausedDays", "Paused days"),
+    actionsCount: tr("envola.closingTheLoop.cases.actionsCount", "Actions"),
+    contactsCount: tr("envola.closingTheLoop.cases.contactsCount", "Contacts"),
+    addNote: tr(
+      "envola.closingTheLoop.cases.addNote",
+      "Add note before moving to the next stage"
+    ),
+    addNotePlaceholder: tr(
+      "envola.closingTheLoop.cases.addNotePlaceholder",
+      "Add context, outcome, owner notes, customer update, etc."
+    ),
+    workflowStages: tr("envola.closingTheLoop.cases.workflowStages", "Workflow stages"),
+    currentStage: tr("envola.closingTheLoop.cases.currentStage", "Current stage"),
+    completedStage: tr("envola.closingTheLoop.cases.completedStage", "Completed stage"),
+    clickToMove: tr(
+      "envola.closingTheLoop.cases.clickToMove",
+      "Click to move to this stage"
+    ),
+    notAvailableYet: tr(
+      "envola.closingTheLoop.cases.notAvailableYet",
+      "Not available yet"
+    ),
+    closedHint: tr(
+      "envola.closingTheLoop.cases.closedHint",
+      "This loop has been closed. It will no longer appear as an active case in the queue."
+    ),
+
+    followupCompleted: tr(
+      "envola.closingTheLoop.timeline.followupCompleted",
+      "Customer follow-up completed"
+    ),
+    ownerAssigned: tr("envola.closingTheLoop.timeline.ownerAssigned", "Owner assigned"),
+    improvementPlanned: tr(
+      "envola.closingTheLoop.timeline.improvementPlanned",
+      "Improvement planned"
+    ),
+    improvementCompleted: tr(
+      "envola.closingTheLoop.timeline.improvementCompleted",
+      "Improvement completed"
+    ),
+    customerInformed: tr(
+      "envola.closingTheLoop.timeline.customerInformed",
+      "Customer informed"
+    ),
+    impactChecked: tr(
+      "envola.closingTheLoop.timeline.impactChecked",
+      "Impact checked"
+    ),
+    closed: tr("envola.closingTheLoop.timeline.closed", "Closed"),
+
+    modalTitle: tr("envola.closingTheLoop.modal.title", "Survey response"),
+    modalClose: tr("envola.closingTheLoop.modal.close", "Close"),
+    modalLoading: tr("envola.closingTheLoop.modal.loading", "Loading response…"),
+    modalError: tr("envola.closingTheLoop.modal.error", "Couldn’t load this response."),
+    modalScore: tr("envola.closingTheLoop.modal.score", "Score"),
+    modalSubmitted: tr("envola.closingTheLoop.modal.submitted", "Submitted"),
+    modalReceipt: tr("envola.closingTheLoop.modal.receipt", "Receipt"),
+    modalOptions: tr(
+      "envola.closingTheLoop.modal.selectedOptions",
+      "Selected options"
+    ),
+    modalVerbatims: tr("envola.closingTheLoop.modal.verbatims", "Verbatims"),
+    modalRaw: tr("envola.closingTheLoop.modal.rawAnswers", "Raw answers"),
+    modalOpenIntercom: tr(
+      "envola.closingTheLoop.modal.openIntercom",
+      "Open contact in Intercom"
+    ),
+    modalView: tr("envola.closingTheLoop.modal.view", "View:"),
+    modalRelevantOnly: tr(
+      "envola.closingTheLoop.modal.relevantOnly",
+      "Relevant only"
+    ),
+    modalAllQuestions: tr(
+      "envola.closingTheLoop.modal.allQuestions",
+      "All questions"
+    ),
+    modalShowJson: tr("envola.closingTheLoop.modal.showJson", "Show JSON"),
+    modalNoAnswers: tr("envola.closingTheLoop.modal.noAnswers", "No answers found."),
+    modalShown: tr("envola.closingTheLoop.modal.shown", "shown"),
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace / Envola")}>
         <div className="pt-4">
-          <h1 className="text-3xl md:text-4xl font-semibold text-white">
+          <h1 className="text-3xl font-semibold text-white md:text-4xl">
             {title}
           </h1>
 
-          <p className="mt-3 max-w-3xl text-slate-300">
-            {subtitle}
-          </p>
+          <p className="mt-3 max-w-3xl text-slate-300">{subtitle}</p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={fetchQueue}
-              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
               disabled={loading}
             >
               {loading ? labels.refreshing : labels.refresh}
@@ -724,10 +822,10 @@ export default function EnvolaClosingTheLoop() {
             <button
               type="button"
               onClick={fetchCases}
-              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
               disabled={casesLoading}
             >
-              {casesLoading ? "Refreshing cases…" : "Refresh cases"}
+              {casesLoading ? labels.refreshingCases : labels.refreshCases}
             </button>
           </div>
         </div>
@@ -748,92 +846,90 @@ export default function EnvolaClosingTheLoop() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-6 pt-6">
-        {/* Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-          <div className="md:col-span-4">
-            <label className="text-xs text-slate-400">{labels.contentId}</label>
-            <input
-              value={contentId}
-              onChange={(e) => setContentId(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-              placeholder="e.g. 189616"
-            />
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
+            <div className="md:col-span-4">
+              <label className="text-xs text-slate-400">{labels.contentId}</label>
+              <input
+                value={contentId}
+                onChange={(e) => setContentId(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+                placeholder="e.g. 189616"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-xs text-slate-400">{labels.days}</label>
+              <input
+                type="number"
+                min={1}
+                max={3650}
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value || 30))}
+                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-xs text-slate-400">{labels.limit}</label>
+              <input
+                type="number"
+                min={1}
+                max={2000}
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value || 50))}
+                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-xs text-slate-400">{labels.bucket}</label>
+              <select
+                value={bucket}
+                onChange={(e) => setBucket(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              >
+                <option value="all">{labels.all}</option>
+                <option value="detractor">{labels.detractors}</option>
+                <option value="passive">{labels.passives}</option>
+                <option value="promoter">{labels.promoters}</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-xs text-slate-400">{labels.sort}</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              >
+                <option value="risk">{labels.risk}</option>
+                <option value="date">{labels.latestDate}</option>
+                <option value="score">{labels.score}</option>
+              </select>
+            </div>
           </div>
 
-          <div className="md:col-span-2">
-            <label className="text-xs text-slate-400">{labels.days}</label>
-            <input
-              type="number"
-              min={1}
-              max={3650}
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value || 30))}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-xs text-slate-400">{labels.limit}</label>
-            <input
-              type="number"
-              min={1}
-              max={2000}
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value || 50))}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-xs text-slate-400">{labels.bucket}</label>
-            <select
-              value={bucket}
-              onChange={(e) => setBucket(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            >
-              <option value="all">{labels.all}</option>
-              <option value="detractor">{labels.detractors}</option>
-              <option value="passive">{labels.passives}</option>
-              <option value="promoter">{labels.promoters}</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-xs text-slate-400">{labels.sort}</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            >
-              <option value="risk">{labels.risk}</option>
-              <option value="date">{labels.latestDate}</option>
-              <option value="score">{labels.score}</option>
-            </select>
-          </div>
+          {error && (
+            <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
+              <div className="font-medium">{labels.errorTitle}</div>
+              <div className="mt-1 text-sm opacity-90">{error}</div>
+            </div>
+          )}
         </div>
-
-        {error && (
-          <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
-            <div className="font-medium">{labels.errorTitle}</div>
-            <div className="mt-1 text-sm opacity-90">{error}</div>
-          </div>
-        )}
       </section>
 
-      {/* Queue */}
       <section className="mx-auto max-w-7xl px-6 pb-10">
-        <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="mb-3 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => setQueueCollapsed((v) => !v)}
-            className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+            className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
           >
-            {queueCollapsed ? "Show queue" : "Hide queue"}
+            {queueCollapsed ? labels.showQueue : labels.hideQueue}
           </button>
-          <h2 className="text-xl font-semibold text-white">Queue</h2>
-          <div className="text-xs text-slate-400">
-            Prioritised from recent survey responses
-          </div>
+          <h2 className="text-xl font-semibold text-white">{labels.queueTitle}</h2>
+          <div className="text-xs text-slate-400">{labels.queueSubtitle}</div>
         </div>
 
         {!error && loading && (
@@ -852,197 +948,205 @@ export default function EnvolaClosingTheLoop() {
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0B0F19]/40">
             <div className="overflow-x-auto">
               {!queueCollapsed && (
-              <table className="min-w-full text-sm">
-                <thead className="bg-white/5 text-slate-300">
-                  <tr>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thRisk}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thLatest}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thScore}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thBucket}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thThemes}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thRecommendation}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thResponse}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thIntercom}</th>
-                    <th className="text-left px-4 py-3 font-medium">{labels.thLoop}</th>
-                  </tr>
-                </thead>
+                <table className="min-w-full text-sm">
+                  <thead className="bg-white/5 text-slate-300">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thRisk}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thLatest}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thScore}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thBucket}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thThemes}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thRecommendation}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thResponse}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thIntercom}</th>
+                      <th className="px-4 py-3 text-left font-medium">{labels.thLoop}</th>
+                    </tr>
+                  </thead>
 
-                <tbody className="divide-y divide-white/10">
-                  {queue.map((it) => {
-                    const latest = it.latest || {};
-                    const hasResponse = Boolean(it.response_id);
-                    const themes =
-                      Array.isArray(it.themes) && it.themes.length
-                        ? it.themes.join(", ")
-                        : labels.dash;
+                  <tbody className="divide-y divide-white/10">
+                    {queue.map((it) => {
+                      const latest = it.latest || {};
+                      const hasResponse = Boolean(it.response_id);
+                      const themes =
+                        Array.isArray(it.themes) && it.themes.length
+                          ? it.themes.join(", ")
+                          : labels.dash;
 
-                    const score =
-                      typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
+                      const score =
+                        typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
 
-                    const bucketKey =
-                      latest.bucket || (score != null ? scoreBucket(score) : null);
+                      const bucketKey =
+                        latest.bucket || (score != null ? scoreBucket(score) : null);
 
-                    return (
-                      <tr key={it.contact_id} className="hover:bg-white/5">
-                        <td className="px-4 py-3 text-white font-semibold">
-                          {typeof it.risk_score === "number" ? it.risk_score : labels.dash}
-                        </td>
+                      return (
+                        <tr key={it.contact_id} className="hover:bg-white/5">
+                          <td className="px-4 py-3 font-semibold text-white">
+                            {typeof it.risk_score === "number" ? it.risk_score : labels.dash}
+                          </td>
 
-                        <td className="px-4 py-3 text-slate-200">
-                          <div className="text-white/90">{formatDate(latest.submitted_at)}</div>
-                          <div className="text-xs text-slate-400 mt-1 line-clamp-2">
-                            {latest.comment_excerpt || labels.dash}
-                          </div>
-                        </td>
-
-                        <td className="px-4 py-3 text-slate-200">
-                          {score != null ? score : labels.dash}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          <span className={bucketPill(bucketKey)}>{bucketKey || labels.dash}</span>
-                        </td>
-
-                        <td className="px-4 py-3 text-slate-200">{themes}</td>
-
-                        <td className="px-4 py-3 text-slate-200">
-                          {it.recommendation || labels.dash}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {hasResponse ? (
-                            <button
-                              type="button"
-                              onClick={() => openResponse(it.response_id)}
-                              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
-                            >
-                              {labels.view}
-                            </button>
-                          ) : (
-                            <span className="text-slate-500">{labels.dash}</span>
-                          )}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {it.intercom_contact_url ? (
-                            <a
-                              href={it.intercom_contact_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
-                            >
-                              {labels.open}
-                            </a>
-                          ) : (
-                            <span className="text-slate-500">{labels.dash}</span>
-                          )}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {it.active_case ? (
-                            <div className="flex flex-col gap-1">
-                              <span className="text-xs text-slate-400">
-                                {it.active_case.is_closed ? "Loop completed" : "Loop active"}
-                              </span>
-
-                              <span
-                                className={
-                                  it.active_case.is_closed
-                                    ? "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-emerald-500/15 text-emerald-100 border border-emerald-500/25"
-                                    : "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-indigo-500/15 text-indigo-100 border border-indigo-500/25"
-                                }
-                              >
-                                {prettyStatus(it.active_case.status)}
-                              </span>
+                          <td className="px-4 py-3 text-slate-200">
+                            <div className="text-white/90">{formatDate(latest.submitted_at)}</div>
+                            <div className="mt-1 line-clamp-2 text-xs text-slate-400">
+                              {latest.comment_excerpt || labels.dash}
                             </div>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => createCaseFromQueue(it)}
-                              disabled={queueActionLoadingId === String(it.contact_id)}
-                              className="inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-medium bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition disabled:opacity-60"
-                            >
-                              {queueActionLoadingId === String(it.contact_id)
-                                ? "Starting…"
-                                : "Start loop"}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+
+                          <td className="px-4 py-3 text-slate-200">
+                            {score != null ? score : labels.dash}
+                          </td>
+
+                          <td className="px-4 py-3">
+                            <span className={bucketPill(bucketKey)}>{bucketKey || labels.dash}</span>
+                          </td>
+
+                          <td className="px-4 py-3 text-slate-200">{themes}</td>
+
+                          <td className="px-4 py-3 text-slate-200">
+                            {it.recommendation || labels.dash}
+                          </td>
+
+                          <td className="px-4 py-3">
+                            {hasResponse ? (
+                              <button
+                                type="button"
+                                onClick={() => openResponse(it.response_id)}
+                                className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
+                              >
+                                {labels.view}
+                              </button>
+                            ) : (
+                              <span className="text-slate-500">{labels.dash}</span>
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3">
+                            {it.intercom_contact_url ? (
+                              <a
+                                href={it.intercom_contact_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
+                              >
+                                {labels.open}
+                              </a>
+                            ) : (
+                              <span className="text-slate-500">{labels.dash}</span>
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3">
+                            {it.active_case ? (
+                              <div className="flex flex-col gap-1">
+                                <span className="text-xs text-slate-400">
+                                  {it.active_case.is_closed
+                                    ? labels.loopCompleted
+                                    : labels.loopActive}
+                                </span>
+
+                                <span
+                                  className={
+                                    it.active_case.is_closed
+                                      ? "inline-flex items-center rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-100"
+                                      : "inline-flex items-center rounded-xl border border-indigo-500/25 bg-indigo-500/15 px-3 py-1.5 text-xs font-medium text-indigo-100"
+                                  }
+                                >
+                                  {prettyStatus(it.active_case.status, tr)}
+                                </span>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => createCaseFromQueue(it)}
+                                disabled={queueActionLoadingId === String(it.contact_id)}
+                                className="inline-flex items-center rounded-xl bg-[#22C55E] px-3 py-1.5 text-xs font-medium text-[#0B0F19] transition hover:bg-[#16A34A] disabled:opacity-60"
+                              >
+                                {queueActionLoadingId === String(it.contact_id)
+                                  ? labels.starting
+                                  : labels.startLoop}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               )}
             </div>
 
-            <div className="px-4 py-3 text-xs text-slate-400 border-t border-white/10">
-              Showing <span className="text-slate-200">{queue.length}</span> items
+            <div className="border-t border-white/10 px-4 py-3 text-xs text-slate-400">
+              {labels.showingItems}{" "}
+              <span className="text-slate-200">{queue.length}</span> {labels.items}
             </div>
           </div>
         )}
       </section>
 
-      {/* Active cases */}
-      <section className="mt-10">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <h2 className="text-xl font-semibold text-white">Active cases</h2>
-          <div className="text-xs text-slate-400">
-            Persisted close-the-loop workflow cases
-          </div>
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold text-white">{labels.activeCasesTitle}</h2>
+          <div className="text-xs text-slate-400">{labels.activeCasesSubtitle}</div>
         </div>
 
         {casesError && (
           <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
-            <div className="font-medium">Cases error</div>
+            <div className="font-medium">{labels.casesError}</div>
             <div className="mt-1 text-sm opacity-90">{casesError}</div>
           </div>
         )}
 
         {!casesError && casesLoading && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
-            Loading active cases…
+            {labels.loadingActiveCases}
           </div>
         )}
 
         {!casesError && !casesLoading && casesData.length === 0 && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
-            No active cases yet. Start a loop from the queue above.
+            {labels.noActiveCases}
           </div>
         )}
 
         {!casesError && !casesLoading && casesData.length > 0 && (
           <div className="grid gap-4">
             {casesData.map((c) => {
-              const bucket = c.latest_bucket || scoreBucket(c.latest_score_0_10);
               const nextStatuses = nextStatusOptions(c.status);
               const durations = c.durations || {};
-              const currentStageIndex = CASE_STAGES.indexOf(c.status);
 
               return (
                 <div
                   key={c.case_id}
                   className="rounded-3xl border border-white/10 bg-white/5 p-5"
                 >
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-slate-400">Current status</span>
-                        <Chip tone="indigo">{prettyStatus(c.status)}</Chip>
-                        <Chip tone={c.priority === "high" || c.priority === "critical" ? "red" : "amber"}>
-                          Priority: {c.priority || "—"}
+                        <span className="text-xs text-slate-400">{labels.currentStatus}</span>
+                        <Chip tone="indigo">{prettyStatus(c.status, tr)}</Chip>
+                        <Chip
+                          tone={
+                            c.priority === "high" || c.priority === "critical"
+                              ? "red"
+                              : "amber"
+                          }
+                        >
+                          {labels.priority}: {c.priority || "—"}
                         </Chip>
-                        <span className={bucketPill(c.latest_bucket || scoreBucket(c.latest_score_0_10))}>
+                        <span
+                          className={bucketPill(
+                            c.latest_bucket || scoreBucket(c.latest_score_0_10)
+                          )}
+                        >
                           {c.latest_bucket || scoreBucket(c.latest_score_0_10)}
                         </span>
                       </div>
 
-                      <div className="mt-3 text-white font-semibold">
-                        {c.comment_excerpt || "No comment excerpt"}
+                      <div className="mt-3 font-semibold text-white">
+                        {c.comment_excerpt || labels.noCommentExcerpt}
                       </div>
 
                       <div className="mt-2 text-sm text-slate-300">
-                        Case ID: <span className="font-mono">{c.case_id}</span>
+                        {labels.caseId}: <span className="font-mono">{c.case_id}</span>
                       </div>
 
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -1057,7 +1161,9 @@ export default function EnvolaClosingTheLoop() {
                           (Array.isArray(c.audit_log) ? c.audit_log : [])
                             .filter((a) => a?.to_value)
                             .sort((a, b) =>
-                              String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
+                              String(b?.created_at || "").localeCompare(
+                                String(a?.created_at || "")
+                              )
                             )
                             .map((a) => [a.to_value, a])
                         );
@@ -1071,7 +1177,7 @@ export default function EnvolaClosingTheLoop() {
                               <span>{label}:</span>
                               <span className="text-white">{formatDate(dateValue)}</span>
                               {note ? (
-                                <span className="text-slate-300 italic">— {note}</span>
+                                <span className="italic text-slate-300">— {note}</span>
                               ) : null}
                             </div>
                           );
@@ -1080,104 +1186,72 @@ export default function EnvolaClosingTheLoop() {
                         return (
                           <div className="mt-3 grid gap-1 text-xs text-slate-400">
                             {renderStageRow(
-                              "Customer follow-up completed",
+                              labels.followupCompleted,
                               c.customer_followup_completed_at,
                               "customer_followup_completed"
                             )}
                             {renderStageRow(
-                              "Owner assigned",
+                              labels.ownerAssigned,
                               c.owner_assigned_at,
                               "owner_assigned"
                             )}
                             {renderStageRow(
-                              "Improvement planned",
+                              labels.improvementPlanned,
                               c.improvement_planned_at,
                               "improvement_planned"
                             )}
                             {renderStageRow(
-                              "Improvement completed",
+                              labels.improvementCompleted,
                               c.improvement_completed_at,
                               "improvement_completed"
                             )}
                             {renderStageRow(
-                              "Customer informed",
+                              labels.customerInformed,
                               c.customer_informed_at,
                               "customer_informed"
                             )}
                             {renderStageRow(
-                              "Impact checked",
+                              labels.impactChecked,
                               c.impact_checked_at,
                               "impact_checked"
                             )}
-                            {renderStageRow(
-                              "Closed",
-                              c.closed_at,
-                              "closed"
-                            )}
+                            {renderStageRow(labels.closed, c.closed_at, "closed")}
                           </div>
                         );
                       })()}
-
-                      {/* {Array.isArray(c.audit_log) && c.audit_log.some((a) => a?.notes) && (
-                        <div className="mt-4">
-                          <div className="text-xs text-slate-400 mb-2">Progress notes</div>
-                          <div className="space-y-2">
-                            {c.audit_log
-                              .filter((a) => a?.notes)
-                              .sort((a, b) =>
-                                String(b?.created_at || "").localeCompare(String(a?.created_at || ""))
-                              )
-                              .map((a, idx) => (
-                                <div
-                                  key={`${a.case_id || c.case_id}-audit-${idx}`}
-                                  className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3"
-                                >
-                                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                                    <span className="text-slate-200">{formatActionType(a)}</span>
-                                    <span>•</span>
-                                    <span>{formatDate(a.created_at)}</span>
-                                  </div>
-                                  <div className="mt-2 text-sm text-slate-200 whitespace-pre-wrap">
-                                    {a.notes}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )} */}
                     </div>
 
-                    <div className="text-sm text-slate-300 space-y-1 min-w-[240px]">
+                    <div className="min-w-[240px] space-y-1 text-sm text-slate-300">
                       <div>
-                        Survey received:{" "}
+                        {labels.surveyReceived}:{" "}
                         <span className="text-white">{formatDate(c.survey_received_at)}</span>
                       </div>
                       <div>
-                        Active close days:{" "}
+                        {labels.activeCloseDays}:{" "}
                         <span className="text-white">
                           {durations.active_close_days ?? "—"}
                         </span>
                       </div>
                       <div>
-                        Paused days:{" "}
+                        {labels.pausedDays}:{" "}
                         <span className="text-white">
                           {durations.paused_days_total ?? "—"}
                         </span>
                       </div>
                       <div>
-                        Actions:{" "}
+                        {labels.actionsCount}:{" "}
                         <span className="text-white">{c.actions_count ?? 0}</span>
                       </div>
                       <div>
-                        Contacts:{" "}
+                        {labels.contactsCount}:{" "}
                         <span className="text-white">{c.contact_events_count ?? 0}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-5">
-                    <label className="block text-xs text-slate-400 mb-2">
-                      Add note before moving to the next stage
+                    <label className="mb-2 block text-xs text-slate-400">
+                      {labels.addNote}
                     </label>
                     <textarea
                       value={caseComments[c.case_id] || ""}
@@ -1188,13 +1262,13 @@ export default function EnvolaClosingTheLoop() {
                         }))
                       }
                       rows={3}
-                      placeholder="Add context, outcome, owner notes, customer update, etc."
-                      className="w-full rounded-2xl bg-black/20 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+                      placeholder={labels.addNotePlaceholder}
+                      className="w-full rounded-2xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
                     />
                   </div>
 
                   <div className="mt-5">
-                    <div className="mb-2 text-xs text-slate-400">Workflow stages</div>
+                    <div className="mb-2 text-xs text-slate-400">{labels.workflowStages}</div>
 
                     <div className="flex flex-wrap gap-2">
                       {CASE_STAGES.map((stage) => {
@@ -1215,17 +1289,17 @@ export default function EnvolaClosingTheLoop() {
                             } disabled:opacity-60`}
                             title={
                               isCurrent
-                                ? "Current stage"
+                                ? labels.currentStage
                                 : state === "done"
-                                ? "Completed stage"
+                                ? labels.completedStage
                                 : clickable
-                                ? "Click to move to this stage"
-                                : "Not available yet"
+                                ? labels.clickToMove
+                                : labels.notAvailableYet
                             }
                           >
                             {caseActionLoadingId === c.case_id && clickable
-                              ? "Updating…"
-                              : prettyStatus(stage)}
+                              ? tr("envola.closingTheLoop.actions.updating", "Updating…")
+                              : prettyStatus(stage, tr)}
                           </button>
                         );
                       })}
@@ -1233,7 +1307,7 @@ export default function EnvolaClosingTheLoop() {
 
                     {c.status === "closed" && (
                       <div className="mt-3 text-xs text-emerald-300">
-                        This loop has been closed. It will no longer appear as an active case in the queue.
+                        {labels.closedHint}
                       </div>
                     )}
                   </div>
@@ -1244,7 +1318,6 @@ export default function EnvolaClosingTheLoop() {
         )}
       </section>
 
-      {/* Modal */}
       {openId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1258,19 +1331,19 @@ export default function EnvolaClosingTheLoop() {
             aria-label={labels.modalClose}
           />
 
-          <div className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+          <div className="relative max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-white/5 px-6 py-4">
               <div className="font-semibold text-white">{labels.modalTitle}</div>
               <button
                 type="button"
                 onClick={closeModal}
-                className="rounded-xl px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
               >
                 {labels.modalClose}
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[calc(85vh-72px)]">
+            <div className="max-h-[calc(85vh-72px)] overflow-y-auto p-6">
               {detailLoading && (
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
                   {labels.modalLoading}
@@ -1306,7 +1379,7 @@ export default function EnvolaClosingTheLoop() {
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-xs text-slate-400">{labels.modalReceipt}</div>
-                      <div className="mt-2 text-white font-mono text-xs break-all">
+                      <div className="mt-2 break-all font-mono text-xs text-white">
                         {(detail.content_id || "—") + ":" + (detail.receipt_id || "—")}
                       </div>
                     </div>
@@ -1318,7 +1391,7 @@ export default function EnvolaClosingTheLoop() {
                         href={detail.intercom_contact_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center rounded-2xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                        className="inline-flex items-center rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
                       >
                         {labels.modalOpenIntercom}
                       </a>
@@ -1326,32 +1399,36 @@ export default function EnvolaClosingTheLoop() {
                   )}
 
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="text-white font-semibold">{labels.modalOptions}</div>
+                    <div className="font-semibold text-white">{labels.modalOptions}</div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {Array.isArray(detail.selected_options) && detail.selected_options.length ? (
+                      {Array.isArray(detail.selected_options) &&
+                      detail.selected_options.length ? (
                         detail.selected_options.map((o) => (
                           <span key={o} className={chipClass()}>
                             {o}
                           </span>
                         ))
                       ) : (
-                        <span className="text-slate-400 text-sm">{labels.dash}</span>
+                        <span className="text-sm text-slate-400">{labels.dash}</span>
                       )}
                     </div>
                   </div>
 
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="text-white font-semibold">{labels.modalVerbatims}</div>
+                    <div className="font-semibold text-white">{labels.modalVerbatims}</div>
 
                     <div className="mt-4 space-y-4">
                       {(() => {
                         const groups = groupVerbatims(detail.verbatims);
                         if (!groups.length) {
-                          return <div className="text-slate-400 text-sm">{labels.dash}</div>;
+                          return <div className="text-sm text-slate-400">{labels.dash}</div>;
                         }
 
                         return groups.map(([q, texts]) => (
-                          <div key={q} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                          <div
+                            key={q}
+                            className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                          >
                             <div className="text-xs text-slate-400">{q}</div>
                             <ul className="mt-2 space-y-2 text-sm text-slate-200">
                               {texts.map((t, idx) => (
@@ -1384,12 +1461,12 @@ export default function EnvolaClosingTheLoop() {
                     return (
                       <Disclosure
                         title={labels.modalRaw}
-                        right={`${sortedAnswers.length} shown`}
+                        right={`${sortedAnswers.length} ${labels.modalShown}`}
                         defaultOpen={false}
                       >
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-xs text-slate-400">View:</span>
+                            <span className="text-xs text-slate-400">{labels.modalView}</span>
 
                             <button
                               type="button"
@@ -1400,7 +1477,7 @@ export default function EnvolaClosingTheLoop() {
                                   : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
                               }
                             >
-                              Relevant only
+                              {labels.modalRelevantOnly}
                             </button>
 
                             <button
@@ -1412,13 +1489,20 @@ export default function EnvolaClosingTheLoop() {
                                   : "rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-slate-200 hover:bg-white/5"
                               }
                             >
-                              All questions
+                              {labels.modalAllQuestions}
                             </button>
 
                             {relevantQids.length ? (
                               <div className="ml-2 flex flex-wrap gap-2">
                                 {relevantQids.map((qid) => (
-                                  <Chip key={qid} tone="indigo" title="Inferred relevant question id">
+                                  <Chip
+                                    key={qid}
+                                    tone="indigo"
+                                    title={tr(
+                                      "envola.closingTheLoop.modal.inferredRelevantQuestionId",
+                                      "Inferred relevant question id"
+                                    )}
+                                  >
                                     QID {qid}
                                   </Chip>
                                 ))}
@@ -1433,15 +1517,17 @@ export default function EnvolaClosingTheLoop() {
                               checked={rawShowJson}
                               onChange={(e) => setRawShowJson(e.target.checked)}
                             />
-                            Show JSON
+                            {labels.modalShowJson}
                           </label>
                         </div>
 
                         <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
                           {sortedAnswers.length ? (
-                            <AnswerTable rows={sortedAnswers} compact={false} />
+                            <AnswerTable rows={sortedAnswers} compact={false} tr={tr} />
                           ) : (
-                            <div className="text-sm text-slate-300">No answers found.</div>
+                            <div className="text-sm text-slate-300">
+                              {labels.modalNoAnswers}
+                            </div>
                           )}
                         </div>
 

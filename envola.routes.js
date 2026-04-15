@@ -152,6 +152,47 @@ function monthStartYmdUTC(ms) {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-01`;
 }
 
+function dayStartMsUTC(ms) {
+  const d = new Date(ms);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+}
+
+function weekStartMsUTC(ms) {
+  const d = new Date(ms);
+  const day = d.getUTCDay(); // 0=Sun
+  const diffToMonday = (day === 0 ? -6 : 1) - day;
+  return Date.UTC(
+    d.getUTCFullYear(),
+    d.getUTCMonth(),
+    d.getUTCDate() + diffToMonday
+  );
+}
+
+function monthStartMsUTC(ms) {
+  const d = new Date(ms);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+}
+
+function bucketStartMs(ms, granularity) {
+  if (granularity === "day") return dayStartMsUTC(ms);
+  if (granularity === "month") return monthStartMsUTC(ms);
+  return weekStartMsUTC(ms);
+}
+
+function nextBucketMs(ms, granularity) {
+  const d = new Date(ms);
+
+  if (granularity === "day") {
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1);
+  }
+
+  if (granularity === "month") {
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+  }
+
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 7);
+}
+
 function intercomContactUrl(contactId) {
   if (!ENVOLA_INTERCOM_APP_ID || !contactId) return null;
   return `https://app.intercom.com/a/apps/${ENVOLA_INTERCOM_APP_ID}/users/${contactId}`;
@@ -511,7 +552,9 @@ function summarizeDataset(rows) {
   };
 }
 
-function buildTimeseries(rows, granularity = "week") {
+function buildTimeseries(rows, granularity = "week", options = {}) {
+  const { includeEmpty = false, fromMs = null, toMs = null } = options;
+
   const keyFor = (ms) => {
     if (granularity === "day") return toYmdUtc(ms);
     if (granularity === "month") return monthStartYmdUTC(ms);
@@ -533,6 +576,7 @@ function buildTimeseries(rows, granularity = "week") {
     };
 
     cur.responses += 1;
+
     const bucket = scoreBucket(r.score_0_10);
     if (bucket === "promoter") cur.promoters += 1;
     else if (bucket === "passive") cur.passives += 1;
@@ -541,14 +585,42 @@ function buildTimeseries(rows, granularity = "week") {
     map.set(key, cur);
   }
 
-  return Array.from(map.values())
-    .map((x) => ({
-      ...x,
-      nps: x.responses
-        ? Math.round(((x.promoters - x.detractors) / x.responses) * 100)
-        : null,
-    }))
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const withNps = (x) => ({
+    ...x,
+    nps: x.responses
+      ? Math.round(((x.promoters - x.detractors) / x.responses) * 100)
+      : null,
+  });
+
+  if (!includeEmpty || !Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
+    return Array.from(map.values())
+      .map(withNps)
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  }
+
+  const startMs = bucketStartMs(fromMs, granularity);
+  const endMs = bucketStartMs(toMs, granularity);
+
+  const points = [];
+
+  for (let t = startMs; t <= endMs; t = nextBucketMs(t, granularity)) {
+    const key = keyFor(t);
+    const existing = map.get(key);
+
+    points.push(
+      withNps(
+        existing || {
+          date: key,
+          responses: 0,
+          promoters: 0,
+          passives: 0,
+          detractors: 0,
+        }
+      )
+    );
+  }
+
+  return points;
 }
 
 function flattenResponseForTable(r, allRowsForContact = []) {
@@ -911,6 +983,7 @@ export function createEnvolaRouter() {
       const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
       const bucket = String(req.query.bucket || "all").trim().toLowerCase();
       const granularity = String(req.query.granularity || "week").trim().toLowerCase();
+      const includeEmpty = String(req.query.include_empty || "0") === "1";
 
       if (!["day", "week", "month"].includes(granularity)) {
         return res.status(400).json({ ok: false, error: "Invalid granularity" });
@@ -929,7 +1002,21 @@ export function createEnvolaRouter() {
         bucket,
       });
 
-      const points = buildTimeseries(filtered, granularity);
+      const points = buildTimeseries(filtered, granularity, {
+        includeEmpty,
+        fromMs: window.fromMs,
+        toMs: window.toMs,
+      });
+
+      console.log("[envola timeseries]", {
+        contentId,
+        granularity,
+        includeEmpty,
+        from: window.from,
+        to: window.to,
+        filteredRows: filtered.length,
+        returnedBuckets: points.length,
+      });
 
       return res.json({
         ok: true,
@@ -939,6 +1026,7 @@ export function createEnvolaRouter() {
         to: window.to,
         bucket,
         granularity,
+        include_empty: includeEmpty,
         points,
       });
     } catch (err) {

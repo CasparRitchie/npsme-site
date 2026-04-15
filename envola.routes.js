@@ -775,87 +775,53 @@ export function createEnvolaRouter() {
       const days = clampInt(req.query.days, 90, 1, 3650);
       const statusFilter = String(req.query.status || "all").trim().toLowerCase();
 
-      const [invites, responses] = await Promise.all([
-        loadLiveInvitations(),
-        loadLiveResponses(),
-      ]);
+      const text = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
+      const statsRows = parseJsonl(text);
 
       const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      const latestResponseByInvitationId = new Map();
-      for (const r of responses || []) {
-        const invId = String(r.invitationId || "").trim();
-        if (!invId) continue;
+      const deriveStatus = (row) => {
+        if (row.first_completion) return "responded";
+        if (row.first_open || row.first_click) return "opened";
+        if (row.first_hard_bounce || row.first_soft_bounce) return "bounced";
+        if (row.received_at) return "sent";
+        return "unknown";
+      };
 
-        const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
-        const prev = latestResponseByInvitationId.get(invId);
-        const prevT = prev?.createdAt ? new Date(prev.createdAt).getTime() : 0;
-
-        if (!prev || t >= prevT) {
-          latestResponseByInvitationId.set(invId, r);
-        }
-      }
-
-      let rows = (invites || [])
-        .map((inv) => {
-          const invitationId = String(inv.invitationId || "").trim();
-          const response = invitationId
-            ? latestResponseByInvitationId.get(invitationId)
-            : null;
-
-          const sentAtRaw = inv.sentAt || inv.lastSentAt || "";
+      let rows = (statsRows || [])
+        .filter((row) => String(row.content_id || "").trim() === contentId)
+        .map((row) => {
+          const sentAtRaw = row.received_at || "";
           const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
-
-          const score =
-            response &&
-            response.score != null &&
-            String(response.score).trim() !== "" &&
-            Number.isFinite(Number(response.score))
-              ? Number(response.score)
-              : null;
-
-          const hasResponse = Boolean(response?.responseId || inv.responseId);
-
-          let status = String(inv.status || "").trim().toLowerCase();
-          if (hasResponse) {
-            status = "responded";
-          } else if (!status) {
-            status = "sent";
-          }
+          const status = deriveStatus(row);
 
           return {
-            invitation_id: invitationId,
-            customer_id: inv.customerId || "",
-            name: inv.customerName || "",
-            business_name: inv.businessName || "",
-            email: inv.email || "",
-            stage: inv.stage || "",
-            survey_id: inv.surveyId || "",
-            type_of_device: inv.typeOfDevice || "",
-            assistante_maternelle: inv.assistanteMaternelle || "",
+            invitation_id: String(row.receipt_id || "").trim(),
+            customer_id: String(row.user_id || "").trim(),
+            name: row.name || "",
+            business_name: "",
+            email: row.email || "",
+            stage: "",
+            survey_id: String(row.content_id || "").trim(),
+            type_of_device: row.device || "",
+            assistante_maternelle: "",
             sent_at: sentAtRaw || null,
             sent_at_ms: sentAtMs,
-            resent_count: Number.isFinite(Number(inv.resentCount))
-              ? Number(inv.resentCount)
-              : 0,
+            resent_count: 0,
             status,
-            response_id: response?.responseId || inv.responseId || "",
-            score_0_10: score,
-            comment: response?.comment || "",
-            responded_at: response?.createdAt || null,
+            response_id:
+              row.first_completion && row.content_id && row.receipt_id
+                ? `${row.content_id}:${row.receipt_id}`
+                : "",
+            score_0_10: null,
+            comment: "",
+            responded_at: row.first_completion || null,
           };
         })
         .filter((row) => {
           if (!row.sent_at_ms || Number.isNaN(row.sent_at_ms)) return false;
           if (row.sent_at_ms < cutoffMs) return false;
-
-          // content_id from the frontend maps to survey_id in this dataset
-          if (contentId && String(row.survey_id || "").trim()) {
-            if (String(row.survey_id).trim() !== contentId) return false;
-          }
-
           if (statusFilter !== "all" && row.status !== statusFilter) return false;
-
           return true;
         })
         .sort((a, b) => (b.sent_at_ms || 0) - (a.sent_at_ms || 0));
@@ -863,7 +829,7 @@ export function createEnvolaRouter() {
       const summary = {
         sent: rows.length,
         delivered: rows.filter((r) =>
-          ["sent", "started", "opened", "responded"].includes(r.status)
+          ["sent", "opened", "responded"].includes(r.status)
         ).length,
         responded: rows.filter((r) => r.status === "responded").length,
         response_rate_pct:

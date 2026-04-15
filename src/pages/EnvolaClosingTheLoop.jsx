@@ -6,6 +6,12 @@ import { useLocation } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
 
+import {
+  CASE_STAGE_ORDER,
+  STATUS_TRANSITIONS,
+  CASE_TIMELINE_FIELDS,
+} from "../../shared/closingTheLoopConfig";
+
 const DEFAULT_CONTENT_ID = "189616";
 
 const SURVEY_ORDER_BY_CONTENT_ID = {
@@ -265,52 +271,10 @@ function groupVerbatims(verbatims) {
   return Array.from(out.entries());
 }
 
-const CASE_STAGES = [
-  "new",
-  "triaged",
-  "customer_followup_planned",
-  "customer_followup_completed",
-  "owner_assigned",
-  "improvement_planned",
-  "improvement_scheduled",
-  "improvement_in_progress",
-  "improvement_completed",
-  "customer_informed",
-  "impact_check_pending",
-  "impact_checked",
-  "closed",
-];
-
 function nextStatusOptions(currentStatus) {
-  switch (currentStatus) {
-    case "new":
-      return ["triaged"];
-    case "triaged":
-      return ["customer_followup_planned"];
-    case "customer_followup_planned":
-      return ["customer_followup_completed"];
-    case "customer_followup_completed":
-      return ["owner_assigned"];
-    case "owner_assigned":
-      return ["improvement_planned"];
-    case "improvement_planned":
-      return ["improvement_scheduled", "improvement_in_progress"];
-    case "improvement_scheduled":
-      return ["improvement_in_progress"];
-    case "improvement_in_progress":
-      return ["improvement_completed"];
-    case "improvement_completed":
-      return ["customer_informed", "impact_check_pending"];
-    case "customer_informed":
-      return ["impact_check_pending", "impact_checked", "closed"];
-    case "impact_check_pending":
-      return ["impact_checked", "closed"];
-    case "impact_checked":
-      return ["closed"];
-    default:
-      return [];
-  }
+  return STATUS_TRANSITIONS[currentStatus] || [];
 }
+
 
 function prettyStatus(status, tr) {
   return tr(
@@ -322,8 +286,8 @@ function prettyStatus(status, tr) {
 }
 
 function getStageState(caseStatus, stage) {
-  const currentIndex = CASE_STAGES.indexOf(caseStatus);
-  const stageIndex = CASE_STAGES.indexOf(stage);
+  const currentIndex = CASE_STAGE_ORDER.indexOf(caseStatus);
+  const stageIndex = CASE_STAGE_ORDER.indexOf(stage);
 
   if (currentIndex === -1 || stageIndex === -1) return "future";
   if (stageIndex < currentIndex) return "done";
@@ -529,11 +493,15 @@ export default function EnvolaClosingTheLoop() {
 
   const filteredCases = React.useMemo(() => {
     if (caseFilter === "active") {
-      return casesData.filter((c) => c.status !== "closed");
+      return casesData.filter(
+        (c) => c.status !== "closed" && c.status !== "cancelled"
+      );
     }
 
     if (caseFilter === "completed") {
-      return casesData.filter((c) => c.status === "closed");
+      return casesData.filter(
+        (c) => c.status === "closed" || c.status === "cancelled"
+      );
     }
 
     return casesData;
@@ -866,6 +834,18 @@ export default function EnvolaClosingTheLoop() {
     modalShown: tr("envola.closingTheLoop.modal.shownSuffix", "shown"),
 
     dash: tr("common.dash", "—"),
+  };
+
+  const timelineLabels = {
+    customer_followup_completed: labels.followupCompleted,
+    owner_assigned: labels.ownerAssigned,
+    improvement_planned: labels.improvementPlanned,
+    improvement_scheduled: labels.improvementScheduled,
+    improvement_in_progress: labels.improvementInProgress,
+    improvement_completed: labels.improvementCompleted,
+    customer_informed: labels.customerInformed,
+    impact_checked: labels.impactChecked,
+    closed: labels.closed,
   };
 
   return (
@@ -1299,52 +1279,13 @@ export default function EnvolaClosingTheLoop() {
 
                         return (
                           <div className="mt-3 grid gap-1 text-xs text-slate-400">
-                            {renderStageRow(
-                              labels.followupCompleted,
-                              c.customer_followup_completed_at,
-                              "customer_followup_completed"
+                            {Object.entries(CASE_TIMELINE_FIELDS).map(([statusKey, fieldName]) =>
+                              renderStageRow(
+                                timelineLabels[statusKey] || prettyStatus(statusKey, tr),
+                                c[fieldName],
+                                statusKey
+                              )
                             )}
-                            {renderStageRow(
-                              labels.ownerAssigned,
-                              c.owner_assigned_at,
-                              "owner_assigned"
-                            )}
-                            {renderStageRow(
-                              labels.improvementPlanned,
-                              c.improvement_planned_at,
-                              "improvement_planned"
-                            )}
-                            {renderStageRow(
-                              labels.improvementScheduled,
-                              c.improvement_scheduled_at,
-                              "improvement_scheduled"
-                            )}
-                            {renderStageRow(
-                              labels.improvementInProgress,
-                              c.improvement_in_progress_at,
-                              "improvement_in_progress"
-                            )}
-                            {renderStageRow(
-                              labels.improvementCompleted,
-                              c.improvement_completed_at,
-                              "improvement_completed"
-                            )}
-                            {renderStageRow(
-                              labels.customerInformed,
-                              c.customer_informed_at,
-                              "customer_informed"
-                            )}
-                            {renderStageRow(
-                              labels.impactCheckPending,
-                              c.impact_check_pending_at,
-                              "impact_check_pending"
-                            )}
-                            {renderStageRow(
-                              labels.impactChecked,
-                              c.impact_checked_at,
-                              "impact_checked"
-                            )}
-                            {renderStageRow(labels.closed, c.closed_at, "closed")}
                           </div>
                         );
                       })()}
@@ -1400,7 +1341,7 @@ export default function EnvolaClosingTheLoop() {
                     <div className="mb-2 text-xs text-slate-400">{labels.workflowStages}</div>
 
                     <div className="flex flex-wrap gap-2">
-                      {CASE_STAGES.map((stage) => {
+                      {CASE_STAGE_ORDER.map((stage) => {
                         const state = getStageState(c.status, stage);
                         const isCurrent = stage === c.status;
                         const isNext = nextStatuses.includes(stage);

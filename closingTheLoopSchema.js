@@ -1,4 +1,9 @@
 // closingTheLoopSchema.js
+import {
+  STATUS_TRANSITIONS,
+  CASE_TIMELINE_FIELDS,
+} from "./shared/closingTheLoopConfig";
+// } from "./src/shared/closingTheLoopConfig.js";
 
 function nowIso() {
   return new Date().toISOString();
@@ -159,34 +164,8 @@ const AUDIT_EVENT_TYPES = Object.freeze([
 const CASE_MILESTONE_FIELDS = Object.freeze([
   "survey_received_at",
   "customer_followup_attempted_at",
-  "customer_followup_completed_at",
-  "owner_assigned_at",
-  "improvement_planned_at",
-  "improvement_scheduled_at",
-  "improvement_started_at",
-  "improvement_completed_at",
-  "customer_informed_at",
-  "impact_checked_at",
-  "closed_at",
+  ...Object.values(CASE_TIMELINE_FIELDS),
 ]);
-
-const STATUS_TRANSITIONS = Object.freeze({
-  new: ["triaged", "paused", "cancelled"],
-  triaged: ["customer_followup_planned", "owner_assigned", "paused", "cancelled"],
-  customer_followup_planned: ["customer_followup_completed", "paused", "cancelled"],
-  customer_followup_completed: ["owner_assigned", "paused", "cancelled"],
-  owner_assigned: ["improvement_planned", "paused", "cancelled"],
-  improvement_planned: ["improvement_scheduled", "improvement_in_progress", "paused", "cancelled"],
-  improvement_scheduled: ["improvement_in_progress", "paused", "cancelled"],
-  improvement_in_progress: ["improvement_completed", "paused", "cancelled"],
-  improvement_completed: ["customer_informed", "impact_check_pending", "paused", "cancelled"],
-  customer_informed: ["impact_check_pending", "impact_checked", "closed", "paused", "cancelled"],
-  impact_check_pending: ["impact_checked", "closed", "paused", "cancelled"],
-  impact_checked: ["closed", "paused", "cancelled"],
-  closed: [],
-  paused: [],
-  cancelled: [],
-});
 
 function isValidEnum(value, validValues) {
   return validValues.includes(value);

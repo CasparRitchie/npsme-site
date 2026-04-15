@@ -1,5 +1,5 @@
 // src/pages/EnvolaInvitations.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import EnvolaWorkspaceNav from "../components/EnvolaWorkspaceNav";
@@ -75,6 +75,14 @@ function statusPill(status, tr) {
     );
   }
 
+  if (status === "sent") {
+    return (
+      <span className={`${base} border-white/10 bg-white/5 text-slate-200`}>
+        {tr("envola.invitations.status.sent", "Sent")}
+      </span>
+    );
+  }
+
   return (
     <span className={`${base} border-white/10 bg-white/5 text-slate-200`}>
       {status || tr("common.unknown", "Unknown")}
@@ -113,7 +121,7 @@ function useInvitationFilters() {
 export default function EnvolaInvitations() {
   const location = useLocation();
   const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
+  const tr = useCallback((p, f) => translations(lang, p, f), [lang]);
   const { filters, updateFilters } = useInvitationFilters();
 
   const navAnchorRef = useRef(null);

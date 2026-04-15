@@ -904,6 +904,16 @@ export function createIntercomRouter() {
     }
   });
 
+  router.get("/debug/export-stats", requirePrivateCookie, async (req, res) => {
+    try {
+      const out = await ingestExportStats({ hours: req.query.hours || 720 });
+      return res.json(out);
+    } catch (err) {
+      console.error("[intercom] debug export-stats error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   router.post("/ingest/nps", requireIngestToken, async (_req, res) => {
     try {
       const out = await ingestSurveyCompletionsToCleanStore();

@@ -58,6 +58,8 @@ const DROPBOX_REFRESH_TOKEN = process.env.DROPBOX_REFRESH_TOKEN;
 const DROPBOX_APP_KEY = process.env.DROPBOX_APP_KEY;
 const DROPBOX_APP_SECRET = process.env.DROPBOX_APP_SECRET;
 const LEGACY_DROPBOX_TOKEN = process.env.DROPBOX_ACCESS_TOKEN;
+const LIVE_INVITATIONS_PATH = process.env.DROPBOX_LIVE_INVITATIONS_PATH || "/npsme/live/invitations.csv";
+const LIVE_RESPONSES_PATH = process.env.DROPBOX_LIVE_RESPONSES_PATH || "/npsme/live/responses.csv";
 
 const ENVOLA_RESPONSES_PATH =
   process.env.DROPBOX_ENVOLA_RESPONSES_PATH || "/npsme/envola/responses.jsonl";
@@ -603,6 +605,91 @@ function flattenResponseForTable(r, allRowsForContact = []) {
   };
 }
 
+function detectDelimiter(headerLine = "") {
+  const commaCount = (headerLine.match(/,/g) || []).length;
+  const semiCount = (headerLine.match(/;/g) || []).length;
+
+  if (semiCount && !commaCount) return ";";
+  if (commaCount && !semiCount) return ",";
+  return ",";
+}
+
+function splitCsvLine(line, delimiter) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === delimiter && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+function parseCsvWithHeader(csvText) {
+  const lines = String(csvText || "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  if (lines.length < 2) return [];
+
+  const delimiter = detectDelimiter(lines[0]);
+  const header = splitCsvLine(lines[0], delimiter).map((h) => h.trim());
+
+  return lines.slice(1).map((line) => {
+    const cols = splitCsvLine(line, delimiter);
+    const obj = {};
+
+    header.forEach((h, idx) => {
+      let value = cols[idx] ?? "";
+
+      if (value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1).replace(/""/g, '"');
+      }
+
+      obj[h] = value.trim();
+    });
+
+    return obj;
+  });
+}
+
+async function loadLiveInvitations() {
+  const csv = await readDropboxFile(LIVE_INVITATIONS_PATH).catch((err) => {
+    console.error("[envola] Error reading live invitations.csv", err);
+    return null;
+  });
+
+  if (!csv) return [];
+  return parseCsvWithHeader(csv);
+}
+
+async function loadLiveResponses() {
+  const csv = await readDropboxFile(LIVE_RESPONSES_PATH).catch((err) => {
+    console.error("[envola] Error reading live responses.csv", err);
+    return null;
+  });
+
+  if (!csv) return [];
+  return parseCsvWithHeader(csv);
+}
+
 // --------------------------------------------------
 // Router
 // --------------------------------------------------
@@ -681,6 +768,129 @@ export function createEnvolaRouter() {
 
   // Everything below this line requires private cookie
   router.use(requirePrivateCookie);
+
+  router.get("/invitations", async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+      const days = clampInt(req.query.days, 90, 1, 3650);
+      const statusFilter = String(req.query.status || "all").trim().toLowerCase();
+
+      const [invites, responses] = await Promise.all([
+        loadLiveInvitations(),
+        loadLiveResponses(),
+      ]);
+
+      const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
+
+      const latestResponseByInvitationId = new Map();
+      for (const r of responses || []) {
+        const invId = String(r.invitationId || "").trim();
+        if (!invId) continue;
+
+        const t = r.createdAt ? new Date(r.createdAt).getTime() : 0;
+        const prev = latestResponseByInvitationId.get(invId);
+        const prevT = prev?.createdAt ? new Date(prev.createdAt).getTime() : 0;
+
+        if (!prev || t >= prevT) {
+          latestResponseByInvitationId.set(invId, r);
+        }
+      }
+
+      let rows = (invites || [])
+        .map((inv) => {
+          const invitationId = String(inv.invitationId || "").trim();
+          const response = invitationId
+            ? latestResponseByInvitationId.get(invitationId)
+            : null;
+
+          const sentAtRaw = inv.sentAt || inv.lastSentAt || "";
+          const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
+
+          const score =
+            response &&
+            response.score != null &&
+            String(response.score).trim() !== "" &&
+            Number.isFinite(Number(response.score))
+              ? Number(response.score)
+              : null;
+
+          const hasResponse = Boolean(response?.responseId || inv.responseId);
+
+          let status = String(inv.status || "").trim().toLowerCase();
+          if (hasResponse) {
+            status = "responded";
+          } else if (!status) {
+            status = "sent";
+          }
+
+          return {
+            invitation_id: invitationId,
+            customer_id: inv.customerId || "",
+            name: inv.customerName || "",
+            business_name: inv.businessName || "",
+            email: inv.email || "",
+            stage: inv.stage || "",
+            survey_id: inv.surveyId || "",
+            type_of_device: inv.typeOfDevice || "",
+            assistante_maternelle: inv.assistanteMaternelle || "",
+            sent_at: sentAtRaw || null,
+            sent_at_ms: sentAtMs,
+            resent_count: Number.isFinite(Number(inv.resentCount))
+              ? Number(inv.resentCount)
+              : 0,
+            status,
+            response_id: response?.responseId || inv.responseId || "",
+            score_0_10: score,
+            comment: response?.comment || "",
+            responded_at: response?.createdAt || null,
+          };
+        })
+        .filter((row) => {
+          if (!row.sent_at_ms || Number.isNaN(row.sent_at_ms)) return false;
+          if (row.sent_at_ms < cutoffMs) return false;
+
+          // content_id from the frontend maps to survey_id in this dataset
+          if (contentId && String(row.survey_id || "").trim()) {
+            if (String(row.survey_id).trim() !== contentId) return false;
+          }
+
+          if (statusFilter !== "all" && row.status !== statusFilter) return false;
+
+          return true;
+        })
+        .sort((a, b) => (b.sent_at_ms || 0) - (a.sent_at_ms || 0));
+
+      const summary = {
+        sent: rows.length,
+        delivered: rows.filter((r) =>
+          ["sent", "started", "opened", "responded"].includes(r.status)
+        ).length,
+        responded: rows.filter((r) => r.status === "responded").length,
+        response_rate_pct:
+          rows.length > 0
+            ? Math.round(
+                (rows.filter((r) => r.status === "responded").length / rows.length) * 1000
+              ) / 10
+            : null,
+        last_sent_at: rows[0]?.sent_at || null,
+      };
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        days,
+        status: statusFilter,
+        summary,
+        rows,
+      });
+    } catch (err) {
+      console.error("[envola] invitations error", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to load invitations",
+      });
+    }
+  });
 
   router.get("/summary", async (req, res) => {
     try {

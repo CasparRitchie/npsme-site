@@ -2302,6 +2302,25 @@ router.get("/survey-export/start", async (req, res) => {
     }
   });
 
+  function isLikelySurveyRow(row) {
+    if (!row || typeof row !== "object") return false;
+
+    const values = Object.values(row).map((v) =>
+      v == null ? "" : String(v).toLowerCase().trim()
+    );
+
+    const joined = values.join(" ");
+
+    return (
+      joined.includes("survey") ||
+      joined.includes("response") ||
+      joined.includes("submitted") ||
+      joined.includes("score") ||
+      joined.includes("answer") ||
+      joined.includes("question")
+    );
+  }
+
   router.get("/survey-export/parse/:jobId", async (req, res) => {
     try {
       const jobId = req.params.jobId;
@@ -2313,14 +2332,23 @@ router.get("/survey-export/start", async (req, res) => {
       const done = ["complete", "completed"].includes(st);
 
       if (!(done && status.download_url)) {
-        return res.json({ ok: true, job_identifier: jobId, status: status.status, progress: status });
+        return res.json({
+          ok: true,
+          job_identifier: jobId,
+          status: status.status,
+          progress: status,
+        });
       }
 
       const csvText = await downloadExportCsv(status.download_url, { token });
       const records = parse(csvText, { columns: true, skip_empty_lines: true });
 
       let surveyRows = records.filter(isLikelySurveyRow);
-      if (surveyId) surveyRows = surveyRows.filter((row) => JSON.stringify(row).includes(surveyId));
+      if (surveyId) {
+        surveyRows = surveyRows.filter((row) =>
+          JSON.stringify(row).includes(surveyId)
+        );
+      }
 
       res.json({
         ok: true,

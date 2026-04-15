@@ -314,7 +314,7 @@ function nextStatusOptions(currentStatus) {
 
 function prettyStatus(status, tr) {
   return tr(
-    `envola.closingTheLoop.statuses.${status}`,
+    `envola.closingTheLoop.stages.${status}`,
     String(status || "")
       .replaceAll("_", " ")
       .replace(/\b\w/g, (m) => m.toUpperCase())
@@ -373,6 +373,9 @@ export default function EnvolaClosingTheLoop() {
   const [casesError, setCasesError] = React.useState("");
   const [casesData, setCasesData] = React.useState([]);
   const [caseComments, setCaseComments] = React.useState({});
+  const [caseFilter, setCaseFilter] = React.useState("all");
+  const caseRefs = React.useRef({});
+  const [lastUpdatedCaseId, setLastUpdatedCaseId] = React.useState(null);
 
   const [caseActionLoadingId, setCaseActionLoadingId] = React.useState(null);
   const [queueActionLoadingId, setQueueActionLoadingId] = React.useState(null);
@@ -524,6 +527,18 @@ export default function EnvolaClosingTheLoop() {
     });
   }, [data, bucket, sortBy]);
 
+  const filteredCases = React.useMemo(() => {
+    if (caseFilter === "active") {
+      return casesData.filter((c) => c.status !== "closed");
+    }
+
+    if (caseFilter === "completed") {
+      return casesData.filter((c) => c.status === "closed");
+    }
+
+    return casesData;
+  }, [casesData, caseFilter]);
+
   const openResponse = React.useCallback(async (responseId) => {
     if (!responseId) return;
     setOpenId(responseId);
@@ -587,6 +602,8 @@ export default function EnvolaClosingTheLoop() {
   const updateCaseStatus = React.useCallback(
     async (caseId, status) => {
       if (!caseId || !status) return;
+
+      setLastUpdatedCaseId(caseId);
       setCaseActionLoadingId(caseId);
 
       try {
@@ -634,6 +651,20 @@ export default function EnvolaClosingTheLoop() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openId, closeModal]);
 
+  React.useEffect(() => {
+    if (!lastUpdatedCaseId || casesLoading) return;
+
+    const el = caseRefs.current[lastUpdatedCaseId];
+    if (!el) return;
+
+    window.requestAnimationFrame(() => {
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+  }, [casesData, casesLoading, lastUpdatedCaseId]);
+
   const title = tr("envola.closingTheLoop.title", "Closing the loop");
   const subtitle = tr(
     "envola.closingTheLoop.subtitle",
@@ -644,7 +675,10 @@ export default function EnvolaClosingTheLoop() {
     refresh: tr("envola.closingTheLoop.controls.refresh", "Refresh"),
     refreshing: tr("envola.closingTheLoop.controls.refreshing", "Refreshing…"),
     refreshCases: tr("envola.closingTheLoop.controls.refreshCases", "Refresh cases"),
-    refreshingCases: tr("envola.closingTheLoop.controls.refreshingCases", "Refreshing cases…"),
+    refreshingCases: tr(
+      "envola.closingTheLoop.controls.refreshingCases",
+      "Refreshing cases…"
+    ),
     contentId: tr("envola.closingTheLoop.controls.contentId", "content_id"),
     days: tr("envola.closingTheLoop.controls.days", "days"),
     limit: tr("envola.closingTheLoop.controls.limit", "limit"),
@@ -656,26 +690,56 @@ export default function EnvolaClosingTheLoop() {
     passives: tr("envola.closingTheLoop.filters.passives", "Passives"),
     promoters: tr("envola.closingTheLoop.filters.promoters", "Promoters"),
 
-    risk: tr("envola.closingTheLoop.sort.risk", "Risk"),
-    latestDate: tr("envola.closingTheLoop.sort.date", "Latest date"),
-    score: tr("envola.closingTheLoop.sort.score", "Score"),
+    risk: tr("envola.closingTheLoop.sortOptions.risk", "Risk"),
+    latestDate: tr("envola.closingTheLoop.sortOptions.date", "Latest date"),
+    score: tr("envola.closingTheLoop.sortOptions.score", "Score"),
 
-    loadingQueue: tr("envola.closingTheLoop.state.loading", "Loading queue…"),
-    noResults: tr("envola.closingTheLoop.state.noResults", "No results for this filter/window."),
+    loadingQueue: tr("envola.closingTheLoop.state.loadingQueue", "Loading queue…"),
+    noResults: tr(
+      "envola.closingTheLoop.state.noResults",
+      "No results for this filter/window."
+    ),
     errorTitle: tr("envola.closingTheLoop.state.errorTitle", "Error"),
     notAuthHint: tr(
       "envola.closingTheLoop.state.notAuthHint",
       'If you see “Not authorised”, log in again at /private/login.'
     ),
-    showQueue: tr("envola.closingTheLoop.queue.show", "Show queue"),
-    hideQueue: tr("envola.closingTheLoop.queue.hide", "Hide queue"),
-    queueTitle: tr("envola.closingTheLoop.queue.title", "Queue"),
+
+    showQueue: tr("envola.closingTheLoop.actions.showQueue", "Show queue"),
+    hideQueue: tr("envola.closingTheLoop.actions.hideQueue", "Hide queue"),
+    queueTitle: tr("envola.closingTheLoop.sections.queue", "Queue"),
     queueSubtitle: tr(
-      "envola.closingTheLoop.queue.subtitle",
-      "Prioritised from recent survey responses."
+      "envola.closingTheLoop.sections.queueSubtitle",
+      "Prioritised from recent survey responses"
     ),
-    showingItems: tr("envola.closingTheLoop.queue.showing", "Showing"),
-    items: tr("envola.closingTheLoop.queue.items", "items"),
+
+    activeCasesTitle: tr("envola.closingTheLoop.sections.activeCases", "Active cases"),
+    activeCasesSubtitle: tr(
+      "envola.closingTheLoop.sections.activeCasesSubtitle",
+      "Persisted close-the-loop workflow cases"
+    ),
+
+    showingItems: tr("envola.closingTheLoop.table.showingItems", "Showing"),
+    items: tr("envola.closingTheLoop.table.items", "items"),
+
+    currentStage: tr("envola.closingTheLoop.actions.currentStage", "Current stage"),
+    completedStage: tr("envola.closingTheLoop.actions.completedStage", "Completed stage"),
+    clickToMove: tr("envola.closingTheLoop.actions.clickToMove", "Click to move to this stage"),
+    notAvailableYet: tr("envola.closingTheLoop.actions.notAvailableYet", "Not available yet"),
+
+    caseFilterAll: tr("envola.closingTheLoop.filters.caseFilterAll", "All"),
+    caseFilterActive: tr("envola.closingTheLoop.filters.caseFilterActive", "Active"),
+    caseFilterCompleted: tr("envola.closingTheLoop.filters.caseFilterCompleted", "Completed"),
+
+    casesError: tr("envola.closingTheLoop.state.casesError", "Cases error"),
+    loadingActiveCases: tr(
+      "envola.closingTheLoop.state.loadingCases",
+      "Loading active cases…"
+    ),
+    noActiveCases: tr(
+      "envola.closingTheLoop.state.noCases",
+      "No active cases yet. Start a loop from the queue above."
+    ),
 
     thRisk: tr("envola.closingTheLoop.table.risk", "Risk"),
     thLatest: tr("envola.closingTheLoop.table.latest", "Latest"),
@@ -691,65 +755,50 @@ export default function EnvolaClosingTheLoop() {
     view: tr("envola.closingTheLoop.actions.view", "View"),
     startLoop: tr("envola.closingTheLoop.actions.startLoop", "Start loop"),
     starting: tr("envola.closingTheLoop.actions.starting", "Starting…"),
-    loopCompleted: tr("envola.closingTheLoop.actions.loopCompleted", "Loop completed"),
     loopActive: tr("envola.closingTheLoop.actions.loopActive", "Loop active"),
-    dash: tr("common.dash", "—"),
-
-    activeCasesTitle: tr("envola.closingTheLoop.cases.title", "Active cases"),
-    activeCasesSubtitle: tr(
-      "envola.closingTheLoop.cases.subtitle",
-      "Persisted close-the-loop workflow cases"
-    ),
-    casesError: tr("envola.closingTheLoop.cases.error", "Cases error"),
-    loadingActiveCases: tr(
-      "envola.closingTheLoop.cases.loading",
-      "Loading active cases…"
-    ),
-    noActiveCases: tr(
-      "envola.closingTheLoop.cases.none",
-      "No active cases yet. Start a loop from the queue above."
-    ),
-    currentStatus: tr("envola.closingTheLoop.cases.currentStatus", "Current status"),
-    priority: tr("envola.closingTheLoop.cases.priority", "Priority"),
-    noCommentExcerpt: tr(
-      "envola.closingTheLoop.cases.noCommentExcerpt",
-      "No comment excerpt"
-    ),
-    caseId: tr("envola.closingTheLoop.cases.caseId", "Case ID"),
-    surveyReceived: tr("envola.closingTheLoop.cases.surveyReceived", "Survey received"),
-    activeCloseDays: tr("envola.closingTheLoop.cases.activeCloseDays", "Active close days"),
-    pausedDays: tr("envola.closingTheLoop.cases.pausedDays", "Paused days"),
-    actionsCount: tr("envola.closingTheLoop.cases.actionsCount", "Actions"),
-    contactsCount: tr("envola.closingTheLoop.cases.contactsCount", "Contacts"),
+    loopCompleted: tr("envola.closingTheLoop.actions.loopCompleted", "Loop completed"),
     addNote: tr(
-      "envola.closingTheLoop.cases.addNote",
+      "envola.closingTheLoop.actions.addNote",
       "Add note before moving to the next stage"
     ),
     addNotePlaceholder: tr(
-      "envola.closingTheLoop.cases.addNotePlaceholder",
+      "envola.closingTheLoop.actions.addNotePlaceholder",
       "Add context, outcome, owner notes, customer update, etc."
     ),
-    workflowStages: tr("envola.closingTheLoop.cases.workflowStages", "Workflow stages"),
-    currentStage: tr("envola.closingTheLoop.cases.currentStage", "Current stage"),
-    completedStage: tr("envola.closingTheLoop.cases.completedStage", "Completed stage"),
-    clickToMove: tr(
-      "envola.closingTheLoop.cases.clickToMove",
-      "Click to move to this stage"
+    workflowStages: tr(
+      "envola.closingTheLoop.actions.workflowStages",
+      "Workflow stages"
     ),
-    notAvailableYet: tr(
-      "envola.closingTheLoop.cases.notAvailableYet",
-      "Not available yet"
+    updating: tr("envola.closingTheLoop.actions.updating", "Updating…"),
+
+    currentStatus: tr("envola.closingTheLoop.case.currentStatus", "Current status"),
+    priority: tr("envola.closingTheLoop.case.priority", "Priority"),
+    noCommentExcerpt: tr(
+      "envola.closingTheLoop.case.noCommentExcerpt",
+      "No comment excerpt"
     ),
+    caseId: tr("envola.closingTheLoop.case.caseId", "Case ID"),
+    surveyReceived: tr("envola.closingTheLoop.case.surveyReceived", "Survey received"),
+    activeCloseDays: tr(
+      "envola.closingTheLoop.case.activeCloseDays",
+      "Active close days"
+    ),
+    pausedDays: tr("envola.closingTheLoop.case.pausedDays", "Paused days"),
+    actionsCount: tr("envola.closingTheLoop.case.actions", "Actions"),
+    contactsCount: tr("envola.closingTheLoop.case.contacts", "Contacts"),
     closedHint: tr(
-      "envola.closingTheLoop.cases.closedHint",
+      "envola.closingTheLoop.case.closedHint",
       "This loop has been closed. It will no longer appear as an active case in the queue."
     ),
 
     followupCompleted: tr(
-      "envola.closingTheLoop.timeline.followupCompleted",
+      "envola.closingTheLoop.timeline.customerFollowupCompleted",
       "Customer follow-up completed"
     ),
-    ownerAssigned: tr("envola.closingTheLoop.timeline.ownerAssigned", "Owner assigned"),
+    ownerAssigned: tr(
+      "envola.closingTheLoop.timeline.ownerAssigned",
+      "Owner assigned"
+    ),
     improvementPlanned: tr(
       "envola.closingTheLoop.timeline.improvementPlanned",
       "Improvement planned"
@@ -771,7 +820,10 @@ export default function EnvolaClosingTheLoop() {
     modalTitle: tr("envola.closingTheLoop.modal.title", "Survey response"),
     modalClose: tr("envola.closingTheLoop.modal.close", "Close"),
     modalLoading: tr("envola.closingTheLoop.modal.loading", "Loading response…"),
-    modalError: tr("envola.closingTheLoop.modal.error", "Couldn’t load this response."),
+    modalError: tr(
+      "envola.closingTheLoop.modal.error",
+      "Couldn’t load this response."
+    ),
     modalScore: tr("envola.closingTheLoop.modal.score", "Score"),
     modalSubmitted: tr("envola.closingTheLoop.modal.submitted", "Submitted"),
     modalReceipt: tr("envola.closingTheLoop.modal.receipt", "Receipt"),
@@ -785,7 +837,6 @@ export default function EnvolaClosingTheLoop() {
       "envola.closingTheLoop.modal.openIntercom",
       "Open contact in Intercom"
     ),
-    modalView: tr("envola.closingTheLoop.modal.view", "View:"),
     modalRelevantOnly: tr(
       "envola.closingTheLoop.modal.relevantOnly",
       "Relevant only"
@@ -795,8 +846,14 @@ export default function EnvolaClosingTheLoop() {
       "All questions"
     ),
     modalShowJson: tr("envola.closingTheLoop.modal.showJson", "Show JSON"),
-    modalNoAnswers: tr("envola.closingTheLoop.modal.noAnswers", "No answers found."),
-    modalShown: tr("envola.closingTheLoop.modal.shown", "shown"),
+    modalNoAnswers: tr(
+      "envola.closingTheLoop.modal.noAnswers",
+      "No answers found."
+    ),
+    modalView: tr("envola.closingTheLoop.modal.view", "View:"),
+    modalShown: tr("envola.closingTheLoop.modal.shownSuffix", "shown"),
+
+    dash: tr("common.dash", "—"),
   };
 
   return (
@@ -1083,9 +1140,49 @@ export default function EnvolaClosingTheLoop() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-10">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-white">{labels.activeCasesTitle}</h2>
-          <div className="text-xs text-slate-400">{labels.activeCasesSubtitle}</div>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-white">{labels.activeCasesTitle}</h2>
+            <div className="text-xs text-slate-400">{labels.activeCasesSubtitle}</div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCaseFilter("all")}
+              className={
+                caseFilter === "all"
+                  ? "rounded-xl border border-indigo-500/25 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-100"
+                  : "rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-slate-200 hover:bg-white/15"
+              }
+            >
+              {labels.caseFilterAll}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCaseFilter("active")}
+              className={
+                caseFilter === "active"
+                  ? "rounded-xl border border-amber-500/25 bg-amber-500/15 px-3 py-1.5 text-xs font-semibold text-amber-100"
+                  : "rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-slate-200 hover:bg-white/15"
+              }
+            >
+              {labels.caseFilterActive}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCaseFilter("completed")}
+              className={
+                caseFilter === "completed"
+                  ? "rounded-xl border border-emerald-500/25 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-100"
+                  : "rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-slate-200 hover:bg-white/15"
+              }
+            >
+              {labels.caseFilterCompleted}
+            </button>
+          </div>
         </div>
 
         {casesError && (
@@ -1101,21 +1198,26 @@ export default function EnvolaClosingTheLoop() {
           </div>
         )}
 
-        {!casesError && !casesLoading && casesData.length === 0 && (
+        {!casesError && !casesLoading && filteredCases.length === 0 && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-slate-200">
             {labels.noActiveCases}
           </div>
         )}
 
-        {!casesError && !casesLoading && casesData.length > 0 && (
+        {!casesError && !casesLoading && filteredCases.length > 0 && (
           <div className="grid gap-4">
-            {casesData.map((c) => {
+            {filteredCases.map((c) => {
               const nextStatuses = nextStatusOptions(c.status);
               const durations = c.durations || {};
 
               return (
                 <div
                   key={c.case_id}
+                  ref={(el) => {
+                    if (el) {
+                      caseRefs.current[c.case_id] = el;
+                    }
+                  }}
                   className="rounded-3xl border border-white/10 bg-white/5 p-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">

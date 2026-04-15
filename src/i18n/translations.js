@@ -2803,6 +2803,21 @@ export const TRANSLATIONS = {
           noAnswers: "No answers found.",
           view: "View:",
           shownSuffix: "shown",
+          question: "Question",
+          answer: "Answer",
+          answered: "Answered",
+          inferredRelevantQuestionId: "Inferred relevant question id",
+          showingItems: "Showing",
+          items: "items",
+
+          currentStage: "Current stage",
+          completedStage: "Completed stage",
+          clickToMove: "Click to move to this stage",
+          notAvailableYet: "Not available yet",
+
+          caseFilterAll: "All",
+          caseFilterActive: "Active",
+          caseFilterCompleted: "Completed",
         },
       },
 
@@ -6125,6 +6140,21 @@ export const TRANSLATIONS = {
           noAnswers: "Aucune réponse trouvée.",
           view: "Vue :",
           shownSuffix: "affichées",
+          question: "Question",
+          answer: "Réponse",
+          answered: "Répondu le",
+          inferredRelevantQuestionId: "Identifiant de question pertinent déduit",
+          showingItems: "Affichage de",
+          items: "éléments",
+
+          currentStage: "Étape actuelle",
+          completedStage: "Étape terminée",
+          clickToMove: "Cliquer pour passer à cette étape",
+          notAvailableYet: "Pas encore disponible",
+
+          caseFilterAll: "Tous",
+          caseFilterActive: "Actifs",
+          caseFilterCompleted: "Terminés",
         },
       },
 

@@ -1,130 +1,86 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, Briefcase, GraduationCap, Mic, LineChart } from "lucide-react";
+import { ArrowRight, Briefcase, Layers, CheckCircle2 } from "lucide-react";
 import Seo from "./components/Seo";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext.jsx";
-import { TRANSLATIONS, translations } from "./i18n/translations.js";
+import { translations } from "./i18n/translations.js";
 import { localizePath } from "./i18n/pathHelpers.js";
 
 export default function Products() {
   const { lang } = useLanguage();
   const location = useLocation();
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-  const cards = dict?.products?.cards || {};
-  const detailSections = dict?.products?.detailSections || {};
+  const offers = translations(lang, "products.offers", []);
+  const comparison = translations(lang, "products.comparison.rows", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
         path={location.pathname}
         lang={lang}
-        title={translations(lang, "products.seoTitle", "NPS Me services")}
+        title={translations(lang, "products.seoTitle", "NPS Me offers")}
         description={translations(
           lang,
           "products.seoDescription",
-          "Explore the ways to work with NPS Me."
+          "Explore the two main ways to work with NPS Me."
         )}
       />
 
       <PageHeader
-        iconLabel={translations(lang, "products.header.iconLabel", "NPS Me services")}
-        tag={translations(lang, "products.header.tag", "NPS Me / Services")}
-        accent={translations(lang, "products.header.accent", "Four ways to work with")}
+        iconLabel={translations(lang, "products.header.iconLabel", "NPS Me offers")}
+        tag={translations(lang, "products.header.tag", "NPS Me / Offers")}
+        accent={translations(lang, "products.header.accent", "Two ways to work with")}
         title={translations(lang, "products.header.title", "NPS Me")}
         subtitle={translations(
           lang,
           "products.header.subtitle",
-          "Choose the format that fits your stage."
+          "Consultancy-backed CX implementation to help you embed customer experience into the way your business works."
         )}
       />
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-semibold text-white">
-            {translations(lang, "products.intro.title", "How NPS Me works with teams")}
+            {translations(lang, "products.intro.title")}
           </h2>
-          <p className="mt-3 text-slate-300 max-w-3xl">
+          <p className="mt-3 max-w-3xl text-slate-300">
             {translations(lang, "products.intro.body")}
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <OfferCard
-            icon={<Briefcase className="h-5 w-5 text-white" />}
-            title={cards?.consulting?.title}
-            price={cards?.consulting?.price}
-            hint={cards?.consulting?.hint}
-            bullets={cards?.consulting?.bullets || []}
-            examplesTitle={cards?.consulting?.examplesTitle}
-            examples={cards?.consulting?.examples || []}
-            cta={{
-              label: cards?.consulting?.cta,
-              href: localizePath("/book", lang),
-            }}
-          />
-
-          <OfferCard
-            icon={<GraduationCap className="h-5 w-5 text-white" />}
-            title={cards?.training?.title}
-            price={cards?.training?.price}
-            hint={cards?.training?.hint}
-            bullets={cards?.training?.bullets || []}
-            examplesTitle={cards?.training?.examplesTitle}
-            examples={cards?.training?.examples || []}
-            cta={{
-              label: cards?.training?.cta,
-              href: localizePath("/training", lang),
-            }}
-          />
-
-          <OfferCard
-            icon={<Mic className="h-5 w-5 text-white" />}
-            title={cards?.speaking?.title}
-            price={cards?.speaking?.price}
-            hint={cards?.speaking?.hint}
-            bullets={cards?.speaking?.bullets || []}
-            examplesTitle={cards?.speaking?.examplesTitle}
-            examples={cards?.speaking?.examples || []}
-            cta={{
-              label: cards?.speaking?.cta,
-              href: localizePath("/speaking", lang),
-            }}
-          />
-
-          <OfferCard
-            featured
-            icon={<LineChart className="h-5 w-5 text-white" />}
-            title={cards?.insight?.title}
-            price={cards?.insight?.price}
-            hint={cards?.insight?.hint}
-            bullets={cards?.insight?.bullets || []}
-            examplesTitle={cards?.insight?.examplesTitle}
-            examples={cards?.insight?.examples || []}
-            cta={{
-              label: cards?.insight?.cta,
-              href: localizePath("/cx-pulse-sample", lang),
-            }}
-          />
+        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          {offers.map((offer, i) => (
+            <OfferCard
+              key={offer.title}
+              featured={i === 1}
+              icon={i === 0 ? <Briefcase className="h-5 w-5 text-white" /> : <Layers className="h-5 w-5 text-white" />}
+              title={offer.title}
+              badge={offer.badge}
+              price={offer.price}
+              hint={offer.hint}
+              intro={offer.intro}
+              bullets={offer.bullets || []}
+              includesTitle={offer.includesTitle}
+              includes={offer.includes || []}
+              outcomeLabel={translations(lang, "products.offer.outcomeLabel")}
+              outcome={offer.outcome}
+              cta={{
+                label: offer.cta,
+                href: `${localizePath("/book", lang)}?topic=${i === 0 ? "cx-foundations" : "cx-embedded"}`,
+              }}
+            />
+          ))}
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
-          <DetailCard
-            title={detailSections?.consulting?.title}
-            body={detailSections?.consulting?.body}
+          <InfoCard
+            title={translations(lang, "products.support.title")}
+            body={translations(lang, "products.support.body")}
           />
-          <DetailCard
-            title={detailSections?.training?.title}
-            body={detailSections?.training?.body}
-          />
-          <DetailCard
-            title={detailSections?.speaking?.title}
-            body={detailSections?.speaking?.body}
-          />
-          <DetailCard
-            title={detailSections?.insight?.title}
-            body={detailSections?.insight?.body}
+          <InfoCard
+            title={translations(lang, "products.fit.title")}
+            body={translations(lang, "products.fit.body")}
           />
         </div>
 
@@ -132,31 +88,52 @@ export default function Products() {
           <h2 className="text-xl md:text-2xl font-semibold text-white">
             {translations(lang, "products.comparison.title")}
           </h2>
-          <p className="mt-3 text-slate-300 max-w-3xl">
+          <p className="mt-3 max-w-3xl text-slate-300">
             {translations(lang, "products.comparison.body")}
           </p>
+
+          <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
+            <table className="w-full border-collapse text-sm">
+              <thead className="bg-white/5">
+                <tr className="text-left text-slate-300">
+                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.topic")}</th>
+                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.foundations")}</th>
+                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.embedded")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparison.map((row) => (
+                  <tr key={row.topic} className="border-t border-white/10">
+                    <td className="px-4 py-3 font-medium text-white">{row.topic}</td>
+                    <td className="px-4 py-3 text-slate-300">{row.foundations}</td>
+                    <td className="px-4 py-3 text-slate-300">{row.embedded}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 text-center">
           <h3 className="text-2xl font-semibold text-white">
             {translations(lang, "products.cta.title")}
           </h3>
-          <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
+          <p className="mx-auto mt-3 max-w-2xl text-slate-300">
             {translations(lang, "products.cta.body")}
           </p>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
             <a
               href="mailto:hello@npsme.com"
-              className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#22C55E] px-6 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-[#16A34A]"
             >
               {translations(lang, "products.cta.email")}
               <ArrowRight className="h-4 w-4" />
             </a>
 
             <Link
-              to={`${localizePath("/book", lang)}?topic=consulting`}
-              className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition inline-flex items-center justify-center gap-2"
+              to={localizePath("/book", lang)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#7C3AED] px-6 py-3 text-sm font-semibold transition hover:bg-[#6D28D9]"
             >
               {translations(lang, "products.cta.book")}
               <ArrowRight className="h-4 w-4" />
@@ -168,71 +145,96 @@ export default function Products() {
   );
 }
 
-function OfferCard({ icon, title, price, hint, bullets, examplesTitle, examples, cta, featured = false }) {
-  const isInternal = cta?.href && cta.href.startsWith("/") && !cta.href.startsWith("//");
-  const CTA = isInternal ? Link : "a";
-  const ctaProps = isInternal
-    ? { to: cta.href }
-    : {
-        href: cta.href,
-        target: cta.href.startsWith("http") ? "_blank" : undefined,
-        rel: "noreferrer",
-      };
-
+function OfferCard({
+  icon,
+  title,
+  badge,
+  price,
+  hint,
+  intro,
+  bullets,
+  includesTitle,
+  includes,
+  outcomeLabel,
+  outcome,
+  cta,
+  featured = false,
+}) {
   return (
     <div
       className={
         "rounded-2xl border p-6 " +
         (featured
-          ? "border-[#7C3AED]/40 bg-gradient-to-br from-[#141B2E] to-[#0F172A] shadow-[0_0_0_1px_rgba(124,58,237,0.25)]"
+          ? "border-[#7C3AED]/50 bg-gradient-to-br from-[#141B2E] to-[#0F172A] shadow-[0_0_0_1px_rgba(124,58,237,0.25)]"
           : "border-white/10 bg-white/5")
       }
     >
-      <div className="flex items-center gap-3">
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E] flex items-center justify-center">
-          {icon}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]">
+            {icon}
+          </div>
+          <h3 className="text-xl font-semibold text-white">{title}</h3>
         </div>
-        <h3 className="font-semibold text-white">{title}</h3>
+
+        {badge ? (
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-300">
+            {badge}
+          </span>
+        ) : null}
       </div>
 
-      <div className="mt-2 text-sm text-slate-400">{price}</div>
+      <div className="mt-3 text-sm text-slate-400">{price}</div>
       {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}
+      {intro ? <p className="mt-4 text-sm leading-relaxed text-slate-300">{intro}</p> : null}
 
-      <ul className="mt-4 space-y-2 text-sm text-slate-300 list-disc pl-5">
-        {(bullets || []).map((b) => (
-          <li key={b}>{b}</li>
+      <ul className="mt-5 space-y-2 text-sm text-slate-300">
+        {bullets.map((b) => (
+          <li key={b} className="flex items-start gap-2">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#22C55E]" />
+            <span>{b}</span>
+          </li>
         ))}
       </ul>
 
-      {examplesTitle ? (
-        <div className="mt-5">
+      {includesTitle ? (
+        <div className="mt-6">
           <div className="text-xs uppercase tracking-widest text-slate-500">
-            {examplesTitle}
+            {includesTitle}
           </div>
-          <ul className="mt-2 space-y-2 text-sm text-slate-400 list-disc pl-5">
-            {(examples || []).map((e) => (
+          <ul className="mt-3 space-y-2 list-disc pl-5 text-sm text-slate-400">
+            {includes.map((e) => (
               <li key={e}>{e}</li>
             ))}
           </ul>
         </div>
       ) : null}
 
-      <CTA
-        {...ctaProps}
-        className="mt-6 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
+      {outcome ? (
+        <div className="mt-6 rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/10 p-4">
+          <div className="text-[11px] uppercase tracking-wide text-[#86EFAC]">
+            {outcomeLabel}
+          </div>
+          <div className="mt-1 text-sm text-white">{outcome}</div>
+        </div>
+      ) : null}
+
+      <Link
+        to={cta.href}
+        className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#22C55E] px-4 py-2 text-sm font-semibold text-[#0B0F19] transition hover:bg-[#16A34A]"
       >
         {cta.label}
         <ArrowRight className="h-4 w-4" />
-      </CTA>
+      </Link>
     </div>
   );
 }
 
-function DetailCard({ title, body }) {
+function InfoCard({ title, body }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
-      <h3 className="text-white font-semibold">{title}</h3>
-      <p className="mt-3 text-sm text-slate-300 leading-relaxed">{body}</p>
+      <h3 className="font-semibold text-white">{title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-slate-300">{body}</p>
     </div>
   );
 }

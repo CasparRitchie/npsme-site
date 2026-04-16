@@ -2047,142 +2047,138 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "NPS Me services: consulting, training, speaking and ongoing insight",
+      seoTitle: "CX Foundations and CX Embedded | NPS Me",
       seoDescription:
-        "Explore the four ways to work with NPS Me: consulting, workshops and training, speaking, and ongoing insight for teams improving NPS and customer experience.",
+        "Explore the two main ways to work with NPS Me: CX Foundations and CX Embedded. Consultancy-backed CX implementation to help businesses put customer feedback at the centre of how they operate.",
 
       header: {
-        iconLabel: "NPS Me services",
-        tag: "NPS Me / Services",
-        accent: "Four ways to work with",
+        iconLabel: "NPS Me offers",
+        tag: "NPS Me / Offers",
+        accent: "Two ways to work with",
         title: "NPS Me",
         subtitle:
-          "Choose the format that fits your stage: consulting, workshops and training, speaking, or ongoing insight.",
+          "Consultancy-backed CX implementation to help you embed customer experience into the way your business works.",
       },
 
       intro: {
-        title: "How NPS Me works with teams",
+        title: "Two practical ways to embed customer experience",
         body:
-          "The landing page introduces the four main ways to work with NPS Me. This page turns those into concrete offers, examples and delivery formats so it is easier to choose the right starting point.",
+          "NPS Me is not just another feedback tool. The software supports the process, but the real value comes from putting the right CX structure, routines and follow-through in place inside your business.",
       },
 
-      cards: {
-        consulting: {
-          title: "Consulting",
+      offer: {
+        outcomeLabel: "Best result",
+      },
+
+      offers: [
+        {
+          title: "CX Foundations",
+          badge: "Setup",
           price: "Scoped to the work",
-          hint: "Best for: teams that want practical change, not just advice",
+          hint: "Best for: startups and SMEs who want a practical CX system set up properly",
+          intro:
+            "A focused implementation offer to help you get the essentials in place: the right feedback structure, usable reporting, and a practical close-the-loop process.",
           bullets: [
-            "NPS programme design and reset work",
-            "Customer feedback analysis and friction diagnosis",
-            "Prioritised action roadmaps with owners and sequencing",
-            "Hands-on implementation support across CX, ops and product",
-          ],
-          examplesTitle: "Typical consulting work",
-          examples: [
-            "Feedback Foundations audit",
-            "Momentum implementation support",
+            "NPS / feedback programme design",
+            "Survey governance and anti-bias setup",
+            "Reporting and comment analysis",
             "Close-the-loop workflow design",
-            "Journey friction and verbatim analysis",
+            "Team onboarding and practical handover",
           ],
-          cta: "Book a consulting review",
+          includesTitle: "Typical scope",
+          includes: [
+            "Programme setup or reset",
+            "Customer feedback structure",
+            "Core reporting and workflows",
+            "Practical implementation support",
+          ],
+          outcome:
+            "A simple, credible CX system your team can actually use.",
+          cta: "Book a CX Foundations call",
         },
-
-        training: {
-          title: "Workshops & training",
-          price: "Half-day, full-day or tailored sessions",
-          hint: "Best for: teams that want stronger internal capability",
+        {
+          title: "CX Embedded",
+          badge: "Adoption",
+          price: "Implementation + ongoing support",
+          hint: "Best for: businesses who want customer experience embedded into day-to-day operations",
+          intro:
+            "A deeper offer for organisations that want customer feedback to shape routines, ownership, management cadence and continuous improvement across teams.",
           bullets: [
-            "Practical training on how to run NPS properly",
-            "Survey design, sampling and comparability",
-            "Comment analysis, prioritisation and action planning",
-            "Close-the-loop templates, scripts and facilitation",
+            "Everything in CX Foundations",
+            "Role and ownership design",
+            "Management cadence and review routines",
+            "Cross-team adoption support",
+            "Ongoing optimisation and advisory support",
           ],
-          examplesTitle: "Typical workshop themes",
-          examples: [
-            "How to design a decision-grade NPS programme",
-            "How to interpret comments and themes properly",
-            "How to turn NPS into action across teams",
-            "How to avoid survey fatigue and bad data",
+          includesTitle: "Typical scope",
+          includes: [
+            "CX Foundations plus adoption support",
+            "Leadership and management routines",
+            "Cross-functional follow-through",
+            "Ongoing guidance and optimisation",
           ],
-          cta: "Discuss a workshop",
+          outcome:
+            "Customer feedback becomes part of how your business operates and improves.",
+          cta: "Book a CX Embedded call",
         },
+      ],
 
-        speaking: {
-          title: "Speaking",
-          price: "Tailored to the event",
-          hint: "Best for: leadership sessions, offsites and team events",
-          bullets: [
-            "Talks on practical CX and what really moves NPS",
-            "Leadership sessions that connect insight to delivery",
-            "Content grounded in real programme experience",
-            "Clear takeaways rather than generic inspiration",
-          ],
-          examplesTitle: "Typical speaking topics",
-          examples: [
-            "Why NPS stalls even when CX looks better",
-            "How to make customer feedback more useful",
-            "How to build momentum around CX improvement",
-            "What leaders should focus on beyond dashboards",
-          ],
-          cta: "Enquire about speaking",
-        },
-
-        insight: {
-          title: "Ongoing insight",
-          price: "From monthly support to recurring feeds",
-          hint: "Best for: teams that want a lighter ongoing intelligence layer",
-          bullets: [
-            "Recurring insight from NPS, comments and external signals",
-            "CX Pulse reporting and trend interpretation",
-            "Intercom NPS intelligence layer support",
-            "Clear next steps, priorities and risk flags",
-          ],
-          examplesTitle: "Typical ongoing insight offers",
-          examples: [
-            "Weekly or monthly CX Pulse",
-            "Intercom NPS intelligence layer",
-            "Theme and driver tracking",
-            "Executive-ready summaries and action prompts",
-          ],
-          cta: "See ongoing insight options",
-        },
+      support: {
+        title: "What sits behind both offers",
+        body:
+          "Both offers are consultancy-backed and system-supported. That means the work is not limited to advice or dashboards: it includes practical implementation, usable workflows, and support to help teams actually work with customer feedback.",
       },
 
-      detailSections: {
-        consulting: {
-          title: "Consulting: from diagnosis to implementation",
-          body:
-            "NPS Me helps teams move from raw feedback to practical change. That can include programme design, friction diagnosis, roadmap building, close-the-loop workflows, and hands-on implementation support.",
-        },
-        training: {
-          title: "Workshops & training: build stronger internal capability",
-          body:
-            "NPS Me provides practical training so teams can run NPS better, interpret feedback with more confidence, and make better decisions without becoming dependent on heavy consulting support.",
-        },
-        speaking: {
-          title: "Speaking: practical CX content for real teams",
-          body:
-            "NPS Me speaking sessions are designed to be useful, grounded and commercially relevant. They work well for leadership groups, offsites, internal events and customer experience communities.",
-        },
-        insight: {
-          title: "Ongoing insight: a lighter intelligence layer",
-          body:
-            "For teams that do not need a full consulting programme, NPS Me can provide a lighter ongoing insight service through CX Pulse reporting, Intercom-based analysis, and recurring feedback interpretation.",
-        },
+      fit: {
+        title: "Who this is for",
+        body:
+          "NPS Me is best suited to startups and SMEs already working digitally, especially teams using platforms like Intercom, HubSpot, Zendesk or structured exports, and who want a more formal but practical approach to customer experience.",
       },
 
       comparison: {
-        title: "How to choose the right starting point",
+        title: "Which offer is the right fit?",
         body:
-          "Start with consulting when the programme needs fixing or redesigning. Choose workshops when the team needs stronger capability. Choose speaking for leadership or event settings. Choose ongoing insight when the team wants a lighter recurring feed of priorities and action prompts.",
+          "Start with CX Foundations if you need the basics set up properly. Choose CX Embedded if you want customer experience built into management routines, team behaviour and continuous improvement.",
+        columns: {
+          topic: "Topic",
+          foundations: "CX Foundations",
+          embedded: "CX Embedded",
+        },
+        rows: [
+          {
+            topic: "Main goal",
+            foundations: "Get a practical CX system set up properly",
+            embedded: "Embed customer experience into the way the business runs",
+          },
+          {
+            topic: "Best for",
+            foundations: "Teams needing structure, reporting and close-the-loop basics",
+            embedded: "Teams wanting adoption, ownership and ongoing improvement",
+          },
+          {
+            topic: "Depth",
+            foundations: "Focused implementation",
+            embedded: "Implementation plus adoption support",
+          },
+          {
+            topic: "Leadership involvement",
+            foundations: "Light to moderate",
+            embedded: "Higher and more ongoing",
+          },
+          {
+            topic: "Ongoing support",
+            foundations: "Optional",
+            embedded: "Built in",
+          },
+        ],
       },
 
       cta: {
         title: "Not sure where to start?",
         body:
-          "NPS Me can review your current setup and recommend the best starting point across consulting, training, speaking or ongoing insight.",
+          "We can look at your current setup and quickly work out whether CX Foundations or CX Embedded is the better starting point.",
         email: "Email hello@npsme.com",
-        book: "Book a free NPS review",
+        book: "Book a free review call",
       },
     },
     socialListening: {
@@ -5391,142 +5387,138 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "Services NPS Me : conseil, formation, conférences et insights récurrents",
+      seoTitle: "CX Foundations et CX Embedded | NPS Me",
       seoDescription:
-        "Découvrez les quatre façons de travailler avec NPS Me : conseil, ateliers et formation, conférences, et insights récurrents pour les équipes qui veulent améliorer le NPS et l’expérience client.",
+        "Découvrez les deux principales façons de travailler avec NPS Me : CX Foundations et CX Embedded. Un accompagnement CX soutenu par un système pour aider les entreprises à mettre le feedback client au centre de leur fonctionnement.",
 
       header: {
-        iconLabel: "Services NPS Me",
-        tag: "NPS Me / Services",
-        accent: "Quatre façons de travailler avec",
+        iconLabel: "Offres NPS Me",
+        tag: "NPS Me / Offres",
+        accent: "Deux façons de travailler avec",
         title: "NPS Me",
         subtitle:
-          "Choisissez le format adapté à votre étape : conseil, ateliers et formation, conférences, ou insights récurrents.",
+          "Un accompagnement CX soutenu par un système, pour intégrer l’expérience client dans la façon dont votre entreprise fonctionne.",
       },
 
       intro: {
-        title: "Comment NPS Me travaille avec les équipes",
+        title: "Deux façons concrètes d’ancrer l’expérience client",
         body:
-          "La landing page présente les quatre grandes façons de travailler avec NPS Me. Cette page les transforme en offres concrètes, exemples et formats de delivery pour faciliter le choix du bon point de départ.",
+          "NPS Me n’est pas simplement un outil de feedback en plus. Le logiciel soutient le process, mais la vraie valeur vient de la mise en place d’une structure CX claire, de routines utiles et d’un vrai suivi au sein de l’entreprise.",
       },
 
-      cards: {
-        consulting: {
-          title: "Conseil",
+      offer: {
+        outcomeLabel: "Résultat recherché",
+      },
+
+      offers: [
+        {
+          title: "CX Foundations",
+          badge: "Mise en place",
           price: "Périmètre défini selon le besoin",
-          hint: "Idéal pour : les équipes qui veulent des changements concrets, pas seulement des recommandations",
+          hint: "Idéal pour : les startups et PME qui veulent mettre en place un système CX simple et crédible",
+          intro:
+            "Une offre de mise en place ciblée pour installer les fondamentaux : une bonne structure de feedback, un reporting exploitable et un process de close-the-loop concret.",
           bullets: [
-            "Design ou refonte de programme NPS",
-            "Analyse des retours clients et diagnostic des frictions",
-            "Roadmaps priorisées avec responsables et séquencement",
-            "Accompagnement opérationnel sur la mise en œuvre CX, ops et produit",
+            "Conception du programme NPS / feedback",
+            "Gouvernance d’enquête et réduction des biais",
+            "Reporting et analyse des verbatims",
+            "Conception du workflow de close-the-loop",
+            "Onboarding des équipes et passage de relais",
           ],
-          examplesTitle: "Exemples de missions conseil",
-          examples: [
-            "Audit Feedback Foundations",
-            "Accompagnement Momentum",
-            "Design de workflows close-the-loop",
-            "Analyse de parcours et de verbatims",
+          includesTitle: "Périmètre typique",
+          includes: [
+            "Mise en place ou refonte du programme",
+            "Structure de feedback client",
+            "Reporting et workflows de base",
+            "Accompagnement concret à la mise en œuvre",
           ],
-          cta: "Réserver une revue conseil",
+          outcome:
+            "Un système CX simple, crédible et réellement utilisable par vos équipes.",
+          cta: "Réserver un échange CX Foundations",
         },
+        {
+          title: "CX Embedded",
+          badge: "Adoption",
+          price: "Mise en place + accompagnement continu",
+          hint: "Idéal pour : les entreprises qui veulent intégrer l’expérience client dans leur fonctionnement quotidien",
+          intro:
+            "Une offre plus approfondie pour les organisations qui veulent que le feedback client structure les routines, les responsabilités, la cadence managériale et l’amélioration continue.",
+          bullets: [
+            "Tout ce qui est inclus dans CX Foundations",
+            "Définition des rôles et responsabilités",
+            "Cadence managériale et routines de revue",
+            "Accompagnement à l’adoption transverse",
+            "Optimisation continue et accompagnement conseil",
+          ],
+          includesTitle: "Périmètre typique",
+          includes: [
+            "CX Foundations plus accompagnement à l’adoption",
+            "Routines leadership et management",
+            "Suivi transverse entre équipes",
+            "Accompagnement et optimisation dans la durée",
+          ],
+          outcome:
+            "Le feedback client devient une vraie partie de la façon dont l’entreprise fonctionne et s’améliore.",
+          cta: "Réserver un échange CX Embedded",
+        },
+      ],
 
-        training: {
-          title: "Ateliers & formation",
-          price: "Demi-journée, journée ou format sur mesure",
-          hint: "Idéal pour : les équipes qui veulent monter en compétence en interne",
-          bullets: [
-            "Formation pratique pour bien faire du NPS",
-            "Design d’enquête, échantillonnage et comparabilité",
-            "Analyse des verbatims, priorisation et plans d’action",
-            "Templates, scripts close-the-loop et facilitation",
-          ],
-          examplesTitle: "Exemples de thèmes d’atelier",
-          examples: [
-            "Comment concevoir un programme NPS decision-grade",
-            "Comment bien interpréter les verbatims et les thèmes",
-            "Comment transformer le NPS en action inter-équipes",
-            "Comment éviter la fatigue d’enquête et les mauvaises données",
-          ],
-          cta: "Discuter d’un atelier",
-        },
-
-        speaking: {
-          title: "Conférences",
-          price: "Selon l’événement",
-          hint: "Idéal pour : sessions leadership, offsites et événements internes",
-          bullets: [
-            "Interventions sur une CX pragmatique et ce qui fait vraiment bouger le NPS",
-            "Sessions leadership reliant insight et exécution",
-            "Contenus ancrés dans des programmes réels",
-            "Des messages utiles plutôt qu’une inspiration générique",
-          ],
-          examplesTitle: "Exemples de sujets",
-          examples: [
-            "Pourquoi le NPS stagne même quand la CX semble meilleure",
-            "Comment rendre le feedback client plus utile",
-            "Comment créer de la dynamique autour de l’amélioration CX",
-            "Ce que les dirigeants doivent regarder au-delà des dashboards",
-          ],
-          cta: "Demander une intervention",
-        },
-
-        insight: {
-          title: "Insights récurrents",
-          price: "À partir d’un accompagnement mensuel léger",
-          hint: "Idéal pour : les équipes qui veulent une couche d’intelligence récurrente plus légère",
-          bullets: [
-            "Insights récurrents à partir du NPS, des verbatims et des signaux externes",
-            "CX Pulse et lecture des tendances",
-            "Couche d’intelligence Intercom NPS",
-            "Prochaines étapes, priorités et signaux de risque",
-          ],
-          examplesTitle: "Exemples d’offres récurrentes",
-          examples: [
-            "CX Pulse hebdo ou mensuel",
-            "Couche d’intelligence Intercom NPS",
-            "Suivi des thèmes et drivers",
-            "Synthèses exécutives et prompts d’action",
-          ],
-          cta: "Voir les options d’insights récurrents",
-        },
+      support: {
+        title: "Ce qui se trouve derrière les deux offres",
+        body:
+          "Les deux offres sont soutenues à la fois par un accompagnement conseil et par un système. Le travail ne se limite donc ni à des recommandations, ni à des dashboards : il inclut une mise en œuvre concrète, des workflows utilisables, et un accompagnement pour aider les équipes à vraiment travailler avec le feedback client.",
       },
 
-      detailSections: {
-        consulting: {
-          title: "Conseil : du diagnostic à la mise en œuvre",
-          body:
-            "NPS Me aide les équipes à passer du feedback brut au changement concret. Cela peut inclure le design du programme, le diagnostic des frictions, la construction de la roadmap, les workflows close-the-loop et l’accompagnement opérationnel.",
-        },
-        training: {
-          title: "Ateliers & formation : renforcer la capacité interne",
-          body:
-            "NPS Me propose des formations pratiques pour aider les équipes à mieux faire du NPS, interpréter le feedback avec plus de confiance et prendre de meilleures décisions sans dépendre d’un gros dispositif de conseil.",
-        },
-        speaking: {
-          title: "Conférences : des contenus CX utiles pour des équipes réelles",
-          body:
-            "Les interventions NPS Me sont conçues pour être utiles, concrètes et commercialement pertinentes. Elles fonctionnent bien pour des équipes de direction, des offsites, des événements internes et des communautés CX.",
-        },
-        insight: {
-          title: "Insights récurrents : une couche d’intelligence plus légère",
-          body:
-            "Pour les équipes qui n’ont pas besoin d’un programme conseil complet, NPS Me peut fournir un service d’insights récurrents plus léger via le CX Pulse, l’analyse Intercom et l’interprétation continue du feedback.",
-        },
+      fit: {
+        title: "Pour qui",
+        body:
+          "NPS Me s’adresse surtout aux startups et PME déjà à l’aise avec des outils digitaux, notamment celles qui utilisent Intercom, HubSpot, Zendesk ou des exports structurés, et qui veulent une approche plus formelle mais concrète de l’expérience client.",
       },
 
       comparison: {
-        title: "Comment choisir le bon point de départ",
+        title: "Quelle offre choisir ?",
         body:
-          "Commencez par le conseil si le programme doit être réparé ou repensé. Choisissez les ateliers si l’équipe a besoin de renforcer ses compétences. Choisissez les conférences pour un contexte leadership ou événementiel. Choisissez les insights récurrents pour un flux plus léger de priorités et d’actions.",
+          "Commencez par CX Foundations si vous avez besoin de mettre en place les bases correctement. Choisissez CX Embedded si vous voulez intégrer l’expérience client dans les routines managériales, les habitudes des équipes et l’amélioration continue.",
+        columns: {
+          topic: "Sujet",
+          foundations: "CX Foundations",
+          embedded: "CX Embedded",
+        },
+        rows: [
+          {
+            topic: "Objectif principal",
+            foundations: "Mettre en place un système CX concret et bien structuré",
+            embedded: "Intégrer l’expérience client dans le fonctionnement de l’entreprise",
+          },
+          {
+            topic: "Idéal pour",
+            foundations: "Les équipes qui ont besoin de structure, de reporting et des bases du close-the-loop",
+            embedded: "Les équipes qui veulent de l’adoption, des responsabilités claires et de l’amélioration continue",
+          },
+          {
+            topic: "Niveau d’accompagnement",
+            foundations: "Mise en place ciblée",
+            embedded: "Mise en place plus accompagnement à l’adoption",
+          },
+          {
+            topic: "Implication du leadership",
+            foundations: "Légère à modérée",
+            embedded: "Plus forte et plus continue",
+          },
+          {
+            topic: "Accompagnement dans la durée",
+            foundations: "Optionnel",
+            embedded: "Inclus",
+          },
+        ],
       },
 
       cta: {
-        title: "Vous ne savez pas par où commencer ?",
+        title: "Vous hésitez sur le bon point de départ ?",
         body:
-          "NPS Me peut revoir votre dispositif actuel et recommander le meilleur point de départ entre conseil, formation, conférences et insights récurrents.",
+          "Nous pouvons regarder rapidement votre contexte actuel et voir si CX Foundations ou CX Embedded est le meilleur point de départ.",
         email: "Écrire à hello@npsme.com",
-        book: "Réserver une revue NPS gratuite",
+        book: "Réserver un appel de cadrage",
       },
     },
     socialListening: {

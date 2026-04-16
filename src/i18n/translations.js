@@ -160,66 +160,47 @@ export const TRANSLATIONS = {
     },
     book: {
       seo: {
-        title: "Book a discovery session | NPS Me",
+        title: "Book a discussion | NPS Me",
         description:
-          "Pick a time that works for you and we’ll confirm a 30-minute discovery call to discuss CX and NPS improvement.",
+          "Book a discussion with NPS Me about CX Foundations, CX Embedded or a general discovery conversation.",
       },
       header: {
-        iconLabel: "Discovery call",
+        iconLabel: "Discussion",
         tag: "NPS Me / Book",
-        title: "Book a free discovery call",
-        subtitle:
-          "Share a bit about your current CX and NPS setup and we’ll explore where we can help - no obligation.",
+      },
+      topics: {
+        cxFoundations: {
+          title: "Book a CX Foundations discussion",
+          subtitle:
+            "Share a bit about your current setup and NPS Me will explore how to put the right customer experience foundations in place.",
+          prefill: "We’d like to discuss CX Foundations, especially around ",
+          subject: "CX Foundations booking request (npsme.com)",
+        },
+        cxEmbedded: {
+          title: "Book a CX Embedded discussion",
+          subtitle:
+            "Share a bit about your business and NPS Me will explore how customer experience could be embedded into team routines, ownership and continuous improvement.",
+          prefill: "We’d like to discuss CX Embedded, especially around ",
+          subject: "CX Embedded booking request (npsme.com)",
+        },
+        discovery: {
+          title: "Book a free discovery call",
+          subtitle:
+            "Share a bit about your current CX and feedback setup and NPS Me will explore where support could help most - no obligation.",
+          prefill: "",
+          subject: "Discovery booking request (npsme.com)",
+        },
       },
       form: {
         name: "Your name",
         email: "Your email",
-        tz: "Time zone (e.g., Europe/Paris)",
-        context:
-          "What would you like to focus on? (e.g., survey design, close-the-loop, onboarding friction, support response time, etc.)",
-        submit: "Request booking",
+        timezone: "Time zone (e.g., Europe/Paris)",
+        context: "What would you like to focus on?",
         sending: "Sending…",
-        success: "Thanks! I’ll confirm shortly and send a calendar invite.",
+        submit: "Request booking",
+        success:
+          "Thanks! NPS Me will confirm shortly and send a calendar invite.",
         errorPrefix: "Sorry-something went wrong. Please email",
-        dateAria: "Preferred date",
-        timeAria: "Preferred time",
-      },
-      topics: {
-        discovery: {
-          title: "Book a free discovery call",
-          subtitle:
-            "Share a bit about your current CX and NPS setup and NPS Me will explore where support could help most - no obligation.",
-          prefill: "",
-          subject: "Discovery booking request (npsme.com)",
-        },
-        consulting: {
-          title: "Book a consulting discussion",
-          subtitle:
-            "Share a bit about your current CX and NPS setup and NPS Me will explore where consulting support could help most.",
-          prefill: "We’d like to discuss consulting support for our CX / NPS setup, especially around ",
-          subject: "Consulting booking request (npsme.com)",
-        },
-        training: {
-          title: "Book a training discussion",
-          subtitle:
-            "Share a bit about your team and training needs and NPS Me will suggest the most relevant workshop or session format.",
-          prefill: "We’d like to discuss a workshop or training session, especially around ",
-          subject: "Training booking request (npsme.com)",
-        },
-        speaking: {
-          title: "Book a speaking discussion",
-          subtitle:
-            "Share a bit about your audience and event and NPS Me will explore whether a speaking session is a good fit.",
-          prefill: "We’d like to discuss a speaking session for our event, especially around ",
-          subject: "Speaking booking request (npsme.com)",
-        },
-        insight: {
-          title: "Book an ongoing insight discussion",
-          subtitle:
-            "Share a bit about your current setup and NPS Me will explore the best ongoing insight option for your team.",
-          prefill: "We’d like to discuss ongoing insight support, especially around ",
-          subject: "Insight booking request (npsme.com)",
-        },
       },
     },
     blog: {
@@ -4760,64 +4741,45 @@ export const TRANSLATIONS = {
       seo: {
         title: "Réserver un échange | NPS Me",
         description:
-          "Choisissez un créneau et je confirmerai un échange de 30 minutes pour discuter de votre CX et de vos progrès NPS.",
+          "Réservez un échange avec NPS Me à propos de CX Foundations, CX Embedded ou d’un appel de découverte plus général.",
       },
       header: {
         iconLabel: "Échange",
         tag: "NPS Me / Réserver",
-        title: "Réserver un échange gratuit",
-        subtitle:
-          "Partagez un peu de contexte sur votre CX et votre programme NPS, et voyons ensemble où je peux vous aider - sans engagement.",
+      },
+      topics: {
+        cxFoundations: {
+          title: "Réserver un échange CX Foundations",
+          subtitle:
+            "Partagez quelques éléments sur votre contexte actuel et NPS Me explorera comment mettre en place les bonnes fondations d’expérience client.",
+          prefill: "Nous aimerions échanger sur CX Foundations, notamment autour de ",
+          subject: "Demande d’échange CX Foundations (npsme.com)",
+        },
+        cxEmbedded: {
+          title: "Réserver un échange CX Embedded",
+          subtitle:
+            "Partagez quelques éléments sur votre entreprise et NPS Me explorera comment intégrer l’expérience client dans les routines d’équipe, les responsabilités et l’amélioration continue.",
+          prefill: "Nous aimerions échanger sur CX Embedded, notamment autour de ",
+          subject: "Demande d’échange CX Embedded (npsme.com)",
+        },
+        discovery: {
+          title: "Réserver un appel découverte gratuit",
+          subtitle:
+            "Partagez quelques éléments sur votre dispositif CX / feedback actuel et NPS Me explorera où un accompagnement pourrait être le plus utile - sans engagement.",
+          prefill: "",
+          subject: "Demande d’appel découverte (npsme.com)",
+        },
       },
       form: {
         name: "Votre nom",
         email: "Votre email",
-        tz: "Fuseau horaire (ex : Europe/Paris)",
-        context:
-          "Sur quoi souhaitez-vous vous concentrer ? (ex : design de l’enquête, close-the-loop, friction onboarding, temps de réponse support, etc.)",
-        submit: "Demander un créneau",
+        timezone: "Fuseau horaire (ex. Europe/Paris)",
+        context: "Sur quoi souhaitez-vous échanger ?",
         sending: "Envoi…",
-        success: "Merci ! Je confirme rapidement et j’enverrai une invitation calendrier.",
-        errorPrefix: "Désolé, une erreur est survenue. Vous pouvez écrire à",
-        dateAria: "Date souhaitée",
-        timeAria: "Heure souhaitée",
-      },
-      topics: {
-        discovery: {
-          title: "Réserver un échange découverte gratuit",
-          subtitle:
-            "Partagez quelques éléments sur votre setup CX et NPS actuel et NPS Me explorera où un accompagnement pourrait être utile - sans engagement.",
-          prefill: "",
-          subject: "Demande d’échange découverte (npsme.com)",
-        },
-        consulting: {
-          title: "Réserver un échange conseil",
-          subtitle:
-            "Partagez quelques éléments sur votre setup CX et NPS actuel et NPS Me explorera où un accompagnement conseil pourrait aider le plus.",
-          prefill: "Nous aimerions discuter d’un accompagnement conseil pour notre setup CX / NPS, notamment autour de ",
-          subject: "Demande d’échange conseil (npsme.com)",
-        },
-        training: {
-          title: "Réserver un échange formation",
-          subtitle:
-            "Partagez quelques éléments sur votre équipe et vos besoins de formation et NPS Me proposera le format d’atelier ou de session le plus pertinent.",
-          prefill: "Nous aimerions discuter d’un atelier ou d’une session de formation, notamment autour de ",
-          subject: "Demande d’échange formation (npsme.com)",
-        },
-        speaking: {
-          title: "Réserver un échange conférence",
-          subtitle:
-            "Partagez quelques éléments sur votre audience et votre événement et NPS Me explorera si une intervention est pertinente.",
-          prefill: "Nous aimerions discuter d’une intervention pour notre événement, notamment autour de ",
-          subject: "Demande d’échange conférence (npsme.com)",
-        },
-        insight: {
-          title: "Réserver un échange sur les insights récurrents",
-          subtitle:
-            "Partagez quelques éléments sur votre setup actuel et NPS Me explorera l’option d’insights récurrents la plus pertinente pour votre équipe.",
-          prefill: "Nous aimerions discuter d’un accompagnement en insights récurrents, notamment autour de ",
-          subject: "Demande d’échange insights récurrents (npsme.com)",
-        },
+        submit: "Demander un échange",
+        success:
+          "Merci ! NPS Me vous confirmera cela rapidement et vous enverra une invitation calendrier.",
+        errorPrefix: "Désolé-un problème est survenu. Merci d’écrire à",
       },
     },
     dataAutomation: {

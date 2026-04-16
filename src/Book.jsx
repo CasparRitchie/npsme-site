@@ -7,47 +7,29 @@ import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 
 const BOOK_TOPICS = {
-  consulting: {
-    key: "consulting",
-    fallbackTitle: "Book a consulting discussion",
+  "cx-foundations": {
+    key: "cxFoundations",
+    fallbackTitle: "Book a CX Foundations discussion",
     fallbackSubtitle:
-      "Share a bit about your current CX and NPS setup and NPS Me will explore where consulting support could help most.",
+      "Share a bit about your current setup and NPS Me will explore how to put the right customer experience foundations in place.",
     fallbackPrefill:
-      "We’d like to discuss consulting support for our CX / NPS setup, especially around ",
-    fallbackSubject: "Consulting booking request (npsme.com)",
+      "We’d like to discuss CX Foundations, especially around ",
+    fallbackSubject: "CX Foundations booking request (npsme.com)",
   },
-  training: {
-    key: "training",
-    fallbackTitle: "Book a training discussion",
+  "cx-embedded": {
+    key: "cxEmbedded",
+    fallbackTitle: "Book a CX Embedded discussion",
     fallbackSubtitle:
-      "Share a bit about your team and training needs and NPS Me will suggest the most relevant workshop or session format.",
+      "Share a bit about your business and NPS Me will explore how customer experience could be embedded into team routines, ownership and continuous improvement.",
     fallbackPrefill:
-      "We’d like to discuss a workshop or training session, especially around ",
-    fallbackSubject: "Training booking request (npsme.com)",
-  },
-  speaking: {
-    key: "speaking",
-    fallbackTitle: "Book a speaking discussion",
-    fallbackSubtitle:
-      "Share a bit about your audience and event and NPS Me will explore whether a speaking session is a good fit.",
-    fallbackPrefill:
-      "We’d like to discuss a speaking session for our event, especially around ",
-    fallbackSubject: "Speaking booking request (npsme.com)",
-  },
-  insight: {
-    key: "insight",
-    fallbackTitle: "Book an ongoing insight discussion",
-    fallbackSubtitle:
-      "Share a bit about your current setup and NPS Me will explore the best ongoing insight option for your team.",
-    fallbackPrefill:
-      "We’d like to discuss ongoing insight support, especially around ",
-    fallbackSubject: "Insight booking request (npsme.com)",
+      "We’d like to discuss CX Embedded, especially around ",
+    fallbackSubject: "CX Embedded booking request (npsme.com)",
   },
   discovery: {
     key: "discovery",
     fallbackTitle: "Book a free discovery call",
     fallbackSubtitle:
-      "Share a bit about your current CX and NPS setup and NPS Me will explore where support could help most - no obligation.",
+      "Share a bit about your current CX and feedback setup and NPS Me will explore where support could help most - no obligation.",
     fallbackPrefill: "",
     fallbackSubject: "Discovery booking request (npsme.com)",
   },
@@ -59,9 +41,8 @@ export default function Book() {
   const tr = (p, f) => translations(lang, p, f);
 
   const params = new URLSearchParams(location.search);
-  const topicParam = params.get("topic") || "discovery";
+  const topicParam = params.get("topic");
   const topicConfig = BOOK_TOPICS[topicParam] || BOOK_TOPICS.discovery;
-
   const initialContext =
     tr(`book.topics.${topicConfig.key}.prefill`, topicConfig.fallbackPrefill) || "";
 
@@ -129,7 +110,7 @@ export default function Book() {
         title={tr("book.seo.title", "Book a discussion | NPS Me")}
         description={tr(
           "book.seo.description",
-          "Book a discussion with NPS Me about consulting, training, speaking or ongoing insight."
+          "Book a discussion with NPS Me about CX Foundations, CX Embedded or a general discovery conversation."
         )}
       />
 

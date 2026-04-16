@@ -61,9 +61,9 @@ export const ROUTES_MANIFEST = [
 
   // Envola private workspace
   { path: "/envola/performance", label: "Envola Performance", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
-  { path: "/fr/envola/performance", label: "Performance Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+  { path: "/fr/envola/performance", label: "Performance Envola", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
-  { path: "/envola/responses", label: "Envola Responses", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/envola/responses", label: "Envola Responses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/envola/responses", label: "Réponses Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
   { path: "/envola/invitations", label: "Envola Invitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },

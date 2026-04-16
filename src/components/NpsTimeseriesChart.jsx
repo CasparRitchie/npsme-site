@@ -134,9 +134,10 @@ export default function NpsTimeseriesChart({
             <Line
               type="monotone"
               dataKey="nps"
-              dot={<ClickableDot />}
-              activeDot={<ClickableDot />}
-              strokeWidth={2}
+              stroke="#7C3AED"
+              strokeWidth={3}
+              dot={{ r: 4, fill: "#22C55E", stroke: "#22C55E" }}
+              activeDot={{ r: 6, fill: "#22C55E", stroke: "#22C55E" }}
               isAnimationActive={false}
             />
           </LineChart>

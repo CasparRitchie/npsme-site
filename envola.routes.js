@@ -891,6 +891,8 @@ export function createEnvolaRouter() {
             score_0_10: null,
             comment: "",
             responded_at: row.first_completion || null,
+            contact_id: row.user_id || null,
+            intercom_contact_url: row.user_id ? intercomContactUrl(row.user_id) : null,
           };
         })
         .filter((row) => {

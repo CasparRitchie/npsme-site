@@ -374,7 +374,7 @@ export default function EnvolaInvitations() {
                       {tr("envola.invitations.table.sentAt", "Sent")}
                     </th>
                     <th className="px-4 py-3">
-                      {tr("envola.invitations.table.name", "Name")}
+                      {tr("envola.invitations.table.contact", "Contact")}
                     </th>
                     <th className="px-4 py-3">
                       {tr("envola.invitations.table.email", "Email")}
@@ -402,7 +402,22 @@ export default function EnvolaInvitations() {
                       </td>
 
                       <td className="px-4 py-3 text-white">
-                        {row.name || "—"}
+                        <div>{row.name || "—"}</div>
+
+                        <div className="mt-2">
+                          {row.intercom_contact_url ? (
+                            <a
+                              href={row.intercom_contact_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
+                            >
+                              {tr("common.open", "Open")}
+                            </a>
+                          ) : (
+                            <span className="text-slate-500">—</span>
+                          )}
+                        </div>
                       </td>
 
                       <td className="px-4 py-3 text-slate-200">

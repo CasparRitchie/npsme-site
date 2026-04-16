@@ -1911,9 +1911,9 @@ export const TRANSLATIONS = {
       embedCx: {
         title: "How I help you embed customer experience",
         body: "Customer feedback only creates value when it is built into the way your business works. NPS Me helps you make CX visible, practical and actionable across process, performance, people and mindset.",
-        centerTitle: "At the centre: the customer",
+        centerTitle: "The customer",
         centerBody:
-          "The goal is not just to collect scores. It is to help your business listen properly, act on what matters, and build better habits around customer experience over time.",
+          "At the centre of the system: better listening, better follow-through and better customer experience over time.",
         pillars: [
           {
             title: "Process",
@@ -5255,9 +5255,9 @@ export const TRANSLATIONS = {
       embedCx: {
         title: "Comment j’aide à ancrer l’expérience client dans l’entreprise",
         body: "Le feedback client ne crée de la valeur que s’il est intégré à la façon dont l’entreprise fonctionne. NPS Me vous aide à rendre la CX visible, concrète et actionnable à travers les process, la performance, les équipes et l’état d’esprit.",
-        centerTitle: "Au centre : le client",
+        centerTitle: "Le client",
         centerBody:
-          "L’objectif n’est pas seulement de collecter des scores, mais d’aider l’entreprise à mieux écouter, agir sur ce qui compte, et faire évoluer durablement ses habitudes autour de l’expérience client.",
+          "Au centre du système : une meilleure écoute, un meilleur suivi et une meilleure expérience client dans la durée.",
         pillars: [
           {
             title: "Process",

@@ -32,51 +32,51 @@ function EmbedCxSection() {
         </div>
 
         <div className="mt-10">
-          <div className="relative mx-auto max-w-5xl">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
-              <div className="min-h-[230px] rounded-[2rem] border border-[#FACC15]/25 bg-[#FACC15]/12 p-6 md:p-8">
-                <div className="text-xl font-semibold text-[#FDE68A]">
+          <div className="relative mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="min-h-[260px] rounded-[2rem] border border-[#FACC15]/20 bg-gradient-to-br from-[#FACC15]/8 to-transparent p-8 md:pr-20">
+                <div className="text-2xl font-semibold text-[#FDE68A]">
                   {topLeft?.title}
                 </div>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                <p className="mt-4 max-w-[26rem] text-base leading-relaxed text-slate-200">
                   {topLeft?.desc}
                 </p>
               </div>
 
-              <div className="min-h-[230px] rounded-[2rem] border border-slate-300/20 bg-slate-300/10 p-6 md:p-8">
-                <div className="text-xl font-semibold text-slate-100">
+              <div className="min-h-[260px] rounded-[2rem] border border-[#7C3AED]/25 bg-gradient-to-br from-[#7C3AED]/16 to-white/[0.03] p-8 md:pl-16">
+                <div className="text-2xl font-semibold text-[#DDD6FE]">
                   {topRight?.title}
                 </div>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                <p className="mt-4 max-w-[26rem] text-base leading-relaxed text-slate-200">
                   {topRight?.desc}
                 </p>
               </div>
 
-              <div className="min-h-[230px] rounded-[2rem] border border-lime-400/25 bg-lime-400/12 p-6 md:p-8">
-                <div className="text-xl font-semibold text-lime-300">
+              <div className="min-h-[260px] rounded-[2rem] border border-[#22C55E]/25 bg-gradient-to-br from-[#22C55E]/14 to-transparent p-8 md:pr-20">
+                <div className="text-2xl font-semibold text-[#86EFAC]">
                   {bottomLeft?.title}
                 </div>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                <p className="mt-4 max-w-[26rem] text-base leading-relaxed text-slate-200">
                   {bottomLeft?.desc}
                 </p>
               </div>
 
-              <div className="min-h-[230px] rounded-[2rem] border border-sky-400/25 bg-sky-400/12 p-6 md:p-8">
-                <div className="text-xl font-semibold text-sky-300">
+              <div className="min-h-[260px] rounded-[2rem] border border-[#38BDF8]/20 bg-gradient-to-br from-[#0EA5E9]/10 via-[#7C3AED]/8 to-transparent p-8 md:pl-16">
+                <div className="text-2xl font-semibold text-[#93C5FD]">
                   {bottomRight?.title}
                 </div>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                <p className="mt-4 max-w-[26rem] text-base leading-relaxed text-slate-200">
                   {bottomRight?.desc}
                 </p>
               </div>
             </div>
 
-            <div className="pointer-events-none hidden md:block absolute left-1/2 top-1/2 z-10 h-[230px] w-[230px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.95)]">
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#7C3AED]/20 to-[#22C55E]/20 px-6 text-center">
-                <div className="text-lg font-semibold text-white">
+            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[180px] w-[180px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_12px_rgba(11,15,25,0.96)]">
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#7C3AED]/22 via-[#0F172A] to-[#22C55E]/18 px-5 text-center">
+                <div className="text-xl font-semibold leading-tight text-white">
                   {centerTitle}
                 </div>
-                <p className="mt-3 text-xs leading-relaxed text-slate-300">
+                <p className="mt-3 text-[11px] leading-relaxed text-slate-300">
                   {centerBody}
                 </p>
               </div>

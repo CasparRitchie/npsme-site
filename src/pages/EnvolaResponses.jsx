@@ -535,9 +535,13 @@ export default function EnvolaResponses() {
                       updateFilters={updateFilters}
                       className="sticky left-[150px] z-40 w-[95px] min-w-[95px] bg-[#0F172A]"
                     />
-                    <th className="sticky left-[245px] z-40 w-[88px] min-w-[88px] bg-[#0F172A] px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-200">
-                      {tr("common.intercom", "Intercom")}
-                    </th>
+                    <SortableTh
+                      label={tr("common.bucket", "Bucket")}
+                      sortKey="bucket"
+                      filters={filters}
+                      updateFilters={updateFilters}
+                      className="sticky left-[245px] z-40 w-[88px] min-w-[88px] bg-[#0F172A]"
+                    />
 
                     <SortableTh
                       label="NPS"
@@ -546,9 +550,10 @@ export default function EnvolaResponses() {
                       updateFilters={updateFilters}
                       className="w-[70px]"
                     />
+
                     <SortableTh
-                      label={tr("common.bucket", "Bucket")}
-                      sortKey="bucket"
+                      label="Response ID"
+                      sortKey="response_id"
                       filters={filters}
                       updateFilters={updateFilters}
                       className="w-[115px]"

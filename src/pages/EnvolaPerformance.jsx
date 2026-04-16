@@ -860,6 +860,7 @@ export default function EnvolaPerformance() {
       <section className="mx-auto max-w-7xl px-6 pb-10">
         <NpsBucketStackedColumns
           points={trendPoints}
+          granularity={filters.granularity}
           height={220}
           maxBars={36}
           title={tr("envola.top.splitTitle", "Score split over time")}

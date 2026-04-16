@@ -10,8 +10,30 @@ function safeInt(n) {
   return Number.isFinite(n) ? n : 0;
 }
 
+function formatBucketLabel(dateStr, granularity = "week") {
+  if (!dateStr) return "";
+
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return dateStr;
+
+  if (granularity === "month") {
+    return d.toLocaleDateString("en-GB", {
+      month: "short",
+      year: "2-digit",
+      timeZone: "UTC",
+    });
+  }
+
+  return d.toLocaleDateString("en-GB", {
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "UTC",
+  });
+}
+
 export default function NpsBucketStackedColumns({
   points = [],
+  granularity = "week",
   height = 160,
   maxBars = 36,
   title = "Distribution over time",
@@ -19,7 +41,6 @@ export default function NpsBucketStackedColumns({
 }) {
   const data = React.useMemo(() => {
     const arr = Array.isArray(points) ? points : [];
-    // keep most recent bars (nice + performant)
     return arr.slice(Math.max(0, arr.length - maxBars));
   }, [points, maxBars]);
 
@@ -31,10 +52,12 @@ export default function NpsBucketStackedColumns({
     );
   }, [data]);
 
-  // SVG layout
-  const W = 1000; // viewBox width
-  const H = 200;  // viewBox height
-  const pad = { l: 22, r: 10, t: 10, b: 26 };
+  const W = 1000;
+  const H = 200;
+
+  const labelAreaHeight = granularity === "month" ? 36 : 48;
+  const pad = { l: 22, r: 10, t: 10, b: labelAreaHeight };
+
   const innerW = W - pad.l - pad.r;
   const innerH = H - pad.t - pad.b;
 
@@ -48,12 +71,10 @@ export default function NpsBucketStackedColumns({
   }
 
   function yFor(value) {
-    // value in [0..1]
     return pad.t + (1 - clamp01(value)) * innerH;
   }
 
-  // Simple axis labels (sparse)
-  const labelEvery = data.length > 18 ? 6 : data.length > 10 ? 4 : 2;
+  const rotateLabels = granularity !== "month";
 
   return (
     <div className="rounded-2xl border border-white/10 bg-black/10 p-5">
@@ -91,7 +112,6 @@ export default function NpsBucketStackedColumns({
             role="img"
             aria-label="NPS bucket distribution over time"
           >
-            {/* grid lines */}
             {[0.25, 0.5, 0.75].map((v) => {
               const y = yFor(v);
               return (
@@ -107,41 +127,33 @@ export default function NpsBucketStackedColumns({
               );
             })}
 
-            {/* bars */}
             {data.map((p, i) => {
               const promoters = safeInt(p.promoters);
               const passives = safeInt(p.passives);
               const detractors = safeInt(p.detractors);
               const total = Math.max(1, promoters + passives + detractors);
 
-              // Use maxTotal scaling (so chart height is stable across buckets)
-              const scaledTotal = (promoters + passives + detractors) / maxTotal;
-
               const promoterFrac = promoters / maxTotal;
               const passiveFrac = passives / maxTotal;
               const detractorFrac = detractors / maxTotal;
 
               const x = xFor(i);
-              const y0 = yFor(0); // bottom baseline
+              const y0 = yFor(0);
 
-              // Heights in px (innerH space)
               const hProm = clamp01(promoterFrac) * innerH;
               const hPass = clamp01(passiveFrac) * innerH;
               const hDetr = clamp01(detractorFrac) * innerH;
 
-              // Stack from bottom: detractors (red) at bottom, passives, promoters at top
               const yDetr = y0 - hDetr;
               const yPass = yDetr - hPass;
               const yProm = yPass - hProm;
 
-              // Tooltip label
               const label = `${p.date || ""} • total ${total} (P${promoters} / Pa${passives} / D${detractors})`;
 
               return (
                 <g key={p.date || i}>
                   <title>{label}</title>
 
-                  {/* detractors */}
                   <rect
                     x={x}
                     y={yDetr}
@@ -153,7 +165,6 @@ export default function NpsBucketStackedColumns({
                     style={{ transition: "all 350ms ease" }}
                   />
 
-                  {/* passives */}
                   <rect
                     x={x}
                     y={yPass}
@@ -165,7 +176,6 @@ export default function NpsBucketStackedColumns({
                     style={{ transition: "all 350ms ease" }}
                   />
 
-                  {/* promoters */}
                   <rect
                     x={x}
                     y={yProm}
@@ -177,23 +187,24 @@ export default function NpsBucketStackedColumns({
                     style={{ transition: "all 350ms ease" }}
                   />
 
-                  {/* x-axis labels (sparse) */}
-                  {i % labelEvery === 0 ? (
-                    <text
-                      x={x + barW / 2}
-                      y={H - 8}
-                      textAnchor="middle"
-                      fontSize="11"
-                      fill="rgba(148,163,184,0.9)"
-                    >
-                      {String(p.date || "").slice(5)} {/* MM-DD style */}
-                    </text>
-                  ) : null}
+                  <text
+                    x={x + barW / 2}
+                    y={H - 10}
+                    textAnchor={rotateLabels ? "end" : "middle"}
+                    fontSize="11"
+                    fill="rgba(148,163,184,0.9)"
+                    transform={
+                      rotateLabels
+                        ? `rotate(-35 ${x + barW / 2} ${H - 10})`
+                        : undefined
+                    }
+                  >
+                    {formatBucketLabel(p.date, granularity)}
+                  </text>
                 </g>
               );
             })}
 
-            {/* baseline */}
             <line
               x1={pad.l}
               x2={W - pad.r}

@@ -19,6 +19,11 @@ function EmbedCxSection() {
 
   const [topLeft, topRight, bottomLeft, bottomRight] = pillars;
 
+  const panelBase =
+    "min-h-[260px] rounded-[2rem] border border-[#7C3AED]/70 bg-[rgba(8,12,28,0.72)] p-8";
+  const headingClass = "text-2xl font-semibold text-[#22C55E]";
+  const bodyClass = "mt-4 max-w-[24rem] text-base leading-relaxed text-slate-200";
+
   return (
     <section id="embed-cx" className="mx-auto max-w-7xl px-6 pb-20">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -34,56 +39,48 @@ function EmbedCxSection() {
         <div className="mt-10">
           <div className="relative mx-auto max-w-6xl">
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div className="min-h-[260px] rounded-[2rem] border border-[#7C3AED]/30 bg-gradient-to-br from-[#7C3AED]/8 to-transparent p-8 md:pr-20 text-left">
-                <div className="text-2xl font-semibold text-[#22C55E]">
-                  {topLeft?.title}
-                </div>
-                <p className="mt-4 max-w-[24rem] text-base leading-relaxed text-slate-200">
-                  {topLeft?.desc}
-                </p>
+              <div className={`${panelBase} md:pr-24 text-left`}>
+                <div className={headingClass}>{topLeft?.title}</div>
+                <p className={bodyClass}>{topLeft?.desc}</p>
               </div>
 
-              <div className="min-h-[260px] rounded-[2rem] border border-[#7C3AED]/30 bg-gradient-to-br from-[#7C3AED]/10 to-white/[0.02] p-8 md:pl-20 text-right">
-                <div className="ml-auto max-w-[24rem] text-2xl font-semibold text-[#22C55E]">
+              <div className={`${panelBase} md:pl-24 text-right`}>
+                <div className={`ml-auto ${headingClass} max-w-[24rem]`}>
                   {topRight?.title}
                 </div>
-                <p className="mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200">
+                <p className={`mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200`}>
                   {topRight?.desc}
                 </p>
               </div>
 
-              <div className="min-h-[260px] rounded-[2rem] border border-[#7C3AED]/30 bg-gradient-to-br from-[#22C55E]/8 to-transparent p-8 md:pr-20 text-left">
-                <div className="text-2xl font-semibold text-[#22C55E]">
-                  {bottomLeft?.title}
-                </div>
-                <p className="mt-4 max-w-[24rem] text-base leading-relaxed text-slate-200">
-                  {bottomLeft?.desc}
-                </p>
+              <div className={`${panelBase} md:pr-24 text-left`}>
+                <div className={headingClass}>{bottomLeft?.title}</div>
+                <p className={bodyClass}>{bottomLeft?.desc}</p>
               </div>
 
-              <div className="min-h-[260px] rounded-[2rem] border border-[#7C3AED]/30 bg-gradient-to-br from-[#7C3AED]/8 via-[#22C55E]/4 to-transparent p-8 md:pl-20 text-right">
-                <div className="ml-auto max-w-[24rem] text-2xl font-semibold text-[#22C55E]">
+              <div className={`${panelBase} md:pl-24 text-right`}>
+                <div className={`ml-auto ${headingClass} max-w-[24rem]`}>
                   {bottomRight?.title}
                 </div>
-                <p className="mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200">
+                <p className={`mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200`}>
                   {bottomRight?.desc}
                 </p>
               </div>
             </div>
 
-            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[170px] w-[170px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_12px_rgba(11,15,25,0.96)]">
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-[#7C3AED]/25 bg-gradient-to-br from-[#7C3AED]/18 via-[#0F172A] to-[#22C55E]/14 px-5 text-center">
-                <div className="text-xl font-semibold leading-tight text-white">
+            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[220px] w-[220px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.96)]">
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-[#7C3AED] bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.18),_rgba(11,15,25,0.96)_58%,_rgba(34,197,94,0.10)_100%)] px-6 text-center">
+                <div className="text-[2rem] font-semibold leading-tight text-white">
                   {centerTitle}
                 </div>
-                <p className="mt-3 text-[11px] leading-relaxed text-slate-300">
+                <p className="mt-4 text-base leading-relaxed text-slate-300">
                   {centerBody}
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 md:hidden rounded-[2rem] border border-[#7C3AED]/25 bg-gradient-to-br from-[#7C3AED]/15 to-[#22C55E]/15 p-6 text-center">
-              <div className="text-lg font-semibold text-white">
+            <div className="mt-5 md:hidden rounded-[2rem] border border-[#7C3AED] bg-gradient-to-br from-[#7C3AED]/15 to-[#22C55E]/10 p-6 text-center">
+              <div className="text-xl font-semibold text-white">
                 {centerTitle}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-slate-300">

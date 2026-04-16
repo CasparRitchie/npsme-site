@@ -1711,7 +1711,7 @@ export const TRANSLATIONS = {
             tail: "Intercom, HubSpot, Zendesk or CSV.",
             accent: "Run NPS properly with the tools you already use.",
           },
-          body: "Keep your survey tool. NPS Me helps you run a reliable NPS programme, analyse customer feedback and comments, prioritise the fixes that matter, and embed close-the-loop workflows that improve retention, referrals and revenue.",
+          body: "Keep your survey tool. NPS Me helps you put a practical customer experience system in place - so feedback becomes visible, actionable and embedded in the way your team works. From NPS governance to close-the-loop workflows, the goal is not more dashboards, but better decisions, better service and stronger retention.",
           ctaPrimary: "Book a free NPS review",
           ctaMethod: "See how it works",
           ctaDemo: "View example insights",
@@ -1721,7 +1721,7 @@ export const TRANSLATIONS = {
             lift: "Measured CX impact",
           },
           chips: {
-            help: ["Consulting", "Workshops", "Speaking", "Ongoing insight"],
+            help: ["CX system design", "Implementation", "Team adoption", "Close-the-loop"],
             worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
           },
           chipsNote:
@@ -1870,50 +1870,68 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Four ways to work together",
-        body: "Choose the format that fits your stage - hands-on delivery, enablement, inspiration, or ongoing insight.",
-        cards: [
+        title: "Two ways to work together",
+        body: "The software supports the process - but the real value comes from putting the right CX structure, routines and follow-through in place inside your business.",
+        outcomeLabel: "Best for",
+        offers: [
           {
-            title: "Consulting",
-            desc: "Most consultants advise. I implement - diagnose → prioritise → ship.",
+            title: "CX Foundations",
+            badge: "Setup",
+            desc: "For startups and SMEs who want a practical customer experience system set up properly, without overcomplicating things.",
             bullets: [
-              "NPS programme design (no survey spam, no bad data)",
-              "Theme/driver analysis from real comments",
-              "Roadmap + owners + monthly review cycles",
+              "NPS / feedback programme design",
+              "Survey governance and anti-bias setup",
+              "Reporting and comment analysis",
+              "Close-the-loop workflow design",
+              "Team onboarding and practical handover",
             ],
+            outcome:
+              "Get a simple, credible CX system your team can actually use.",
           },
           {
-            title: "Workshops & training",
-            desc: "Practical training to help teams run NPS well - not theory-only decks.",
+            title: "CX Embedded",
+            badge: "Adoption",
+            desc: "For businesses who want customer experience embedded into day-to-day operations, management routines and team behaviour.",
             bullets: [
-              "Survey design, sampling, comparability",
-              "Close-the-loop workflows and templates",
-              "Action planning facilitation",
+              "Everything in CX Foundations",
+              "Role and ownership design",
+              "Management cadence and review routines",
+              "Cross-team adoption support",
+              "Ongoing optimisation and advisory support",
             ],
-          },
-          {
-            title: "Speaking",
-            desc: "Keynotes and talks on practical CX: what actually moves NPS and how to build momentum.",
-            bullets: [
-              "Leadership sessions and offsites",
-              "Company events and conferences",
-              "CX strategy meets delivery reality",
-            ],
-          },
-          {
-            title: "Ongoing insight",
-            desc: "A lightweight intelligence feed (Pulse / Intercom analytics) you can act on week by week.",
-            bullets: [
-              "Themes, delighters, risk flags",
-              "Competitor & sentiment pulse (optional)",
-              "Clear next steps (not dashboards for dashboards’ sake)",
-            ],
+            outcome:
+              "Make customer feedback part of how your business operates and improves.",
           },
         ],
         ctas: {
-          products: "See services",
+          products: "See offers",
           about: "Why me",
         },
+      },
+      embedCx: {
+        title: "How I help you embed customer experience",
+        body: "Customer feedback only creates value when it is built into the way your business works. NPS Me helps you make CX visible, practical and actionable across process, performance, people and mindset.",
+        centerTitle: "At the centre: the customer",
+        centerBody:
+          "The goal is not just to collect scores. It is to help your business listen properly, act on what matters, and build better habits around customer experience over time.",
+        pillars: [
+          {
+            title: "Process",
+            desc: "Design practical feedback and follow-up workflows that are visible, repeatable and easy to run.",
+          },
+          {
+            title: "Performance",
+            desc: "Make customer experience measurable, so teams and leaders can see what is improving and what needs attention.",
+          },
+          {
+            title: "People",
+            desc: "Clarify roles, ownership and routines so teams know how to work with customer feedback in practice.",
+          },
+          {
+            title: "Mindset",
+            desc: "Build a culture where customer feedback helps shape decisions, priorities and continuous improvement.",
+          },
+        ],
       },
     },
     surveyProgramme: {
@@ -5030,7 +5048,7 @@ export const TRANSLATIONS = {
         tail: "Intercom, HubSpot, Zendesk ou CSV.",
         accent: "Faites du NPS correctement avec les outils que vous utilisez déjà.",
       },
-      body: "Gardez votre outil d’envoi. NPS Me vous aide à opérer un programme NPS fiable, analyser les retours clients et les verbatims, prioriser les corrections qui comptent, et déployer des workflows de close-the-loop qui améliorent rétention, recommandation et chiffre d’affaires.",
+      body: "Gardez votre outil d’envoi. NPS Me vous aide à mettre en place un système CX concret, pour que le feedback devienne visible, actionnable et intégré dans la façon dont vos équipes travaillent. De la gouvernance NPS aux workflows de close-the-loop, l’objectif n’est pas d’ajouter des dashboards, mais d’améliorer les décisions, le service et la rétention.",
       ctaPrimary: "Réserver une revue NPS gratuite",
       ctaMethod: "Voir comment ça marche",
       ctaDemo: "Voir des exemples d’insights",
@@ -5040,7 +5058,7 @@ export const TRANSLATIONS = {
         lift: "Impact CX mesuré",
       },
       chips: {
-        help: ["Conseil", "Ateliers", "Conférences", "Insights récurrents"],
+        help: ["Design du système CX", "Mise en place", "Adoption équipes", "Close-the-loop"],
         worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
       },
       chipsNote:
@@ -5196,50 +5214,68 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Quatre façons de travailler ensemble",
-        body: "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
-        cards: [
+        title: "Deux façons de travailler ensemble",
+        body: "Le logiciel soutient le process - mais la vraie valeur vient de la mise en place d’une structure CX claire, de routines utiles et d’un vrai suivi au sein de votre organisation.",
+        outcomeLabel: "Idéal pour",
+        offers: [
           {
-            title: "Conseil / accompagnement",
-            desc: "Beaucoup conseillent. Moi, j’implémente : diagnostiquer → prioriser → déployer.",
+            title: "CX Foundations",
+            badge: "Mise en place",
+            desc: "Pour les startups et PME qui veulent mettre en place un système d’expérience client simple, crédible et bien structuré.",
             bullets: [
-              "Design de programme NPS (sans spam ni mauvaise donnée)",
-              "Analyse thèmes/drivers à partir des verbatims",
-              "Roadmap + responsables + revues mensuelles",
+              "Conception du programme NPS / feedback",
+              "Gouvernance d’enquête et réduction des biais",
+              "Reporting et analyse des verbatims",
+              "Conception du workflow de close-the-loop",
+              "Onboarding des équipes et passage de relais",
             ],
+            outcome:
+              "Mettre en place un système CX simple et réellement utilisable par vos équipes.",
           },
           {
-            title: "Ateliers & formation",
-            desc: "Formation pratique pour bien faire du NPS - pas des slides pour faire joli.",
+            title: "CX Embedded",
+            badge: "Adoption",
+            desc: "Pour les entreprises qui veulent intégrer l’expérience client dans le fonctionnement quotidien, les routines managériales et les habitudes des équipes.",
             bullets: [
-              "Design d’enquête, échantillonnage, comparabilité",
-              "Close-the-loop + templates",
-              "Facilitation plan d’actions",
+              "Tout ce qui est inclus dans CX Foundations",
+              "Définition des rôles et responsabilités",
+              "Cadence managériale et routines de revue",
+              "Accompagnement à l’adoption transverse",
+              "Optimisation continue et accompagnement conseil",
             ],
-          },
-          {
-            title: "Conférences",
-            desc: "Interventions sur une CX pragmatique : ce qui fait bouger le NPS et comment créer une dynamique.",
-            bullets: [
-              "Sessions leadership et offsites",
-              "Événements et conférences",
-              "Stratégie + réalité terrain",
-            ],
-          },
-          {
-            title: "Insights récurrents",
-            desc: "Un flux léger d’intelligence (Pulse / analytics Intercom) actionnable chaque semaine.",
-            bullets: [
-              "Thèmes, delighters, signaux de risque",
-              "Pouls concurrentiel & sentiment (option)",
-              "Prochaines actions claires",
-            ],
+            outcome:
+              "Faire du feedback client une vraie partie de la façon dont l’entreprise fonctionne et s’améliore.",
           },
         ],
         ctas: {
           products: "Voir les offres",
           about: "Pourquoi moi",
         },
+      },
+      embedCx: {
+        title: "Comment j’aide à ancrer l’expérience client dans l’entreprise",
+        body: "Le feedback client ne crée de la valeur que s’il est intégré à la façon dont l’entreprise fonctionne. NPS Me vous aide à rendre la CX visible, concrète et actionnable à travers les process, la performance, les équipes et l’état d’esprit.",
+        centerTitle: "Au centre : le client",
+        centerBody:
+          "L’objectif n’est pas seulement de collecter des scores, mais d’aider l’entreprise à mieux écouter, agir sur ce qui compte, et faire évoluer durablement ses habitudes autour de l’expérience client.",
+        pillars: [
+          {
+            title: "Process",
+            desc: "Concevoir des workflows de feedback et de suivi qui soient concrets, visibles, reproductibles et simples à exécuter.",
+          },
+          {
+            title: "Performance",
+            desc: "Rendre l’expérience client mesurable, pour que les équipes et les dirigeants voient ce qui s’améliore et ce qui doit être traité.",
+          },
+          {
+            title: "Équipes",
+            desc: "Clarifier les rôles, les responsabilités et les routines pour que les équipes sachent concrètement comment travailler avec le feedback client.",
+          },
+          {
+            title: "État d’esprit",
+            desc: "Faire émerger une culture où le feedback client nourrit les décisions, les priorités et l’amélioration continue.",
+          },
+        ],
       },
     },
     surveyProgramme: {

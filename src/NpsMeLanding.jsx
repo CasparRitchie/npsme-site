@@ -14,6 +14,10 @@ function EmbedCxSection() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const pillars = translations(lang, "landing.embedCx.pillars", []);
+  const centerTitle = tr("landing.embedCx.centerTitle");
+  const centerBody = tr("landing.embedCx.centerBody");
+
+  const [topLeft, topRight, bottomLeft, bottomRight] = pillars;
 
   return (
     <section id="embed-cx" className="mx-auto max-w-7xl px-6 pb-20">
@@ -27,29 +31,66 @@ function EmbedCxSection() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {pillars.map((pillar, i) => (
-            <motion.div
-              key={pillar.title}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.45, delay: i * 0.05 }}
-              className="rounded-2xl border border-white/10 bg-black/20 p-5"
-            >
-              <div className="text-white font-semibold">{pillar.title}</div>
-              <div className="mt-2 text-sm text-slate-300">{pillar.desc}</div>
-            </motion.div>
-          ))}
-        </div>
+        <div className="mt-10">
+          <div className="relative mx-auto max-w-5xl">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+              <div className="min-h-[230px] rounded-[2rem] border border-[#FACC15]/25 bg-[#FACC15]/12 p-6 md:p-8">
+                <div className="text-xl font-semibold text-[#FDE68A]">
+                  {topLeft?.title}
+                </div>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                  {topLeft?.desc}
+                </p>
+              </div>
 
-        <div className="mt-8 rounded-2xl border border-[#7C3AED]/20 bg-gradient-to-r from-[#7C3AED]/10 to-[#22C55E]/10 p-5">
-          <div className="text-sm font-medium text-white">
-            {tr("landing.embedCx.centerTitle")}
+              <div className="min-h-[230px] rounded-[2rem] border border-slate-300/20 bg-slate-300/10 p-6 md:p-8">
+                <div className="text-xl font-semibold text-slate-100">
+                  {topRight?.title}
+                </div>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                  {topRight?.desc}
+                </p>
+              </div>
+
+              <div className="min-h-[230px] rounded-[2rem] border border-lime-400/25 bg-lime-400/12 p-6 md:p-8">
+                <div className="text-xl font-semibold text-lime-300">
+                  {bottomLeft?.title}
+                </div>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                  {bottomLeft?.desc}
+                </p>
+              </div>
+
+              <div className="min-h-[230px] rounded-[2rem] border border-sky-400/25 bg-sky-400/12 p-6 md:p-8">
+                <div className="text-xl font-semibold text-sky-300">
+                  {bottomRight?.title}
+                </div>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-200">
+                  {bottomRight?.desc}
+                </p>
+              </div>
+            </div>
+
+            <div className="pointer-events-none hidden md:block absolute left-1/2 top-1/2 z-10 h-[230px] w-[230px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.95)]">
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#7C3AED]/20 to-[#22C55E]/20 px-6 text-center">
+                <div className="text-lg font-semibold text-white">
+                  {centerTitle}
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-slate-300">
+                  {centerBody}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 md:hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#7C3AED]/15 to-[#22C55E]/15 p-6 text-center">
+              <div className="text-lg font-semibold text-white">
+                {centerTitle}
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                {centerBody}
+              </p>
+            </div>
           </div>
-          <p className="mt-2 text-sm text-slate-300">
-            {tr("landing.embedCx.centerBody")}
-          </p>
         </div>
       </div>
     </section>

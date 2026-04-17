@@ -2028,9 +2028,9 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "CX Foundations and CX Embedded | NPS Me",
+      seoTitle: "CX Foundations and CX Intelligence Layer | NPS Me",
       seoDescription:
-        "Explore the two main ways to work with NPS Me: CX Foundations and CX Embedded. Consultancy-backed CX implementation to help businesses put customer feedback at the centre of how they operate.",
+        "Explore the two main ways to work with NPS Me: CX Foundations and CX Intelligence Layer. Consultancy-backed CX implementation and insight support to help businesses put customer feedback at the centre of how they operate.",
 
       header: {
         iconLabel: "NPS Me offers",
@@ -2038,7 +2038,7 @@ export const TRANSLATIONS = {
         accent: "Two ways to work with",
         title: "NPS Me",
         subtitle:
-          "Consultancy-backed CX implementation to help you embed customer experience into the way your business works.",
+          "Consultancy-backed CX implementation and insight support to help you embed customer experience into the way your business works.",
       },
 
       intro: {
@@ -2053,10 +2053,12 @@ export const TRANSLATIONS = {
 
       offers: [
         {
+          topic: "cx-foundations",
           title: "CX Foundations",
           badge: "Setup",
           price: "Scoped to the work",
-          hint: "Best for: startups and SMEs who want a practical CX system set up properly",
+          hint:
+            "Best for: startups and SMEs who want a practical CX system set up properly",
           intro:
             "A focused implementation offer to help you get the essentials in place: the right feedback structure, usable reporting, and a practical close-the-loop process.",
           bullets: [
@@ -2078,29 +2080,31 @@ export const TRANSLATIONS = {
           cta: "Book a CX Foundations call",
         },
         {
-          title: "CX Embedded",
-          badge: "Adoption",
+          topic: "intelligence-layer",
+          title: "CX Intelligence Layer",
+          badge: "Insight + action",
           price: "Implementation + ongoing support",
-          hint: "Best for: businesses who want customer experience embedded into day-to-day operations",
+          hint:
+            "Best for: businesses who want insight, workflow and action on top of tools they already use",
           intro:
-            "A deeper offer for organisations that want customer feedback to shape routines, ownership, management cadence and continuous improvement across teams.",
+            "A deeper offer for organisations that want NPS Me to sit as an intelligence layer above tools like Intercom, HubSpot, Zendesk or structured exports, turning customer feedback into clearer insight, ownership and follow-through.",
           bullets: [
             "Everything in CX Foundations",
-            "Role and ownership design",
-            "Management cadence and review routines",
-            "Cross-team adoption support",
+            "Integration with existing systems and exports",
+            "Comment, theme and operational insight layer",
+            "Close-the-loop workflow support",
             "Ongoing optimisation and advisory support",
           ],
           includesTitle: "Typical scope",
           includes: [
-            "CX Foundations plus adoption support",
-            "Leadership and management routines",
-            "Cross-functional follow-through",
+            "CX Foundations plus intelligence-layer setup",
+            "Insight and workflow design on top of existing tools",
+            "Cross-team follow-through support",
             "Ongoing guidance and optimisation",
           ],
           outcome:
-            "Customer feedback becomes part of how your business operates and improves.",
-          cta: "Book a CX Embedded call",
+            "Customer feedback becomes easier to interpret, manage and act on across the business.",
+          cta: "Book a CX Intelligence Layer call",
         },
       ],
 
@@ -2119,32 +2123,35 @@ export const TRANSLATIONS = {
       comparison: {
         title: "Which offer is the right fit?",
         body:
-          "Start with CX Foundations if you need the basics set up properly. Choose CX Embedded if you want customer experience built into management routines, team behaviour and continuous improvement.",
+          "Start with CX Foundations if you need the basics set up properly. Choose CX Intelligence Layer if you want customer feedback interpreted and actioned more systematically on top of the systems you already use.",
         columns: {
           topic: "Topic",
           foundations: "CX Foundations",
-          embedded: "CX Embedded",
+          embedded: "CX Intelligence Layer",
         },
         rows: [
           {
             topic: "Main goal",
             foundations: "Get a practical CX system set up properly",
-            embedded: "Embed customer experience into the way the business runs",
+            embedded:
+              "Turn existing customer feedback tools into a clearer intelligence and action layer",
           },
           {
             topic: "Best for",
-            foundations: "Teams needing structure, reporting and close-the-loop basics",
-            embedded: "Teams wanting adoption, ownership and ongoing improvement",
+            foundations:
+              "Teams needing structure, reporting and close-the-loop basics",
+            embedded:
+              "Teams wanting better interpretation, ownership and follow-through across existing systems",
           },
           {
             topic: "Depth",
             foundations: "Focused implementation",
-            embedded: "Implementation plus adoption support",
+            embedded: "Implementation plus ongoing optimisation support",
           },
           {
             topic: "Leadership involvement",
             foundations: "Light to moderate",
-            embedded: "Higher and more ongoing",
+            embedded: "Moderate to high",
           },
           {
             topic: "Ongoing support",
@@ -2157,9 +2164,9 @@ export const TRANSLATIONS = {
       cta: {
         title: "Not sure where to start?",
         body:
-          "We can look at your current setup and quickly work out whether CX Foundations or CX Embedded is the better starting point.",
+          "We can look at your current setup and quickly work out whether CX Foundations or CX Intelligence Layer is the better starting point.",
         email: "Email hello@npsme.com",
-        book: "Book a free review call",
+        book: "Book a discovery call",
       },
     },
     socialListening: {
@@ -5349,9 +5356,9 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "CX Foundations et CX Embedded | NPS Me",
+      seoTitle: "CX Foundations et Couche d’intelligence CX | NPS Me",
       seoDescription:
-        "Découvrez les deux principales façons de travailler avec NPS Me : CX Foundations et CX Embedded. Un accompagnement CX soutenu par un système pour aider les entreprises à mettre le feedback client au centre de leur fonctionnement.",
+        "Découvrez les deux principales façons de travailler avec NPS Me : CX Foundations et Couche d’intelligence CX. Un accompagnement CX soutenu par un système et par l’analyse, pour aider les entreprises à mettre le feedback client au centre de leur fonctionnement.",
 
       header: {
         iconLabel: "Offres NPS Me",
@@ -5359,7 +5366,7 @@ export const TRANSLATIONS = {
         accent: "Deux façons de travailler avec",
         title: "NPS Me",
         subtitle:
-          "Un accompagnement CX soutenu par un système, pour intégrer l’expérience client dans la façon dont votre entreprise fonctionne.",
+          "Un accompagnement CX soutenu par un système et par l’analyse, pour intégrer l’expérience client dans la façon dont votre entreprise fonctionne.",
       },
 
       intro: {
@@ -5374,10 +5381,12 @@ export const TRANSLATIONS = {
 
       offers: [
         {
+          topic: "cx-foundations",
           title: "CX Foundations",
           badge: "Mise en place",
           price: "Périmètre défini selon le besoin",
-          hint: "Idéal pour : les startups et PME qui veulent mettre en place un système CX simple et crédible",
+          hint:
+            "Idéal pour : les startups et PME qui veulent mettre en place un système CX simple et crédible",
           intro:
             "Une offre de mise en place ciblée pour installer les fondamentaux : une bonne structure de feedback, un reporting exploitable et un process de close-the-loop concret.",
           bullets: [
@@ -5399,29 +5408,31 @@ export const TRANSLATIONS = {
           cta: "Réserver un échange CX Foundations",
         },
         {
-          title: "CX Embedded",
-          badge: "Adoption",
+          topic: "intelligence-layer",
+          title: "Couche d’intelligence CX",
+          badge: "Insight + action",
           price: "Mise en place + accompagnement continu",
-          hint: "Idéal pour : les entreprises qui veulent intégrer l’expérience client dans leur fonctionnement quotidien",
+          hint:
+            "Idéal pour : les entreprises qui veulent mieux exploiter les outils qu’elles utilisent déjà",
           intro:
-            "Une offre plus approfondie pour les organisations qui veulent que le feedback client structure les routines, les responsabilités, la cadence managériale et l’amélioration continue.",
+            "Une offre plus approfondie pour les organisations qui veulent que NPS Me agisse comme une couche d’intelligence au-dessus d’outils comme Intercom, HubSpot, Zendesk ou d’exports structurés, afin de transformer le feedback client en insight, en responsabilités claires et en actions concrètes.",
           bullets: [
             "Tout ce qui est inclus dans CX Foundations",
-            "Définition des rôles et responsabilités",
-            "Cadence managériale et routines de revue",
-            "Accompagnement à l’adoption transverse",
+            "Connexion aux systèmes et exports existants",
+            "Couche d’analyse des verbatims, thèmes et signaux opérationnels",
+            "Support au workflow de close-the-loop",
             "Optimisation continue et accompagnement conseil",
           ],
           includesTitle: "Périmètre typique",
           includes: [
-            "CX Foundations plus accompagnement à l’adoption",
-            "Routines leadership et management",
-            "Suivi transverse entre équipes",
+            "CX Foundations plus mise en place de la couche d’intelligence",
+            "Conception de l’insight et des workflows sur les outils existants",
+            "Accompagnement du suivi transverse entre équipes",
             "Accompagnement et optimisation dans la durée",
           ],
           outcome:
-            "Le feedback client devient une vraie partie de la façon dont l’entreprise fonctionne et s’améliore.",
-          cta: "Réserver un échange CX Embedded",
+            "Le feedback client devient plus simple à interpréter, piloter et transformer en actions dans l’entreprise.",
+          cta: "Réserver un échange Couche d’intelligence CX",
         },
       ],
 
@@ -5440,32 +5451,36 @@ export const TRANSLATIONS = {
       comparison: {
         title: "Quelle offre choisir ?",
         body:
-          "Commencez par CX Foundations si vous avez besoin de mettre en place les bases correctement. Choisissez CX Embedded si vous voulez intégrer l’expérience client dans les routines managériales, les habitudes des équipes et l’amélioration continue.",
+          "Commencez par CX Foundations si vous avez besoin de mettre en place les bases correctement. Choisissez la Couche d’intelligence CX si vous voulez mieux interpréter et piloter le feedback client à partir des systèmes que vous utilisez déjà.",
         columns: {
           topic: "Sujet",
           foundations: "CX Foundations",
-          embedded: "CX Embedded",
+          embedded: "Couche d’intelligence CX",
         },
         rows: [
           {
             topic: "Objectif principal",
-            foundations: "Mettre en place un système CX concret et bien structuré",
-            embedded: "Intégrer l’expérience client dans le fonctionnement de l’entreprise",
+            foundations:
+              "Mettre en place un système CX concret et bien structuré",
+            embedded:
+              "Transformer les outils de feedback existants en une couche plus claire d’analyse et d’action",
           },
           {
             topic: "Idéal pour",
-            foundations: "Les équipes qui ont besoin de structure, de reporting et des bases du close-the-loop",
-            embedded: "Les équipes qui veulent de l’adoption, des responsabilités claires et de l’amélioration continue",
+            foundations:
+              "Les équipes qui ont besoin de structure, de reporting et des bases du close-the-loop",
+            embedded:
+              "Les équipes qui veulent une meilleure interprétation, des responsabilités claires et un meilleur suivi à partir des systèmes existants",
           },
           {
             topic: "Niveau d’accompagnement",
             foundations: "Mise en place ciblée",
-            embedded: "Mise en place plus accompagnement à l’adoption",
+            embedded: "Mise en place plus accompagnement d’optimisation continue",
           },
           {
             topic: "Implication du leadership",
             foundations: "Légère à modérée",
-            embedded: "Plus forte et plus continue",
+            embedded: "Modérée à forte",
           },
           {
             topic: "Accompagnement dans la durée",
@@ -5478,9 +5493,9 @@ export const TRANSLATIONS = {
       cta: {
         title: "Vous hésitez sur le bon point de départ ?",
         body:
-          "Nous pouvons regarder rapidement votre contexte actuel et voir si CX Foundations ou CX Embedded est le meilleur point de départ.",
+          "Nous pouvons regarder rapidement votre contexte actuel et voir si CX Foundations ou la Couche d’intelligence CX est le meilleur point de départ.",
         email: "Écrire à hello@npsme.com",
-        book: "Réserver un appel de cadrage",
+        book: "Réserver un appel découverte",
       },
     },
     socialListening: {

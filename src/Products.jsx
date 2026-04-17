@@ -11,8 +11,10 @@ export default function Products() {
   const { lang } = useLanguage();
   const location = useLocation();
 
-  const offers = translations(lang, "products.offers", []);
+  const offersRaw = translations(lang, "products.offers", []);
   const comparison = translations(lang, "products.comparison.rows", []);
+
+  const offers = translations(lang, "products.offers", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -23,25 +25,25 @@ export default function Products() {
         description={translations(
           lang,
           "products.seoDescription",
-          "Explore the two main ways to work with NPS Me."
+          "Explore the main ways to work with NPS Me."
         )}
       />
 
       <PageHeader
         iconLabel={translations(lang, "products.header.iconLabel", "NPS Me offers")}
         tag={translations(lang, "products.header.tag", "NPS Me / Offers")}
-        accent={translations(lang, "products.header.accent", "Two ways to work with")}
+        accent={translations(lang, "products.header.accent", "Ways to work with")}
         title={translations(lang, "products.header.title", "NPS Me")}
         subtitle={translations(
           lang,
           "products.header.subtitle",
-          "Consultancy-backed CX implementation to help you embed customer experience into the way your business works."
+          "Consultancy-backed CX implementation and insight support to help you embed customer experience into the way your business works."
         )}
       />
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-white md:text-2xl">
             {translations(lang, "products.intro.title")}
           </h2>
           <p className="mt-3 max-w-3xl text-slate-300">
@@ -54,7 +56,13 @@ export default function Products() {
             <OfferCard
               key={offer.title}
               featured={i === 1}
-              icon={i === 0 ? <Briefcase className="h-5 w-5 text-white" /> : <Layers className="h-5 w-5 text-white" />}
+              icon={
+                i === 0 ? (
+                  <Briefcase className="h-5 w-5 text-white" />
+                ) : (
+                  <Layers className="h-5 w-5 text-white" />
+                )
+              }
               title={offer.title}
               badge={offer.badge}
               price={offer.price}
@@ -67,7 +75,7 @@ export default function Products() {
               outcome={offer.outcome}
               cta={{
                 label: offer.cta,
-                href: `${localizePath("/book", lang)}?topic=${i === 0 ? "cx-foundations" : "cx-embedded"}`,
+                href: `${localizePath("/book", lang)}?topic=${offer.topic || "discovery"}`,
               }}
             />
           ))}
@@ -85,7 +93,7 @@ export default function Products() {
         </div>
 
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-white md:text-2xl">
             {translations(lang, "products.comparison.title")}
           </h2>
           <p className="mt-3 max-w-3xl text-slate-300">
@@ -96,9 +104,15 @@ export default function Products() {
             <table className="w-full border-collapse text-sm">
               <thead className="bg-white/5">
                 <tr className="text-left text-slate-300">
-                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.topic")}</th>
-                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.foundations")}</th>
-                  <th className="px-4 py-3">{translations(lang, "products.comparison.columns.embedded")}</th>
+                  <th className="px-4 py-3">
+                    {translations(lang, "products.comparison.columns.topic")}
+                  </th>
+                  <th className="px-4 py-3">
+                    {translations(lang, "products.comparison.columns.foundations")}
+                  </th>
+                  <th className="px-4 py-3">
+                    {translations(lang, "products.comparison.columns.embedded")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -132,7 +146,7 @@ export default function Products() {
             </a>
 
             <Link
-              to={localizePath("/book", lang)}
+              to={`${localizePath("/book", lang)}?topic=discovery`}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#7C3AED] px-6 py-3 text-sm font-semibold transition hover:bg-[#6D28D9]"
             >
               {translations(lang, "products.cta.book")}
@@ -202,7 +216,7 @@ function OfferCard({
           <div className="text-xs uppercase tracking-widest text-slate-500">
             {includesTitle}
           </div>
-          <ul className="mt-3 space-y-2 list-disc pl-5 text-sm text-slate-400">
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-400">
             {includes.map((e) => (
               <li key={e}>{e}</li>
             ))}

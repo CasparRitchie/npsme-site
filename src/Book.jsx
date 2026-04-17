@@ -7,6 +7,16 @@ import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 
 const BOOK_TOPICS = {
+  discovery: {
+    key: "discovery",
+    fallbackTitle: "Book a discovery call",
+    fallbackSubtitle:
+      "Share a bit about your current customer feedback, support and CX setup and NPS Me will explore where support could help most.",
+    fallbackPrefill:
+      "We’d like to discuss our current customer feedback / CX setup, especially around ",
+    fallbackSubject: "Discovery call request (npsme.com)",
+  },
+
   "cx-foundations": {
     key: "cxFoundations",
     fallbackTitle: "Book a CX Foundations discussion",
@@ -14,24 +24,17 @@ const BOOK_TOPICS = {
       "Share a bit about your current setup and NPS Me will explore how to put the right customer experience foundations in place.",
     fallbackPrefill:
       "We’d like to discuss CX Foundations, especially around ",
-    fallbackSubject: "CX Foundations booking request (npsme.com)",
+    fallbackSubject: "CX Foundations discussion request (npsme.com)",
   },
-  "cx-embedded": {
-    key: "cxEmbedded",
-    fallbackTitle: "Book a CX Embedded discussion",
+
+  "intelligence-layer": {
+    key: "intelligenceLayer",
+    fallbackTitle: "Book a CX Intelligence Layer discussion",
     fallbackSubtitle:
-      "Share a bit about your business and NPS Me will explore how customer experience could be embedded into team routines, ownership and continuous improvement.",
+      "Share a bit about your current tools and NPS Me will explore how an intelligence layer could sit on top of your existing setup to turn feedback into clearer insight and action.",
     fallbackPrefill:
-      "We’d like to discuss CX Embedded, especially around ",
-    fallbackSubject: "CX Embedded booking request (npsme.com)",
-  },
-  discovery: {
-    key: "discovery",
-    fallbackTitle: "Book a free discovery call",
-    fallbackSubtitle:
-      "Share a bit about your current CX and feedback setup and NPS Me will explore where support could help most - no obligation.",
-    fallbackPrefill: "",
-    fallbackSubject: "Discovery booking request (npsme.com)",
+      "We’d like to discuss a CX Intelligence Layer, especially around ",
+    fallbackSubject: "CX Intelligence Layer discussion request (npsme.com)",
   },
 };
 

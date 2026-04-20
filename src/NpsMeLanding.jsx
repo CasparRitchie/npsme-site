@@ -68,12 +68,12 @@ function EmbedCxSection() {
               </div>
             </div>
 
-            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[220px] w-[220px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.96)]">
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-[#7C3AED] bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.18),_rgba(11,15,25,0.96)_58%,_rgba(34,197,94,0.10)_100%)] px-6 text-center">
-                <div className="text-[2rem] font-semibold leading-tight text-white">
+            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.96)]">
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-[#7C3AED] bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.18),_rgba(11,15,25,0.96)_58%,_rgba(34,197,94,0.10)_100%)] px-7 text-center">
+                <div className="max-w-[170px] text-[1.5rem] font-semibold leading-[1.05] text-white">
                   {centerTitle}
                 </div>
-                <p className="mt-4 text-base leading-relaxed text-slate-300">
+                <p className="mt-3 max-w-[180px] text-[0.95rem] leading-[1.35] text-slate-300">
                   {centerBody}
                 </p>
               </div>

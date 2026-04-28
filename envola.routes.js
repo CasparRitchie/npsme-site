@@ -485,7 +485,7 @@ function parseWindowFromQuery(req) {
     };
   }
 
-  const days = clampInt(req.query.days, 90, 1, 3650);
+  const days = clampInt(req.query.days, 365, 1, 3650);
   const toMs = Date.now();
   const fromMs = toMs - days * 24 * 60 * 60 * 1000;
 
@@ -847,7 +847,7 @@ export function createEnvolaRouter() {
   router.get("/invitations", async (req, res) => {
     try {
       const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
-      const days = clampInt(req.query.days, 90, 1, 3650);
+      const days = clampInt(req.query.days, 365, 1, 3650);
       const statusFilter = String(req.query.status || "all").trim().toLowerCase();
 
       const text = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);

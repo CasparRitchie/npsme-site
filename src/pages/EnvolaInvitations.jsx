@@ -96,7 +96,7 @@ function useInvitationFilters() {
   const filters = useMemo(() => {
     return {
       contentId: searchParams.get("content_id") || DEFAULT_CONTENT_ID,
-      days: Number(searchParams.get("days") || 90),
+      days: Number(searchParams.get("days") || 365),
       status: searchParams.get("status") || "all",
     };
   }, [searchParams]);
@@ -157,7 +157,7 @@ export default function EnvolaInvitations() {
       try {
         const qs = new URLSearchParams({
           content_id: String(filters.contentId || "").trim(),
-          days: String(filters.days || 90),
+          days: String(filters.days || 365),
           status: String(filters.status || "all"),
         });
 

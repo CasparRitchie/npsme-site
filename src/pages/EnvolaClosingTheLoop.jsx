@@ -325,7 +325,7 @@ export default function EnvolaClosingTheLoop() {
   const [isNavPinned, setIsNavPinned] = React.useState(false);
 
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
-  const [days, setDays] = React.useState(30);
+  const [days, setDays] = React.useState(365);
   const [limit, setLimit] = React.useState(50);
 
   const [bucket, setBucket] = React.useState("all");

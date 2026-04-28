@@ -35,7 +35,7 @@ function todayYmdLocal() {
 
 function daysAgoYmd(days) {
   const d = new Date();
-  d.setDate(d.getDate() - Number(days || 90));
+  d.setDate(d.getDate() - Number(days || 365));
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -74,8 +74,8 @@ function useEnvolaFilters() {
 
   const filters = useMemo(() => {
     const mode = searchParams.get("mode") || "rolling";
-    const days = Number(searchParams.get("days") || 90);
-    const from = searchParams.get("from") || daysAgoYmd(90);
+    const days = Number(searchParams.get("days") || 365);
+    const from = searchParams.get("from") || daysAgoYmd(365);
     const to = searchParams.get("to") || todayYmdLocal();
     const granularity = searchParams.get("granularity") || "week";
     const bucket = searchParams.get("bucket") || "all";

@@ -22,7 +22,7 @@ function shortDate(iso) {
 
 function daysAgoYmd(days) {
   const d = new Date();
-  d.setDate(d.getDate() - Number(days || 90));
+  d.setDate(d.getDate() - Number(days || 365));
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -52,8 +52,8 @@ function useExplorerFilters() {
     return {
       contentId: searchParams.get("content_id") || DEFAULT_CONTENT_ID,
       mode: searchParams.get("mode") || "rolling",
-      days: Number(searchParams.get("days") || 120),
-      from: searchParams.get("from") || daysAgoYmd(120),
+      days: Number(searchParams.get("days") || 365),
+      from: searchParams.get("from") || daysAgoYmd(365),
       to: searchParams.get("to") || todayYmdLocal(),
       bucket: searchParams.get("bucket") || "all",
       search: searchParams.get("search") || "",

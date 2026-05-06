@@ -841,6 +841,89 @@ export function createEnvolaRouter() {
     }
   });
 
+  router.get("/monitor", requireIngestToken, async (req, res) => {
+    try {
+      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
+
+      const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+      const rawEvents = parseJsonl(rawText);
+
+      const completionEvents = (rawEvents || [])
+        .filter(
+          (e) =>
+            String(e?.stat_type || "").toLowerCase() === "completion" &&
+            String(e?.content_id || "") === String(contentId)
+        )
+        .map((e) => ({
+          ...e,
+          _receivedMs: Date.parse(e?.received_at || ""),
+        }))
+        .filter((e) => Number.isFinite(e._receivedMs));
+
+      const canonicalRows = await getCanonicalResponses({ force: true });
+      const contentRows = (canonicalRows || [])
+        .filter((r) => String(r?.content_id || "") === String(contentId))
+        .map((r) => ({
+          ...r,
+          _submittedMs: Date.parse(r?.submitted_at || ""),
+        }))
+        .filter((r) => Number.isFinite(r._submittedMs));
+
+      const now = Date.now();
+      const cutoff24h = now - 24 * 60 * 60 * 1000;
+
+      const latestCompletionEventAt =
+        completionEvents
+          .map((e) => e?.received_at)
+          .filter(Boolean)
+          .sort()
+          .slice(-1)[0] || null;
+
+      const latestCanonicalResponseAt =
+        contentRows
+          .map((r) => r?.submitted_at)
+          .filter(Boolean)
+          .sort()
+          .slice(-1)[0] || null;
+
+      const completionEventsLast24h = completionEvents.filter(
+        (e) => e._receivedMs >= cutoff24h
+      ).length;
+
+      const canonicalRowsLast24h = contentRows.filter(
+        (r) => r._submittedMs >= cutoff24h
+      ).length;
+
+      const inSyncLatestTimestamp =
+        latestCompletionEventAt === latestCanonicalResponseAt;
+
+      const inSyncLast24hCount =
+        completionEventsLast24h === canonicalRowsLast24h;
+
+      let status = "ok";
+      if (!inSyncLatestTimestamp || !inSyncLast24hCount) {
+        status = "warning";
+      }
+
+      return res.json({
+        ok: true,
+        content_id: contentId,
+        latest_completion_event_at: latestCompletionEventAt,
+        latest_canonical_response_at: latestCanonicalResponseAt,
+        completion_events_last_24h: completionEventsLast24h,
+        canonical_rows_last_24h: canonicalRowsLast24h,
+        completion_events_total: completionEvents.length,
+        canonical_rows_total: contentRows.length,
+        in_sync_latest_timestamp: inSyncLatestTimestamp,
+        in_sync_last_24h_count: inSyncLast24hCount,
+        status,
+      });
+    } catch (err) {
+      console.error("[envola] monitor error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   // Everything below this line requires private cookie
   router.use(requirePrivateCookie);
 

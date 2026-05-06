@@ -1630,28 +1630,27 @@ export function createIntercomRouter() {
       const days = clampInt(req.query.days, 30, 1, 3650);
       const limit = clampInt(req.query.limit, 50, 1, 2000);
 
-      // Pull from clean store (Dropbox JSONL)
       const rows = await getCanonicalResponses();
 
       const ctlCases = await readCtlJsonl(CTL_CASES_PATH);
-        const latestCtlCaseMap = buildLatestMapFromJsonlRows(ctlCases, "case_id");
-        const latestCtlCases = Array.from(latestCtlCaseMap.values())
-          .filter((c) => String(c?.content_id || "") === contentId);
+      const latestCtlCaseMap = buildLatestMapFromJsonlRows(ctlCases, "case_id");
+      const latestCtlCases = Array.from(latestCtlCaseMap.values()).filter(
+        (c) => String(c?.content_id || "") === contentId
+      );
 
-        const activeCaseByResponseKey = new Map();
-        const activeCaseByContactKey = new Map();
+      const activeCaseByResponseKey = new Map();
+      const activeCaseByContactKey = new Map();
 
-        for (const c of latestCtlCases) {
-          const responseKey = `${String(c?.content_id || "")}::${String(c?.response_id || "")}`;
-          const contactKey = `${String(c?.content_id || "")}::${String(c?.contact_id || "")}`;
+      for (const c of latestCtlCases) {
+        const responseKey = `${String(c?.content_id || "")}::${String(c?.response_id || "")}`;
+        const contactKey = `${String(c?.content_id || "")}::${String(c?.contact_id || "")}`;
 
-          if (c?.response_id) activeCaseByResponseKey.set(responseKey, c);
-          if (c?.contact_id) activeCaseByContactKey.set(contactKey, c);
-        }
+        if (c?.response_id) activeCaseByResponseKey.set(responseKey, c);
+        if (c?.contact_id) activeCaseByContactKey.set(contactKey, c);
+      }
 
       const since = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      // Group by contact_id
       const byContact = new Map();
       for (const r of rows) {
         if (!r) continue;
@@ -1686,7 +1685,7 @@ export function createIntercomRouter() {
         else if (latestBucket === "promoter") risk += 5;
 
         if (typeof latestScore === "number") {
-          risk += Math.max(0, 10 - latestScore) * 2; // 0..20
+          risk += Math.max(0, 10 - latestScore) * 2;
         }
 
         if (Array.isArray(themes) && themes.length) {
@@ -1710,9 +1709,9 @@ export function createIntercomRouter() {
         responses.sort((a, b) => Date.parse(a.submitted_at) - Date.parse(b.submitted_at));
         const latest = responses[responses.length - 1];
 
-        const latestScore = typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
-        const latestBucket =
-          latestScore == null ? null : scoreBucket(latestScore);
+        const latestScore =
+          typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
+        const latestBucket = latestScore == null ? null : scoreBucket(latestScore);
 
         const texts = extractTexts(latest);
         const joined = texts.join(" ");
@@ -1751,17 +1750,16 @@ export function createIntercomRouter() {
           themes,
           risk_score,
           recommendation: recommendAction(latestBucket, risk_score),
-
           active_case: linkedCase
-          ? {
-              case_id: linkedCase.case_id,
-              status: linkedCase.status,
-              owner_team: linkedCase.owner_team || null,
-              owner_user: linkedCase.owner_user || null,
-              is_paused: !!linkedCase.is_paused,
-              is_closed: ["closed", "cancelled"].includes(String(linkedCase.status || "")),
-            }
-          : null,
+            ? {
+                case_id: linkedCase.case_id,
+                status: linkedCase.status,
+                owner_team: linkedCase.owner_team || null,
+                owner_user: linkedCase.owner_user || null,
+                is_paused: !!linkedCase.is_paused,
+                is_closed: ["closed", "cancelled"].includes(String(linkedCase.status || "")),
+              }
+            : null,
         });
       }
 
@@ -2282,18 +2280,17 @@ export function createIntercomRouter() {
   router.get("/private/nps-multi-select", requirePrivateCookie, async (req, res) => {
     try {
       const contentId = String(req.query.content_id || "").trim();
-      if (!contentId) return res.status(400).json({ ok: false, error: "content_id is required" });
+      if (!contentId) {
+        return res.status(400).json({ ok: false, error: "content_id is required" });
+      }
 
       const days = clampInt(req.query.days, 90, 1, 3650);
       const sample = clampInt(req.query.sample, 120, 10, 5000);
       const limit = clampInt(req.query.limit, 50, 1, 500);
 
-      const store = await getCachedNpsResponsesStore(); // fast
-      const rows = Array.isArray(store.rows) ? store.rows : [];
-
+      const rows = await getCanonicalResponses();
       const since = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      // key -> aggregated stats
       const byQ = new Map();
 
       function qKey(a) {
@@ -2314,19 +2311,17 @@ export function createIntercomRouter() {
             question_id: qid,
             question_text: qt,
             responses: 0,
-            option_counts: {},     // option -> count
+            option_counts: {},
             example_response_ids: [],
             latest_submitted_at: null,
           };
 
-        // Keep best text
         if (cur.question_text === "-" && qt !== "-") cur.question_text = qt;
 
         byQ.set(key, cur);
         return cur;
       }
 
-      // Filter to window + sample newest
       const windowed = rows
         .filter((r) => String(r?.content_id || "") === contentId)
         .map((r) => ({ ...r, _t: Date.parse(r?.submitted_at || "") }))
@@ -2343,14 +2338,13 @@ export function createIntercomRouter() {
           const s = String(raw).trim();
           if (!s) continue;
 
-          // Only treat as multi-select if we are confident it is
           const isMulti =
             isBenefitsMultiSelectAnswer(a) || looksLikeBenefitMultiSelect(s);
 
           if (!isMulti) continue;
 
           const opts = splitMultiSelect(s);
-          if (opts.length < 2) continue; // must actually be multi-choice
+          if (opts.length < 2) continue;
 
           const agg = ensureAgg(a);
           if (!agg) continue;
@@ -2392,7 +2386,7 @@ export function createIntercomRouter() {
         sample,
         returned: items.length,
         items,
-        questions: items, // alias (handy if frontend uses a different name)
+        questions: items,
       });
     } catch (err) {
       console.error("[intercom] private nps-multi-select error", err);

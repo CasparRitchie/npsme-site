@@ -324,12 +324,15 @@ export default function EnvolaClosingTheLoop() {
   const navAnchorRef = React.useRef(null);
   const [isNavPinned, setIsNavPinned] = React.useState(false);
 
+  const PAGE_SIZE = 50;
+
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
   const [days, setDays] = React.useState(365);
   const [limit, setLimit] = React.useState(500);
 
   const [bucket, setBucket] = React.useState("all");
   const [sortBy, setSortBy] = React.useState("date");
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -468,7 +471,7 @@ export default function EnvolaClosingTheLoop() {
     fetchCases();
   }, [fetchQueue, fetchCases]);
 
-  const queue = React.useMemo(() => {
+    const queue = React.useMemo(() => {
     const raw = Array.isArray(data?.queue) ? data.queue : [];
 
     const filtered =
@@ -494,6 +497,16 @@ export default function EnvolaClosingTheLoop() {
       return br - ar;
     });
   }, [data, bucket, sortBy]);
+
+  const visibleQueue = React.useMemo(() => {
+    return queue.slice(0, visibleCount);
+  }, [queue, visibleCount]);
+
+  const hasMoreQueueItems = visibleQueue.length < queue.length;
+
+    React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [contentId, days, bucket, sortBy]);
 
   const filteredCases = React.useMemo(() => {
     if (caseFilter === "active") {
@@ -815,6 +828,7 @@ export default function EnvolaClosingTheLoop() {
 
     open: tr("envola.closingTheLoop.actions.open", "Open"),
     view: tr("envola.closingTheLoop.actions.view", "View"),
+    loadMore: tr("envola.closingTheLoop.actions.loadMore", "Load more"),
     startLoop: tr("envola.closingTheLoop.actions.startLoop", "Start loop"),
     starting: tr("envola.closingTheLoop.actions.starting", "Starting…"),
     loopActive: tr("envola.closingTheLoop.actions.loopActive", "Loop active"),
@@ -1107,7 +1121,7 @@ export default function EnvolaClosingTheLoop() {
                   </thead>
 
                   <tbody className="divide-y divide-white/10">
-                    {queue.map((it) => {
+                    {visibleQueue.map((it) => {
                       const latest = it.latest || {};
                       const hasResponse = Boolean(it.response_id);
                       const themes =
@@ -1217,9 +1231,24 @@ export default function EnvolaClosingTheLoop() {
               )}
             </div>
 
-            <div className="border-t border-white/10 px-4 py-3 text-xs text-slate-400">
-              {labels.showingItems}{" "}
-              <span className="text-slate-200">{queue.length}</span> {labels.items}
+            <div className="border-t border-white/10 px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                <div>
+                  {labels.showingItems}{" "}
+                  <span className="text-slate-200">{visibleQueue.length}</span> /{" "}
+                  <span className="text-slate-200">{queue.length}</span> {labels.items}
+                </div>
+
+                {hasMoreQueueItems ? (
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/15"
+                  >
+                    {labels.loadMore}
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
         )}

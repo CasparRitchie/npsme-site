@@ -2422,9 +2422,7 @@ export function createIntercomRouter() {
 
   // (Optional) keep your existing export debug routes here if you still use them:
   // /survey-export/start, /survey-export/status/:jobId, /survey-export/parse/:jobId
-
-
-router.get("/survey-export/start", async (req, res) => {
+  router.get("/survey-export/start", async (req, res) => {
     try {
       const hours = Number(req.query.hours || 24);
       const now = Math.floor(Date.now() / 1000);

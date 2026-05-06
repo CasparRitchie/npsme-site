@@ -2138,21 +2138,28 @@ export function createIntercomRouter() {
   router.get("/private/nps-responses", requirePrivateCookie, async (req, res) => {
     try {
       const idsRaw = String(req.query.response_ids || "").trim();
-      if (!idsRaw) return res.status(400).json({ ok: false, error: "response_ids is required" });
+      if (!idsRaw) {
+        return res.status(400).json({ ok: false, error: "response_ids is required" });
+      }
 
       const ids = idsRaw
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean)
-        .slice(0, 300); // guardrail
+        .slice(0, 300);
 
-      const store = await getCachedNpsResponsesStore();
-      const items = ids.map((id) => store.byResponseId?.get(id) || null).filter(Boolean);
+      const rows = await getCanonicalResponses();
+      const byResponseId = new Map(
+        (rows || []).map((r) => [String(r?.response_id || ""), r])
+      );
+      const items = ids.map((id) => byResponseId.get(id) || null).filter(Boolean);
 
       const appId = process.env.ENVOLA_INTERCOM_APP_ID || "";
       const enriched = items.map((r) => {
         const intercom_contact_url =
-          appId && r.contact_id ? `https://app.intercom.com/a/apps/${appId}/users/${r.contact_id}` : null;
+          appId && r.contact_id
+            ? `https://app.intercom.com/a/apps/${appId}/users/${r.contact_id}`
+            : null;
 
         return {
           response_id: r.response_id || null,
@@ -2172,8 +2179,7 @@ export function createIntercomRouter() {
         ok: true,
         requested: ids.length,
         returned: enriched.length,
-        responses: enriched, // ✅ what the frontend expects
-        // items: enriched,  // optional: keep temporarily if anything else uses it
+        responses: enriched,
       });
     } catch (err) {
       console.error("[intercom] private nps-responses(batch) error", err);
@@ -2185,18 +2191,17 @@ export function createIntercomRouter() {
   router.get("/private/nps-by-question", requirePrivateCookie, async (req, res) => {
     try {
       const contentId = String(req.query.content_id || "").trim();
-      if (!contentId) return res.status(400).json({ ok: false, error: "content_id is required" });
+      if (!contentId) {
+        return res.status(400).json({ ok: false, error: "content_id is required" });
+      }
 
       const days = clampInt(req.query.days, 30, 1, 3650);
       const minResponses = clampInt(req.query.min_responses, 3, 1, 9999);
       const limit = clampInt(req.query.limit, 20, 1, 200);
 
-      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-      const rows = parseJsonl(text);
-
+      const rows = await getCanonicalResponses();
       const since = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      // key: question_id (preferred) else question_text
       const byQ = new Map();
 
       function bump(questionId, questionText, bucket) {
@@ -2220,7 +2225,6 @@ export function createIntercomRouter() {
 
         cur.responses += 1;
 
-        // Keep the nicest question text we’ve seen
         if (cur.question === "-" && qText !== "-") cur.question = qText;
 
         byQ.set(key, cur);
@@ -2237,8 +2241,6 @@ export function createIntercomRouter() {
         if (score == null) continue;
 
         const bucket = scoreBucket(score);
-
-        // Count once per response per question_id
         const seen = new Set();
 
         const answers = Array.isArray(r.answers) ? r.answers : [];
@@ -2246,7 +2248,6 @@ export function createIntercomRouter() {
           const qid = a?.question_id;
           const qText = a?.question_text;
 
-          // Need at least some identifier
           const key = qid != null ? `id:${qid}` : `text:${String(qText || "").trim()}`;
           if (!key || key === "text:") continue;
 

@@ -16,7 +16,10 @@ import {
   resumeCase,
 } from "./closingTheLoopSchema.js";
 
-import { rebuildEnvolaResponsesFile } from "./envola.routes.js";
+import {
+  rebuildEnvolaResponsesFile,
+  getCanonicalResponses,
+  } from "./envola.routes.js";
 
 
 // --- Private auth (shared password cookie) ---
@@ -1628,8 +1631,7 @@ export function createIntercomRouter() {
       const limit = clampInt(req.query.limit, 50, 1, 2000);
 
       // Pull from clean store (Dropbox JSONL)
-      const text = await readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null);
-      const rows = parseJsonl(text);
+      const rows = await getCanonicalResponses();
 
       const ctlCases = await readCtlJsonl(CTL_CASES_PATH);
         const latestCtlCaseMap = buildLatestMapFromJsonlRows(ctlCases, "case_id");
@@ -2099,8 +2101,11 @@ export function createIntercomRouter() {
       if (!responseId) return res.status(400).json({ ok: false, error: "response_id is required" });
 
       // Cached read + O(1) lookup (huge win when this route is called 40+ times on one page).
-      const store = await getCachedNpsResponsesStore();
-      const r = store.byResponseId?.get(responseId) || null;
+      const rows = await getCanonicalResponses();
+      const byResponseId = new Map(
+        (rows || []).map((r) => [String(r?.response_id || ""), r])
+      );
+      const r = byResponseId.get(responseId) || null;
       if (!r) return res.status(404).json({ ok: false, error: "Response not found" });
 
       const appId = process.env.ENVOLA_INTERCOM_APP_ID || "";

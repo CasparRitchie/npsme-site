@@ -419,7 +419,7 @@ async function writeDropboxFile(path, contents) {
 // --------------------------------------------------
 // Canonical dataset loader
 // --------------------------------------------------
-async function getCanonicalResponses({ force = false } = {}) {
+export async function getCanonicalResponses({ force = false } = {}) {
   const fresh =
     cache.responses.rows &&
     Date.now() - cache.responses.fetchedAt < cache.responses.ttlMs;

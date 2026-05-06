@@ -16,6 +16,7 @@ import {
   resumeCase,
 } from "./closingTheLoopSchema.js";
 
+import { rebuildEnvolaResponsesFile } from "./envola.routes.js";
 
 
 // --- Private auth (shared password cookie) ---
@@ -987,7 +988,30 @@ export function createIntercomRouter() {
 
       const isCompletion = String(record.stat_type || "").toLowerCase() === "completion";
       if (isCompletion) {
+        console.log("[intercom webhook] completion received", {
+          content_id: record.content_id,
+          receipt_id: record.receipt_id,
+          contact_id: record.contact_id,
+          received_at: record.received_at,
+        });
+
         await appendDropboxJsonl(INTERCOM_SURVEY_EVENTS_PATH, record);
+        console.log("[intercom webhook] appended to survey-events.jsonl", {
+          content_id: record.content_id,
+          receipt_id: record.receipt_id,
+        });
+
+        try {
+          const ingestOut = await ingestSurveyCompletionsToCleanStore();
+          console.log("[intercom webhook] clean store updated", ingestOut);
+
+          const rebuildOut = await rebuildEnvolaResponsesFile({
+            contentId: String(record.content_id || "").trim() || process.env.ENVOLA_CONTENT_ID || "189616",
+          });
+          console.log("[intercom webhook] envola responses rebuilt", rebuildOut);
+        } catch (err) {
+          console.error("[intercom webhook] post-ingest rebuild error", err);
+        }
       }
 
       return res.status(200).json({ ok: true });

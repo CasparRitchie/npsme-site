@@ -765,6 +765,50 @@ async function loadLiveResponses() {
   return parseCsvWithHeader(csv);
 }
 
+export async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_ID } = {}) {
+  const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+  const rawEvents = parseJsonl(rawText);
+
+  const completions = rawEvents.filter(
+    (e) =>
+      String(e?.stat_type || "").toLowerCase() === "completion" &&
+      String(e?.content_id || "") === String(contentId)
+  );
+
+  const normalized = completions
+    .map(normalizeCompletionEvent)
+    .filter(Boolean);
+
+  const byId = new Map();
+  for (const r of normalized) {
+    const existing = byId.get(r.response_id);
+    if (!existing) {
+      byId.set(r.response_id, r);
+      continue;
+    }
+
+    const existingTs = Date.parse(existing.submitted_at || "") || 0;
+    const newTs = Date.parse(r.submitted_at || "") || 0;
+    if (newTs >= existingTs) {
+      byId.set(r.response_id, r);
+    }
+  }
+
+  const canonical = Array.from(byId.values()).sort((a, b) =>
+    String(b.submitted_at || "").localeCompare(String(a.submitted_at || ""))
+  );
+
+  await writeDropboxFile(ENVOLA_RESPONSES_PATH, jsonlStringify(canonical));
+  invalidateResponsesCache();
+
+  return {
+    ok: true,
+    content_id: contentId,
+    rebuilt_rows: canonical.length,
+    path: ENVOLA_RESPONSES_PATH,
+  };
+}
+
 // --------------------------------------------------
 // Router
 // --------------------------------------------------
@@ -783,50 +827,6 @@ export function createEnvolaRouter() {
     }
 
     next();
-  }
-
-  async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_ID } = {}) {
-    const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
-    const rawEvents = parseJsonl(rawText);
-
-    const completions = rawEvents.filter(
-      (e) =>
-        String(e?.stat_type || "").toLowerCase() === "completion" &&
-        String(e?.content_id || "") === String(contentId)
-    );
-
-    const normalized = completions
-      .map(normalizeCompletionEvent)
-      .filter(Boolean);
-
-    const byId = new Map();
-    for (const r of normalized) {
-      const existing = byId.get(r.response_id);
-      if (!existing) {
-        byId.set(r.response_id, r);
-        continue;
-      }
-
-      const existingTs = Date.parse(existing.submitted_at || "") || 0;
-      const newTs = Date.parse(r.submitted_at || "") || 0;
-      if (newTs >= existingTs) {
-        byId.set(r.response_id, r);
-      }
-    }
-
-    const canonical = Array.from(byId.values()).sort((a, b) =>
-      String(b.submitted_at || "").localeCompare(String(a.submitted_at || ""))
-    );
-
-    await writeDropboxFile(ENVOLA_RESPONSES_PATH, jsonlStringify(canonical));
-    invalidateResponsesCache();
-
-    return {
-      ok: true,
-      content_id: contentId,
-      rebuilt_rows: canonical.length,
-      path: ENVOLA_RESPONSES_PATH,
-    };
   }
 
   // Public to ingest-token only

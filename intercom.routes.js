@@ -238,8 +238,6 @@ function intercomContactUrl(contactId) {
   return `https://app.intercom.com/a/apps/${appId}/users/${contactId}`;
 }
 
-
-
 async function getDropboxAccessToken() {
   if (!DROPBOX_REFRESH_TOKEN) return LEGACY_DROPBOX_TOKEN || null;
 

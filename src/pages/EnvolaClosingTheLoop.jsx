@@ -326,10 +326,10 @@ export default function EnvolaClosingTheLoop() {
 
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
   const [days, setDays] = React.useState(365);
-  const [limit, setLimit] = React.useState(50);
+  const [limit, setLimit] = React.useState(500);
 
   const [bucket, setBucket] = React.useState("all");
-  const [sortBy, setSortBy] = React.useState("risk");
+  const [sortBy, setSortBy] = React.useState("date");
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");

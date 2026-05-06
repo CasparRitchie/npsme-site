@@ -1,4 +1,3 @@
-// src/pages/ClosingTheLoop.jsx
 import React from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
@@ -25,7 +24,6 @@ function sortAnswersForSurvey({ contentId, answers }) {
   const order = SURVEY_ORDER_BY_CONTENT_ID[String(contentId)] || [];
   const idx = new Map(order.map((qid, i) => [String(qid), i]));
 
-  // stable sort: keep original order for ties (e.g. multi-select repeats)
   return (Array.isArray(answers) ? answers : [])
     .map((a, originalIndex) => ({ a, originalIndex }))
     .sort((x, y) => {
@@ -36,8 +34,6 @@ function sortAnswersForSurvey({ contentId, answers }) {
       const iy = idx.has(ay) ? idx.get(ay) : 9999;
 
       if (ix !== iy) return ix - iy;
-
-      // fallback: keep Intercom’s original sequence
       return x.originalIndex - y.originalIndex;
     })
     .map((x) => x.a);
@@ -59,12 +55,15 @@ function formatDate(iso) {
 function bucketPill(bucket) {
   const base =
     "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border";
-  if (bucket === "detractor")
+  if (bucket === "detractor") {
     return `${base} border-rose-400/30 bg-rose-500/10 text-rose-200`;
-  if (bucket === "passive")
+  }
+  if (bucket === "passive") {
     return `${base} border-amber-400/30 bg-amber-500/10 text-amber-200`;
-  if (bucket === "promoter")
+  }
+  if (bucket === "promoter") {
     return `${base} border-emerald-400/30 bg-emerald-500/10 text-emerald-200`;
+  }
   return `${base} border-white/10 bg-white/5 text-slate-200`;
 }
 
@@ -119,7 +118,6 @@ function Disclosure({ title, right, children, defaultOpen = false }) {
 }
 
 function AnswerTable({ rows, compact = false }) {
-  // Group answers by (qid + question_text) so multi-select becomes one row with multiple values.
   const grouped = React.useMemo(() => {
     const by = new Map();
 
@@ -148,16 +146,13 @@ function AnswerTable({ rows, compact = false }) {
       .map((g) => ({
         ...g,
         values: Array.from(new Set(g.values)),
-        // store original position from rows array
         _order: rows.findIndex(
           (r) =>
             String(r?.question_id) === String(g.question_id) &&
             (r?.question_text || "") === (g.question_text || "")
         ),
       }))
-      .sort((a, b) => {
-        return a._order - b._order;
-      });
+      .sort((a, b) => a._order - b._order);
   }, [rows]);
 
   return (
@@ -211,8 +206,6 @@ function AnswerTable({ rows, compact = false }) {
   );
 }
 
-// Heuristic: guess which answer rows are “follow-ups”
-// (keeps your modal readable without hardcoding qids)
 function inferRelevantQuestionIds(detail) {
   const answers = Array.isArray(detail?.answers) ? detail.answers : [];
   if (!answers.length) return [];
@@ -225,19 +218,21 @@ function inferRelevantQuestionIds(detail) {
   };
   const isText = (v) => typeof v === "string" && v.trim().length >= 2;
 
-  // Find the “main” scored question (first 0–10 score in answers)
   const firstScoredIdx = answers.findIndex((a) => toNum0to10(a?.response) != null);
   if (firstScoredIdx < 0) return [];
 
-  const scoredQid = answers[firstScoredIdx]?.question_id != null ? String(answers[firstScoredIdx].question_id) : null;
+  const scoredQid =
+    answers[firstScoredIdx]?.question_id != null
+      ? String(answers[firstScoredIdx].question_id)
+      : null;
 
-  // Include the next 1–2 free-text answers as follow-ups (often “Pourquoi ?”, etc.)
   const followQids = [];
   for (let i = firstScoredIdx + 1; i < answers.length; i++) {
     const raw = answers[i]?.response;
     if (!isText(raw)) continue;
     if (toNum0to10(raw) != null) continue;
-    const qid = answers[i]?.question_id != null ? String(answers[i].question_id) : null;
+    const qid =
+      answers[i]?.question_id != null ? String(answers[i].question_id) : null;
     if (qid && !followQids.includes(qid)) followQids.push(qid);
     if (followQids.length >= 2) break;
   }
@@ -255,33 +250,33 @@ function groupVerbatims(verbatims) {
     cur.push(t);
     out.set(q, cur);
   }
-  return Array.from(out.entries()); // [ [question, [texts...]], ...]
+  return Array.from(out.entries());
 }
 
 export default function ClosingTheLoop() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
 
+  const PAGE_SIZE = 50;
+
   const [contentId, setContentId] = React.useState(DEFAULT_CONTENT_ID);
   const [days, setDays] = React.useState(30);
-  const [limit, setLimit] = React.useState(50);
-
-  const [bucket, setBucket] = React.useState("all"); // all|detractor|passive|promoter
-  const [sortBy, setSortBy] = React.useState("risk"); // risk|date|score
+  const [limit, setLimit] = React.useState(500);
+  const [bucket, setBucket] = React.useState("all");
+  const [sortBy, setSortBy] = React.useState("date");
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [data, setData] = React.useState(null);
 
-  // Modal state
-  const [openId, setOpenId] = React.useState(null); // response_id
+  const [openId, setOpenId] = React.useState(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [detailError, setDetailError] = React.useState("");
   const [detail, setDetail] = React.useState(null);
-  // Raw answers view (modal)
-  const [rawView, setRawView] = React.useState("all"); // relevant | all
-  const [rawShowJson, setRawShowJson] = React.useState(false);
 
+  const [rawView, setRawView] = React.useState("all");
+  const [rawShowJson, setRawShowJson] = React.useState(false);
 
   const closeModal = React.useCallback(() => {
     setOpenId(null);
@@ -302,35 +297,27 @@ export default function ClosingTheLoop() {
       });
 
       const url = `/api/intercom/private/closing-the-loop?${qs.toString()}`;
-
       const r = await fetch(url, { credentials: "include" });
 
-      // If the server returns 304, fetch will usually give you the cached body,
-      // but some setups/proxies can behave oddly. We'll still handle it safely.
       const contentType = (r.headers.get("content-type") || "").toLowerCase();
-
-      // Read body ONCE (then parse from the text)
       const rawText = await r.text().catch(() => "");
+      const looksLikeJson =
+        rawText.trim().startsWith("{") || rawText.trim().startsWith("[");
 
-      // If it isn't JSON, give a helpful error (often login HTML)
-      const looksLikeJson = rawText.trim().startsWith("{") || rawText.trim().startsWith("[");
       if (!contentType.includes("application/json") && !looksLikeJson) {
         const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
         throw new Error(
-          `Expected JSON from ${url} but got "${contentType || "unknown content-type"}" (status ${r.status}). ` +
-          `First chars: ${preview || "«empty body»"}`
+          `Expected JSON from ${url} but got "${contentType || "unknown content-type"}" (status ${r.status}). First chars: ${preview || "«empty body»"}`
         );
       }
 
-      // Now parse JSON safely
       let j = null;
       try {
         j = rawText ? JSON.parse(rawText) : null;
-      } catch (parseErr) {
+      } catch {
         const preview = rawText.slice(0, 220).replace(/\s+/g, " ").trim();
         throw new Error(
-          `JSON parse failed (status ${r.status}, content-type "${contentType || "unknown"}"). ` +
-          `First chars: ${preview || "«empty body»"}`
+          `JSON parse failed (status ${r.status}, content-type "${contentType || "unknown"}"). First chars: ${preview || "«empty body»"}`
         );
       }
 
@@ -352,6 +339,10 @@ export default function ClosingTheLoop() {
     fetchQueue();
   }, [fetchQueue]);
 
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [contentId, days, bucket, sortBy]);
+
   const queue = React.useMemo(() => {
     const raw = Array.isArray(data?.queue) ? data.queue : [];
 
@@ -360,28 +351,36 @@ export default function ClosingTheLoop() {
         ? raw
         : raw.filter((x) => String(x?.latest?.bucket || "") === bucket);
 
-    const sorted = [...filtered].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       if (sortBy === "date") {
         const at = Date.parse(a?.latest?.submitted_at || "");
         const bt = Date.parse(b?.latest?.submitted_at || "");
         return (Number.isFinite(bt) ? bt : 0) - (Number.isFinite(at) ? at : 0);
       }
+
       if (sortBy === "score") {
-        const as = typeof a?.latest?.score_0_10 === "number" ? a.latest.score_0_10 : -1;
-        const bs = typeof b?.latest?.score_0_10 === "number" ? b.latest.score_0_10 : -1;
-        return bs - as; // higher first
+        const as =
+          typeof a?.latest?.score_0_10 === "number" ? a.latest.score_0_10 : -1;
+        const bs =
+          typeof b?.latest?.score_0_10 === "number" ? b.latest.score_0_10 : -1;
+        return bs - as;
       }
-      // risk (default)
+
       const ar = typeof a?.risk_score === "number" ? a.risk_score : -1;
       const br = typeof b?.risk_score === "number" ? b.risk_score : -1;
       return br - ar;
     });
-
-    return sorted;
   }, [data, bucket, sortBy]);
+
+  const visibleQueue = React.useMemo(() => {
+    return queue.slice(0, visibleCount);
+  }, [queue, visibleCount]);
+
+  const hasMoreQueueItems = visibleQueue.length < queue.length;
 
   const openResponse = React.useCallback(async (responseId) => {
     if (!responseId) return;
+
     setOpenId(responseId);
     setRawView("all");
     setRawShowJson(false);
@@ -410,7 +409,6 @@ export default function ClosingTheLoop() {
     }
   }, []);
 
-  // Escape closes modal
   React.useEffect(() => {
     if (!openId) return;
     const onKey = (e) => {
@@ -448,7 +446,6 @@ export default function ClosingTheLoop() {
       "closingTheLoop.state.notAuthHint",
       'If you see “Not authorised”, log in again at /private/login.'
     ),
-
     thRisk: tr("closingTheLoop.table.risk", "Risk"),
     thLatest: tr("closingTheLoop.table.latest", "Latest"),
     thScore: tr("closingTheLoop.table.score", "Score"),
@@ -459,8 +456,8 @@ export default function ClosingTheLoop() {
     thIntercom: tr("closingTheLoop.table.intercom", "Intercom"),
     open: tr("closingTheLoop.actions.open", "Open"),
     view: tr("closingTheLoop.actions.view", "View"),
+    loadMore: tr("closingTheLoop.actions.loadMore", "Load more"),
     dash: tr("common.dash", "—"),
-
     modalTitle: tr("closingTheLoop.modal.title", "Survey response"),
     modalClose: tr("closingTheLoop.modal.close", "Close"),
     modalLoading: tr("closingTheLoop.modal.loading", "Loading response…"),
@@ -495,7 +492,6 @@ export default function ClosingTheLoop() {
         </button>
       </div>
 
-      {/* Controls */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-3">
         <div className="md:col-span-4">
           <label className="text-xs text-slate-400">{labels.contentId}</label>
@@ -526,7 +522,7 @@ export default function ClosingTheLoop() {
             min={1}
             max={2000}
             value={limit}
-            onChange={(e) => setLimit(Number(e.target.value || 50))}
+            onChange={(e) => setLimit(Number(e.target.value || 500))}
             className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/20"
           />
         </div>
@@ -559,7 +555,6 @@ export default function ClosingTheLoop() {
         </div>
       </div>
 
-      {/* Status */}
       {error && (
         <div className="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100">
           <div className="font-medium">{labels.errorTitle}</div>
@@ -583,7 +578,6 @@ export default function ClosingTheLoop() {
         </div>
       )}
 
-      {/* Table */}
       {!error && !loading && queue.length > 0 && (
         <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#0B0F19]/40">
           <div className="overflow-x-auto">
@@ -602,16 +596,19 @@ export default function ClosingTheLoop() {
               </thead>
 
               <tbody className="divide-y divide-white/10">
-                {queue.map((it) => {
+                {visibleQueue.map((it) => {
                   const latest = it.latest || {};
                   const hasResponse = Boolean(it.response_id);
                   const themes =
-                    Array.isArray(it.themes) && it.themes.length ? it.themes.join(", ") : labels.dash;
+                    Array.isArray(it.themes) && it.themes.length
+                      ? it.themes.join(", ")
+                      : labels.dash;
 
                   const score =
                     typeof latest.score_0_10 === "number" ? latest.score_0_10 : null;
 
-                  const bucketKey = latest.bucket || (score != null ? scoreBucket(score) : null);
+                  const bucketKey =
+                    latest.bucket || (score != null ? scoreBucket(score) : null);
 
                   return (
                     <tr key={it.contact_id} className="hover:bg-white/5">
@@ -631,7 +628,9 @@ export default function ClosingTheLoop() {
                       </td>
 
                       <td className="px-4 py-3">
-                        <span className={bucketPill(bucketKey)}>{bucketKey || labels.dash}</span>
+                        <span className={bucketPill(bucketKey)}>
+                          {bucketKey || labels.dash}
+                        </span>
                       </td>
 
                       <td className="px-4 py-3 text-slate-200">{themes}</td>
@@ -679,16 +678,29 @@ export default function ClosingTheLoop() {
 
           <div className="px-4 py-3 text-xs text-slate-400 border-t border-white/10">
             {tr("closingTheLoop.footer.showing", "Showing")}{" "}
+            <span className="text-slate-200">{visibleQueue.length}</span> /{" "}
             <span className="text-slate-200">{queue.length}</span>{" "}
             {tr("closingTheLoop.footer.items", "items")} ({labels.contentId}{" "}
             <span className="text-slate-200">{data?.content_id}</span>,{" "}
             <span className="text-slate-200">{data?.days}</span>{" "}
             {tr("closingTheLoop.footer.days", "days")})
           </div>
+
+          {hasMoreQueueItems && (
+            <div className="px-4 pb-4">
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium
+                           bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+              >
+                {labels.loadMore}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Modal */}
       {openId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -702,8 +714,9 @@ export default function ClosingTheLoop() {
             aria-label={labels.modalClose}
           />
 
-            <div className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
-              <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">              <div className="font-semibold text-white">{labels.modalTitle}</div>
+          <div className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+              <div className="font-semibold text-white">{labels.modalTitle}</div>
               <button
                 type="button"
                 onClick={closeModal}
@@ -729,13 +742,14 @@ export default function ClosingTheLoop() {
 
               {!detailLoading && !detailError && detail && (
                 <div className="space-y-6">
-                  {/* Top summary */}
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-xs text-slate-400">{labels.modalScore}</div>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="text-2xl font-semibold text-white">
-                          {typeof detail.score_0_10 === "number" ? detail.score_0_10 : "—"}
+                          {typeof detail.score_0_10 === "number"
+                            ? detail.score_0_10
+                            : "—"}
                         </div>
                         <span className={bucketPill(detail.bucket)}>
                           {detail.bucket || scoreBucket(detail.score_0_10)}
@@ -756,7 +770,6 @@ export default function ClosingTheLoop() {
                     </div>
                   </div>
 
-                  {/* Intercom link (if present) */}
                   {detail.intercom_contact_url && (
                     <div>
                       <a
@@ -771,11 +784,11 @@ export default function ClosingTheLoop() {
                     </div>
                   )}
 
-                  {/* Selected options */}
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
                     <div className="text-white font-semibold">{labels.modalOptions}</div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {Array.isArray(detail.selected_options) && detail.selected_options.length ? (
+                      {Array.isArray(detail.selected_options) &&
+                      detail.selected_options.length ? (
                         detail.selected_options.map((o) => (
                           <span key={o} className={chipClass()}>
                             {o}
@@ -787,7 +800,6 @@ export default function ClosingTheLoop() {
                     </div>
                   </div>
 
-                  {/* Verbatims */}
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
                     <div className="text-white font-semibold">{labels.modalVerbatims}</div>
 
@@ -795,11 +807,16 @@ export default function ClosingTheLoop() {
                       {(() => {
                         const groups = groupVerbatims(detail.verbatims);
                         if (!groups.length) {
-                          return <div className="text-slate-400 text-sm">{labels.dash}</div>;
+                          return (
+                            <div className="text-slate-400 text-sm">{labels.dash}</div>
+                          );
                         }
 
                         return groups.map(([q, texts]) => (
-                          <div key={q} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                          <div
+                            key={q}
+                            className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                          >
                             <div className="text-xs text-slate-400">{q}</div>
                             <ul className="mt-2 space-y-2 text-sm text-slate-200">
                               {texts.map((t, idx) => (
@@ -814,9 +831,10 @@ export default function ClosingTheLoop() {
                     </div>
                   </div>
 
-                  {/* Raw answers (readable) */}
                   {(() => {
-                    const allAnswers = Array.isArray(detail?.answers) ? detail.answers : [];
+                    const allAnswers = Array.isArray(detail?.answers)
+                      ? detail.answers
+                      : [];
                     const relevantQids = inferRelevantQuestionIds(detail);
 
                     const relevantAnswers = allAnswers.filter((a) => {
@@ -824,7 +842,9 @@ export default function ClosingTheLoop() {
                       return relevantQids.includes(qid);
                     });
 
-                    const answersToShow = rawView === "all" ? allAnswers : relevantAnswers;
+                    const answersToShow =
+                      rawView === "all" ? allAnswers : relevantAnswers;
+
                     const sortedAnswers = sortAnswersForSurvey({
                       contentId: detail?.content_id || DEFAULT_CONTENT_ID,
                       answers: answersToShow,
@@ -867,7 +887,11 @@ export default function ClosingTheLoop() {
                             {relevantQids.length ? (
                               <div className="ml-2 flex flex-wrap gap-2">
                                 {relevantQids.map((qid) => (
-                                  <Chip key={qid} tone="indigo" title="Inferred relevant question id">
+                                  <Chip
+                                    key={qid}
+                                    tone="indigo"
+                                    title="Inferred relevant question id"
+                                  >
                                     QID {qid}
                                   </Chip>
                                 ))}
@@ -890,7 +914,9 @@ export default function ClosingTheLoop() {
                           {sortedAnswers.length ? (
                             <AnswerTable rows={sortedAnswers} compact={false} />
                           ) : (
-                            <div className="text-sm text-slate-300">No answers found.</div>
+                            <div className="text-sm text-slate-300">
+                              No answers found.
+                            </div>
                           )}
                         </div>
 

@@ -1621,6 +1621,42 @@ export function createEnvolaRouter() {
     }
   });
 
+  router.get("/debug-find", async (req, res) => {
+    try {
+      const q = String(req.query.q || "").trim().toLowerCase();
+      const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+      const rawEvents = parseJsonl(rawText);
+
+      const matches = rawEvents.filter((e) => {
+        const hay =
+          [
+            e?.name,
+            e?.email,
+            e?.external_id,
+            e?.contact_id,
+            e?.receipt_id,
+            e?.content_id,
+            e?.content_title,
+            e?.answers_json,
+          ]
+            .map((x) => String(x || "").toLowerCase())
+            .join(" ");
+
+        return hay.includes(q);
+      });
+
+      return res.json({
+        ok: true,
+        q,
+        count: matches.length,
+        matches: matches.slice(0, 50),
+      });
+    } catch (err) {
+      console.error("[envola] debug-find error", err);
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
   router.post("/refresh", async (_req, res) => {
     try {
       invalidateResponsesCache();

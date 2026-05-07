@@ -81,6 +81,8 @@ export default function CsvNpsResponses() {
         </p>
       </section>
 
+      <CsvNpsWorkspaceNav />
+
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>

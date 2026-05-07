@@ -104,6 +104,8 @@ export default function CsvNpsPerformance() {
           <p>No CSV dataset has been analysed yet.</p>
         </section>
 
+        <CsvNpsWorkspaceNav />
+
         <section className="csv-nps-panel">
           <p>
             Go to{" "}

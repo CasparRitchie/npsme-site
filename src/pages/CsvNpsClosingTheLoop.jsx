@@ -1,5 +1,6 @@
 // src/pages/CsvNpsClosingTheLoop.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
 
@@ -140,13 +141,9 @@ export default function CsvNpsClosingTheLoop() {
           Track follow-up actions for customer feedback imported from your
           latest CSV dataset.
         </p>
-        <nav className="csv-nps-workspace-nav" aria-label="CSV NPS workspace navigation">
-          <a href="/csv-nps/upload">Upload</a>
-          <a href="/csv-nps/performance">Performance</a>
-          <a href="/csv-nps/responses">Responses</a>
-          <a href="/csv-nps/closing-the-loop">Closing the loop</a>
-        </nav>
       </section>
+
+      <CsvNpsWorkspaceNav />
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">

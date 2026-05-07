@@ -1,5 +1,6 @@
 // src/pages/CsvNpsResponses.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 
 export default function CsvNpsResponses() {
   const [dataset, setDataset] = useState(null);
@@ -52,13 +53,9 @@ export default function CsvNpsResponses() {
           <p className="eyebrow">CSV NPS workspace</p>
           <h1>CSV NPS Responses</h1>
           <p>No CSV dataset has been analysed yet.</p>
-          <nav className="csv-nps-workspace-nav" aria-label="CSV NPS workspace navigation">
-            <a href="/csv-nps/upload">Upload</a>
-            <a href="/csv-nps/performance">Performance</a>
-            <a href="/csv-nps/responses">Responses</a>
-            <a href="/csv-nps/closing-the-loop">Closing the loop</a>
-          </nav>
         </section>
+
+        <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
           <p>

@@ -15,7 +15,259 @@ import express from "express";
  */
 export function createCsvNpsRouter() {
   const router = express.Router();
+  function looksLikeJsonInput(text) {
+  const value = String(text || "").trim();
+  return value.startsWith("{") || value.startsWith("[");
+}
 
+function safeParseJsonInput(text) {
+  try {
+    return JSON.parse(String(text || "").trim());
+  } catch (_err) {
+    return null;
+  }
+}
+
+function getJsonRows(payload) {
+  if (Array.isArray(payload)) return payload;
+
+  if (payload && Array.isArray(payload.rows)) return payload.rows;
+
+  if (payload && payload.data && Array.isArray(payload.data.rows)) {
+    return payload.data.rows;
+  }
+
+  if (payload && Array.isArray(payload.responses)) return payload.responses;
+
+  return null;
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    const str = String(value).trim();
+    if (str !== "" && str.toLowerCase() !== "null") return value;
+  }
+  return "";
+}
+
+function toNpsScore(value) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const score = Number(value);
+
+  if (!Number.isFinite(score)) return null;
+  if (score < 0 || score > 10) return null;
+
+  return score;
+}
+
+function bucketFromScore(score) {
+  if (!Number.isFinite(score)) return "unknown";
+  if (score >= 9) return "promoter";
+  if (score >= 7) return "passive";
+  return "detractor";
+}
+
+function normaliseDate(value) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toISOString();
+}
+
+function normaliseSelectedOptions(value) {
+  if (Array.isArray(value)) return value.filter(Boolean);
+
+  if (typeof value === "string" && value.trim()) {
+    return value
+      .split(/[;,|]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function buildBestComment(row) {
+  const parts = [];
+
+  const recommendComment = firstNonEmpty(
+    row.q_recommend_comment,
+    row.recommend_comment,
+    row.comment,
+    row.feedback,
+    row.response_comment
+  );
+
+  const installComment = firstNonEmpty(row.q_install_comment);
+  const parentRelationComment = firstNonEmpty(row.q_parent_relation_comment);
+  const finalComment = firstNonEmpty(row.q_final_comment);
+
+  if (recommendComment) parts.push(String(recommendComment).trim());
+  if (installComment) parts.push(`Installation: ${String(installComment).trim()}`);
+  if (parentRelationComment) {
+    parts.push(`Parent relationship: ${String(parentRelationComment).trim()}`);
+  }
+  if (finalComment) parts.push(`Final comment: ${String(finalComment).trim()}`);
+
+  return parts.join("\n\n");
+}
+
+function normaliseJsonRows(payload) {
+  const sourceRows = getJsonRows(payload);
+
+  if (!sourceRows) {
+    return {
+      ok: false,
+      error:
+        "JSON was detected, but no rows array was found. Expected { rows: [...] } or an array of response objects.",
+    };
+  }
+
+  const rows = [];
+  const skippedRows = [];
+  const warnings = [];
+
+  sourceRows.forEach((row, index) => {
+    const score = toNpsScore(
+      firstNonEmpty(
+        row.nps_score,
+        row.score,
+        row.q_recommend_score,
+        row.recommend_score,
+        row.rating
+      )
+    );
+
+    if (score === null) {
+      skippedRows.push({
+        row_number: index + 1,
+        reason: "Invalid or missing NPS score",
+        rawScore: firstNonEmpty(
+          row.nps_score,
+          row.score,
+          row.q_recommend_score,
+          row.recommend_score,
+          row.rating
+        ),
+        raw: row,
+      });
+      return;
+    }
+
+    const submittedAt = normaliseDate(
+      firstNonEmpty(
+        row.submitted_at,
+        row.createdAt,
+        row.created_at,
+        row.date,
+        row.timestamp
+      )
+    );
+
+    const selectedOptions = normaliseSelectedOptions(row.selected_options);
+
+    rows.push({
+      response_id:
+        firstNonEmpty(row.response_id, row.id, row.responseId) ||
+        `JSON-${String(index + 1).padStart(5, "0")}`,
+
+      source: "json",
+
+      row_number: index + 1,
+
+      submitted_at: submittedAt,
+
+      score,
+
+      bucket: bucketFromScore(score),
+
+      customer_name: firstNonEmpty(
+        row.contact_name,
+        row.customer_name,
+        row.customerName,
+        row.name,
+        row.contact
+      ),
+
+      customer_email: firstNonEmpty(
+        row.contact_email,
+        row.customer_email,
+        row.customerEmail,
+        row.email
+      ),
+
+      company: firstNonEmpty(row.company, row.company_name, row.businessName),
+
+      stage: firstNonEmpty(row.stage, row.survey_stage, row.milestone),
+
+      comment: buildBestComment(row),
+
+      contact_id: firstNonEmpty(row.contact_id, row.customer_id),
+
+      intercom_contact_url: firstNonEmpty(row.intercom_contact_url),
+
+      selected_options: selectedOptions,
+
+      extra_scores: {
+        recommend: toNpsScore(row.q_recommend_score),
+        install: toNpsScore(row.q_install_score),
+        daily_use: toNpsScore(row.q_daily_use_score),
+        parent_relation: toNpsScore(row.q_parent_relation_score),
+        support: toNpsScore(row.q_support_score),
+      },
+
+      raw: row,
+    });
+  });
+
+  if (skippedRows.length > 0) {
+    warnings.push({
+      type: "skipped_rows",
+      message: `${skippedRows.length} row(s) were skipped because they did not contain a valid NPS score from 0 to 10.`,
+    });
+  }
+
+  const hasDates = rows.some((row) => row.submitted_at);
+
+  if (!hasDates) {
+    warnings.push({
+      type: "missing_date_column",
+      message:
+        "No usable submitted date was detected. The data can still be analysed, but timeline charts will not work.",
+    });
+  }
+
+  const summary = buildNpsSummary(rows);
+
+  return {
+    ok: true,
+    inputType: "json",
+    content_id: payload?.content_id || null,
+    days: payload?.days || null,
+    columns: rows.length ? Object.keys(rows[0].raw || {}) : [],
+    rawRowCount: sourceRows.length,
+    validRowCount: rows.length,
+    skippedRowCount: skippedRows.length,
+    detectedFields: {
+      score: "nps_score / q_recommend_score / score",
+      submittedAt: "submitted_at / createdAt / date",
+      customerName: "contact_name / customer_name / name",
+      email: "contact_email / customer_email / email",
+      comment:
+        "q_recommend_comment + q_install_comment + q_parent_relation_comment + q_final_comment",
+      company: "company / company_name / businessName",
+      stage: "stage / survey_stage / milestone",
+    },
+    warnings,
+    summary,
+    rows,
+    skippedRows,
+  };
+}
 
   router.get("/ping", (_req, res) => {
 
@@ -33,16 +285,48 @@ export function createCsvNpsRouter() {
    */
   router.post("/parse", (req, res) => {
     try {
-      const csvText = String(req.body?.csvText || "").trim();
+      const inputText = String(req.body?.csvText || req.body?.text || req.body?.data || "").trim();
 
-      if (!csvText) {
+      if (!inputText) {
         return res.status(400).json({
           ok: false,
           error: "csvText is required",
         });
       }
 
-      const parsed = parseCsvWithHeader(csvText);
+      // --------------------------------------------------
+      // JSON input support
+      // Accepts:
+      // - { rows: [...] }
+      // - { data: { rows: [...] } }
+      // - { responses: [...] }
+      // - [ ... ]
+      // --------------------------------------------------
+      if (looksLikeJsonInput(inputText)) {
+        const payload = safeParseJsonInput(inputText);
+
+        if (!payload) {
+          return res.status(400).json({
+            ok: false,
+            error:
+              "The pasted data looks like JSON, but it could not be parsed. Please check it is valid JSON.",
+          });
+        }
+
+        const jsonResult = normaliseJsonRows(payload);
+
+        if (!jsonResult.ok) {
+          return res.status(400).json(jsonResult);
+        }
+
+        return res.json(jsonResult);
+      }
+
+      // --------------------------------------------------
+      // CSV input support
+      // Existing behaviour preserved
+      // --------------------------------------------------
+      const parsed = parseCsvWithHeader(inputText);
       const detectedFields = detectNpsFields(parsed.columns);
       const normalised = normaliseNpsRows(parsed.rows, detectedFields);
 
@@ -50,6 +334,7 @@ export function createCsvNpsRouter() {
 
       return res.json({
         ok: true,
+        inputType: "csv",
         delimiter: parsed.delimiter,
         columns: parsed.columns,
         rawRowCount: parsed.rows.length,
@@ -69,7 +354,7 @@ export function createCsvNpsRouter() {
       console.error("[csv-nps] Error in POST /parse", err);
       return res.status(500).json({
         ok: false,
-        error: "Failed to parse CSV",
+        error: "Failed to parse pasted data",
       });
     }
   });

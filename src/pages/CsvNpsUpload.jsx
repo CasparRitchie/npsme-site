@@ -47,8 +47,8 @@ export default function CsvNpsUpload() {
         <p className="eyebrow">CSV NPS workspace</p>
         <h1>CSV NPS Upload</h1>
         <p>
-          Paste survey response data below. NPS Me will detect the score, date,
-          customer, email and comment columns where possible.
+          Paste survey response data below. NPS Me can analyse CSV data or JSON response exports,
+          then normalise the score, date, customer, email and comment fields where possible.
         </p>
       </section>
 
@@ -56,7 +56,7 @@ export default function CsvNpsUpload() {
 
       <section className="csv-nps-panel">
         <label className="csv-nps-label" htmlFor="csv-nps-textarea">
-          Paste CSV data
+          Paste CSV or JSON data
         </label>
 
         <textarea
@@ -74,7 +74,7 @@ export default function CsvNpsUpload() {
             onClick={handleParseCsv}
             disabled={loading || !csvText.trim()}
           >
-            {loading ? "Analysing..." : "Analyse CSV"}
+            {loading ? "Analysing..." : "Analyse data"}
           </button>
         </div>
       </section>

@@ -59,8 +59,10 @@ export default function NavBar() {
 
   React.useEffect(() => {
     if (!open) return;
+
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     return () => {
       document.body.style.overflow = prev;
     };
@@ -75,143 +77,113 @@ export default function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-black/10 border-b border-white/10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        {/* Brand */}
-        <Link to={localizePath("/", lang)} className="flex items-center gap-3 shrink-0">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
-          <span className="text-lg tracking-tight font-semibold">
-            NPS <span className="text-[#7C3AED]">Me</span>
-          </span>
-        </Link>
-
-        {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-5 text-sm text-slate-300 min-w-0">
-          <NavItem to={localizePath("/products", lang)}>
-            {translations(lang, "routes.products", "Products")}
-          </NavItem>
-
-          <DesktopDropdown
-            label={translations(lang, "navbar.group.method", "Method")}
-            items={[
-              {
-                to: localizePath("/why-nps-me", lang),
-                label: translations(lang, "routes.whyNpsMe", "Why NPS Me"),
-              },
-              {
-                to: localizePath("/what-is-nps", lang),
-                label: translations(lang, "routes.whatIsNps", "What is NPS"),
-              },
-              {
-                to: localizePath("/milestone-nps", lang),
-                label: translations(lang, "routes.milestoneNps", "Milestone NPS"),
-              },
-              {
-                to: localizePath("/nps-survey-programme", lang),
-                label: translations(lang, "routes.npsSurveyProgramme", "NPS Survey Programme"),
-              },
-              {
-                to: localizePath("/nps-intelligence-layer", lang),
-                label: translations(lang, "routes.npsIntelligenceLayer", "NPS Intelligence Layer"),
-              },
-            ]}
-          />
-
-          <DesktopDropdown
-            label={translations(lang, "navbar.group.integrations", "Integrations")}
-            items={[
-              {
-                to: localizePath("/intercom-nps-analytics", lang),
-                label: translations(lang, "routes.intercomNpsAnalytics", "Intercom NPS Analytics"),
-              },
-              {
-                to: localizePath("/social-listening", lang),
-                label: translations(lang, "routes.socialListening", "Social Listening"),
-              },
-              {
-                to: localizePath("/data-automation", lang),
-                label: translations(lang, "routes.dataAutomation", "Data automation"),
-              },
-            ]}
-          />
-
-          <NavItem to={localizePath("/blog", lang)}>
-            {translations(lang, "routes.blog", "Blog")}
-          </NavItem>
-
-          {/* Admin + Logout (only when authed) */}
-          {isAuthed === true && (
-            <>
-              <NavItem to={localizePath("/private/closing-the-loop", lang)}>
-                {translations(lang, "navbar.admin", "Admin")}
-              </NavItem>
-
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="shrink-0 inline-flex items-center gap-2 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
-              >
-                {translations(lang, "navbar.logout", "Log out")}
-              </button>
-            </>
-          )}
-
-          <button
-            type="button"
-            onClick={toggleLang}
-            className="shrink-0 inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
-          >
-            <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
-              {translations(lang, "navbar.languageEn", "EN")}
-            </span>
-            <span className="mx-1 text-slate-500">/</span>
-            <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
-              {translations(lang, "navbar.languageFr", "FR")}
-            </span>
-          </button>
-
+    <>
+      <header className="fixed top-0 left-0 right-0 z-[1000] isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-[#0B0F19]/90 border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+          {/* Brand */}
           <Link
-            to={localizePath("/book")}
-            className="shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium
-                      bg-[#7C3AED] hover:bg-[#6D28D9] text-white
-                      transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0F19]"
+            to={localizePath("/", lang)}
+            className="flex items-center gap-3 shrink-0"
           >
-            {translations(lang, "navbar.bookDiscovery", "Book discovery")}
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
+            <span className="text-lg tracking-tight font-semibold">
+              NPS <span className="text-[#7C3AED]">Me</span>
+            </span>
           </Link>
-        </nav>
 
-        {/* Mobile burger */}
-        <button
-          className="md:hidden inline-flex items-center justify-center p-2 rounded-lg hover:bg-white/10 shrink-0"
-          aria-label="Toggle menu"
-          aria-expanded={open ? "true" : "false"}
-          onClick={() => setOpen((s) => !s)}
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-      </div>
+          {/* Desktop */}
+          <nav className="hidden md:flex items-center gap-5 text-sm text-slate-300 min-w-0">
+            <NavItem to={localizePath("/products", lang)}>
+              {translations(lang, "routes.products", "Products")}
+            </NavItem>
 
-      {/* Mobile panel */}
-      {open && (
-        <div className="md:hidden border-t border-white/10 bg-[#0B0F19]/95 backdrop-blur">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
-            {headerLinks.map(({ path, label, labelKey }) => (
-              <NavItem key={path} to={localizePath(path, lang)} mobile>
-                {translations(lang, labelKey, label)}
-              </NavItem>
-            ))}
+            <DesktopDropdown
+              label={translations(lang, "navbar.group.method", "Method")}
+              items={[
+                {
+                  to: localizePath("/why-nps-me", lang),
+                  label: translations(lang, "routes.whyNpsMe", "Why NPS Me"),
+                },
+                {
+                  to: localizePath("/what-is-nps", lang),
+                  label: translations(lang, "routes.whatIsNps", "What is NPS"),
+                },
+                {
+                  to: localizePath("/milestone-nps", lang),
+                  label: translations(
+                    lang,
+                    "routes.milestoneNps",
+                    "Milestone NPS"
+                  ),
+                },
+                {
+                  to: localizePath("/nps-survey-programme", lang),
+                  label: translations(
+                    lang,
+                    "routes.npsSurveyProgramme",
+                    "NPS Survey Programme"
+                  ),
+                },
+                {
+                  to: localizePath("/nps-intelligence-layer", lang),
+                  label: translations(
+                    lang,
+                    "routes.npsIntelligenceLayer",
+                    "NPS Intelligence Layer"
+                  ),
+                },
+              ]}
+            />
 
-            {/* Admin + Logout (mobile) */}
+            <DesktopDropdown
+              label={translations(
+                lang,
+                "navbar.group.integrations",
+                "Integrations"
+              )}
+              items={[
+                {
+                  to: localizePath("/intercom-nps-analytics", lang),
+                  label: translations(
+                    lang,
+                    "routes.intercomNpsAnalytics",
+                    "Intercom NPS Analytics"
+                  ),
+                },
+                {
+                  to: localizePath("/social-listening", lang),
+                  label: translations(
+                    lang,
+                    "routes.socialListening",
+                    "Social Listening"
+                  ),
+                },
+                {
+                  to: localizePath("/data-automation", lang),
+                  label: translations(
+                    lang,
+                    "routes.dataAutomation",
+                    "Data automation"
+                  ),
+                },
+              ]}
+            />
+
+            <NavItem to={localizePath("/blog", lang)}>
+              {translations(lang, "routes.blog", "Blog")}
+            </NavItem>
+
+            {/* Admin + Logout (only when authed) */}
             {isAuthed === true && (
               <>
-                <NavItem to={localizePath("/private/closing-the-loop", lang)} mobile>
+                <NavItem to={localizePath("/private/closing-the-loop", lang)}>
                   {translations(lang, "navbar.admin", "Admin")}
                 </NavItem>
 
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="mt-1 inline-flex items-center justify-center rounded-2xl border border-white/15 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 transition self-start"
+                  className="shrink-0 inline-flex items-center gap-2 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
                 >
                   {translations(lang, "navbar.logout", "Log out")}
                 </button>
@@ -221,7 +193,7 @@ export default function NavBar() {
             <button
               type="button"
               onClick={toggleLang}
-              className="mt-1 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
+              className="shrink-0 inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
             >
               <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
                 {translations(lang, "navbar.languageEn", "EN")}
@@ -233,17 +205,90 @@ export default function NavBar() {
             </button>
 
             <Link
-              to={localizePath("/book")}
-              className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium
+              to={localizePath("/book", lang)}
+              className="shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium
                         bg-[#7C3AED] hover:bg-[#6D28D9] text-white
                         transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0F19]"
             >
               {translations(lang, "navbar.bookDiscovery", "Book discovery")}
             </Link>
-          </div>
+          </nav>
+
+          {/* Mobile burger */}
+          <button
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-lg hover:bg-white/10 shrink-0"
+            aria-label="Toggle menu"
+            aria-expanded={open ? "true" : "false"}
+            onClick={() => setOpen((s) => !s)}
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
-      )}
-    </header>
+
+        {/* Mobile panel */}
+        {open && (
+          <div className="md:hidden border-t border-white/10 bg-[#0B0F19]/95 backdrop-blur">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
+              {headerLinks.map(({ path, label, labelKey }) => (
+                <NavItem key={path} to={localizePath(path, lang)} mobile>
+                  {translations(lang, labelKey, label)}
+                </NavItem>
+              ))}
+
+              {/* Admin + Logout (mobile) */}
+              {isAuthed === true && (
+                <>
+                  <NavItem
+                    to={localizePath("/private/closing-the-loop", lang)}
+                    mobile
+                  >
+                    {translations(lang, "navbar.admin", "Admin")}
+                  </NavItem>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="mt-1 inline-flex items-center justify-center rounded-2xl border border-white/15 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 transition self-start"
+                  >
+                    {translations(lang, "navbar.logout", "Log out")}
+                  </button>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={toggleLang}
+                className="mt-1 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
+              >
+                <span
+                  className={lang === "en" ? "font-semibold" : "opacity-60"}
+                >
+                  {translations(lang, "navbar.languageEn", "EN")}
+                </span>
+                <span className="mx-1 text-slate-500">/</span>
+                <span
+                  className={lang === "fr" ? "font-semibold" : "opacity-60"}
+                >
+                  {translations(lang, "navbar.languageFr", "FR")}
+                </span>
+              </button>
+
+              <Link
+                to={localizePath("/book", lang)}
+                className="mt-2 inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium
+                          bg-[#7C3AED] hover:bg-[#6D28D9] text-white
+                          transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0F19]"
+              >
+                {translations(lang, "navbar.bookDiscovery", "Book discovery")}
+              </Link>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Spacer so the fixed navbar does not cover the top of the page */}
+      <div className="h-[65px]" aria-hidden="true" />
+    </>
   );
 }
 

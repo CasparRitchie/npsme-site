@@ -397,6 +397,51 @@
    4. Filters + navigation
    ----------------------------------------------------- */
 
+.csv-nps-workspace-nav {
+  position: sticky;
+  top: 12px;
+  z-index: 30;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 20px;
+  padding: 8px;
+
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  border-radius: 999px;
+  background: rgba(15, 17, 21, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+}
+
+.csv-nps-workspace-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  padding: 9px 14px;
+
+  color: var(--text, #f5f7fb);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid transparent;
+}
+
+.csv-nps-workspace-nav a:hover {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.1);
+}
+
 .csv-nps-next-actions {
   display: flex;
   flex-wrap: wrap;
@@ -786,6 +831,20 @@
 /* -----------------------------------------------------
    9. Responsive
    ----------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .csv-nps-workspace-nav {
+    top: 8px;
+    width: 100%;
+    border-radius: 18px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .csv-nps-workspace-nav a {
+    flex: 0 0 auto;
+  }
+}
 
 @media (max-width: 900px) {
   .csv-nps-performance-grid {

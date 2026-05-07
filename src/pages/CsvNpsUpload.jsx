@@ -49,6 +49,12 @@ export default function CsvNpsUpload() {
           Paste survey response data below. NPS Me will detect the score, date,
           customer, email and comment columns where possible.
         </p>
+        <nav className="csv-nps-workspace-nav" aria-label="CSV NPS workspace navigation">
+          <a href="/csv-nps/upload">Upload</a>
+          <a href="/csv-nps/performance">Performance</a>
+          <a href="/csv-nps/responses">Responses</a>
+          <a href="/csv-nps/closing-the-loop">Closing the loop</a>
+        </nav>
       </section>
 
       <section className="csv-nps-panel">

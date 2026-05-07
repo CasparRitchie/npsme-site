@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================
+   Global utilities
+   ===================================================== */
 
-/* globals.css */
 .text-link {
   @apply font-medium underline underline-offset-4
          decoration-[#22C55E]/80
@@ -11,21 +13,18 @@
          hover:text-white;
 }
 
-/* -------------------------------------------------
+/* =====================================================
    Envola live survey theme
    Applied only when .envola-theme is on survey-page
--------------------------------------------------- */
-
+   ===================================================== */
 
 .envola-theme {
-  /* Light, soft background like the Envola site */
   background: #f5f7ff;
   color: #152238;
   font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
 }
 
-/* Card styling – clean white block with soft shadow and rounded corners */
 .envola-card {
   background: #ffffff;
   border-radius: 24px;
@@ -35,7 +34,6 @@
   max-width: 640px;
 }
 
-/* Top bar with “Envola” badge */
 .envola-brand-bar {
   display: flex;
   align-items: center;
@@ -48,7 +46,7 @@
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.04em;
-  color: #263b87; /* deep Envola blue-ish */
+  color: #263b87;
 }
 
 .envola-badge {
@@ -60,7 +58,6 @@
   font-weight: 500;
 }
 
-/* Headings / text */
 .envola-theme h1 {
   font-size: 1.5rem;
   line-height: 1.3;
@@ -71,10 +68,9 @@
   color: #384255;
 }
 
-/* Main buttons ("Commencer le questionnaire", "Envoyer ma réponse") */
 .envola-theme button[type="button"],
 .envola-theme button[type="submit"] {
-  background: #263b87; /* primary blue */
+  background: #263b87;
   color: #ffffff;
   border-radius: 999px;
   padding: 0.75rem 1.7rem;
@@ -100,7 +96,6 @@
   box-shadow: 0 6px 16px rgba(38, 59, 135, 0.3);
 }
 
-/* Score buttons */
 .envola-theme .score-grid button {
   background: #ffffff;
   border-radius: 999px;
@@ -110,18 +105,15 @@
 
 .envola-theme .score-grid button[style*="background: #dcfce7"],
 .envola-theme .score-grid button[style*="background:#dcfce7"] {
-  /* When your inline styles flip the selected state, tweak it a bit */
   background: #e3ebff !important;
   border-color: #263b87 !important;
 }
 
-/* Textarea */
 .envola-theme textarea {
   border-radius: 16px;
   border-color: #d0d7f5;
 }
 
-/* Powered-by line */
 .envola-powered {
   margin-top: 1.5rem;
   font-size: 0.8rem;
@@ -131,4 +123,705 @@
 .envola-powered a {
   color: #263b87;
   text-decoration: underline;
+}
+
+/* =====================================================
+   CSV NPS workspace
+
+   1. Layout + shared panels
+   2. Upload page
+   3. Metrics, buckets + tables
+   4. Filters + navigation
+   5. Responses page
+   6. Closing the loop
+   7. Performance page
+   8. Warnings
+   9. Responsive
+   ===================================================== */
+
+/* -----------------------------------------------------
+   1. Layout + shared panels
+   ----------------------------------------------------- */
+
+.csv-nps-page {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+}
+
+.csv-nps-hero {
+  margin-bottom: 28px;
+}
+
+.csv-nps-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.05;
+}
+
+.csv-nps-hero p {
+  max-width: 760px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  line-height: 1.7;
+}
+
+.csv-nps-panel,
+.csv-nps-results {
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: var(--panel, rgba(255, 255, 255, 0.06));
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
+}
+
+.csv-nps-results {
+  margin-top: 28px;
+}
+
+/* -----------------------------------------------------
+   2. Upload page
+   ----------------------------------------------------- */
+
+.csv-nps-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text, #f5f7fb);
+  font-weight: 700;
+}
+
+.csv-nps-textarea {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(15, 17, 21, 0.82);
+  color: var(--text, #f5f7fb);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  outline: none;
+}
+
+.csv-nps-textarea:focus {
+  border-color: rgba(34, 197, 94, 0.75);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+.csv-nps-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
+.csv-nps-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #22c55e, #7c3aed);
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 38px rgba(34, 197, 94, 0.18);
+}
+
+.csv-nps-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.csv-nps-error {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(248, 113, 113, 0.32);
+  background: rgba(127, 29, 29, 0.25);
+  color: #fecaca;
+}
+
+/* -----------------------------------------------------
+   3. Metrics, buckets + tables
+   ----------------------------------------------------- */
+
+.csv-nps-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+  margin-bottom: 32px;
+}
+
+.csv-nps-metric-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.csv-nps-metric-label {
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.csv-nps-metric-value {
+  margin-top: 6px;
+  color: var(--text, #f5f7fb);
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.csv-nps-bucket {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.csv-nps-bucket-promoter {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.csv-nps-bucket-passive {
+  background: rgba(250, 204, 21, 0.14);
+  color: #fde68a;
+}
+
+.csv-nps-bucket-detractor {
+  background: rgba(248, 113, 113, 0.14);
+  color: #fecaca;
+}
+
+.csv-nps-bucket-bars {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.csv-nps-bucket-bar-row {
+  display: grid;
+  gap: 8px;
+}
+
+.csv-nps-bucket-bar-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.csv-nps-bucket-bar-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+}
+
+.csv-nps-bucket-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.csv-nps-bucket-bar-fill-promoter {
+  background: #22c55e;
+}
+
+.csv-nps-bucket-bar-fill-passive {
+  background: #facc15;
+}
+
+.csv-nps-bucket-bar-fill-detractor {
+  background: #f87171;
+}
+
+.csv-nps-code {
+  margin-top: 14px;
+  margin-bottom: 30px;
+  padding: 18px;
+  border-radius: 18px;
+  overflow-x: auto;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(15, 17, 21, 0.88);
+  color: var(--text, #f5f7fb);
+}
+
+.csv-nps-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+}
+
+.csv-nps-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  background: rgba(15, 17, 21, 0.45);
+}
+
+.csv-nps-table th,
+.csv-nps-table td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  vertical-align: top;
+}
+
+.csv-nps-table th {
+  color: var(--text, #f5f7fb);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.csv-nps-table td {
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+}
+
+.csv-nps-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* -----------------------------------------------------
+   4. Filters + navigation
+   ----------------------------------------------------- */
+
+.csv-nps-next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.csv-nps-next-actions-tight {
+  margin-top: 0;
+}
+
+.csv-nps-button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #22c55e, #7c3aed);
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 16px 38px rgba(34, 197, 94, 0.18);
+}
+
+.csv-nps-secondary-link {
+  color: var(--text, #f5f7fb);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(34, 197, 94, 0.75);
+  text-underline-offset: 4px;
+}
+
+.csv-nps-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(180px, 240px);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.csv-nps-filter-field {
+  display: grid;
+  gap: 8px;
+}
+
+.csv-nps-filter-field span {
+  color: var(--text, #f5f7fb);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.csv-nps-filter-field input,
+.csv-nps-filter-field select {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 16px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background-color: rgba(15, 17, 21, 0.9);
+  color: var(--text, #f5f7fb);
+  padding: 11px 14px;
+  outline: none;
+  font: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.csv-nps-filter-field input::placeholder {
+  color: rgba(245, 247, 251, 0.45);
+}
+
+.csv-nps-filter-field select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(245, 247, 251, 0.72) 50%),
+    linear-gradient(135deg, rgba(245, 247, 251, 0.72) 50%, transparent 50%);
+  background-position:
+    calc(100% - 19px) 20px,
+    calc(100% - 13px) 20px;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 42px;
+}
+
+.csv-nps-filter-field select option {
+  background: #0f1115;
+  color: #f5f7fb;
+}
+
+.csv-nps-filter-field input:focus,
+.csv-nps-filter-field select:focus {
+  border-color: rgba(34, 197, 94, 0.75);
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.csv-nps-filter-field input:-webkit-autofill,
+.csv-nps-filter-field input:-webkit-autofill:hover,
+.csv-nps-filter-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f5f7fb;
+  box-shadow: 0 0 0 1000px #0f1115 inset;
+  caret-color: #f5f7fb;
+}
+
+/* -----------------------------------------------------
+   5. Responses page
+   ----------------------------------------------------- */
+
+.csv-nps-responses-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.csv-nps-responses-header h2 {
+  margin: 0 0 6px;
+}
+
+.csv-nps-responses-header p {
+  margin: 0;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+}
+
+/* -----------------------------------------------------
+   6. Closing the loop
+   ----------------------------------------------------- */
+
+.csv-nps-loop-list {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.csv-nps-loop-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 22px;
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.csv-nps-loop-card-detractor {
+  border-left: 4px solid #f87171;
+}
+
+.csv-nps-loop-card-passive {
+  border-left: 4px solid #facc15;
+}
+
+.csv-nps-loop-card-promoter {
+  border-left: 4px solid #22c55e;
+}
+
+.csv-nps-loop-card-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.csv-nps-loop-card h3 {
+  margin: 0 0 6px;
+  color: var(--text, #f5f7fb);
+  font-size: 1.15rem;
+}
+
+.csv-nps-loop-meta {
+  margin: 0 0 14px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-size: 0.9rem;
+}
+
+.csv-nps-loop-card blockquote {
+  margin: 0;
+  padding: 14px 16px;
+  border-left: 3px solid rgba(34, 197, 94, 0.75);
+  border-radius: 14px;
+  background: rgba(15, 17, 21, 0.5);
+  color: var(--text, #f5f7fb);
+  line-height: 1.6;
+}
+
+.csv-nps-loop-score {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text, #f5f7fb);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.csv-nps-loop-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.csv-nps-loop-status-open {
+  background: rgba(248, 113, 113, 0.14);
+  color: #fecaca;
+}
+
+.csv-nps-loop-status-in_progress {
+  background: rgba(250, 204, 21, 0.14);
+  color: #fde68a;
+}
+
+.csv-nps-loop-status-closed {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.csv-nps-loop-card-actions {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.csv-nps-loop-action-field textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 110px;
+  border-radius: 16px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background-color: rgba(15, 17, 21, 0.9);
+  color: var(--text, #f5f7fb);
+  padding: 12px 14px;
+  outline: none;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.csv-nps-loop-action-field textarea::placeholder {
+  color: rgba(245, 247, 251, 0.45);
+}
+
+.csv-nps-loop-action-field textarea:focus {
+  border-color: rgba(34, 197, 94, 0.75);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+.csv-nps-loop-updated {
+  margin: 0;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-size: 0.8rem;
+}
+
+.csv-nps-empty-state {
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px dashed var(--panel-border, rgba(255, 255, 255, 0.12));
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* -----------------------------------------------------
+   7. Performance page
+   ----------------------------------------------------- */
+
+.csv-nps-performance-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.csv-nps-chart-card {
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.csv-nps-chart-card h3 {
+  margin: 0 0 6px;
+  color: var(--text, #f5f7fb);
+}
+
+.csv-nps-chart-card p {
+  margin: 0 0 18px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  line-height: 1.6;
+}
+
+.csv-nps-chart-card-wide {
+  margin-top: 18px;
+}
+
+.csv-nps-score-chart {
+  display: grid;
+  gap: 9px;
+}
+
+.csv-nps-score-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 10px;
+}
+
+.csv-nps-score-label {
+  color: var(--text, #f5f7fb);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.csv-nps-score-count {
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.csv-nps-score-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+}
+
+.csv-nps-score-fill {
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+}
+
+.csv-nps-score-fill-promoter {
+  background: #22c55e;
+}
+
+.csv-nps-score-fill-passive {
+  background: #facc15;
+}
+
+.csv-nps-score-fill-detractor {
+  background: #f87171;
+}
+
+/* -----------------------------------------------------
+   8. Warnings
+   ----------------------------------------------------- */
+
+.csv-nps-warning-panel {
+  margin-top: 22px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(250, 204, 21, 0.32);
+  background: rgba(250, 204, 21, 0.08);
+  color: var(--text, #f5f7fb);
+}
+
+.csv-nps-warning-panel h2 {
+  margin: 0 0 8px;
+  color: #fde68a;
+  font-size: 1.1rem;
+}
+
+.csv-nps-warning-panel p {
+  margin: 0 0 12px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+}
+
+.csv-nps-warning-panel ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #fde68a;
+}
+
+.csv-nps-warning-panel li + li {
+  margin-top: 6px;
+}
+
+/* -----------------------------------------------------
+   9. Responsive
+   ----------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .csv-nps-performance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .csv-nps-loop-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .csv-nps-responses-header {
+    display: grid;
+  }
+
+  .csv-nps-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .csv-nps-page {
+    width: min(100% - 20px, 1100px);
+    padding-top: 28px;
+  }
+
+  .csv-nps-panel,
+  .csv-nps-results {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .csv-nps-textarea {
+    min-height: 220px;
+  }
 }

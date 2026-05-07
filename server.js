@@ -7,11 +7,12 @@ import helmet from "helmet";
 import fs from "fs";
 import nodemailer from "nodemailer";
 import OpenAI from "openai";
-import { createIntercomRouter } from "./intercom.routes.js";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 import crypto from "crypto";
+import { createIntercomRouter } from "./intercom.routes.js";
 import { createEnvolaRouter } from "./envola.routes.js";
+import { createCsvNpsRouter } from "./csvNps.routes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -247,6 +248,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // Mount Intercom router ONCE, before express.json()
 app.use("/api/intercom", createIntercomRouter());
 
@@ -254,6 +256,12 @@ app.use("/api/envola", createEnvolaRouter());
 
 app.use(express.json());
 
+
+// =====================================================
+// CSV NPS API ROUTES
+// Base path: /api/csv-nps
+// =====================================================
+app.use("/api/csv-nps", createCsvNpsRouter());
 
 // ---------------------------------------------------------------------------
 // Simple shared-password protection (Option B)

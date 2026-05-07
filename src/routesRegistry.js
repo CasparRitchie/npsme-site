@@ -60,6 +60,11 @@ import EnvolaResponses from "./pages/EnvolaResponses";
 import EnvolaInvitations from "./pages/EnvolaInvitations";
 import EnvolaClosingTheLoop from "./pages/EnvolaClosingTheLoop";
 
+import CsvNpsUpload from "./pages/CsvNpsUpload";
+import CsvNpsPerformance from "./pages/CsvNpsPerformance";
+import CsvNpsResponses from "./pages/CsvNpsResponses";
+import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
+
 const protect = (Component) => {
   return function ProtectedPage() {
     return React.createElement(
@@ -124,6 +129,21 @@ const COMPONENTS = {
 
   "/envola/closing-the-loop": EnvolaClosingTheLoop,
   "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
+
+  // CSV NPS workspace
+  // Temporarily public while developing/testing.
+  // Later we can wrap these with protect(...) again once PRIVATE_DASH_PASSWORD is configured locally.
+  "/csv-nps/upload": CsvNpsUpload,
+  "/fr/csv-nps/upload": CsvNpsUpload,
+
+  "/csv-nps/performance": CsvNpsPerformance,
+  "/fr/csv-nps/performance": CsvNpsPerformance,
+
+  "/csv-nps/responses": CsvNpsResponses,
+  "/fr/csv-nps/responses": CsvNpsResponses,
+
+  "/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
+  "/fr/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

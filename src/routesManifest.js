@@ -72,6 +72,21 @@ export const ROUTES_MANIFEST = [
   { path: "/envola/closing-the-loop", label: "Envola Closing the Loop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/envola/closing-the-loop", label: "Boucle de feedback Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
+  // CSV NPS workspace
+  // Generic pasted/uploaded CSV survey data workspace.
+  // Keep separate from Envola/Intercom routes so existing Envola dashboards are not impacted.
+  { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/csv-nps/performance", label: "CSV NPS Performance", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/performance", label: "Performance CSV NPS", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/csv-nps/responses", label: "CSV NPS Responses", labelKey: "routes.csvNpsResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/responses", label: "Réponses CSV NPS", labelKey: "routes.csvNpsResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/csv-nps/closing-the-loop", label: "CSV NPS Closing the Loop", labelKey: "routes.csvNpsClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/closing-the-loop", label: "Boucle de feedback CSV NPS", labelKey: "routes.csvNpsClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // Social listening (indexable)
   { path: "/social-listening",     label: "Social Listening",       labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "en" },
   { path: "/fr/social-listening",  label: "Écoute sociale",         labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "fr" },

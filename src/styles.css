@@ -139,6 +139,12 @@
    9. Responsive
    ===================================================== */
 
+  .csv-nps-page,
+  .csv-nps-hero,
+  .csv-nps-panel,
+  .csv-nps-results {
+    overflow: visible;
+  }
 /* -----------------------------------------------------
    1. Layout + shared panels
    ----------------------------------------------------- */
@@ -415,18 +421,30 @@
    4. Filters + navigation
    ----------------------------------------------------- */
 
-.csv-nps-workspace-nav {
+.csv-nps-workspace-nav-wrap {
   position: sticky;
-  top: 78px;
+  top: 65px;
   z-index: 900;
 
+  width: 100%;
+  margin: -8px 0 24px;
+  padding: 10px 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(11, 15, 25, 0.96) 0%,
+    rgba(11, 15, 25, 0.86) 72%,
+    rgba(11, 15, 25, 0) 100%
+  );
+}
+
+.csv-nps-workspace-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 
   width: fit-content;
   max-width: 100%;
-  margin: -8px 0 24px;
   padding: 8px;
 
   border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
@@ -851,8 +869,11 @@
    ----------------------------------------------------- */
 
 @media (max-width: 720px) {
+  .csv-nps-workspace-nav-wrap {
+    top: 65px;
+  }
+
   .csv-nps-workspace-nav {
-    top: 74px;
     width: 100%;
     border-radius: 18px;
     overflow-x: auto;

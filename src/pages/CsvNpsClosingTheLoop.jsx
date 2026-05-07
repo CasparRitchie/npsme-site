@@ -155,18 +155,6 @@ export default function CsvNpsClosingTheLoop() {
               Showing {rows.length} of {dataset.rows.length} responses.
             </p>
           </div>
-
-          <div className="csv-nps-next-actions csv-nps-next-actions-tight">
-            <a className="csv-nps-secondary-link" href="/csv-nps/upload">
-              Upload
-            </a>
-            <a className="csv-nps-secondary-link" href="/csv-nps/performance">
-              Performance
-            </a>
-            <a className="csv-nps-secondary-link" href="/csv-nps/responses">
-              Responses
-            </a>
-          </div>
         </div>
 
         <div className="csv-nps-metric-grid">

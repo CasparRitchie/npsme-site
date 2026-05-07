@@ -143,21 +143,6 @@ export default function CsvNpsPerformance() {
               analysis.
             </p>
           </div>
-
-          <div className="csv-nps-next-actions csv-nps-next-actions-tight">
-            <a className="csv-nps-secondary-link" href="/csv-nps/upload">
-              Upload
-            </a>
-            <a className="csv-nps-secondary-link" href="/csv-nps/responses">
-              Responses
-            </a>
-            <a
-              className="csv-nps-secondary-link"
-              href="/csv-nps/closing-the-loop"
-            >
-              Closing the loop
-            </a>
-          </div>
         </div>
 
         <div className="csv-nps-metric-grid">

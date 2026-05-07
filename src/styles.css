@@ -124,7 +124,6 @@
   color: #263b87;
   text-decoration: underline;
 }
-
 /* =====================================================
    CSV NPS workspace
 
@@ -139,15 +138,16 @@
    9. Responsive
    ===================================================== */
 
-  .csv-nps-page,
-  .csv-nps-hero,
-  .csv-nps-panel,
-  .csv-nps-results {
-    overflow: visible;
-  }
 /* -----------------------------------------------------
    1. Layout + shared panels
    ----------------------------------------------------- */
+
+.csv-nps-page,
+.csv-nps-hero,
+.csv-nps-panel,
+.csv-nps-results {
+  overflow: visible;
+}
 
 .csv-nps-page {
   width: min(1100px, calc(100% - 32px));
@@ -395,32 +395,18 @@
   color: var(--muted, rgba(245, 247, 251, 0.72));
 }
 
-.csv-nps-workspace-nav {
-  position: sticky;
-  top: 78px;
-  z-index: 900;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-
-  width: fit-content;
-  max-width: 100%;
-  margin: -8px 0 24px;
-  padding: 8px;
-
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
-  border-radius: 999px;
-  background: rgba(11, 15, 25, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+.csv-nps-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 /* -----------------------------------------------------
    4. Filters + navigation
    ----------------------------------------------------- */
 
+/*
+  Sticky behaviour belongs to the wrapper.
+  The inner nav is just the visual pill.
+*/
 .csv-nps-workspace-nav-wrap {
   position: sticky;
   top: 65px;
@@ -868,23 +854,6 @@
    9. Responsive
    ----------------------------------------------------- */
 
-@media (max-width: 720px) {
-  .csv-nps-workspace-nav-wrap {
-    top: 65px;
-  }
-
-  .csv-nps-workspace-nav {
-    width: 100%;
-    border-radius: 18px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-  }
-
-  .csv-nps-workspace-nav a {
-    flex: 0 0 auto;
-  }
-}
-
 @media (max-width: 900px) {
   .csv-nps-performance-grid {
     grid-template-columns: 1fr;
@@ -908,6 +877,21 @@
 }
 
 @media (max-width: 720px) {
+  .csv-nps-workspace-nav-wrap {
+    top: 65px;
+  }
+
+  .csv-nps-workspace-nav {
+    width: 100%;
+    border-radius: 18px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .csv-nps-workspace-nav a {
+    flex: 0 0 auto;
+  }
+
   .csv-nps-page {
     width: min(100% - 20px, 1100px);
     padding-top: 28px;

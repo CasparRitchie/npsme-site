@@ -75,8 +75,8 @@ export const ROUTES_MANIFEST = [
   // CSV NPS workspace
   // Generic pasted/uploaded CSV survey data workspace.
   // Keep separate from Envola/Intercom routes so existing Envola dashboards are not impacted.
-  { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
-  { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+  { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
   { path: "/csv-nps/performance", label: "CSV NPS Performance", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/csv-nps/performance", label: "Performance CSV NPS", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },

@@ -933,32 +933,64 @@ export function createEnvolaRouter() {
       const days = clampInt(req.query.days, 365, 1, 3650);
       const statusFilter = String(req.query.status || "all").trim().toLowerCase();
 
-      const text = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
-      const statsRows = parseJsonl(text);
+      const statsText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null);
+      const statsRows = parseJsonl(statsText);
+
+      const canonicalRows = await getCanonicalResponses();
 
       const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      const deriveStatus = (row) => {
-        if (row.first_completion) return "responded";
-        if (row.first_open || row.first_click) return "opened";
-        if (row.first_hard_bounce || row.first_soft_bounce) return "bounced";
-        if (row.received_at) return "sent";
-        return "unknown";
-      };
+      // Build latest canonical response lookup by receipt_id
+      const responsesByReceiptId = new Map();
+
+      for (const r of canonicalRows || []) {
+        if (String(r?.content_id || "").trim() !== contentId) continue;
+
+        const receiptId = String(r?.receipt_id || "").trim();
+        if (!receiptId) continue;
+
+        const existing = responsesByReceiptId.get(receiptId);
+        if (!existing) {
+          responsesByReceiptId.set(receiptId, r);
+          continue;
+        }
+
+        const existingTs = Date.parse(existing?.submitted_at || "") || 0;
+        const newTs = Date.parse(r?.submitted_at || "") || 0;
+
+        if (newTs >= existingTs) {
+          responsesByReceiptId.set(receiptId, r);
+        }
+      }
 
       let rows = (statsRows || [])
         .filter((row) => String(row.content_id || "").trim() === contentId)
         .map((row) => {
           const sentAtRaw = row.received_at || "";
           const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
-          const status = deriveStatus(row);
+
+          const receiptId = String(row.receipt_id || "").trim();
+          const matchedResponse = receiptId ? responsesByReceiptId.get(receiptId) : null;
+
+          const respondedAt =
+            matchedResponse?.submitted_at ||
+            row.first_completion ||
+            null;
+
+          let status = "unknown";
+          if (respondedAt) status = "responded";
+          else if (row.first_open || row.first_click) status = "opened";
+          else if (row.first_hard_bounce || row.first_soft_bounce) status = "bounced";
+          else if (row.received_at) status = "sent";
+
+          const contactId = row.user_id || matchedResponse?.contact_id || null;
 
           return {
-            invitation_id: String(row.receipt_id || "").trim(),
+            invitation_id: receiptId,
             customer_id: String(row.user_id || "").trim(),
-            name: row.name || "",
+            name: row.name || matchedResponse?.name || "",
             business_name: "",
-            email: row.email || "",
+            email: row.email || matchedResponse?.email || "",
             stage: "",
             survey_id: String(row.content_id || "").trim(),
             type_of_device: row.device || "",
@@ -968,14 +1000,18 @@ export function createEnvolaRouter() {
             resent_count: 0,
             status,
             response_id:
-              row.first_completion && row.content_id && row.receipt_id
+              matchedResponse?.response_id ||
+              (respondedAt && row.content_id && row.receipt_id
                 ? `${row.content_id}:${row.receipt_id}`
-                : "",
-            score_0_10: null,
-            comment: "",
-            responded_at: row.first_completion || null,
-            contact_id: row.user_id || null,
-            intercom_contact_url: row.user_id ? intercomContactUrl(row.user_id) : null,
+                : ""),
+            score_0_10:
+              typeof matchedResponse?.score_0_10 === "number"
+                ? matchedResponse.score_0_10
+                : null,
+            comment: matchedResponse?.comment || "",
+            responded_at: respondedAt,
+            contact_id: contactId,
+            intercom_contact_url: contactId ? intercomContactUrl(contactId) : null,
           };
         })
         .filter((row) => {
@@ -984,7 +1020,13 @@ export function createEnvolaRouter() {
           if (statusFilter !== "all" && row.status !== statusFilter) return false;
           return true;
         })
-        .sort((a, b) => (b.sent_at_ms || 0) - (a.sent_at_ms || 0));
+        .sort((a, b) => {
+          const ar = a.responded_at ? Date.parse(a.responded_at) || 0 : 0;
+          const br = b.responded_at ? Date.parse(b.responded_at) || 0 : 0;
+
+          // responded most recent first, otherwise sent most recent first
+          return Math.max(br, b.sent_at_ms || 0) - Math.max(ar, a.sent_at_ms || 0);
+        });
 
       const summary = {
         sent: rows.length,
@@ -998,7 +1040,11 @@ export function createEnvolaRouter() {
                 (rows.filter((r) => r.status === "responded").length / rows.length) * 1000
               ) / 10
             : null,
-        last_sent_at: rows[0]?.sent_at || null,
+        last_sent_at: rows
+          .map((r) => r.sent_at)
+          .filter(Boolean)
+          .sort()
+          .slice(-1)[0] || null,
       };
 
       return res.json({

@@ -289,10 +289,10 @@ export function createNpsDataRouter() {
       const workspaceId = getWorkspaceId();
       const datasetId = String(req.params.datasetId || "").trim();
 
-      if (!datasetId) {
+      if (!isUuid(datasetId)) {
         return res.status(400).json({
           ok: false,
-          error: "datasetId is required",
+          error: "Valid datasetId is required",
         });
       }
 
@@ -367,10 +367,10 @@ export function createNpsDataRouter() {
       const workspaceId = getWorkspaceId();
       const datasetId = String(req.params.datasetId || "").trim();
 
-      if (!datasetId) {
+      if (!isUuid(datasetId)) {
         return res.status(400).json({
           ok: false,
-          error: "datasetId is required",
+          error: "Valid datasetId is required",
         });
       }
 
@@ -439,10 +439,10 @@ export function createNpsDataRouter() {
       const workspaceId = getWorkspaceId();
       const datasetRowId = String(req.params.datasetRowId || "").trim();
 
-      if (!datasetRowId) {
+      if (!isUuid(datasetRowId)) {
         return res.status(400).json({
           ok: false,
-          error: "datasetRowId is required",
+          error: "Valid datasetRowId is required",
         });
       }
 
@@ -508,10 +508,10 @@ export function createNpsDataRouter() {
       const workspaceId = getWorkspaceId();
       const actionId = String(req.params.actionId || "").trim();
 
-      if (!actionId) {
+      if (!isUuid(actionId)) {
         return res.status(400).json({
           ok: false,
-          error: "actionId is required",
+          error: "Valid actionId is required",
         });
       }
 
@@ -627,6 +627,12 @@ async function findWorkspaceAction(actionId, workspaceId) {
   if (error || !data) return null;
 
   return data;
+}
+
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value || "").trim()
+  );
 }
 
 function normaliseActionStatus(value) {

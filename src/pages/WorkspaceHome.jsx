@@ -80,18 +80,46 @@ export default function WorkspaceHome() {
 
   return (
     <main className="csv-nps-page">
-      <section className="csv-nps-hero">
+      <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">NPS Me Workspace</p>
-        <h1>Your customer feedback command centre</h1>
+        <h1>Feedback command centre</h1>
         <p>
-          Import NPS data, review performance, inspect customer responses, and
-          manage close-the-loop follow-up actions from one protected workspace.
+          Import customer feedback, review NPS performance, inspect individual
+          responses, and manage close-the-loop follow-up from one protected
+          workspace.
         </p>
       </section>
 
       <CsvNpsWorkspaceNav />
 
       {error && <section className="csv-nps-error">{error}</section>}
+
+      <section className="csv-nps-workspace-overview-grid">
+        <WorkspaceActionCard
+          title="Import feedback data"
+          description="Paste CSV data or JSON survey exports and turn them into a reusable NPS dataset."
+          to="/workspace/import"
+          cta="Import data"
+        />
+
+        <WorkspaceActionCard
+          title="Review saved datasets"
+          description="Reopen previous imports, review NPS performance, and inspect customer responses."
+          to="/workspace/datasets"
+          cta="View datasets"
+        />
+
+        <WorkspaceActionCard
+          title="Close the loop"
+          description="Prioritise detractors, assign owners, track next steps, and keep follow-up visible."
+          to={
+            latestDatasets[0]
+              ? `/workspace/datasets/${latestDatasets[0].id}/closing-the-loop`
+              : "/workspace/datasets"
+          }
+          cta="Open action queue"
+        />
+      </section>
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
@@ -122,81 +150,81 @@ export default function WorkspaceHome() {
           <MetricCard label="Detractors" value={totals.detractors} />
         </div>
 
-        <div className="csv-nps-performance-grid">
+        <div className="csv-nps-workspace-home-grid">
           <section className="csv-nps-chart-card">
-            <h3>Start here</h3>
+            <h3>Recent datasets</h3>
             <p>
-              Bring in CSV or JSON survey data, then save it as a reusable NPS
-              dataset.
+              Reopen performance, responses, or close-the-loop views from your
+              latest saved imports.
             </p>
 
-            <div className="csv-nps-dataset-actions">
+            {loading ? (
+              <div className="csv-nps-empty-state">
+                Loading recent datasets...
+              </div>
+            ) : latestDatasets.length === 0 ? (
+              <div className="csv-nps-empty-state">
+                No saved datasets yet. Import your first CSV or JSON file to get
+                started.
+              </div>
+            ) : (
+              <div className="csv-nps-dataset-grid">
+                {latestDatasets.map((dataset) => (
+                  <RecentDatasetCard key={dataset.id} dataset={dataset} />
+                ))}
+              </div>
+            )}
+
+            <div className="csv-nps-next-actions">
+              <Link className="csv-nps-secondary-link" to="/workspace/datasets">
+                View all datasets
+              </Link>
+            </div>
+          </section>
+
+          <section className="csv-nps-chart-card">
+            <h3>Current setup</h3>
+            <p>
+              This private alpha workspace is currently configured for imported
+              feedback datasets, Supabase storage, and persistent follow-up
+              actions.
+            </p>
+
+            <div className="csv-nps-workspace-status-list">
+              <StatusRow
+                label="Workspace"
+                value={workspace?.workspace_name || "NPS Me Internal"}
+              />
+              <StatusRow label="Data source" value="CSV / JSON import" />
+              <StatusRow label="Storage" value="Supabase" />
+              <StatusRow label="Access" value="Private password-protected" />
+              <StatusRow label="Product stage" value="Internal alpha" />
+            </div>
+
+            <div className="csv-nps-next-actions">
               <Link className="csv-nps-secondary-link" to="/workspace/import">
                 Import new data
               </Link>
 
               <Link className="csv-nps-secondary-link" to="/workspace/datasets">
-                View saved datasets
+                Manage datasets
               </Link>
             </div>
           </section>
-
-          <section className="csv-nps-chart-card">
-            <h3>Close the loop</h3>
-            <p>
-              Prioritise detractors, assign owners, track action taken, and keep
-              follow-up visible.
-            </p>
-
-            {latestDatasets[0] ? (
-              <div className="csv-nps-dataset-actions">
-                <Link
-                  className="csv-nps-secondary-link"
-                  to={`/workspace/datasets/${latestDatasets[0].id}/closing-the-loop`}
-                >
-                  Open latest action queue
-                </Link>
-              </div>
-            ) : (
-              <div className="csv-nps-empty-state">
-                Save a dataset first to create a follow-up queue.
-              </div>
-            )}
-          </section>
         </div>
-
-        <section className="csv-nps-chart-card csv-nps-chart-card-wide">
-          <div className="csv-nps-responses-header">
-            <div>
-              <h3>Recent datasets</h3>
-              <p>
-                Reopen performance, responses, or close-the-loop views from your
-                latest saved imports.
-              </p>
-            </div>
-
-            <Link className="csv-nps-secondary-link" to="/workspace/datasets">
-              View all datasets
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="csv-nps-empty-state">Loading recent datasets...</div>
-          ) : latestDatasets.length === 0 ? (
-            <div className="csv-nps-empty-state">
-              No saved datasets yet. Import your first CSV or JSON file to get
-              started.
-            </div>
-          ) : (
-            <div className="csv-nps-dataset-grid">
-              {latestDatasets.map((dataset) => (
-                <RecentDatasetCard key={dataset.id} dataset={dataset} />
-              ))}
-            </div>
-          )}
-        </section>
       </section>
     </main>
+  );
+}
+
+function WorkspaceActionCard({ title, description, to, cta }) {
+  return (
+    <Link className="csv-nps-workspace-action-card" to={to}>
+      <span className="csv-nps-source-badge">Workspace</span>
+      <h2>{title}</h2>
+      <p>{description}</p>
+      <strong>{cta}</strong>
+    </Link>
   );
 }
 
@@ -250,6 +278,15 @@ function RecentDatasetCard({ dataset }) {
         </Link>
       </div>
     </article>
+  );
+}
+
+function StatusRow({ label, value }) {
+  return (
+    <div className="csv-nps-workspace-status-row">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 

@@ -413,6 +413,7 @@ export function createNpsDataRouter({ openai } = {}) {
             "comment",
             "selected_options_json",
             "extra_scores_json",
+            "raw_json",
           ].join(",")
         )
         .eq("dataset_id", datasetId)
@@ -429,18 +430,44 @@ export function createNpsDataRouter({ openai } = {}) {
 
       const usableRows = (rows || [])
         .filter((row) => Number.isFinite(Number(row.score)))
-        .slice(0, 100)
-        .map((row) => ({
-          response_id: row.response_id || row.id,
-          date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
-          score: Number(row.score),
-          bucket: row.bucket || "",
-          stage: row.stage || "",
-          comment: String(row.comment || "").slice(0, 300),
-          selected_options: Array.isArray(row.selected_options_json)
-            ? row.selected_options_json.slice(0, 5)
-            : [],
-        }));
+        .slice(0, 120)
+        .map((row) => {
+          const raw = row.raw_json || {};
+          const extra = row.extra_scores_json || {};
+
+          return {
+            response_id: row.response_id || row.id,
+            date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
+            score: Number(row.score),
+            bucket: row.bucket || "",
+            comment: cleanForAi(row.comment, 350),
+
+            recommend_comment: cleanForAi(
+              raw.q_recommend_comment || extra.q_recommend_comment,
+              350
+            ),
+            install_comment: cleanForAi(
+              raw.q_install_comment || extra.q_install_comment,
+              250
+            ),
+            daily_use_comment: cleanForAi(
+              raw.q_daily_use_comment || extra.q_daily_use_comment,
+              250
+            ),
+            parent_relation_comment: cleanForAi(
+              raw.q_parent_relation_comment || extra.q_parent_relation_comment,
+              250
+            ),
+            final_comment: cleanForAi(
+              raw.q_final_comment || extra.q_final_comment,
+              250
+            ),
+
+            benefits: Array.isArray(row.selected_options_json)
+              ? row.selected_options_json.slice(0, 8)
+              : [],
+          };
+        });
 
       if (usableRows.length === 0) {
         return res.status(400).json({
@@ -498,13 +525,6 @@ Use this exact schema:
       "impact": "high|medium|low",
       "effort": "high|medium|low"
     }
-  ],
-  "close_the_loop_templates": [
-    {
-      "segment": "Detractors|Passives|Promoters",
-      "subject": "string",
-      "body": "string"
-    }
   ]
 }
 
@@ -519,7 +539,7 @@ Rules:
 
       const aiResponse = await openai.responses.create({
         model: "gpt-4o-mini",
-        max_output_tokens: 700,
+        max_output_tokens: 650,
         input: [
           {
             role: "system",
@@ -852,6 +872,16 @@ async function findWorkspaceAction(actionId, workspaceId) {
   if (error || !data) return null;
 
   return data;
+}
+
+function cleanForAi(value, maxLength = 300) {
+  if (!value) return "";
+
+  return String(value)
+    .replace(/\s+/g, " ")
+    .replace(/(.{80,}?)\1+/g, "$1")
+    .trim()
+    .slice(0, maxLength);
 }
 
 function isUuid(value) {

@@ -40,7 +40,7 @@ export default function DatasetAiInsights({ datasetId }) {
       setGeneratedAt(data.generatedAt);
     } catch (err) {
       console.error("Failed to generate AI insights:", err);
-      setError(err.message || "Failed to generate AI insights");
+      setError(err.message || "The AI insight request did not complete. Try again, or reduce the dataset size.");
     } finally {
       setLoading(false);
     }
@@ -69,8 +69,20 @@ export default function DatasetAiInsights({ datasetId }) {
 
       {error && <div className="csv-nps-error">{error}</div>}
 
-      {!insights && !error && (
-        <div className="csv-nps-empty-state">
+      {loading && (
+        <div className="csv-nps-ai-loading">
+          <div className="csv-nps-spinner" />
+          <div>
+            <strong>Generating AI insights...</strong>
+            <p>
+              Analysing scores, comments, themes, risks and recommended actions.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!insights && !error && !loading && (
+          <div className="csv-nps-empty-state">
           No AI insights generated yet. Click “Generate insights” to analyse the
           comments, scores and feedback patterns in this dataset.
         </div>

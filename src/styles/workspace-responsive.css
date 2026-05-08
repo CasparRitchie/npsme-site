@@ -59,3 +59,14 @@
     justify-self: start;
   }
 }
+
+@media (max-width: 960px) {
+  .csv-nps-workspace-overview-grid,
+  .csv-nps-workspace-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .csv-nps-workspace-action-card {
+    min-height: auto;
+  }
+}

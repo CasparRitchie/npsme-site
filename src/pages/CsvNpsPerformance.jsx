@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import DatasetAiInsights from "../components/DatasetAiInsights";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -329,6 +330,7 @@ export default function CsvNpsPerformance() {
             </div>
           )}
         </section>
+        {datasetId && <DatasetAiInsights datasetId={datasetId} />}
       </section>
     </main>
   );

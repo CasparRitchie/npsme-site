@@ -20,7 +20,7 @@ import { supabaseAdmin } from "./supabaseClient.js";
 
 const DEFAULT_WORKSPACE_ID = process.env.DEFAULT_WORKSPACE_ID || "";
 
-export function createNpsDataRouter() {
+export function createNpsDataRouter({ openai } = {}) {
   const router = express.Router();
 
   // --------------------------------------------------
@@ -347,6 +347,232 @@ export function createNpsDataRouter() {
       return res.status(500).json({
         ok: false,
         error: err.message || "Failed to load dataset",
+      });
+    }
+  });
+
+    // --------------------------------------------------
+  // POST /api/nps-data/datasets/:datasetId/insights
+  // Generate AI insights for a saved workspace-owned dataset
+  // --------------------------------------------------
+  router.post("/datasets/:datasetId/insights", async (req, res) => {
+    try {
+      if (!supabaseAdmin) {
+        return res.status(500).json({
+          ok: false,
+          error: "Supabase is not configured",
+        });
+      }
+
+      if (!openai) {
+        return res.status(500).json({
+          ok: false,
+          error: "OpenAI is not configured",
+        });
+      }
+
+      const workspaceId = getWorkspaceId();
+      const datasetId = String(req.params.datasetId || "").trim();
+
+      if (!datasetId) {
+        return res.status(400).json({
+          ok: false,
+          error: "datasetId is required",
+        });
+      }
+
+      // 1) Confirm this dataset belongs to the current workspace.
+      const { data: dataset, error: datasetError } = await supabaseAdmin
+        .from("datasets")
+        .select("*")
+        .eq("id", datasetId)
+        .eq("workspace_id", workspaceId)
+        .single();
+
+      if (datasetError || !dataset) {
+        return res.status(404).json({
+          ok: false,
+          error: "Dataset not found",
+        });
+      }
+
+      // 2) Load rows.
+      const { data: rows, error: rowsError } = await supabaseAdmin
+        .from("dataset_rows")
+        .select(
+          [
+            "id",
+            "response_id",
+            "submitted_at",
+            "score",
+            "bucket",
+            "customer_name",
+            "customer_email",
+            "company",
+            "stage",
+            "comment",
+            "selected_options_json",
+            "extra_scores_json",
+          ].join(",")
+        )
+        .eq("dataset_id", datasetId)
+        .order("submitted_at", { ascending: false, nullsFirst: false })
+        .limit(500);
+
+      if (rowsError) {
+        console.error("[nps-data] Failed to load rows for insights", rowsError);
+        return res.status(500).json({
+          ok: false,
+          error: rowsError.message,
+        });
+      }
+
+      const usableRows = (rows || [])
+        .filter((row) => Number.isFinite(Number(row.score)))
+        .map((row) => ({
+          response_id: row.response_id || row.id,
+          date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
+          score: Number(row.score),
+          bucket: row.bucket || "",
+          stage: row.stage || "",
+          company: row.company || "",
+          comment: String(row.comment || "").slice(0, 700),
+          selected_options: Array.isArray(row.selected_options_json)
+            ? row.selected_options_json
+            : [],
+          extra_scores: row.extra_scores_json || {},
+        }));
+
+      if (usableRows.length === 0) {
+        return res.status(400).json({
+          ok: false,
+          error: "This dataset does not contain enough usable NPS rows",
+        });
+      }
+
+      const summary = dataset.summary_json || {};
+      const compactPayload = {
+        dataset: {
+          id: dataset.id,
+          name: dataset.dataset_name,
+          source_type: dataset.source_type,
+          created_at: dataset.created_at,
+          summary,
+        },
+        rows: usableRows,
+      };
+
+      const prompt = `
+You are a senior CX and NPS analyst.
+
+You will receive a saved NPS feedback dataset containing scores, buckets, comments, stages and selected options.
+
+Return ONLY valid JSON. Do not use markdown. Do not wrap the JSON in code fences.
+
+Use this exact schema:
+{
+  "executive_summary": "string",
+  "nps_readout": {
+    "score": number | null,
+    "interpretation": "string"
+  },
+  "key_themes": [
+    {
+      "theme": "string",
+      "sentiment": "positive|negative|mixed|neutral",
+      "evidence_count": number,
+      "example_quotes": ["string"]
+    }
+  ],
+  "cx_risks": [
+    {
+      "risk": "string",
+      "severity": "high|medium|low",
+      "why_it_matters": "string",
+      "who_to_review": "string"
+    }
+  ],
+  "recommended_actions": [
+    {
+      "action": "string",
+      "why": "string",
+      "impact": "high|medium|low",
+      "effort": "high|medium|low"
+    }
+  ],
+  "close_the_loop_templates": [
+    {
+      "segment": "Detractors|Passives|Promoters",
+      "subject": "string",
+      "body": "string"
+    }
+  ]
+}
+
+Rules:
+- Be practical and commercially useful.
+- Do not invent evidence.
+- If comments are sparse, say so.
+- Example quotes must be short excerpts from comments, max 15 words each.
+- Recommended actions should be specific enough that a founder, CX lead or ops manager could act on them.
+- Close-the-loop templates should be warm, concise and human.
+`.trim();
+
+      const aiResponse = await openai.responses.create({
+        model: "gpt-4o-mini",
+        max_output_tokens: 1200,
+        input: [
+          {
+            role: "system",
+            content: prompt,
+          },
+          {
+            role: "user",
+            content: JSON.stringify(compactPayload),
+          },
+        ],
+      });
+
+      let text = String(aiResponse.output_text || "").trim();
+
+      if (text.startsWith("```")) {
+        text = text.replace(/```json|```/gi, "").trim();
+      }
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        text = jsonMatch[0];
+      }
+
+      let insights;
+
+      try {
+        insights = JSON.parse(text);
+      } catch (parseError) {
+        console.error("[nps-data] Failed to parse AI insights JSON", {
+          parseError,
+          raw: text,
+        });
+
+        return res.status(500).json({
+          ok: false,
+          error: "AI insights could not be parsed",
+          raw: text,
+        });
+      }
+
+      return res.json({
+        ok: true,
+        datasetId,
+        workspaceId,
+        generatedAt: new Date().toISOString(),
+        insights,
+      });
+    } catch (err) {
+      console.error("[nps-data] Error in POST /datasets/:datasetId/insights", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to generate dataset insights",
       });
     }
   });

@@ -259,8 +259,18 @@ app.use("/api/intercom", createIntercomRouter());
 
 app.use("/api/envola", createEnvolaRouter());
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "10mb",
+  })
+);
 
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "10mb",
+  })
+);
 
 // =====================================================
 // CSV NPS API ROUTES
@@ -276,10 +286,14 @@ app.use("/api/csv-nps", (req, res, next) => {
 // Persistent saved NPS datasets + rows + close-loop data
 // Base path: /api/nps-data
 // =====================================================
-app.use("/api/nps-data", (req, res, next) => {
-  if (req.path === "/ping") return next();
-  return requirePrivateAuth(req, res, next);
-}, createNpsDataRouter());
+app.use(
+  "/api/nps-data",
+  (req, res, next) => {
+    if (req.path === "/ping") return next();
+    return requirePrivateAuth(req, res, next);
+  },
+  createNpsDataRouter({ openai })
+);
 
 
 // ---------------------------------------------------------------------------
@@ -2662,6 +2676,17 @@ app.get("/api/social-summary", socialSummaryLimiter, async (req, res) => {
     console.error("Error in /api/social-summary:", err);
     res.status(500).json({ error: "Internal error generating social summary" });
   }
+});
+
+app.use((err, req, res, next) => {
+  if (err?.type === "entity.too.large") {
+    return res.status(413).json({
+      ok: false,
+      error: "The uploaded dataset is too large. Please reduce the file size or split it into smaller imports.",
+    });
+  }
+
+  return next(err);
 });
 
 /* -----------------------------

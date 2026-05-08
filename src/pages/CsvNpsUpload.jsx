@@ -68,45 +68,57 @@ export default function CsvNpsUpload() {
     }
   }
 
-  async function handleSaveDataset() {
-    if (!result) return;
+async function handleSaveDataset() {
+  if (!result) return;
 
-    const finalDatasetName = datasetName.trim() || suggestedDatasetName;
+  const finalDatasetName = datasetName.trim() || suggestedDatasetName;
 
-    setSaving(true);
-    setSaveError("");
-    setSavedDataset(null);
+  setSaving(true);
+  setSaveError("");
+  setSavedDataset(null);
 
-    try {
-      const res = await fetch("/api/nps-data/datasets", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          datasetName: finalDatasetName,
-          parsedDataset: result,
-        }),
-      });
+  try {
+    const res = await fetch("/api/nps-data/datasets", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        datasetName: finalDatasetName,
+        parsedDataset: result,
+      }),
+    });
 
-      const data = await res.json();
+    const contentType = res.headers.get("content-type") || "";
 
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to save dataset");
-      }
-
-      setSavedDataset(data.dataset);
-
-      // Helpful for the next phase: remember the last saved dataset ID.
-      sessionStorage.setItem("csvNpsLatestSavedDatasetId", data.dataset.id);
-    } catch (err) {
-      console.error("Dataset save failed:", err);
-      setSaveError(err.message || "Something went wrong while saving");
-    } finally {
-      setSaving(false);
+    if (!contentType.includes("application/json")) {
+      const text = await res.text();
+      console.error("Expected JSON but received:", text.slice(0, 500));
+      throw new Error(
+        `Expected JSON from save endpoint, but received ${
+          contentType || "unknown content type"
+        }`
+      );
     }
+
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "Failed to save dataset");
+    }
+
+    setSavedDataset(data.dataset);
+
+    // Helpful for the next phase: remember the last saved dataset ID.
+    sessionStorage.setItem("csvNpsLatestSavedDatasetId", data.dataset.id);
+  } catch (err) {
+    console.error("Dataset save failed:", err);
+    setSaveError(err.message || "Something went wrong while saving");
+  } finally {
+    setSaving(false);
   }
+}
 
   return (
     <main className="csv-nps-page">

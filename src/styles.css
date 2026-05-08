@@ -1091,3 +1091,10 @@
   font-size: 0.78rem;
   font-weight: 750;
 }
+
+
+.csv-nps-error-compact {
+  margin-top: 0;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}

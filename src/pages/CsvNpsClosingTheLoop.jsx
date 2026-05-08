@@ -40,6 +40,7 @@ export default function CsvNpsClosingTheLoop() {
         });
 
         const localActions = readLocalActions(datasetId);
+
         setActions({
           ...savedActionsByResponseId,
           ...localActions,
@@ -84,15 +85,112 @@ export default function CsvNpsClosingTheLoop() {
           owner: "",
           actionTaken: "",
           updatedAt: null,
+          isDirty: true,
+          isSaving: false,
+          saveError: "",
           ...(current[responseId] || {}),
           ...patch,
-          updatedAt: new Date().toISOString(),
         },
       };
 
       writeLocalActions(datasetId || "session", updated);
       return updated;
     });
+  }
+
+  async function persistAction(row) {
+    const responseId = row.response_id;
+    const action = actions[responseId] || {
+      status: "open",
+      owner: "",
+      actionTaken: "",
+    };
+
+    if (!datasetId || !row.db_row_id) {
+      const updatedAction = {
+        ...action,
+        updatedAt: new Date().toISOString(),
+        isDirty: false,
+        isSaving: false,
+        saveError: "",
+      };
+
+      setActions((current) => {
+        const updated = {
+          ...current,
+          [responseId]: updatedAction,
+        };
+
+        writeLocalActions(datasetId || "session", updated);
+        return updated;
+      });
+
+      return;
+    }
+
+    setActions((current) => ({
+      ...current,
+      [responseId]: {
+        ...(current[responseId] || action),
+        isSaving: true,
+        saveError: "",
+      },
+    }));
+
+    try {
+      const hasExistingAction = Boolean(action.id);
+
+      const res = await fetch(
+        hasExistingAction
+          ? `/api/nps-data/actions/${action.id}`
+          : `/api/nps-data/rows/${row.db_row_id}/actions`,
+        {
+          method: hasExistingAction ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: action.status || "open",
+            owner: action.owner || "",
+            actionTaken: action.actionTaken || "",
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Failed to save follow-up action");
+      }
+
+      const savedAction = normaliseSavedAction(data.action);
+
+      setActions((current) => {
+        const updated = {
+          ...current,
+          [responseId]: {
+            ...savedAction,
+            isDirty: false,
+            isSaving: false,
+            saveError: "",
+          },
+        };
+
+        writeLocalActions(datasetId || "session", updated);
+        return updated;
+      });
+    } catch (err) {
+      console.error("Failed to persist close-loop action:", err);
+
+      setActions((current) => ({
+        ...current,
+        [responseId]: {
+          ...(current[responseId] || action),
+          isSaving: false,
+          saveError: err.message || "Failed to save follow-up action",
+        },
+      }));
+    }
   }
 
   const rows = useMemo(() => {
@@ -106,6 +204,9 @@ export default function CsvNpsClosingTheLoop() {
           owner: "",
           actionTaken: "",
           updatedAt: null,
+          isDirty: false,
+          isSaving: false,
+          saveError: "",
         },
       }))
       .filter((row) => {
@@ -229,17 +330,6 @@ export default function CsvNpsClosingTheLoop() {
 
       <CsvNpsWorkspaceNav />
 
-      {datasetId && (
-        <section className="csv-nps-warning-panel">
-          <h2>Temporary action storage</h2>
-          <p>
-            This page now loads saved datasets from Supabase. Follow-up actions
-            are still stored in this browser session until we add the persistent
-            action save API next.
-          </p>
-        </section>
-      )}
-
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
@@ -298,6 +388,7 @@ export default function CsvNpsClosingTheLoop() {
                 row={row}
                 action={row.loopAction}
                 onChange={(patch) => saveAction(row.response_id, patch)}
+                onSave={() => persistAction(row)}
               />
             ))
           )}
@@ -372,6 +463,22 @@ function getLatestCloseLoopAction(actions = []) {
     owner: latest.owner || "",
     actionTaken: latest.action_taken || "",
     updatedAt: latest.updated_at || latest.created_at || null,
+    isDirty: false,
+    isSaving: false,
+    saveError: "",
+  };
+}
+
+function normaliseSavedAction(action) {
+  return {
+    id: action.id,
+    status: action.status || "open",
+    owner: action.owner || "",
+    actionTaken: action.action_taken || "",
+    updatedAt: action.updated_at || action.created_at || null,
+    isDirty: false,
+    isSaving: false,
+    saveError: "",
   };
 }
 
@@ -407,7 +514,7 @@ function MetricCard({ label, value }) {
   );
 }
 
-function ClosingLoopCard({ row, action, onChange }) {
+function ClosingLoopCard({ row, action, onChange, onSave }) {
   return (
     <article className={`csv-nps-loop-card csv-nps-loop-card-${row.bucket}`}>
       <div className="csv-nps-loop-card-main">
@@ -477,6 +584,25 @@ function ClosingLoopCard({ row, action, onChange }) {
             rows={4}
           />
         </label>
+
+        <button
+          type="button"
+          className="csv-nps-button"
+          onClick={onSave}
+          disabled={action.isSaving}
+        >
+          {action.isSaving
+            ? "Saving..."
+            : action.isDirty
+              ? "Save follow-up"
+              : "Saved"}
+        </button>
+
+        {action.saveError && (
+          <div className="csv-nps-error csv-nps-error-compact">
+            {action.saveError}
+          </div>
+        )}
 
         {action.updatedAt && (
           <p className="csv-nps-loop-updated">

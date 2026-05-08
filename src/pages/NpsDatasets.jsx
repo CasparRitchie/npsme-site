@@ -13,7 +13,10 @@ export default function NpsDatasets() {
     setError("");
 
     try {
-      const res = await fetch("/api/nps-data/datasets");
+      const res = await fetch("/api/nps-data/datasets", {
+        credentials: "include",
+      });
+
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
@@ -39,6 +42,7 @@ export default function NpsDatasets() {
     try {
       const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -143,7 +147,10 @@ function DatasetCard({ dataset, onDelete }) {
       </div>
 
       <div className="csv-nps-dataset-metrics">
-        <MiniMetric label="Responses" value={summary.total ?? dataset.valid_row_count} />
+        <MiniMetric
+          label="Responses"
+          value={summary.total ?? dataset.valid_row_count}
+        />
         <MiniMetric label="NPS" value={summary.nps} />
         <MiniMetric label="Promoters" value={summary.promoters} />
         <MiniMetric label="Passives" value={summary.passives} />

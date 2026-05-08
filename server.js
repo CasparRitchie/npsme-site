@@ -266,15 +266,20 @@ app.use(express.json());
 // CSV NPS API ROUTES
 // Base path: /api/csv-nps
 // =====================================================
-app.use("/api/csv-nps", createCsvNpsRouter());
-
+app.use("/api/csv-nps", (req, res, next) => {
+  if (req.path === "/ping") return next();
+  return requirePrivateAuth(req, res, next);
+}, createCsvNpsRouter());
 
 // =====================================================
 // NPS DATA API ROUTES
 // Persistent saved NPS datasets + rows + close-loop data
 // Base path: /api/nps-data
 // =====================================================
-app.use("/api/nps-data", createNpsDataRouter());
+app.use("/api/nps-data", (req, res, next) => {
+  if (req.path === "/ping") return next();
+  return requirePrivateAuth(req, res, next);
+}, createNpsDataRouter());
 
 
 // ---------------------------------------------------------------------------
@@ -314,31 +319,68 @@ function hasPrivateAuth(req) {
   return cookies[PRIVATE_COOKIE_NAME] === expected;
 }
 
+function requirePrivateAuth(req, res, next) {
+  const expectedValue = expectedPrivateCookieValue();
+
+  if (!expectedValue) {
+    return res.status(500).json({
+      ok: false,
+      error: "PRIVATE_DASH_COOKIE_SECRET is not set",
+    });
+  }
+
+  if (!hasPrivateAuth(req)) {
+    return res.status(401).json({
+      ok: false,
+      error: "Authentication required",
+    });
+  }
+
+  return next();
+}
+
 app.post("/api/auth/login", (req, res) => {
   const password = String(req.body?.password || "");
   const expectedPassword = process.env.PRIVATE_DASH_PASSWORD || "";
 
   if (!expectedPassword) {
-    return res.status(500).json({ ok: false, error: "PRIVATE_DASH_PASSWORD is not set" });
+    return res.status(500).json({
+      ok: false,
+      error: "PRIVATE_DASH_PASSWORD is not set",
+    });
   }
+
   if (!password || password !== expectedPassword) {
-    return res.status(401).json({ ok: false, error: "Invalid password" });
+    return res.status(401).json({
+      ok: false,
+      error: "Invalid password",
+    });
   }
 
   const value = expectedPrivateCookieValue();
+
   if (!value) {
-    return res.status(500).json({ ok: false, error: "PRIVATE_DASH_COOKIE_SECRET is not set" });
+    return res.status(500).json({
+      ok: false,
+      error: "PRIVATE_DASH_COOKIE_SECRET is not set",
+    });
   }
 
   const isProd = process.env.NODE_ENV === "production";
-  res.cookie(PRIVATE_COOKIE_NAME, value, {
+
+  const cookieOptions = {
     httpOnly: true,
     sameSite: "lax",
     secure: isProd,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
-    domain: ".npsme.com",
-  });
+  };
+
+  if (isProd) {
+    cookieOptions.domain = ".npsme.com";
+  }
+
+  res.cookie(PRIVATE_COOKIE_NAME, value, cookieOptions);
 
   return res.json({ ok: true });
 });
@@ -346,13 +388,18 @@ app.post("/api/auth/login", (req, res) => {
 app.post("/api/auth/logout", (_req, res) => {
   const isProd = process.env.NODE_ENV === "production";
 
-  res.clearCookie(PRIVATE_COOKIE_NAME, {
+  const cookieOptions = {
     httpOnly: true,
     sameSite: "lax",
     secure: isProd,
     path: "/",
-    domain: ".npsme.com",
-  });
+  };
+
+  if (isProd) {
+    cookieOptions.domain = ".npsme.com";
+  }
+
+  res.clearCookie(PRIVATE_COOKIE_NAME, cookieOptions);
 
   return res.json({ ok: true });
 });

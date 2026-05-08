@@ -56,10 +56,18 @@ export function createNpsDataRouter() {
         .single();
 
       if (error) {
+        console.error("[nps-data] Failed to load default workspace", {
+          workspaceId,
+          error,
+        });
+
         return res.status(404).json({
           ok: false,
           error: "Default workspace not found",
           workspaceId,
+          supabaseError: error.message,
+          supabaseCode: error.code,
+          supabaseDetails: error.details,
         });
       }
 

@@ -131,32 +131,31 @@ const COMPONENTS = {
   "/envola/closing-the-loop": EnvolaClosingTheLoop,
   "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
 
-  // CSV NPS workspace
-  // Temporarily public while developing/testing.
-  // Later we can wrap these with protect(...) again once PRIVATE_DASH_PASSWORD is configured locally.
-  "/csv-nps/upload": CsvNpsUpload,
-  "/fr/csv-nps/upload": CsvNpsUpload,
+  // CSV / NPS data workspace
+  // Protected because datasets and follow-up actions are now persisted in Supabase.
+  "/csv-nps/upload": protect(CsvNpsUpload),
+  "/fr/csv-nps/upload": protect(CsvNpsUpload),
 
-  "/csv-nps/datasets": NpsDatasets,
-  "/fr/csv-nps/datasets": NpsDatasets,
+  "/csv-nps/datasets": protect(NpsDatasets),
+  "/fr/csv-nps/datasets": protect(NpsDatasets),
 
-  "/csv-nps/performance": CsvNpsPerformance,
-  "/fr/csv-nps/performance": CsvNpsPerformance,
+  "/csv-nps/performance": protect(CsvNpsPerformance),
+  "/fr/csv-nps/performance": protect(CsvNpsPerformance),
 
-  "/csv-nps/responses": CsvNpsResponses,
-  "/fr/csv-nps/responses": CsvNpsResponses,
+  "/csv-nps/responses": protect(CsvNpsResponses),
+  "/fr/csv-nps/responses": protect(CsvNpsResponses),
 
-  "/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
-  "/fr/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
+  "/csv-nps/closing-the-loop": protect(CsvNpsClosingTheLoop),
+  "/fr/csv-nps/closing-the-loop": protect(CsvNpsClosingTheLoop),
 
-  "/csv-nps/datasets/:datasetId/performance": CsvNpsPerformance,
-  "/fr/csv-nps/datasets/:datasetId/performance": CsvNpsPerformance,
+  "/csv-nps/datasets/:datasetId/performance": protect(CsvNpsPerformance),
+  "/fr/csv-nps/datasets/:datasetId/performance": protect(CsvNpsPerformance),
 
-  "/csv-nps/datasets/:datasetId/responses": CsvNpsResponses,
-  "/fr/csv-nps/datasets/:datasetId/responses": CsvNpsResponses,
+  "/csv-nps/datasets/:datasetId/responses": protect(CsvNpsResponses),
+  "/fr/csv-nps/datasets/:datasetId/responses": protect(CsvNpsResponses),
 
-  "/csv-nps/datasets/:datasetId/closing-the-loop": CsvNpsClosingTheLoop,
-  "/fr/csv-nps/datasets/:datasetId/closing-the-loop": CsvNpsClosingTheLoop,
+  "/csv-nps/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
+  "/fr/csv-nps/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

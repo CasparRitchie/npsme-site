@@ -111,11 +111,12 @@ export default function CsvNpsUpload() {
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">NPS data workspace</p>
-        <h1>NPS Data Import</h1>
+        <p className="eyebrow">NPS Me Workspace</p>
+        <h1>Import feedback data</h1>
         <p>
           Paste CSV data or JSON survey exports below. NPS Me will detect the
-          score, date, customer, email and comment fields where possible.
+          score, date, customer, email and comment fields where possible, then
+          turn them into a reusable NPS dataset.
         </p>
       </section>
 
@@ -123,7 +124,7 @@ export default function CsvNpsUpload() {
 
       <section className="csv-nps-panel">
         <label className="csv-nps-label" htmlFor="csv-nps-textarea">
-          Paste CSV or JSON data
+          Paste survey data
         </label>
 
         <textarea
@@ -141,7 +142,7 @@ export default function CsvNpsUpload() {
             onClick={handleParseCsv}
             disabled={loading || !csvText.trim()}
           >
-            {loading ? "Analysing..." : "Analyse data"}
+            {loading ? "Analysing..." : "Analyse feedback"}
           </button>
         </div>
       </section>
@@ -165,7 +166,7 @@ export default function CsvNpsUpload() {
         <section className="csv-nps-results">
           <div className="csv-nps-responses-header">
             <div>
-              <h2>Parsed summary</h2>
+              <h2>Import summary</h2>
               <p>
                 Detected{" "}
                 <strong>{(result.inputType || "csv").toUpperCase()}</strong>{" "}
@@ -186,10 +187,10 @@ export default function CsvNpsUpload() {
 
           <section className="csv-nps-save-panel">
             <div>
-              <h3>Save this dataset</h3>
+              <h3>Save as dataset</h3>
               <p>
-                Save this import to Supabase so it can be reopened later and
-                used for persistent dashboards and close-the-loop actions.
+                Save this import so it can be reopened later and used for
+                performance dashboards, response analysis, and close-the-loop actions.
               </p>
             </div>
 
@@ -233,8 +234,7 @@ export default function CsvNpsUpload() {
             {JSON.stringify(result.detectedFields, null, 2)}
           </pre>
 
-          <h3>Normalised rows</h3>
-
+          <h3>Normalised responses</h3>
           <div className="csv-nps-table-wrap">
             <table className="csv-nps-table">
               <thead>

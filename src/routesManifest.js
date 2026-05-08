@@ -76,13 +76,13 @@ export const ROUTES_MANIFEST = [
   // NPS Me Workspace
   // Product-style protected workspace routes.
   // These are the preferred routes. The older /csv-nps routes remain as aliases for now.
-  { path: "/workspace", label: "Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
-  { path: "/fr/workspace", label: "Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
+  { path: "/workspace", label: "NPS Me Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/workspace", label: "NPS Me Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
-  { path: "/workspace/import", label: "Import data", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/workspace/import", label: "Import feedback", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/workspace/import", label: "Importer des données", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
-  { path: "/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/workspace/datasets", label: "Saved datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
   { path: "/workspace/datasets/:datasetId/performance", label: "Dataset Performance", labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },

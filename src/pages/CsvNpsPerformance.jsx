@@ -140,8 +140,8 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Performance</h1>
+          <p className="eyebrow">NPS Me workspace</p>
+          <h1>Performance</h1>
           <p>Loading saved dataset...</p>
         </section>
 
@@ -158,8 +158,8 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Performance</h1>
+          <p className="eyebrow">NPS Me workspace</p>
+          <h1>Performance</h1>
           <p>There was a problem loading this dataset.</p>
         </section>
 
@@ -174,9 +174,9 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Performance</h1>
-          <p>No NPS dataset has been loaded yet.</p>
+          <p className="eyebrow">NPS Me workspace</p>
+          <h1>Performance</h1>
+          <p>No feedback dataset has been loaded yet.</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -185,7 +185,7 @@ export default function CsvNpsPerformance() {
           <p>
             Go to{" "}
             <a className="text-link" href="/workspace/import">
-              NPS Data Import
+            Import feedback data
             </a>{" "}
             and analyse or save a dataset first.
           </p>
@@ -200,8 +200,8 @@ export default function CsvNpsPerformance() {
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">NPS data workspace</p>
-        <h1>NPS Performance</h1>
+        <p className="eyebrow">NPS Me workspace</p>
+        <h1>Performance</h1>
         <p>
           Performance view for <strong>{datasetName}</strong>
           {datasetId
@@ -215,7 +215,7 @@ export default function CsvNpsPerformance() {
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Performance summary</h2>
+            <h2>NPS Performance summary</h2>
             <p>
               Based on {summary.total} valid NPS response
               {summary.total === 1 ? "" : "s"}.
@@ -287,7 +287,7 @@ export default function CsvNpsPerformance() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <h3>Timeline</h3>
           <p>
-            Daily NPS and response volume, where a valid date was detected.
+            Daily NPS and response volume, where response dates were detected.
           </p>
 
           {timeline.length === 0 ? (

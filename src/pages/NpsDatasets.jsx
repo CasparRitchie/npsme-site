@@ -67,11 +67,11 @@ export default function NpsDatasets() {
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">NPS data workspace</p>
-        <h1>Saved NPS Datasets</h1>
+        <p className="eyebrow">NPS Me Workspace</p>
+        <h1>Saved datasets</h1>
         <p>
-          Reopen previously imported CSV or JSON datasets, review their NPS
-          performance, inspect responses, and continue close-the-loop actions.
+          Reopen imported feedback datasets, review NPS performance, inspect
+          customer responses, and continue close-the-loop actions.
         </p>
       </section>
 
@@ -80,7 +80,7 @@ export default function NpsDatasets() {
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Your datasets</h2>
+            <h2>Feedback datasets</h2>
             <p>
               {loading
                 ? "Loading saved datasets..."
@@ -99,8 +99,7 @@ export default function NpsDatasets() {
 
         {!loading && datasets.length === 0 && !error && (
           <div className="csv-nps-empty-state">
-            No saved datasets yet. Import CSV or JSON data first, then save it
-            here.
+            No saved datasets yet. Import feedback data first, then save it here.
           </div>
         )}
 

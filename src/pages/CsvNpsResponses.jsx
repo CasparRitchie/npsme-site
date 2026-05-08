@@ -97,8 +97,8 @@ export default function CsvNpsResponses() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Responses</h1>
+          <p className="eyebrow">NPS Me Workspace</p>
+          <h1>Responses</h1>
           <p>Loading saved dataset...</p>
         </section>
 
@@ -115,8 +115,8 @@ export default function CsvNpsResponses() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Responses</h1>
+          <p className="eyebrow">NPS Me Workspace</p>
+          <h1>Responses</h1>
           <p>There was a problem loading this dataset.</p>
         </section>
 
@@ -131,9 +131,9 @@ export default function CsvNpsResponses() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">NPS data workspace</p>
-          <h1>NPS Responses</h1>
-          <p>No NPS dataset has been loaded yet.</p>
+          <p className="eyebrow">NPS Me Workspace</p>
+          <h1>Responses</h1>
+          <p>No feedback dataset has been loaded yet.</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -142,7 +142,7 @@ export default function CsvNpsResponses() {
           <p>
             Go to{" "}
             <a className="text-link" href="/workspace/import">
-              NPS Data Import
+              Import feedback data
             </a>{" "}
             and analyse or save a dataset first.
           </p>
@@ -156,10 +156,10 @@ export default function CsvNpsResponses() {
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">NPS data workspace</p>
-        <h1>NPS Responses</h1>
+        <p className="eyebrow">NPS Me Workspace</p>
+        <h1>Responses</h1>
         <p>
-          Review the normalised customer feedback for{" "}
+          Review customer feedback for{" "}
           <strong>{datasetName}</strong>
           {datasetId
             ? ", loaded from Supabase."

@@ -11,7 +11,7 @@ export default function CsvNpsWorkspaceNav() {
   return (
     <nav className="csv-nps-workspace-nav" aria-label="NPS workspace navigation">
       <NavLink to="/workspace" end>
-        Workspace
+        Overview
       </NavLink>
 
       <NavLink to="/workspace/import">
@@ -41,7 +41,7 @@ export default function CsvNpsWorkspaceNav() {
             : "/workspace/datasets"
         }
       >
-        Closing the loop
+        Close the loop
       </NavLink>
     </nav>
   );

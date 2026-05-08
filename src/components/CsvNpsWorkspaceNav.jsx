@@ -1,19 +1,48 @@
-// src/components/CsvNpsWorkspaceNav.jsx
 import React from "react";
+import { NavLink, useParams } from "react-router-dom";
 
 export default function CsvNpsWorkspaceNav() {
+  const { datasetId } = useParams();
+
+  const datasetBasePath = datasetId
+    ? `/workspace/datasets/${datasetId}`
+    : null;
+
   return (
-    <div className="csv-nps-workspace-nav-wrap">
-      <nav
-        className="csv-nps-workspace-nav"
-        aria-label="NPS data workspace navigation"
+    <nav className="csv-nps-workspace-nav" aria-label="NPS workspace navigation">
+      <NavLink to="/workspace" end>
+        Workspace
+      </NavLink>
+
+      <NavLink to="/workspace/import">
+        Import
+      </NavLink>
+
+      <NavLink to="/workspace/datasets">
+        Datasets
+      </NavLink>
+
+      <NavLink
+        to={datasetBasePath ? `${datasetBasePath}/performance` : "/workspace/datasets"}
       >
-        <a href="/csv-nps/upload">Import</a>
-        <a href="/csv-nps/datasets">Datasets</a>
-        <a href="/csv-nps/performance">Performance</a>
-        <a href="/csv-nps/responses">Responses</a>
-        <a href="/csv-nps/closing-the-loop">Closing the loop</a>
-      </nav>
-    </div>
+        Performance
+      </NavLink>
+
+      <NavLink
+        to={datasetBasePath ? `${datasetBasePath}/responses` : "/workspace/datasets"}
+      >
+        Responses
+      </NavLink>
+
+      <NavLink
+        to={
+          datasetBasePath
+            ? `${datasetBasePath}/closing-the-loop`
+            : "/workspace/datasets"
+        }
+      >
+        Closing the loop
+      </NavLink>
+    </nav>
   );
 }

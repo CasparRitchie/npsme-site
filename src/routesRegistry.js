@@ -65,6 +65,7 @@ import CsvNpsPerformance from "./pages/CsvNpsPerformance";
 import CsvNpsResponses from "./pages/CsvNpsResponses";
 import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
 import NpsDatasets from "./pages/NpsDatasets";
+import WorkspaceHome from "./pages/WorkspaceHome";
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -130,6 +131,25 @@ const COMPONENTS = {
 
   "/envola/closing-the-loop": EnvolaClosingTheLoop,
   "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
+
+  // NPS Me Workspace - new product-style routes
+  "/workspace": protect(WorkspaceHome),
+  "/fr/workspace": protect(WorkspaceHome),
+
+  "/workspace/import": protect(CsvNpsUpload),
+  "/fr/workspace/import": protect(CsvNpsUpload),
+
+  "/workspace/datasets": protect(NpsDatasets),
+  "/fr/workspace/datasets": protect(NpsDatasets),
+
+  "/workspace/datasets/:datasetId/performance": protect(CsvNpsPerformance),
+  "/fr/workspace/datasets/:datasetId/performance": protect(CsvNpsPerformance),
+
+  "/workspace/datasets/:datasetId/responses": protect(CsvNpsResponses),
+  "/fr/workspace/datasets/:datasetId/responses": protect(CsvNpsResponses),
+
+  "/workspace/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
+  "/fr/workspace/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
 
   // CSV / NPS data workspace
   // Protected because datasets and follow-up actions are now persisted in Supabase.

@@ -306,7 +306,7 @@ export default function CsvNpsClosingTheLoop() {
         <section className="csv-nps-panel">
           <p>
             Go to{" "}
-            <a className="text-link" href="/csv-nps/upload">
+            <a className="text-link" href="/workspace/import">
               NPS Data Import
             </a>{" "}
             and analyse or save a dataset first.

@@ -90,7 +90,7 @@ export default function NpsDatasets() {
             </p>
           </div>
 
-          <Link className="csv-nps-button-link" to="/csv-nps/upload">
+          <Link className="csv-nps-button-link" to="/workspace/import">
             Import new data
           </Link>
         </div>
@@ -166,21 +166,21 @@ function DatasetCard({ dataset, onDelete }) {
       <div className="csv-nps-dataset-actions">
         <Link
           className="csv-nps-secondary-link"
-          to={`/csv-nps/datasets/${dataset.id}/performance`}
+          to={`/workspace/datasets/${dataset.id}/performance`}
         >
           Performance
         </Link>
 
         <Link
           className="csv-nps-secondary-link"
-          to={`/csv-nps/datasets/${dataset.id}/responses`}
+          to={`/workspace/datasets/${dataset.id}/responses`}
         >
           Responses
         </Link>
 
         <Link
           className="csv-nps-secondary-link"
-          to={`/csv-nps/datasets/${dataset.id}/closing-the-loop`}
+          to={`/workspace/datasets/${dataset.id}/closing-the-loop`}
         >
           Closing the loop
         </Link>

@@ -72,6 +72,28 @@ export const ROUTES_MANIFEST = [
   { path: "/envola/closing-the-loop", label: "Envola Closing the Loop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/envola/closing-the-loop", label: "Boucle de feedback Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
+
+  // NPS Me Workspace
+  // Product-style protected workspace routes.
+  // These are the preferred routes. The older /csv-nps routes remain as aliases for now.
+  { path: "/workspace", label: "Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/workspace", label: "Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
+
+  { path: "/workspace/import", label: "Import data", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/import", label: "Importer des données", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/workspace/datasets/:datasetId/performance", label: "Dataset Performance", labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/datasets/:datasetId/performance", label: "Performance dataset", labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/workspace/datasets/:datasetId/responses", label: "Dataset Responses", labelKey: "routes.workspaceDatasetResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/datasets/:datasetId/responses", label: "Réponses dataset", labelKey: "routes.workspaceDatasetResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/workspace/datasets/:datasetId/closing-the-loop", label: "Dataset Closing the Loop", labelKey: "routes.workspaceDatasetClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/datasets/:datasetId/closing-the-loop", label: "Boucle de feedback dataset", labelKey: "routes.workspaceDatasetClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   // CSV NPS workspace
   // Generic pasted/uploaded CSV survey data workspace.
   // Keep separate from Envola/Intercom routes so existing Envola dashboards are not impacted.

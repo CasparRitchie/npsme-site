@@ -1,0 +1,112 @@
+
+/* =====================================================
+   Envola live survey theme
+   Applied only when .envola-theme is on survey-page
+   ===================================================== */
+
+.envola-theme {
+  background: #f5f7ff;
+  color: #152238;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+.envola-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+  padding: 2rem 2.25rem;
+  max-width: 640px;
+}
+
+.envola-brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.envola-logo-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: #263b87;
+}
+
+.envola-badge {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #e3ebff;
+  color: #263b87;
+  font-weight: 500;
+}
+
+.envola-theme h1 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: #152238;
+}
+
+.envola-theme p {
+  color: #384255;
+}
+
+.envola-theme button[type="button"],
+.envola-theme button[type="submit"] {
+  background: #263b87;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.75rem 1.7rem;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 20px rgba(38, 59, 135, 0.25);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+    background-color 0.15s ease-out;
+}
+
+.envola-theme button[type="button"]:hover,
+.envola-theme button[type="submit"]:hover {
+  background: #1f316f;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(38, 59, 135, 0.35);
+}
+
+.envola-theme button[type="button"]:active,
+.envola-theme button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(38, 59, 135, 0.3);
+}
+
+.envola-theme .score-grid button {
+  background: #ffffff;
+  border-radius: 999px;
+  border: 1px solid #d0d7f5;
+  color: #152238;
+}
+
+.envola-theme .score-grid button[style*="background: #dcfce7"],
+.envola-theme .score-grid button[style*="background:#dcfce7"] {
+  background: #e3ebff !important;
+  border-color: #263b87 !important;
+}
+
+.envola-theme textarea {
+  border-radius: 16px;
+  border-color: #d0d7f5;
+}
+
+.envola-powered {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.envola-powered a {
+  color: #263b87;
+  text-decoration: underline;
+}

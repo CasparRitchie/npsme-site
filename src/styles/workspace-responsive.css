@@ -1,0 +1,61 @@
+@media (max-width: 900px) {
+  .csv-nps-performance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .csv-nps-loop-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .csv-nps-responses-header {
+    display: grid;
+  }
+
+  .csv-nps-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .csv-nps-workspace-nav-wrap {
+    top: 65px;
+  }
+
+  .csv-nps-workspace-nav {
+    width: 100%;
+    border-radius: 18px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .csv-nps-workspace-nav a {
+    flex: 0 0 auto;
+  }
+
+  .csv-nps-page {
+    width: min(100% - 20px, 1100px);
+    padding-top: 28px;
+  }
+
+  .csv-nps-panel,
+  .csv-nps-results {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .csv-nps-textarea {
+    min-height: 220px;
+  }
+
+  .csv-nps-dataset-card-header {
+    display: grid;
+  }
+
+  .csv-nps-danger-button {
+    justify-self: start;
+  }
+}

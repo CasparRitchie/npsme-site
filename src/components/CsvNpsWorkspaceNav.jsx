@@ -6,9 +6,10 @@ export default function CsvNpsWorkspaceNav() {
     <div className="csv-nps-workspace-nav-wrap">
       <nav
         className="csv-nps-workspace-nav"
-        aria-label="CSV NPS workspace navigation"
+        aria-label="NPS data workspace navigation"
       >
-        <a href="/csv-nps/upload">Upload</a>
+        <a href="/csv-nps/upload">Import</a>
+        <a href="/csv-nps/datasets">Datasets</a>
         <a href="/csv-nps/performance">Performance</a>
         <a href="/csv-nps/responses">Responses</a>
         <a href="/csv-nps/closing-the-loop">Closing the loop</a>

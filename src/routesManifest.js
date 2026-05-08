@@ -78,6 +78,9 @@ export const ROUTES_MANIFEST = [
   { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
+  { path: "/csv-nps/datasets", label: "NPS Datasets", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/csv-nps/datasets", label: "Datasets NPS", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
+
   { path: "/csv-nps/performance", label: "CSV NPS Performance", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/csv-nps/performance", label: "Performance CSV NPS", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
@@ -86,6 +89,16 @@ export const ROUTES_MANIFEST = [
 
   { path: "/csv-nps/closing-the-loop", label: "CSV NPS Closing the Loop", labelKey: "routes.csvNpsClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/csv-nps/closing-the-loop", label: "Boucle de feedback CSV NPS", labelKey: "routes.csvNpsClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  // CSV NPS saved dataset views
+  { path: "/csv-nps/datasets/:datasetId/performance", label: "Saved NPS Performance", labelKey: "routes.csvNpsSavedPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/datasets/:datasetId/performance", label: "Performance dataset NPS", labelKey: "routes.csvNpsSavedPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/csv-nps/datasets/:datasetId/responses", label: "Saved NPS Responses", labelKey: "routes.csvNpsSavedResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/datasets/:datasetId/responses", label: "Réponses dataset NPS", labelKey: "routes.csvNpsSavedResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
+  { path: "/csv-nps/datasets/:datasetId/closing-the-loop", label: "Saved NPS Closing the Loop", labelKey: "routes.csvNpsSavedClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/datasets/:datasetId/closing-the-loop", label: "Boucle de feedback dataset NPS", labelKey: "routes.csvNpsSavedClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
   // Social listening (indexable)
   { path: "/social-listening",     label: "Social Listening",       labelKey: "routes.socialListening",       enabled: true, indexable: true, inHeader: true,  inFooter: true,  lang: "en" },

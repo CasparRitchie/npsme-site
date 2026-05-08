@@ -1,21 +1,60 @@
 // src/pages/CsvNpsPerformance.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 
 export default function CsvNpsPerformance() {
+  const { datasetId } = useParams();
+
   const [dataset, setDataset] = useState(null);
+  const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
+  const [datasetError, setDatasetError] = useState("");
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("csvNpsLatestDataset");
+    async function loadSavedDataset() {
+      setLoadingDataset(true);
+      setDatasetError("");
 
-    if (!saved) return;
+      try {
+        const res = await fetch(`/api/nps-data/datasets/${datasetId}`);
+        const data = await res.json();
 
-    try {
-      setDataset(JSON.parse(saved));
-    } catch (err) {
-      console.error("Failed to read CSV NPS dataset from sessionStorage", err);
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load saved dataset");
+        }
+
+        setDataset(normaliseSavedDataset(data));
+      } catch (err) {
+        console.error("Failed to load saved NPS dataset:", err);
+        setDatasetError(err.message || "Failed to load saved dataset");
+      } finally {
+        setLoadingDataset(false);
+      }
     }
-  }, []);
+
+    function loadSessionDataset() {
+      const saved = sessionStorage.getItem("csvNpsLatestDataset");
+
+      if (!saved) {
+        setDataset(null);
+        return;
+      }
+
+      try {
+        setDataset(JSON.parse(saved));
+      } catch (err) {
+        console.error("Failed to read CSV NPS dataset from sessionStorage", err);
+        setDatasetError("Failed to read latest browser-session dataset");
+      }
+    }
+
+    if (datasetId) {
+      loadSavedDataset();
+    } else {
+      loadSessionDataset();
+      setLoadingDataset(false);
+    }
+  }, [datasetId]);
 
   const bucketPercentages = useMemo(() => {
     if (!dataset?.summary?.total) {
@@ -95,13 +134,47 @@ export default function CsvNpsPerformance() {
     );
   }, [dataset]);
 
+  if (loadingDataset) {
+    return (
+      <main className="csv-nps-page">
+        <section className="csv-nps-hero">
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Performance</h1>
+          <p>Loading saved dataset...</p>
+        </section>
+
+        <CsvNpsWorkspaceNav />
+
+        <section className="csv-nps-panel">
+          <p>Loading performance data from Supabase.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (datasetError) {
+    return (
+      <main className="csv-nps-page">
+        <section className="csv-nps-hero">
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Performance</h1>
+          <p>There was a problem loading this dataset.</p>
+        </section>
+
+        <CsvNpsWorkspaceNav />
+
+        <section className="csv-nps-error">{datasetError}</section>
+      </main>
+    );
+  }
+
   if (!dataset) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">CSV NPS workspace</p>
-          <h1>CSV NPS Performance</h1>
-          <p>No CSV dataset has been analysed yet.</p>
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Performance</h1>
+          <p>No NPS dataset has been loaded yet.</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -110,9 +183,9 @@ export default function CsvNpsPerformance() {
           <p>
             Go to{" "}
             <a className="text-link" href="/csv-nps/upload">
-              CSV NPS Upload
+              NPS Data Import
             </a>{" "}
-            and analyse a CSV file first.
+            and analyse or save a dataset first.
           </p>
         </section>
       </main>
@@ -120,15 +193,18 @@ export default function CsvNpsPerformance() {
   }
 
   const { summary } = dataset;
+  const datasetName = dataset.datasetName || "Latest browser-session dataset";
 
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">CSV NPS workspace</p>
-        <h1>CSV NPS Performance</h1>
+        <p className="eyebrow">NPS data workspace</p>
+        <h1>NPS Performance</h1>
         <p>
-          Performance view for the latest CSV dataset analysed in this browser
-          session.
+          Performance view for <strong>{datasetName}</strong>
+          {datasetId
+            ? ", loaded from Supabase."
+            : ", analysed in this browser session."}
         </p>
       </section>
 
@@ -139,8 +215,8 @@ export default function CsvNpsPerformance() {
           <div>
             <h2>Performance summary</h2>
             <p>
-              Based on {summary.total} valid NPS responses from the latest CSV
-              analysis.
+              Based on {summary.total} valid NPS response
+              {summary.total === 1 ? "" : "s"}.
             </p>
           </div>
         </div>
@@ -209,13 +285,12 @@ export default function CsvNpsPerformance() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <h3>Timeline</h3>
           <p>
-            Daily NPS and response volume, where a valid date column was
-            detected.
+            Daily NPS and response volume, where a valid date was detected.
           </p>
 
           {timeline.length === 0 ? (
             <div className="csv-nps-empty-state">
-              No usable response dates were detected in this CSV dataset.
+              No usable response dates were detected in this dataset.
             </div>
           ) : (
             <div className="csv-nps-table-wrap">
@@ -249,6 +324,86 @@ export default function CsvNpsPerformance() {
       </section>
     </main>
   );
+}
+
+function normaliseSavedDataset(apiResponse) {
+  const savedDataset = apiResponse.dataset || {};
+  const savedRows = apiResponse.rows || [];
+
+  const rows = savedRows.map((row) => ({
+    response_id: row.response_id || row.id,
+    source: row.source,
+    row_number: row.row_number,
+    submitted_at: row.submitted_at,
+    score: row.score,
+    bucket: row.bucket,
+    customer_name: row.customer_name,
+    customer_email: row.customer_email,
+    company: row.company,
+    stage: row.stage,
+    comment: row.comment,
+    contact_id: row.contact_id,
+    intercom_contact_url: row.intercom_contact_url,
+    selected_options: row.selected_options_json || [],
+    extra_scores: row.extra_scores_json || {},
+    raw: row.raw_json || {},
+  }));
+
+  const summary = normaliseSummary(savedDataset.summary_json, rows);
+
+  return {
+    id: savedDataset.id,
+    datasetName: savedDataset.dataset_name,
+    sourceType: savedDataset.source_type,
+    content_id: savedDataset.content_id,
+    rawRowCount: savedDataset.raw_row_count,
+    validRowCount: savedDataset.valid_row_count,
+    skippedRowCount: savedDataset.skipped_row_count,
+    detectedFields: savedDataset.detected_fields_json || {},
+    warnings: savedDataset.warnings_json || [],
+    skippedRows: savedDataset.skipped_rows_json || [],
+    summary,
+    rows,
+  };
+}
+
+function normaliseSummary(summaryJson, rows) {
+  const summary = summaryJson || {};
+
+  return {
+    total: summary.total ?? rows.length,
+    promoters:
+      summary.promoters ?? rows.filter((row) => row.bucket === "promoter").length,
+    passives:
+      summary.passives ?? rows.filter((row) => row.bucket === "passive").length,
+    detractors:
+      summary.detractors ??
+      rows.filter((row) => row.bucket === "detractor").length,
+    nps: summary.nps ?? calculateNps(rows),
+    averageScore: summary.averageScore ?? calculateAverageScore(rows),
+  };
+}
+
+function calculateNps(rows) {
+  const total = rows.length;
+  if (!total) return null;
+
+  const promoters = rows.filter((row) => row.bucket === "promoter").length;
+  const detractors = rows.filter((row) => row.bucket === "detractor").length;
+
+  return Math.round(((promoters - detractors) / total) * 100);
+}
+
+function calculateAverageScore(rows) {
+  const scores = rows
+    .map((row) => Number(row.score))
+    .filter((score) => Number.isFinite(score));
+
+  if (!scores.length) return null;
+
+  return Math.round(
+    (scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10
+  ) / 10;
 }
 
 function MetricCard({ label, value }) {

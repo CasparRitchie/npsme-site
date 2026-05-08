@@ -64,6 +64,7 @@ import CsvNpsUpload from "./pages/CsvNpsUpload";
 import CsvNpsPerformance from "./pages/CsvNpsPerformance";
 import CsvNpsResponses from "./pages/CsvNpsResponses";
 import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
+import NpsDatasets from "./pages/NpsDatasets";
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -136,6 +137,9 @@ const COMPONENTS = {
   "/csv-nps/upload": CsvNpsUpload,
   "/fr/csv-nps/upload": CsvNpsUpload,
 
+  "/csv-nps/datasets": NpsDatasets,
+  "/fr/csv-nps/datasets": NpsDatasets,
+
   "/csv-nps/performance": CsvNpsPerformance,
   "/fr/csv-nps/performance": CsvNpsPerformance,
 
@@ -144,6 +148,15 @@ const COMPONENTS = {
 
   "/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
   "/fr/csv-nps/closing-the-loop": CsvNpsClosingTheLoop,
+
+  "/csv-nps/datasets/:datasetId/performance": CsvNpsPerformance,
+  "/fr/csv-nps/datasets/:datasetId/performance": CsvNpsPerformance,
+
+  "/csv-nps/datasets/:datasetId/responses": CsvNpsResponses,
+  "/fr/csv-nps/datasets/:datasetId/responses": CsvNpsResponses,
+
+  "/csv-nps/datasets/:datasetId/closing-the-loop": CsvNpsClosingTheLoop,
+  "/fr/csv-nps/datasets/:datasetId/closing-the-loop": CsvNpsClosingTheLoop,
 
   "/what-is-nps": WhatIsNps,
   "/fr/what-is-nps": WhatIsNps,

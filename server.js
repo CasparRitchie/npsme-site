@@ -1,4 +1,5 @@
 // server.js
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,9 +11,13 @@ import OpenAI from "openai";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 import crypto from "crypto";
+import { supabaseAdmin } from "./supabaseClient.js";
+
+
 import { createIntercomRouter } from "./intercom.routes.js";
 import { createEnvolaRouter } from "./envola.routes.js";
 import { createCsvNpsRouter } from "./csvNps.routes.js";
+import { createNpsDataRouter } from "./npsData.routes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -262,6 +267,15 @@ app.use(express.json());
 // Base path: /api/csv-nps
 // =====================================================
 app.use("/api/csv-nps", createCsvNpsRouter());
+
+
+// =====================================================
+// NPS DATA API ROUTES
+// Persistent saved NPS datasets + rows + close-loop data
+// Base path: /api/nps-data
+// =====================================================
+app.use("/api/nps-data", createNpsDataRouter());
+
 
 // ---------------------------------------------------------------------------
 // Simple shared-password protection (Option B)
@@ -1428,6 +1442,42 @@ app.get("/healthz", (_req, res) => {
 app.head("/healthz", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.status(200).end();
+});
+
+// Supabase
+
+app.get("/api/db/health", async (_req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({
+        ok: false,
+        error: "Supabase is not configured",
+      });
+    }
+
+    const { error } = await supabaseAdmin
+      .from("datasets")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      return res.status(500).json({
+        ok: false,
+        error: error.message,
+      });
+    }
+
+    return res.json({
+      ok: true,
+      database: "supabase",
+    });
+  } catch (err) {
+    console.error("[npsme] DB health check failed", err);
+    return res.status(500).json({
+      ok: false,
+      error: "Database health check failed",
+    });
+  }
 });
 
 /* -----------------------------

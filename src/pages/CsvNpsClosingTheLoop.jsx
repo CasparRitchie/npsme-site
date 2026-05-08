@@ -1,36 +1,79 @@
 // src/pages/CsvNpsClosingTheLoop.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
 
 export default function CsvNpsClosingTheLoop() {
+  const { datasetId } = useParams();
+
   const [dataset, setDataset] = useState(null);
   const [actions, setActions] = useState({});
+  const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
+  const [datasetError, setDatasetError] = useState("");
+
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
-    const savedDataset = sessionStorage.getItem("csvNpsLatestDataset");
+    async function loadSavedDataset() {
+      setLoadingDataset(true);
+      setDatasetError("");
 
-    if (savedDataset) {
       try {
-        setDataset(JSON.parse(savedDataset));
+        const res = await fetch(`/api/nps-data/datasets/${datasetId}`);
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load saved dataset");
+        }
+
+        const normalised = normaliseSavedDataset(data);
+        setDataset(normalised);
+
+        const savedActionsByResponseId = {};
+        normalised.rows.forEach((row) => {
+          if (row.loopAction) {
+            savedActionsByResponseId[row.response_id] = row.loopAction;
+          }
+        });
+
+        const localActions = readLocalActions(datasetId);
+        setActions({
+          ...savedActionsByResponseId,
+          ...localActions,
+        });
       } catch (err) {
-        console.error("Failed to read CSV NPS dataset from sessionStorage", err);
+        console.error("Failed to load saved NPS dataset:", err);
+        setDatasetError(err.message || "Failed to load saved dataset");
+      } finally {
+        setLoadingDataset(false);
       }
     }
 
-    const savedActions = sessionStorage.getItem(ACTIONS_STORAGE_KEY);
+    function loadSessionDataset() {
+      const savedDataset = sessionStorage.getItem("csvNpsLatestDataset");
 
-    if (savedActions) {
-      try {
-        setActions(JSON.parse(savedActions));
-      } catch (err) {
-        console.error("Failed to read CSV NPS actions from sessionStorage", err);
+      if (savedDataset) {
+        try {
+          setDataset(JSON.parse(savedDataset));
+        } catch (err) {
+          console.error("Failed to read CSV NPS dataset from sessionStorage", err);
+          setDatasetError("Failed to read latest browser-session dataset");
+        }
       }
+
+      setActions(readLocalActions("session"));
     }
-  }, []);
+
+    if (datasetId) {
+      loadSavedDataset();
+    } else {
+      loadSessionDataset();
+      setLoadingDataset(false);
+    }
+  }, [datasetId]);
 
   function saveAction(responseId, patch) {
     setActions((current) => {
@@ -47,7 +90,7 @@ export default function CsvNpsClosingTheLoop() {
         },
       };
 
-      sessionStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(updated));
+      writeLocalActions(datasetId || "session", updated);
       return updated;
     });
   }
@@ -94,6 +137,7 @@ export default function CsvNpsClosingTheLoop() {
     const sourceRows = dataset?.rows || [];
 
     const total = sourceRows.length;
+
     const open = sourceRows.filter((row) => {
       const action = actions[row.response_id];
       return !action || action.status === "open";
@@ -110,13 +154,47 @@ export default function CsvNpsClosingTheLoop() {
     return { total, open, inProgress, closed };
   }, [dataset, actions]);
 
+  if (loadingDataset) {
+    return (
+      <main className="csv-nps-page">
+        <section className="csv-nps-hero">
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Closing the Loop</h1>
+          <p>Loading saved dataset...</p>
+        </section>
+
+        <CsvNpsWorkspaceNav />
+
+        <section className="csv-nps-panel">
+          <p>Loading close-the-loop data from Supabase.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (datasetError) {
+    return (
+      <main className="csv-nps-page">
+        <section className="csv-nps-hero">
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Closing the Loop</h1>
+          <p>There was a problem loading this dataset.</p>
+        </section>
+
+        <CsvNpsWorkspaceNav />
+
+        <section className="csv-nps-error">{datasetError}</section>
+      </main>
+    );
+  }
+
   if (!dataset) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero">
-          <p className="eyebrow">CSV NPS workspace</p>
-          <h1>CSV NPS Closing the Loop</h1>
-          <p>No CSV dataset has been analysed yet.</p>
+          <p className="eyebrow">NPS data workspace</p>
+          <h1>NPS Closing the Loop</h1>
+          <p>No NPS dataset has been loaded yet.</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -125,34 +203,50 @@ export default function CsvNpsClosingTheLoop() {
           <p>
             Go to{" "}
             <a className="text-link" href="/csv-nps/upload">
-              CSV NPS Upload
+              NPS Data Import
             </a>{" "}
-            and analyse a CSV file first.
+            and analyse or save a dataset first.
           </p>
         </section>
       </main>
     );
   }
 
+  const datasetName = dataset.datasetName || "Latest browser-session dataset";
+
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">CSV NPS workspace</p>
-        <h1>CSV NPS Closing the Loop</h1>
+        <p className="eyebrow">NPS data workspace</p>
+        <h1>NPS Closing the Loop</h1>
         <p>
-          Track follow-up actions for customer feedback imported from your
-          latest CSV dataset.
+          Track follow-up actions for <strong>{datasetName}</strong>
+          {datasetId
+            ? ", loaded from Supabase."
+            : ", analysed in this browser session."}
         </p>
       </section>
 
       <CsvNpsWorkspaceNav />
+
+      {datasetId && (
+        <section className="csv-nps-warning-panel">
+          <h2>Temporary action storage</h2>
+          <p>
+            This page now loads saved datasets from Supabase. Follow-up actions
+            are still stored in this browser session until we add the persistent
+            action save API next.
+          </p>
+        </section>
+      )}
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
             <h2>Follow-up queue</h2>
             <p>
-              Showing {rows.length} of {dataset.rows.length} responses.
+              Showing {rows.length} of {dataset.rows.length} response
+              {dataset.rows.length === 1 ? "" : "s"}.
             </p>
           </div>
         </div>
@@ -213,6 +307,97 @@ export default function CsvNpsClosingTheLoop() {
   );
 }
 
+function normaliseSavedDataset(apiResponse) {
+  const savedDataset = apiResponse.dataset || {};
+  const savedRows = apiResponse.rows || [];
+
+  const rows = savedRows.map((row) => {
+    const latestAction = getLatestCloseLoopAction(row.close_loop_actions);
+
+    return {
+      db_row_id: row.id,
+      response_id: row.response_id || row.id,
+      source: row.source,
+      row_number: row.row_number,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      customer_name: row.customer_name,
+      customer_email: row.customer_email,
+      company: row.company,
+      stage: row.stage,
+      comment: row.comment,
+      contact_id: row.contact_id,
+      intercom_contact_url: row.intercom_contact_url,
+      selected_options: row.selected_options_json || [],
+      extra_scores: row.extra_scores_json || {},
+      raw: row.raw_json || {},
+      loopAction: latestAction,
+    };
+  });
+
+  return {
+    id: savedDataset.id,
+    datasetName: savedDataset.dataset_name,
+    sourceType: savedDataset.source_type,
+    content_id: savedDataset.content_id,
+    rawRowCount: savedDataset.raw_row_count,
+    validRowCount: savedDataset.valid_row_count,
+    skippedRowCount: savedDataset.skipped_row_count,
+    detectedFields: savedDataset.detected_fields_json || {},
+    warnings: savedDataset.warnings_json || [],
+    skippedRows: savedDataset.skipped_rows_json || [],
+    summary: savedDataset.summary_json || {},
+    rows,
+  };
+}
+
+function getLatestCloseLoopAction(actions = []) {
+  if (!Array.isArray(actions) || actions.length === 0) {
+    return null;
+  }
+
+  const sorted = [...actions].sort((a, b) => {
+    const aDate = new Date(a.updated_at || a.created_at || 0).getTime();
+    const bDate = new Date(b.updated_at || b.created_at || 0).getTime();
+
+    return bDate - aDate;
+  });
+
+  const latest = sorted[0];
+
+  return {
+    id: latest.id,
+    status: latest.status || "open",
+    owner: latest.owner || "",
+    actionTaken: latest.action_taken || "",
+    updatedAt: latest.updated_at || latest.created_at || null,
+  };
+}
+
+function readLocalActions(scope) {
+  const storageKey = getActionsStorageKey(scope);
+  const savedActions = sessionStorage.getItem(storageKey);
+
+  if (!savedActions) return {};
+
+  try {
+    return JSON.parse(savedActions);
+  } catch (err) {
+    console.error("Failed to read CSV NPS actions from sessionStorage", err);
+    return {};
+  }
+}
+
+function writeLocalActions(scope, actions) {
+  const storageKey = getActionsStorageKey(scope);
+  sessionStorage.setItem(storageKey, JSON.stringify(actions));
+}
+
+function getActionsStorageKey(scope) {
+  return `${ACTIONS_STORAGE_KEY}:${scope || "session"}`;
+}
+
 function MetricCard({ label, value }) {
   return (
     <div className="csv-nps-metric-card">
@@ -233,7 +418,11 @@ function ClosingLoopCard({ row, action, onChange }) {
 
           <span className="csv-nps-loop-score">Score {row.score}</span>
 
-          <span className={`csv-nps-loop-status csv-nps-loop-status-${action.status}`}>
+          <span
+            className={`csv-nps-loop-status csv-nps-loop-status-${
+              action.status || "open"
+            }`}
+          >
             {formatStatus(action.status)}
           </span>
         </div>
@@ -245,9 +434,15 @@ function ClosingLoopCard({ row, action, onChange }) {
           {row.submitted_at?.slice(0, 10) || "No date"}
         </p>
 
-        <blockquote>
-          {row.comment || "No comment provided."}
-        </blockquote>
+        <blockquote>{row.comment || "No comment provided."}</blockquote>
+
+        {row.selected_options?.length > 0 && (
+          <div className="csv-nps-loop-options">
+            {row.selected_options.map((option) => (
+              <span key={option}>{option}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="csv-nps-loop-card-actions">

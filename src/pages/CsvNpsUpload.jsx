@@ -1,5 +1,5 @@
 // src/pages/CsvNpsUpload.jsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 
 export default function CsvNpsUpload() {
@@ -8,13 +8,35 @@ export default function CsvNpsUpload() {
   );
 
   const [result, setResult] = useState(null);
+  const [datasetName, setDatasetName] = useState("");
+  const [savedDataset, setSavedDataset] = useState(null);
+
   const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const suggestedDatasetName = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (result?.content_id) {
+      return `NPS import ${result.content_id} - ${today}`;
+    }
+
+    if (result?.inputType) {
+      return `${result.inputType.toUpperCase()} NPS import - ${today}`;
+    }
+
+    return `NPS import - ${today}`;
+  }, [result]);
 
   async function handleParseCsv() {
     setLoading(true);
     setError("");
+    setSaveError("");
     setResult(null);
+    setSavedDataset(null);
 
     try {
       const res = await fetch("/api/csv-nps/parse", {
@@ -28,27 +50,70 @@ export default function CsvNpsUpload() {
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to parse CSV");
+        throw new Error(data.error || "Failed to parse data");
       }
 
       setResult(data);
+      setDatasetName((current) => current || suggestedNameFromResult(data));
+
+      // Keep current browser-session behaviour working for now.
+      // We will move the other pages to datasetId-based loading next.
       sessionStorage.setItem("csvNpsLatestDataset", JSON.stringify(data));
     } catch (err) {
-      console.error("CSV parse failed:", err);
+      console.error("CSV/JSON parse failed:", err);
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   }
 
+  async function handleSaveDataset() {
+    if (!result) return;
+
+    const finalDatasetName = datasetName.trim() || suggestedDatasetName;
+
+    setSaving(true);
+    setSaveError("");
+    setSavedDataset(null);
+
+    try {
+      const res = await fetch("/api/nps-data/datasets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          datasetName: finalDatasetName,
+          parsedDataset: result,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Failed to save dataset");
+      }
+
+      setSavedDataset(data.dataset);
+
+      // Helpful for the next phase: remember the last saved dataset ID.
+      sessionStorage.setItem("csvNpsLatestSavedDatasetId", data.dataset.id);
+    } catch (err) {
+      console.error("Dataset save failed:", err);
+      setSaveError(err.message || "Something went wrong while saving");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
-        <p className="eyebrow">CSV NPS workspace</p>
-        <h1>CSV NPS Upload</h1>
+        <p className="eyebrow">NPS data workspace</p>
+        <h1>NPS Data Import</h1>
         <p>
-          Paste survey response data below. NPS Me can analyse CSV data or JSON response exports,
-          then normalise the score, date, customer, email and comment fields where possible.
+          Paste CSV data or JSON survey exports below. NPS Me will detect the
+          score, date, customer, email and comment fields where possible.
         </p>
       </section>
 
@@ -80,16 +145,15 @@ export default function CsvNpsUpload() {
       </section>
 
       {error && <div className="csv-nps-error">{error}</div>}
+
       {result?.warnings?.length > 0 && (
         <section className="csv-nps-warning-panel">
-          <h2>CSV import warnings</h2>
-          <p>
-            NPS Me analysed the CSV, but there are a few things to check.
-          </p>
+          <h2>Import warnings</h2>
+          <p>NPS Me analysed the data, but there are a few things to check.</p>
 
           <ul>
-            {result.warnings.map((warning) => (
-              <li key={warning.type}>{warning.message}</li>
+            {result.warnings.map((warning, index) => (
+              <li key={`${warning.type}-${index}`}>{warning.message}</li>
             ))}
           </ul>
         </section>
@@ -97,7 +161,17 @@ export default function CsvNpsUpload() {
 
       {result && (
         <section className="csv-nps-results">
-          <h2>Parsed summary</h2>
+          <div className="csv-nps-responses-header">
+            <div>
+              <h2>Parsed summary</h2>
+              <p>
+                Detected{" "}
+                <strong>{(result.inputType || "csv").toUpperCase()}</strong>{" "}
+                input with {result.validRowCount} valid NPS response
+                {result.validRowCount === 1 ? "" : "s"}.
+              </p>
+            </div>
+          </div>
 
           <div className="csv-nps-metric-grid">
             <MetricCard label="Responses" value={result.summary.total} />
@@ -107,6 +181,49 @@ export default function CsvNpsUpload() {
             <MetricCard label="Detractors" value={result.summary.detractors} />
             <MetricCard label="Avg. score" value={result.summary.averageScore} />
           </div>
+
+          <section className="csv-nps-save-panel">
+            <div>
+              <h3>Save this dataset</h3>
+              <p>
+                Save this import to Supabase so it can be reopened later and
+                used for persistent dashboards and close-the-loop actions.
+              </p>
+            </div>
+
+            <label className="csv-nps-filter-field">
+              <span>Dataset name</span>
+              <input
+                type="text"
+                value={datasetName}
+                onChange={(e) => setDatasetName(e.target.value)}
+                placeholder={suggestedDatasetName}
+              />
+            </label>
+
+            <div className="csv-nps-actions">
+              <button
+                type="button"
+                className="csv-nps-button"
+                onClick={handleSaveDataset}
+                disabled={saving || !result?.rows?.length}
+              >
+                {saving ? "Saving..." : "Save dataset"}
+              </button>
+            </div>
+
+            {saveError && <div className="csv-nps-error">{saveError}</div>}
+
+            {savedDataset && (
+              <div className="csv-nps-success">
+                <strong>Dataset saved.</strong>
+                <span>
+                  {" "}
+                  ID: <code>{savedDataset.id}</code>
+                </span>
+              </div>
+            )}
+          </section>
 
           <h3>Detected fields</h3>
 
@@ -131,16 +248,18 @@ export default function CsvNpsUpload() {
               <tbody>
                 {result.rows.map((row) => (
                   <tr key={row.response_id}>
-                    <td>{row.submitted_at?.slice(0, 10) || ""}</td>
-                    <td>{row.customer_name}</td>
-                    <td>{row.customer_email}</td>
+                    <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
+                    <td>{row.customer_name || "—"}</td>
+                    <td>{row.customer_email || "—"}</td>
                     <td>{row.score}</td>
                     <td>
-                      <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
+                      <span
+                        className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}
+                      >
                         {row.bucket}
                       </span>
                     </td>
-                    <td>{row.comment}</td>
+                    <td>{row.comment || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -159,4 +278,18 @@ function MetricCard({ label, value }) {
       <div className="csv-nps-metric-value">{value ?? "—"}</div>
     </div>
   );
+}
+
+function suggestedNameFromResult(result) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (result?.content_id) {
+    return `NPS import ${result.content_id} - ${today}`;
+  }
+
+  if (result?.inputType) {
+    return `${result.inputType.toUpperCase()} NPS import - ${today}`;
+  }
+
+  return `NPS import - ${today}`;
 }

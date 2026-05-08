@@ -19,6 +19,17 @@ export default function DatasetAiInsights({ datasetId }) {
         credentials: "include",
       });
 
+      const contentType = res.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Expected JSON but received:", text.slice(0, 500));
+
+        throw new Error(
+          "The AI request did not return JSON. It may have timed out on the server."
+        );
+      }
+
       const data = await res.json();
 
       if (!res.ok || !data.ok) {

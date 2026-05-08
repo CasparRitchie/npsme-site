@@ -429,18 +429,17 @@ export function createNpsDataRouter({ openai } = {}) {
 
       const usableRows = (rows || [])
         .filter((row) => Number.isFinite(Number(row.score)))
+        .slice(0, 100)
         .map((row) => ({
           response_id: row.response_id || row.id,
           date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
           score: Number(row.score),
           bucket: row.bucket || "",
           stage: row.stage || "",
-          company: row.company || "",
-          comment: String(row.comment || "").slice(0, 700),
+          comment: String(row.comment || "").slice(0, 300),
           selected_options: Array.isArray(row.selected_options_json)
-            ? row.selected_options_json
+            ? row.selected_options_json.slice(0, 5)
             : [],
-          extra_scores: row.extra_scores_json || {},
         }));
 
       if (usableRows.length === 0) {
@@ -520,7 +519,7 @@ Rules:
 
       const aiResponse = await openai.responses.create({
         model: "gpt-4o-mini",
-        max_output_tokens: 1200,
+        max_output_tokens: 700,
         input: [
           {
             role: "system",

@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
+import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
 export default function CsvNpsResponses() {
   const { datasetId } = useParams();
@@ -168,6 +169,8 @@ export default function CsvNpsResponses() {
       </section>
 
       <CsvNpsWorkspaceNav />
+      {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
+
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">

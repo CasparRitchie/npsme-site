@@ -332,6 +332,7 @@ export default function CsvNpsClosingTheLoop() {
       </section>
 
       <CsvNpsWorkspaceNav />
+      {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">

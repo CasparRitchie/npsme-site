@@ -23,8 +23,7 @@ export default function WorkspaceDatasetHeader({ dataset }) {
           <h2>{datasetName}</h2>
 
           <p>
-            Move between performance, responses and close-the-loop activity for
-            this saved feedback dataset.
+            Use the tabs below to move between performance, responses and follow-up actions.
           </p>
         </div>
       </div>

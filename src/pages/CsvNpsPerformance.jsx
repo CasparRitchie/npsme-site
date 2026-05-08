@@ -4,6 +4,15 @@ import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
+const PAGE_COPY = {
+  eyebrow: "NPS Me Workspace",
+  title: "Performance",
+  savedSubtitle:
+    "Review NPS results, response mix, score distribution and timeline trends for this saved feedback dataset.",
+  sessionSubtitle:
+    "Review NPS results, response mix, score distribution and timeline trends for the latest browser-session dataset.",
+};
+
 export default function CsvNpsPerformance() {
   const { datasetId } = useParams();
 
@@ -140,9 +149,9 @@ export default function CsvNpsPerformance() {
   if (loadingDataset) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me workspace</p>
-          <h1>Performance</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>Loading saved dataset...</p>
         </section>
 
@@ -158,9 +167,9 @@ export default function CsvNpsPerformance() {
   if (datasetError) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me workspace</p>
-          <h1>Performance</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>There was a problem loading this dataset.</p>
         </section>
 
@@ -174,9 +183,9 @@ export default function CsvNpsPerformance() {
   if (!dataset) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me workspace</p>
-          <h1>Performance</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>No feedback dataset has been loaded yet.</p>
         </section>
 
@@ -186,7 +195,7 @@ export default function CsvNpsPerformance() {
           <p>
             Go to{" "}
             <a className="text-link" href="/workspace/import">
-            Import feedback data
+              Import feedback data
             </a>{" "}
             and analyse or save a dataset first.
           </p>
@@ -196,28 +205,23 @@ export default function CsvNpsPerformance() {
   }
 
   const { summary } = dataset;
-  const datasetName = dataset.datasetName || "Latest browser-session dataset";
 
   return (
     <main className="csv-nps-page">
-      <section className="csv-nps-hero">
-        <p className="eyebrow">NPS Me workspace</p>
-        <h1>Performance</h1>
-        <p>
-          Performance view for <strong>{datasetName}</strong>
-          {datasetId
-            ? ", loaded from Supabase."
-            : ", analysed in this browser session."}
-        </p>
+      <section className="csv-nps-hero csv-nps-hero-compact">
+        <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+        <h1>{PAGE_COPY.title}</h1>
+        <p>{datasetId ? PAGE_COPY.savedSubtitle : PAGE_COPY.sessionSubtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
+
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>NPS Performance summary</h2>
+            <h2>Summary</h2>
             <p>
               Based on {summary.total} valid NPS response
               {summary.total === 1 ? "" : "s"}.

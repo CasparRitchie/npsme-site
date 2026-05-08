@@ -13,6 +13,7 @@ yarn-*.log*
 pnpm-lock.yaml
 
 envola.txt
+note
 
 context-pack/
 context-pack.zip

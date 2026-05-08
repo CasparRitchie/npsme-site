@@ -2,8 +2,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
+import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
+
+const PAGE_COPY = {
+  eyebrow: "NPS Me Workspace",
+  title: "Closing the loop",
+  savedSubtitle:
+    "Prioritise customer follow-up, assign owners and track actions for this saved feedback dataset.",
+  sessionSubtitle:
+    "Prioritise customer follow-up, assign owners and track actions for the latest browser-session dataset.",
+};
 
 export default function CsvNpsClosingTheLoop() {
   const { datasetId } = useParams();
@@ -261,9 +271,9 @@ export default function CsvNpsClosingTheLoop() {
   if (loadingDataset) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me Workspace</p>
-          <h1>Closing the loop</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>Loading saved dataset...</p>
         </section>
 
@@ -279,9 +289,9 @@ export default function CsvNpsClosingTheLoop() {
   if (datasetError) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me Workspace</p>
-          <h1>Closing the loop</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>There was a problem loading this dataset.</p>
         </section>
 
@@ -295,9 +305,9 @@ export default function CsvNpsClosingTheLoop() {
   if (!dataset) {
     return (
       <main className="csv-nps-page">
-        <section className="csv-nps-hero">
-          <p className="eyebrow">NPS Me Workspace</p>
-          <h1>Closing the loop</h1>
+        <section className="csv-nps-hero csv-nps-hero-compact">
+          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <h1>{PAGE_COPY.title}</h1>
           <p>No feedback dataset has been loaded yet.</p>
         </section>
 
@@ -316,28 +326,22 @@ export default function CsvNpsClosingTheLoop() {
     );
   }
 
-  const datasetName = dataset.datasetName || "Latest browser-session dataset";
-
   return (
     <main className="csv-nps-page">
-      <section className="csv-nps-hero">
-        <p className="eyebrow">NPS Me Workspace</p>
-        <h1>Closing the loop</h1>
-        <p>
-          Track follow-up actions for <strong>{datasetName}</strong>
-          {datasetId
-            ? ", loaded from Supabase."
-            : ", analysed in this browser session."}
-        </p>
+      <section className="csv-nps-hero csv-nps-hero-compact">
+        <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+        <h1>{PAGE_COPY.title}</h1>
+        <p>{datasetId ? PAGE_COPY.savedSubtitle : PAGE_COPY.sessionSubtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
+
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Customer follow-up queue</h2>
+            <h2>Follow-up queue</h2>
             <p>
               Showing {rows.length} of {dataset.rows.length} response
               {dataset.rows.length === 1 ? "" : "s"}.

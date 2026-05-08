@@ -1176,3 +1176,16 @@
   background: rgba(34, 197, 94, 0.12);
   color: #22c55e;
 }
+
+
+.csv-nps-hero-compact {
+  padding-bottom: 1.25rem;
+}
+
+.csv-nps-hero-compact h1 {
+  margin-bottom: 0.45rem;
+}
+
+.csv-nps-hero-compact p:last-child {
+  max-width: 760px;
+}

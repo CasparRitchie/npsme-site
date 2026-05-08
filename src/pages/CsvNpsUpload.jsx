@@ -41,6 +41,7 @@ export default function CsvNpsUpload() {
     try {
       const res = await fetch("/api/csv-nps/parse", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -79,6 +80,7 @@ export default function CsvNpsUpload() {
     try {
       const res = await fetch("/api/nps-data/datasets", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

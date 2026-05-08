@@ -22,7 +22,9 @@ export default function CsvNpsClosingTheLoop() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/nps-data/datasets/${datasetId}`);
+        const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
+          credentials: "include",
+        });
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
@@ -146,6 +148,7 @@ export default function CsvNpsClosingTheLoop() {
           : `/api/nps-data/rows/${row.db_row_id}/actions`,
         {
           method: hasExistingAction ? "PATCH" : "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

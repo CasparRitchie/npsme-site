@@ -16,7 +16,9 @@ export default function CsvNpsPerformance() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/nps-data/datasets/${datasetId}`);
+        const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
+          credentials: "include",
+        });
         const data = await res.json();
 
         if (!res.ok || !data.ok) {

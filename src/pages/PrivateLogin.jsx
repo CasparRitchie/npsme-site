@@ -36,6 +36,7 @@ export default function PrivateLogin() {
         setLoading(false);
         return;
       }
+      window.dispatchEvent(new Event("npsme-auth-changed"));
 
       navigate(from, { replace: true });
     } catch (e2) {

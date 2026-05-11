@@ -1,6 +1,7 @@
 // src/components/SiteFooter.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import { ROUTES } from "../routesRegistry";
 import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { translations } from "../i18n/translations.js";
 import { localizePath } from "../i18n/pathHelpers.js";
@@ -17,6 +18,8 @@ function FooterLink({ to, children }) {
 }
 
 function FooterGroup({ title, links }) {
+  if (!links.length) return null;
+
   return (
     <div>
       <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -38,154 +41,103 @@ export default function SiteFooter() {
   const { lang } = useLanguage();
 
   const t = (key, fallback) => translations(lang, key, fallback);
-  const lp = (path) => localizePath(path, lang);
+
+  const currentLangRoutes = React.useMemo(() => {
+    return ROUTES.filter((route) => {
+      if (!route.enabled) return false;
+      if (route.lang !== lang) return false;
+      if (route.path.includes(":")) return false;
+      return true;
+    });
+  }, [lang]);
+
+  const findRoute = React.useCallback(
+    (canonicalPath) => {
+      const localizedPath = localizePath(canonicalPath, lang);
+
+      const match =
+        currentLangRoutes.find((route) => route.path === localizedPath) ||
+        currentLangRoutes.find((route) => route.path === canonicalPath);
+
+      if (!match) {
+        return {
+          path: localizedPath,
+          label: canonicalPath,
+        };
+      }
+
+      return {
+        path: match.path,
+        label: t(match.labelKey, match.label),
+      };
+    },
+    [currentLangRoutes, lang]
+  );
+
+  const makeLinks = React.useCallback(
+    (paths) => paths.map((path) => findRoute(path)),
+    [findRoute]
+  );
 
   const groups = [
     {
       title: "NPS Me",
-      links: [
-        {
-          path: lp("/products"),
-          label: t("routes.products", "Products"),
-        },
-        {
-          path: lp("/why-nps-me"),
-          label: t("routes.whyNpsMe", "Why NPS Me"),
-        },
-        {
-          path: lp("/about"),
-          label: t("routes.about", "About"),
-        },
-        {
-          path: lp("/impact"),
-          label: t("routes.impact", "Impact"),
-        },
-        {
-          path: lp("/book"),
-          label: t("navbar.bookDiscovery", "Book discovery"),
-        },
-      ],
+      links: makeLinks([
+        "/products",
+        "/why-nps-me",
+        "/about",
+        "/impact",
+        "/book",
+      ]),
     },
     {
       title: "Solutions",
-      links: [
-        {
-          path: lp("/nps-intelligence-layer"),
-          label: t("routes.npsIntelligenceLayer", "NPS Intelligence Layer"),
-        },
-        {
-          path: lp("/nps-survey-programme"),
-          label: t("routes.npsSurveyProgramme", "NPS Survey Programme"),
-        },
-        {
-          path: lp("/intercom-nps-analytics"),
-          label: t("routes.intercomNpsAnalytics", "Intercom NPS Analytics"),
-        },
-        {
-          path: lp("/data-automation"),
-          label: t("routes.dataAutomation", "Data & Automation"),
-        },
-        {
-          path: lp("/social-listening"),
-          label: t("routes.socialListening", "Social Listening"),
-        },
-        {
-          path: lp("/cx-cockpit"),
-          label: t("routes.cxCockpit", "CX Cockpit"),
-        },
-      ],
+      links: makeLinks([
+        "/nps-intelligence-layer",
+        "/nps-survey-programme",
+        "/intercom-nps-analytics",
+        "/data-automation",
+        "/social-listening",
+        "/social-listening-index",
+        "/cx-cockpit",
+        "/cx-pulse-sample",
+      ]),
     },
     {
       title: "Workspace",
-      links: [
-        {
-          path: lp("/workspace"),
-          label: t("routes.workspace", "Workspace"),
-        },
-        {
-          path: lp("/workspace/import"),
-          label: t("routes.workspaceImport", "Import feedback"),
-        },
-        {
-          path: lp("/workspace/datasets"),
-          label: t("routes.workspaceDatasets", "Saved datasets"),
-        },
-        {
-          path: lp("/private/closing-the-loop"),
-          label: t("routes.closingTheLoop", "Closing the loop"),
-        },
-        {
-          path: lp("/private/nps-responses-explorer"),
-          label: t("routes.npsExplorer", "NPS Explorer"),
-        },
-      ],
+      links: makeLinks([
+        "/workspace",
+        "/workspace/import",
+        "/workspace/datasets",
+        "/private/nps-responses-explorer",
+      ]),
     },
     {
       title: "Learn",
-      links: [
-        {
-          path: lp("/what-is-nps"),
-          label: t("routes.whatIsNps", "What is NPS?"),
-        },
-        {
-          path: lp("/milestone-nps"),
-          label: t("routes.milestoneNps", "Milestone NPS"),
-        },
-        {
-          path: lp("/blog"),
-          label: t("routes.blog", "Blog"),
-        },
-        {
-          path: lp("/blog/what-to-do-with-nps-scores"),
-          label: t(
-            "routes.blogWhatToDoWithNpsScores",
-            "What to do with NPS scores"
-          ),
-        },
-        {
-          path: lp("/blog/closing-the-loop"),
-          label: t("routes.blogClosingTheLoop", "Closing the loop"),
-        },
-        {
-          path: lp("/blog/ethical-surveys"),
-          label: t("routes.blogEthicalSurveys", "Ethical surveys"),
-        },
-        {
-          path: lp("/blog/ethics-of-contact-selection"),
-          label: t(
-            "routes.blogEthicsOfContactSelection",
-            "Ethics of contact selection"
-          ),
-        },
-        {
-          path: lp("/blog/data-visualisation-cx-insights"),
-          label: t(
-            "routes.blogDataVisualisation",
-            "Data visualisation & CX insights"
-          ),
-        },
-      ],
+      links: makeLinks([
+        "/what-is-nps",
+        "/milestone-nps",
+        "/blog",
+        "/blog/what-to-do-with-nps-scores",
+        "/blog/closing-the-loop",
+        "/blog/intercom-nps-beyond-the-score",
+        "/blog/ethical-surveys",
+        "/blog/ethics-of-contact-selection",
+        "/blog/why-nps-isnt-improving",
+        "/blog/data-visualisation-cx-insights",
+      ]),
     },
     {
       title: "More",
-      links: [
-        {
-          path: lp("/training"),
-          label: t("routes.training", "Training"),
-        },
-        {
-          path: lp("/speaking"),
-          label: t("routes.speaking", "Speaking"),
-        },
-        {
-          path: lp("/privacy"),
-          label: t("routes.privacy", "Privacy"),
-        },
-        {
-          path: lp("/terms"),
-          label: t("routes.terms", "Terms"),
-        },
-      ],
+      links: makeLinks([
+        "/training",
+        "/speaking",
+        "/envola",
+        "/envola/performance",
+        "/privacy",
+        "/terms",
+        "/#contact",
+      ]),
     },
   ];
 
@@ -195,7 +147,7 @@ export default function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[1.1fr_2.4fr]">
           <div>
             <Link
-              to={lp("/")}
+              to={localizePath("/", lang)}
               className="inline-flex items-center gap-3"
               aria-label="NPS Me home"
             >
@@ -212,14 +164,14 @@ export default function SiteFooter() {
 
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
-                to={lp("/book")}
+                to={findRoute("/book").path}
                 className="inline-flex items-center rounded-2xl bg-[#7C3AED] px-4 py-2 text-sm font-medium text-white hover:bg-[#6D28D9] transition"
               >
                 {t("navbar.bookDiscovery", "Book discovery")}
               </Link>
 
               <Link
-                to={lp("/workspace")}
+                to={findRoute("/workspace").path}
                 className="inline-flex items-center rounded-2xl border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 transition"
               >
                 {t("routes.workspace", "Workspace")}

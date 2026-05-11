@@ -79,11 +79,11 @@ export const ROUTES_MANIFEST = [
   { path: "/workspace", label: "NPS Me Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/workspace", label: "NPS Me Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
-  { path: "/workspace/import", label: "Import feedback", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
-  { path: "/fr/workspace/import", label: "Importer des données", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+  { path: "/workspace/import", label: "Import feedback", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/workspace/import", label: "Importer des données", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
-  { path: "/workspace/datasets", label: "Saved datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
-  { path: "/fr/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+  { path: "/workspace/datasets", label: "Saved datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
+  { path: "/fr/workspace/datasets", label: "Datasets", labelKey: "routes.workspaceDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
   { path: "/workspace/datasets/:datasetId/performance", label: "Dataset Performance", labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/workspace/datasets/:datasetId/performance", label: "Performance dataset", labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
@@ -97,11 +97,11 @@ export const ROUTES_MANIFEST = [
   // CSV NPS workspace
   // Generic pasted/uploaded CSV survey data workspace.
   // Keep separate from Envola/Intercom routes so existing Envola dashboards are not impacted.
-  { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
-  { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
+  { path: "/csv-nps/upload", label: "CSV NPS Upload", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/upload", label: "Import CSV NPS", labelKey: "routes.csvNpsUpload", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
-  { path: "/csv-nps/datasets", label: "NPS Datasets", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
-  { path: "/fr/csv-nps/datasets", label: "Datasets NPS", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
+  { path: "/csv-nps/datasets", label: "NPS Datasets", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/csv-nps/datasets", label: "Datasets NPS", labelKey: "routes.csvNpsDatasets", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
 
   { path: "/csv-nps/performance", label: "CSV NPS Performance", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
   { path: "/fr/csv-nps/performance", label: "Performance CSV NPS", labelKey: "routes.csvNpsPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },

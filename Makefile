@@ -72,6 +72,8 @@ context-pack.zip: $(CONTEXT_SRC) $(CONTEXT_BACKEND) $(CONTEXT_CONFIG)
 	cp -r src context-pack/
 	cp server.js context-pack/ 2>/dev/null || true
 	cp intercom.routes.js context-pack/ 2>/dev/null || true
+	cp csvNps.routes.js context-pack/ 2>/dev/null || true
+	cp npsData.routes.js context-pack/ 2>/dev/null || true
 
 	cp package.json context-pack/
 	cp Procfile context-pack/ 2>/dev/null || true

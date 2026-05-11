@@ -1680,58 +1680,68 @@ export const TRANSLATIONS = {
     },
     landing: {
       seo: {
-        title: "NPS Consulting & Analytics for Intercom, HubSpot and Zendesk | NPS Me",
+        title: "NPS Consulting & Customer Feedback Systems | NPS Me",
         description:
-          "NPS Me helps teams run NPS properly using Intercom, HubSpot, Zendesk or CSV. Improve survey design, analyse feedback, prioritise actions and embed close-the-loop workflows that lift retention and revenue.",
+          "NPS Me helps startups, SMEs and growing businesses turn customer feedback into clearer decisions, better CX processes and close-the-loop action. Use CSV uploads, Intercom or APIs to convert survey responses into NPS insight without the cost of enterprise CX platforms.",
       },
 
-        hero: {
-          h1: {
-            lead: "NPS consulting and analytics",
-            nps: "for teams using",
-            tail: "Intercom, HubSpot, Zendesk or CSV.",
-            accent: "Run NPS properly with the tools you already use.",
-          },
-          body: "Keep your survey tool. NPS Me helps you put a practical customer experience system in place - so feedback becomes visible, actionable and embedded in the way your team works. From NPS governance to close-the-loop workflows, the goal is not more dashboards, but better decisions, better service and stronger retention.",
-          ctaPrimary: "Book a free NPS review",
-          ctaMethod: "See how it works",
-          ctaDemo: "View example insights",
-          proof: {
-            mining: "Insight from customer comments",
-            enablement: "Close-the-loop workflows",
-            lift: "Measured CX impact",
-          },
-          chips: {
-            help: ["CX system design", "Implementation", "Team adoption", "Close-the-loop"],
-            worksWith: ["Intercom", "HubSpot", "Zendesk", "CSV"],
-          },
-          chipsNote:
-            "Keep your survey platform. NPS Me focuses on NPS governance, feedback analysis, prioritisation and action.",
+      hero: {
+        h1: {
+          lead: "NPS consulting",
+          nps: "and customer feedback systems",
+          tail: "for growing businesses.",
+          accent: "Turn survey responses into decisions, actions and measurable CX improvement.",
         },
-
-        method: {
-          title: "A simple, repeatable method to improve NPS",
-          body:
-            "Clear steps, quick wins and steady improvement. NPS Me helps you diagnose what is going wrong, prioritise the right fixes and build momentum over time.",
-          cards: [
-            {
-              title: "1) Diagnose",
-              desc: "Audit surveys, customer feedback and internal journeys. Map friction and establish baseline metrics.",
-            },
-            {
-              title: "2) Prioritise",
-              desc: "Build a practical action plan with owners, effort/impact scoring and clear sequencing.",
-            },
-            {
-              title: "3) Implement",
-              desc: "Put changes into practice with scripts, templates, automation, training and hands-on support.",
-            },
-            {
-              title: "4) Improve",
-              desc: "Track NPS, milestone feedback and action velocity. Review regularly and scale what works.",
-            },
+        body:
+          "NPS Me helps startups, SMEs and growing businesses build a practical customer feedback process around the tools they already use. We combine CX expertise, data analysis and hands-on implementation so NPS scores and customer comments become clear themes, close-the-loop workflows and management-ready insight.",
+        ctaPrimary: "Book a free NPS review",
+        ctaMethod: "See how it works",
+        ctaDemo: "View example insights",
+        proof: {
+          mining: "Customer comments turned into insight",
+          enablement: "Teams equipped to close the loop",
+          lift: "Management-ready CX decisions",
+        },
+        chips: {
+          help: [
+            "NPS consulting",
+            "CX process design",
+            "Feedback analysis",
+            "Close-the-loop workflows",
           ],
+          worksWith: ["CSV upload", "Intercom", "APIs", "Existing survey tools"],
         },
+        chipsNote:
+          "Start with a simple CSV upload, connect Intercom, or use APIs to ingest feedback from other systems. The technology supports the process, but the real value is helping your business act on what customers are telling you.",
+      },
+
+      method: {
+        title: "A practical NPS and CX process, not just another dashboard",
+        body:
+          "Most businesses do not need a heavyweight enterprise feedback platform. They need a clear way to collect customer feedback, understand what is driving the score, decide what to fix and make sure someone owns the follow-up. NPS Me helps you put that process in place.",
+        cards: [
+          {
+            title: "1) Collect the right feedback",
+            desc:
+              "Use CSV uploads, Intercom surveys, existing survey tools or APIs to capture NPS scores and customer comments in a structured, repeatable way.",
+          },
+          {
+            title: "2) Understand what is driving the score",
+            desc:
+              "Turn raw comments into themes, drivers, risks and opportunities so leaders can see why customers are promoting, hesitating or leaving.",
+          },
+          {
+            title: "3) Build the close-the-loop process",
+            desc:
+              "Create clear workflows so the right people can respond to detractors, learn from promoters and follow up on customer issues quickly.",
+          },
+          {
+            title: "4) Make decisions from the insight",
+            desc:
+              "Give management a clear view of what customers are saying, what needs attention and which improvements are most likely to affect retention, service quality and growth.",
+          },
+        ],
+      },
 
       demoBlock: {
         title: "Try the live NPS demo and explore example insights",
@@ -1748,21 +1758,24 @@ export const TRANSLATIONS = {
       },
 
       platform: {
-        title: "NPS analytics on top of your existing survey tools",
+        title: "Use the feedback data you already have",
         body:
-          "Most teams already have a way to send surveys. NPS Me helps you run a fair, consistent, decision-grade NPS programme across Intercom, HubSpot, Zendesk or CSV-based setups, so your scores are usable and your next actions are clearer.",
+          "NPS Me is designed to work with your existing customer data, survey tools and support platforms. You do not need to buy a large enterprise CX platform before you can start learning from customers.",
         cards: [
           {
-            title: "NPS governance",
-            desc: "Sampling, cadence, anti-bias and comparability over time so your NPS score actually means something.",
+            title: "CSV upload",
+            desc:
+              "Upload customer lists, survey responses or exported feedback files. A simple way to start analysing NPS data quickly without a complex integration project.",
           },
           {
-            title: "Feedback analysis",
-            desc: "Theme and driver analysis from real comments, with confidence checks and clear prioritisation.",
+            title: "Intercom NPS linkage",
+            desc:
+              "Connect Intercom NPS responses and customer comments so feedback can be analysed, prioritised and linked back to operational follow-up.",
           },
           {
-            title: "Close-the-loop action",
-            desc: "Follow-up workflows, ownership and outcome tracking so survey responses lead to measurable improvements.",
+            title: "API-based feedback ingestion",
+            desc:
+              "Use APIs to bring in feedback from CRMs, support platforms, survey tools or internal databases as your customer experience process matures.",
           },
         ],
         linkIntercomText: "See how this works with Intercom NPS.",
@@ -1783,9 +1796,9 @@ export const TRANSLATIONS = {
       },
 
       contact: {
-        title: "Ready to improve NPS and turn feedback into growth?",
+        title: "Ready to turn customer feedback into action?",
         body:
-          "Book a free 30-minute NPS review. We’ll look at your current setup, identify opportunities for improvement, and find practical opportunities to improve results.",
+          "Book a free 30-minute NPS review. We’ll look at your current feedback process, where the data lives, what decisions you need to make and how NPS Me could help you turn customer feedback into practical CX improvement.",
         emailCta: "Email hello@npsme.com",
         bookCta: "Book a free NPS review",
       },
@@ -1851,42 +1864,47 @@ export const TRANSLATIONS = {
         ],
       },
       services: {
-        title: "Two ways to work together",
-        body: "The software supports the process - but the real value comes from putting the right CX structure, routines and follow-through in place inside your business.",
+        title: "Expert NPS support without enterprise CX platform overhead",
+        body:
+          "NPS Me gives startups, SMEs and growing businesses the practical support usually associated with large CX programmes, but in a leaner, more affordable format. We help you set up the process, analyse the feedback and embed the routines that turn customer comments into action.",
         outcomeLabel: "Best for",
         offers: [
           {
             title: "CX Foundations",
             badge: "Setup",
-            desc: "For startups and SMEs who want a practical customer experience system set up properly, without overcomplicating things.",
+            desc:
+              "For businesses that want a credible NPS and customer feedback process set up properly without buying a heavyweight enterprise platform.",
             bullets: [
-              "NPS / feedback programme design",
-              "Survey governance and anti-bias setup",
-              "Reporting and comment analysis",
+              "NPS and feedback programme design",
+              "CSV, Intercom or API data setup",
+              "Survey governance and anti-bias checks",
+              "Comment analysis and theme reporting",
               "Close-the-loop workflow design",
               "Team onboarding and practical handover",
             ],
             outcome:
-              "Get a simple, credible CX system your team can actually use.",
+              "Get a simple, credible CX system your team can use to understand customers and act on feedback.",
           },
           {
             title: "CX Embedded",
             badge: "Adoption",
-            desc: "For businesses who want customer experience embedded into day-to-day operations, management routines and team behaviour.",
+            desc:
+              "For businesses that want customer feedback embedded into management routines, team ownership and continuous improvement.",
             bullets: [
               "Everything in CX Foundations",
               "Role and ownership design",
-              "Management cadence and review routines",
+              "Management review routines",
               "Cross-team adoption support",
               "Ongoing optimisation and advisory support",
+              "Decision packs for leadership teams",
             ],
             outcome:
-              "Make customer feedback part of how your business operates and improves.",
+              "Make customer feedback part of how your business operates, prioritises work and improves CX.",
           },
         ],
         ctas: {
           products: "See offers",
-          about: "Why me",
+          about: "Why NPS Me",
         },
       },
       embedCx: {

@@ -49,6 +49,7 @@ export default function NpsWorkspaceHome() {
   }, []);
 
   const latestDatasets = useMemo(() => datasets.slice(0, 3), [datasets]);
+  const hasDatasets = datasets.length > 0;
 
   const totals = useMemo(() => {
     return datasets.reduce(
@@ -73,6 +74,13 @@ export default function NpsWorkspaceHome() {
     );
   }, [datasets]);
 
+  const overallNps =
+    totals.responses > 0
+      ? Math.round(
+          ((totals.promoters - totals.detractors) / totals.responses) * 100
+        )
+      : null;
+
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
@@ -89,19 +97,46 @@ export default function NpsWorkspaceHome() {
 
       {error && <section className="csv-nps-error">{error}</section>}
 
+      {!loading && !hasDatasets && (
+        <section className="csv-nps-first-run-panel">
+          <div>
+            <span className="csv-nps-source-badge">New workspace</span>
+            <h2>Start by importing your first feedback dataset</h2>
+            <p>
+              Your workspace is ready. Add a CSV or JSON export to create your
+              first saved dataset, then NPS Me will unlock performance views,
+              response search, AI insights and close-the-loop tracking.
+            </p>
+          </div>
+
+          <div className="csv-nps-next-actions csv-nps-next-actions-tight">
+            <Link className="csv-nps-button-link" to="/workspace/import">
+              Import first dataset
+            </Link>
+
+            <Link className="csv-nps-secondary-link" to="/workspace/account">
+              Check account setup
+            </Link>
+          </div>
+        </section>
+      )}
+
       <section className="csv-nps-workspace-overview-grid">
         <WorkspaceActionCard
           title="Import feedback data"
           description="Paste CSV data or JSON survey exports and normalise them into a reusable NPS dataset."
           to="/workspace/import"
-          cta="Import data"
+          cta={hasDatasets ? "Import more data" : "Import first dataset"}
+          badge={hasDatasets ? "Workspace" : "Start here"}
         />
 
         <WorkspaceActionCard
           title="Saved datasets"
           description="Reopen previous imports, compare results and continue analysis from saved Supabase data."
           to="/workspace/datasets"
-          cta="View datasets"
+          cta={hasDatasets ? "View datasets" : "No datasets yet"}
+          badge={hasDatasets ? "Workspace" : "Waiting for data"}
+          muted={!hasDatasets}
         />
 
         <WorkspaceActionCard
@@ -110,9 +145,11 @@ export default function NpsWorkspaceHome() {
           to={
             latestDatasets[0]
               ? `/workspace/datasets/${latestDatasets[0].id}/closing-the-loop`
-              : "/workspace/datasets"
+              : "/workspace/import"
           }
-          cta="Open follow-up queue"
+          cta={hasDatasets ? "Open follow-up queue" : "Import data first"}
+          badge={hasDatasets ? "Workspace" : "Next step"}
+          muted={!hasDatasets}
         />
       </section>
 
@@ -123,20 +160,23 @@ export default function NpsWorkspaceHome() {
             <p>
               {loading
                 ? "Loading your workspace activity..."
-                : `${totals.datasets} saved dataset${
-                    totals.datasets === 1 ? "" : "s"
-                  } currently available.`}
+                : hasDatasets
+                  ? `${totals.datasets} saved dataset${
+                      totals.datasets === 1 ? "" : "s"
+                    } currently available.`
+                  : "Your workspace is active, but no feedback datasets have been imported yet."}
             </p>
           </div>
 
           <Link className="csv-nps-button-link" to="/workspace/import">
-            Import new data
+            {hasDatasets ? "Import new data" : "Import first dataset"}
           </Link>
         </div>
 
         <div className="csv-nps-metric-grid">
           <MetricCard label="Datasets" value={totals.datasets} />
           <MetricCard label="Responses" value={totals.responses} />
+          <MetricCard label="Overall NPS" value={overallNps} />
           <MetricCard label="Promoters" value={totals.promoters} />
           <MetricCard label="Passives" value={totals.passives} />
           <MetricCard label="Detractors" value={totals.detractors} />
@@ -144,19 +184,17 @@ export default function NpsWorkspaceHome() {
 
         <div className="csv-nps-workspace-home-grid">
           <section className="csv-nps-chart-card">
-            <h3>Recent datasets</h3>
+            <h3>{hasDatasets ? "Recent datasets" : "What happens next?"}</h3>
             <p>
-              Jump back into the latest imported feedback datasets and continue
-              analysis.
+              {hasDatasets
+                ? "Jump back into the latest imported feedback datasets and continue analysis."
+                : "Once you import data, this area will show your latest datasets and shortcuts into performance, responses and close-the-loop activity."}
             </p>
 
             {loading ? (
               <div className="csv-nps-empty-state">Loading datasets...</div>
             ) : latestDatasets.length === 0 ? (
-              <div className="csv-nps-empty-state">
-                No datasets yet. Import feedback data to create your first
-                workspace dataset.
-              </div>
+              <FirstRunChecklist />
             ) : (
               <div className="csv-nps-workspace-recent-list">
                 {latestDatasets.map((dataset) => (
@@ -169,19 +207,29 @@ export default function NpsWorkspaceHome() {
           <section className="csv-nps-chart-card">
             <h3>Current setup</h3>
             <p>
-              This private alpha workspace is currently configured for
-              CSV/JSON-style feedback imports and Supabase-backed persistence.
+              This workspace is configured for private customer feedback
+              analysis, saved datasets and close-the-loop workflows.
             </p>
 
             <div className="csv-nps-workspace-status-list">
               <StatusRow
                 label="Workspace"
-                value={workspace?.workspace_name || "NPS Me Internal"}
+                value={workspace?.workspace_name || "Workspace"}
+                status="ready"
               />
-              <StatusRow label="Data source" value="CSV / JSON import" />
-              <StatusRow label="Storage" value="Supabase" />
-              <StatusRow label="Access" value="Private password-protected" />
-              <StatusRow label="Product stage" value="Internal alpha" />
+              <StatusRow label="Individual login" value="Active" status="ready" />
+              <StatusRow label="Data storage" value="Supabase" status="ready" />
+              <StatusRow
+                label="Datasets"
+                value={hasDatasets ? `${totals.datasets} saved` : "None yet"}
+                status={hasDatasets ? "ready" : "waiting"}
+              />
+              <StatusRow
+                label="Close-the-loop queue"
+                value={hasDatasets ? "Available" : "Waiting for data"}
+                status={hasDatasets ? "ready" : "waiting"}
+              />
+              <StatusRow label="Product stage" value="Private workspace" status="ready" />
             </div>
           </section>
         </div>
@@ -190,14 +238,69 @@ export default function NpsWorkspaceHome() {
   );
 }
 
-function WorkspaceActionCard({ title, description, to, cta }) {
+function WorkspaceActionCard({
+  title,
+  description,
+  to,
+  cta,
+  badge = "Workspace",
+  muted = false,
+}) {
   return (
-    <Link className="csv-nps-workspace-action-card" to={to}>
-      <span className="csv-nps-source-badge">Workspace</span>
+    <Link
+      className={`csv-nps-workspace-action-card${
+        muted ? " csv-nps-workspace-action-card-muted" : ""
+      }`}
+      to={to}
+    >
+      <span className="csv-nps-source-badge">{badge}</span>
       <h2>{title}</h2>
       <p>{description}</p>
       <strong>{cta}</strong>
     </Link>
+  );
+}
+
+function FirstRunChecklist() {
+  return (
+    <div className="csv-nps-first-run-checklist">
+      <FirstRunStep
+        number="1"
+        title="Import feedback"
+        description="Paste or upload a CSV/JSON export containing customer names, scores, dates and comments."
+        to="/workspace/import"
+        cta="Go to import"
+      />
+
+      <FirstRunStep
+        number="2"
+        title="Review performance"
+        description="Once saved, NPS Me creates performance, response and close-the-loop views for that dataset."
+      />
+
+      <FirstRunStep
+        number="3"
+        title="Act on feedback"
+        description="Use the close-the-loop queue to assign follow-up, record actions and keep customer issues visible."
+      />
+    </div>
+  );
+}
+
+function FirstRunStep({ number, title, description, to, cta }) {
+  return (
+    <article className="csv-nps-first-run-step">
+      <span>{number}</span>
+      <div>
+        <h4>{title}</h4>
+        <p>{description}</p>
+        {to && cta && (
+          <Link className="csv-nps-secondary-link" to={to}>
+            {cta}
+          </Link>
+        )}
+      </div>
+    </article>
   );
 }
 
@@ -218,7 +321,10 @@ function RecentDatasetCard({ dataset }) {
       </div>
 
       <div className="csv-nps-workspace-recent-metrics">
-        <MiniMetric label="Responses" value={summary.total ?? dataset.valid_row_count} />
+        <MiniMetric
+          label="Responses"
+          value={summary.total ?? dataset.valid_row_count}
+        />
         <MiniMetric label="NPS" value={summary.nps} />
       </div>
 
@@ -248,11 +354,17 @@ function RecentDatasetCard({ dataset }) {
   );
 }
 
-function StatusRow({ label, value }) {
+function StatusRow({ label, value, status = "ready" }) {
   return (
     <div className="csv-nps-workspace-status-row">
       <span>{label}</span>
-      <strong>{value}</strong>
+      <strong>
+        <span
+          className={`csv-nps-workspace-status-dot csv-nps-workspace-status-dot-${status}`}
+          aria-hidden="true"
+        />
+        {value}
+      </strong>
     </div>
   );
 }

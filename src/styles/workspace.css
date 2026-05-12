@@ -1008,3 +1008,112 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* -----------------------------------------------------
+   Workspace first-run onboarding
+   ----------------------------------------------------- */
+
+.csv-nps-first-run-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 24px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 35%),
+    rgba(255, 255, 255, 0.05);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
+}
+
+.csv-nps-first-run-panel h2 {
+  margin: 10px 0 8px;
+  color: var(--text, #f5f7fb);
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+}
+
+.csv-nps-first-run-panel p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  line-height: 1.7;
+}
+
+.csv-nps-workspace-action-card-muted {
+  opacity: 0.82;
+}
+
+.csv-nps-workspace-action-card-muted:hover {
+  opacity: 1;
+}
+
+.csv-nps-first-run-checklist {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.csv-nps-first-run-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 15px;
+  border-radius: 18px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
+  background: rgba(15, 17, 21, 0.45);
+}
+
+.csv-nps-first-run-step > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+  font-weight: 900;
+}
+
+.csv-nps-first-run-step h4 {
+  margin: 0 0 5px;
+  color: var(--text, #f5f7fb);
+}
+
+.csv-nps-first-run-step p {
+  margin: 0 0 8px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  line-height: 1.55;
+}
+
+.csv-nps-workspace-status-row strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.csv-nps-workspace-status-dot {
+  display: inline-flex;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.csv-nps-workspace-status-dot-ready {
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+.csv-nps-workspace-status-dot-waiting {
+  background: #facc15;
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.12);
+}
+
+@media (max-width: 760px) {
+  .csv-nps-first-run-panel {
+    display: grid;
+  }
+}

@@ -211,8 +211,8 @@ export default function WorkspaceHome() {
               />
               <StatusRow label="Data source" value="CSV / JSON import" />
               <StatusRow label="Storage" value="Supabase" />
-              <StatusRow label="Access" value="Private password-protected" />
-              <StatusRow label="Product stage" value="Internal alpha" />
+              <StatusRow label="Access" value="Individual workspace login" />
+              <StatusRow label="Product stage" value="Private workspace" />
             </div>
 
             <div className="csv-nps-next-actions">
@@ -222,6 +222,25 @@ export default function WorkspaceHome() {
 
               <Link className="csv-nps-secondary-link" to="/workspace/datasets">
                 Manage datasets
+              </Link>
+            </div>
+          </section>
+
+          <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+            <h3>Data protection reminder</h3>
+            <p>
+              This workspace may contain customer names, email addresses, survey comments,
+              NPS scores and follow-up notes. Only upload feedback data that you are
+              authorised to process, and avoid importing unnecessary sensitive data.
+            </p>
+
+            <div className="csv-nps-next-actions">
+              <Link className="csv-nps-secondary-link" to="/privacy">
+                Read privacy policy
+              </Link>
+
+              <Link className="csv-nps-secondary-link" to="/workspace/account">
+                Review account access
               </Link>
             </div>
           </section>

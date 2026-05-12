@@ -12,10 +12,18 @@ export default function WorkspaceLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const searchParams = new URLSearchParams(location.search);
+  const nextPath = searchParams.get("next");
+
   const redirectTo =
-    location.state?.from?.pathname && location.state.from.pathname !== "/workspace/login"
-      ? location.state.from.pathname
-      : "/workspace";
+    nextPath && nextPath !== "/workspace/login"
+      ? nextPath
+      : location.state?.from?.pathname &&
+          location.state.from.pathname !== "/workspace/login"
+        ? location.state.from.pathname
+        : "/workspace";
+
+  const loginReason = searchParams.get("reason");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -86,6 +94,11 @@ export default function WorkspaceLogin() {
               for legacy Envola/private pages.
             </p>
           </div>
+          {loginReason && !error && (
+            <div className="csv-nps-error csv-nps-error-compact">
+              {loginReason}
+            </div>
+          )}
 
           {error && <div className="csv-nps-error">{error}</div>}
 

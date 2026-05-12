@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
+import { workspaceFetch } from "../utils/workspaceApi";
 
 export default function WorkspaceHome() {
   const [datasets, setDatasets] = useState([]);
@@ -15,25 +16,10 @@ export default function WorkspaceHome() {
       setError("");
 
       try {
-        const [workspaceRes, datasetsRes] = await Promise.all([
-          fetch("/api/nps-data/workspace", {
-            credentials: "include",
-          }),
-          fetch("/api/nps-data/datasets", {
-            credentials: "include",
-          }),
+        const [workspaceData, datasetsData] = await Promise.all([
+          workspaceFetch("/api/nps-data/workspace"),
+          workspaceFetch("/api/nps-data/datasets"),
         ]);
-
-        const workspaceData = await workspaceRes.json();
-        const datasetsData = await datasetsRes.json();
-
-        if (!workspaceRes.ok || !workspaceData.ok) {
-          throw new Error(workspaceData.error || "Failed to load workspace");
-        }
-
-        if (!datasetsRes.ok || !datasetsData.ok) {
-          throw new Error(datasetsData.error || "Failed to load datasets");
-        }
 
         setWorkspace(workspaceData.workspace || null);
         setDatasets(datasetsData.datasets || []);

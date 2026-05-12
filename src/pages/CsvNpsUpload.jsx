@@ -1,6 +1,7 @@
 // src/pages/CsvNpsUpload.jsx
 import React, { useMemo, useState } from "react";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
+import { workspaceFetch } from "../../utils/workspaceApi";
 
 export default function CsvNpsUpload() {
   const [csvText, setCsvText] = useState(
@@ -37,7 +38,6 @@ export default function CsvNpsUpload() {
     setSaveError("");
     setResult(null);
     setSavedDataset(null);
-
     try {
       const res = await fetch("/api/csv-nps/parse", {
         method: "POST",
@@ -68,57 +68,38 @@ export default function CsvNpsUpload() {
     }
   }
 
-async function handleSaveDataset() {
-  if (!result) return;
+  async function handleSaveDataset() {
+    if (!result) return;
 
-  const finalDatasetName = datasetName.trim() || suggestedDatasetName;
+    const finalDatasetName = datasetName.trim() || suggestedDatasetName;
 
-  setSaving(true);
-  setSaveError("");
-  setSavedDataset(null);
+    setSaving(true);
+    setSaveError("");
+    setSavedDataset(null);
 
-  try {
-    const res = await fetch("/api/nps-data/datasets", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        datasetName: finalDatasetName,
-        parsedDataset: result,
-      }),
-    });
+    try {
+      const data = await workspaceFetch("/api/nps-data/datasets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          datasetName: finalDatasetName,
+          parsedDataset: result,
+        }),
+      });
 
-    const contentType = res.headers.get("content-type") || "";
+      setSavedDataset(data.dataset);
 
-    if (!contentType.includes("application/json")) {
-      const text = await res.text();
-      console.error("Expected JSON but received:", text.slice(0, 500));
-      throw new Error(
-        `Expected JSON from save endpoint, but received ${
-          contentType || "unknown content type"
-        }`
-      );
+      // Helpful for the next phase: remember the last saved dataset ID.
+      sessionStorage.setItem("csvNpsLatestSavedDatasetId", data.dataset.id);
+    } catch (err) {
+      console.error("Dataset save failed:", err);
+      setSaveError(err.message || "Something went wrong while saving");
+    } finally {
+      setSaving(false);
     }
-
-    const data = await res.json();
-
-    if (!res.ok || !data.ok) {
-      throw new Error(data.error || "Failed to save dataset");
-    }
-
-    setSavedDataset(data.dataset);
-
-    // Helpful for the next phase: remember the last saved dataset ID.
-    sessionStorage.setItem("csvNpsLatestSavedDatasetId", data.dataset.id);
-  } catch (err) {
-    console.error("Dataset save failed:", err);
-    setSaveError(err.message || "Something went wrong while saving");
-  } finally {
-    setSaving(false);
   }
-}
 
   return (
     <main className="csv-nps-page">
@@ -133,6 +114,14 @@ async function handleSaveDataset() {
       </section>
 
       <CsvNpsWorkspaceNav />
+      <section className="csv-nps-warning-panel">
+        <h2>Data protection reminder</h2>
+        <p>
+          Only upload customer feedback data that you are authorised to process.
+          Avoid importing unnecessary sensitive data. Names and email addresses are
+          useful for follow-up, but anonymised IDs may be enough for some analysis.
+        </p>
+      </section>
 
       <section className="csv-nps-panel">
         <label className="csv-nps-label" htmlFor="csv-nps-textarea">

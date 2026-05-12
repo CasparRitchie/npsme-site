@@ -611,6 +611,15 @@ Rules:
       const workspaceId = getRequestWorkspaceId(req);
       const datasetId = String(req.params.datasetId || "").trim();
 
+      const role = req.auth?.role;
+
+      if (!canDeleteDatasets(role)) {
+        return res.status(403).json({
+          ok: false,
+          error: "You do not have permission to delete datasets",
+        });
+      }
+
       if (!isUuid(datasetId)) {
         return res.status(400).json({
           ok: false,
@@ -819,9 +828,7 @@ function getRequestWorkspaceId(req) {
   const workspaceId = req.auth?.workspaceId;
 
   if (!workspaceId) {
-    throw new Error(
-      "Workspace ID is missing from authenticated request. Check requireWorkspaceAuth middleware."
-    );
+    throw new Error("Workspace authentication required");
   }
 
   return workspaceId;
@@ -897,4 +904,8 @@ function normaliseActionStatus(value) {
   if (status === "in_progress") return "in_progress";
   if (status === "closed") return "closed";
   return "open";
+}
+
+function canDeleteDatasets(role) {
+  return role === "owner" || role === "admin";
 }

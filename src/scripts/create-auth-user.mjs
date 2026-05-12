@@ -1,7 +1,7 @@
 // scripts/create-auth-user.mjs
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { supabaseAdmin } from "../supabaseClient.js";
+import { supabaseAdmin } from "../../supabaseClient.js";
 
 const EMAIL = process.argv[2];
 const PASSWORD = process.argv[3];

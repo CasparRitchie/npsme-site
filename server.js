@@ -12,8 +12,14 @@ import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 import crypto from "crypto";
 import { supabaseAdmin } from "./supabaseClient.js";
+import cookieParser from "cookie-parser";
 
-
+import {
+  clearWorkspaceAuthCookie,
+  getWorkspaceAuth,
+  loginWorkspaceUser,
+  requireWorkspaceAuth,
+} from "./utils/workspaceAuth.js";
 import { createIntercomRouter } from "./intercom.routes.js";
 import { createEnvolaRouter } from "./envola.routes.js";
 import { createCsvNpsRouter } from "./csvNps.routes.js";
@@ -265,12 +271,75 @@ app.use(
   })
 );
 
+app.use(cookieParser());
+
 app.use(
   express.urlencoded({
     extended: true,
     limit: "10mb",
   })
 );
+
+// ---------------------------------------------------------------------------
+// Workspace user auth
+// - New individual-login auth for customer workspaces
+// - Runs alongside existing shared-password private auth
+// ---------------------------------------------------------------------------
+
+app.post("/api/workspace-auth/login", async (req, res) => {
+  try {
+    const result = await loginWorkspaceUser({
+      email: req.body?.email,
+      password: req.body?.password,
+      req,
+      res,
+    });
+
+    return res.status(result.status || 200).json(result);
+  } catch (err) {
+    console.error("[workspace-auth] Login route failed", err);
+
+    return res.status(500).json({
+      ok: false,
+      error: "Login failed",
+    });
+  }
+});
+
+app.post("/api/workspace-auth/logout", (req, res) => {
+  clearWorkspaceAuthCookie(res);
+
+  return res.json({
+    ok: true,
+  });
+});
+
+app.get("/api/workspace-auth/me", (req, res) => {
+  const auth = getWorkspaceAuth(req);
+
+  if (!auth) {
+    return res.status(401).json({
+      ok: false,
+      authed: false,
+      error: "Workspace authentication required",
+    });
+  }
+
+  return res.json({
+    ok: true,
+    authed: true,
+    user: {
+      id: auth.userId,
+      email: auth.email,
+      fullName: auth.fullName,
+    },
+    workspace: {
+      id: auth.workspaceId,
+      role: auth.role,
+    },
+  });
+});
+
 
 // =====================================================
 // CSV NPS API ROUTES
@@ -286,11 +355,10 @@ app.use("/api/csv-nps", (req, res, next) => {
 // Persistent saved NPS datasets + rows + close-loop data
 // Base path: /api/nps-data
 // =====================================================
-app.use(
-  "/api/nps-data",
+app.use("/api/nps-data",
   (req, res, next) => {
     if (req.path === "/ping") return next();
-    return requirePrivateAuth(req, res, next);
+    return requireWorkspaceAuth(req, res, next);
   },
   createNpsDataRouter({ openai })
 );

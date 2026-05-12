@@ -66,7 +66,7 @@ import CsvNpsResponses from "./pages/CsvNpsResponses";
 import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
 import NpsDatasets from "./pages/NpsDatasets";
 import WorkspaceHome from "./pages/WorkspaceHome";
-
+import WorkspaceLogin from "./pages/workspace/Login";
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -134,6 +134,9 @@ const COMPONENTS = {
   "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
 
   // NPS Me Workspace - new product-style routes
+  "/workspace/login": WorkspaceLogin,
+  "/fr/workspace/login": WorkspaceLogin,
+
   "/workspace": protect(WorkspaceHome),
   "/fr/workspace": protect(WorkspaceHome),
 

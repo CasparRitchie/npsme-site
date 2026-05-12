@@ -76,6 +76,9 @@ export const ROUTES_MANIFEST = [
   // NPS Me Workspace
   // Product-style protected workspace routes.
   // These are the preferred routes. The older /csv-nps routes remain as aliases for now.
+  { path: "/workspace/login", label: "Workspace login", labelKey: "routes.workspaceLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/login", label: "Connexion workspace", labelKey: "routes.workspaceLogin", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   { path: "/workspace", label: "NPS Me Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/workspace", label: "NPS Me Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 

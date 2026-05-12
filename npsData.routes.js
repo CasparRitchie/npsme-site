@@ -9,8 +9,8 @@ import { supabaseAdmin } from "./supabaseClient.js";
  * Persist imported NPS datasets from CSV/JSON uploads.
  *
  * Workspace-aware foundation:
- * - For now, uses DEFAULT_WORKSPACE_ID from env
- * - Later, this can be replaced with req.user.workspace_id / memberships
+ * - Uses req.auth.workspaceId from the workspace JWT auth middleware
+ * - DEFAULT_WORKSPACE_ID is now only used for /ping/debug fallback checks
  *
  * Kept separate from:
  * - csvNps.routes.js, which parses/normalises pasted data
@@ -38,7 +38,7 @@ export function createNpsDataRouter({ openai } = {}) {
   // GET /api/nps-data/workspace
   // Small debug/helper endpoint while developing
   // --------------------------------------------------
-  router.get("/workspace", async (_req, res) => {
+  router.get("/workspace", async (req, res) => {
     try {
       if (!supabaseAdmin) {
         return res.status(500).json({
@@ -47,7 +47,7 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
 
       const { data, error } = await supabaseAdmin
         .from("workspaces")
@@ -56,14 +56,14 @@ export function createNpsDataRouter({ openai } = {}) {
         .single();
 
       if (error) {
-        console.error("[nps-data] Failed to load default workspace", {
+        console.error("[nps-data] Failed to load workspace", {
           workspaceId,
           error,
         });
 
         return res.status(404).json({
           ok: false,
-          error: "Default workspace not found",
+          error: "Workspace not found",
           workspaceId,
           supabaseError: error.message,
           supabaseCode: error.code,
@@ -112,8 +112,7 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      const workspaceId = getWorkspaceId();
-
+      const workspaceId = getRequestWorkspaceId(req);
       const datasetName = String(req.body?.datasetName || "").trim();
       const parsedDataset = req.body?.parsedDataset;
 
@@ -221,7 +220,7 @@ export function createNpsDataRouter({ openai } = {}) {
   // GET /api/nps-data/datasets
   // List saved datasets for current workspace
   // --------------------------------------------------
-  router.get("/datasets", async (_req, res) => {
+  router.get("/datasets", async (req, res) => {
     try {
       if (!supabaseAdmin) {
         return res.status(500).json({
@@ -230,7 +229,7 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
 
       const { data, error } = await supabaseAdmin
         .from("datasets")
@@ -286,7 +285,7 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
       const datasetId = String(req.params.datasetId || "").trim();
 
       if (!isUuid(datasetId)) {
@@ -371,13 +370,13 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
       const datasetId = String(req.params.datasetId || "").trim();
 
-      if (!datasetId) {
+      if (!isUuid(datasetId)) {
         return res.status(400).json({
           ok: false,
-          error: "datasetId is required",
+          error: "Valid datasetId is required",
         });
       }
 
@@ -609,7 +608,7 @@ Rules:
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
       const datasetId = String(req.params.datasetId || "").trim();
 
       if (!isUuid(datasetId)) {
@@ -681,7 +680,7 @@ Rules:
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
       const datasetRowId = String(req.params.datasetRowId || "").trim();
 
       if (!isUuid(datasetRowId)) {
@@ -750,7 +749,7 @@ Rules:
         });
       }
 
-      const workspaceId = getWorkspaceId();
+      const workspaceId = getRequestWorkspaceId(req);
       const actionId = String(req.params.actionId || "").trim();
 
       if (!isUuid(actionId)) {
@@ -816,14 +815,16 @@ Rules:
   return router;
 }
 
-function getWorkspaceId() {
-  if (!DEFAULT_WORKSPACE_ID) {
+function getRequestWorkspaceId(req) {
+  const workspaceId = req.auth?.workspaceId;
+
+  if (!workspaceId) {
     throw new Error(
-      "DEFAULT_WORKSPACE_ID is not configured. Add it to .env and Heroku Config Vars."
+      "Workspace ID is missing from authenticated request. Check requireWorkspaceAuth middleware."
     );
   }
 
-  return DEFAULT_WORKSPACE_ID;
+  return workspaceId;
 }
 
 async function findWorkspaceDatasetRow(datasetRowId, workspaceId) {

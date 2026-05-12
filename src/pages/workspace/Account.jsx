@@ -1,6 +1,10 @@
 // src/pages/workspace/Account.jsx
 import React, { useEffect, useState } from "react";
 import CsvNpsWorkspaceNav from "../../components/CsvNpsWorkspaceNav";
+import {
+  formatWorkspaceRole,
+  getWorkspaceRoleDescription,
+} from "../../../utils/workspaceRoles";
 
 export default function WorkspaceAccount() {
   const [me, setMe] = useState(null);
@@ -138,14 +142,14 @@ export default function WorkspaceAccount() {
     }
   }
 
+  const role = me?.workspace?.role;
+
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">NPS Me Workspace</p>
         <h1>Account</h1>
-        <p>
-          Manage your workspace login, password and account access.
-        </p>
+        <p>Manage your workspace login, password and account access.</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -154,9 +158,7 @@ export default function WorkspaceAccount() {
         <div className="csv-nps-responses-header">
           <div>
             <h2>Workspace account</h2>
-            <p>
-              View your signed-in account and change your password securely.
-            </p>
+            <p>View your signed-in account and change your password securely.</p>
           </div>
 
           <button
@@ -180,11 +182,21 @@ export default function WorkspaceAccount() {
               <div className="workspace-account-detail-list">
                 <AccountDetail label="Name" value={me?.user?.fullName || "—"} />
                 <AccountDetail label="Email" value={me?.user?.email || "—"} />
+
                 <AccountDetail
                   label="Workspace ID"
                   value={me?.workspace?.id || "—"}
                 />
-                <AccountDetail label="Role" value={me?.workspace?.role || "—"} />
+
+                <AccountDetail
+                  label="Role"
+                  value={formatWorkspaceRole(role)}
+                />
+
+                <AccountDetail
+                  label="Role permissions"
+                  value={getWorkspaceRoleDescription(role)}
+                />
               </div>
             </section>
 

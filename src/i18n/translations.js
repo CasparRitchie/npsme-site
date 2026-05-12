@@ -3237,7 +3237,7 @@ export const TRANSLATIONS = {
         tag: "NPS Me / Why NPS Me",
         title: "CX consulting that connects feedback to the bottom line",
         intro:
-          "NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Fewer turn it into fewer churn events, more repeat revenue, and less firefighting in support. We help you do that, quickly, without a huge consulting army on your payroll.",
+          "NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Not so many turn it into fewer churn events, more repeat revenue, and less firefighting in support. We help you do that, quickly, without a huge consulting army on your payroll.",
         ctaBook: "Book a discovery call",
         ctaDemo: "See example outputs",
       },

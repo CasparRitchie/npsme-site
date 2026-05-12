@@ -19,7 +19,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
     "adm-zip": "^0.5.16",
+    "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",
@@ -27,6 +29,7 @@
     "framer-motion": "^12.23.24",
     "helmet": "^7.2.0",
     "inkscape": "^3.1.1",
+    "jsonwebtoken": "^9.0.3",
     "lru-cache": "^11.2.4",
     "lucide-react": "^0.545.0",
     "nodemailer": "^7.0.10",

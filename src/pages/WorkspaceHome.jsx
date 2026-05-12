@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
-import { workspaceFetch } from "../utils/workspaceApi";
+import { workspaceFetch } from "../../utils/workspaceApi";
+
+
 
 export default function WorkspaceHome() {
   const [datasets, setDatasets] = useState([]);
@@ -35,6 +37,7 @@ export default function WorkspaceHome() {
   }, []);
 
   const latestDatasets = datasets.slice(0, 3);
+  const hasDatasets = datasets.length > 0;
 
   const totals = datasets.reduce(
     (acc, dataset) => {
@@ -79,20 +82,46 @@ export default function WorkspaceHome() {
       <CsvNpsWorkspaceNav />
 
       {error && <section className="csv-nps-error">{error}</section>}
+      {!loading && !hasDatasets && (
+        <section className="csv-nps-first-run-panel">
+          <div>
+            <span className="csv-nps-source-badge">New workspace</span>
+            <h2>Start by importing your first feedback dataset</h2>
+            <p>
+              Your workspace is ready. Add a CSV or JSON export to create your
+              first saved dataset, then NPS Me will unlock performance views,
+              response search, AI insights and close-the-loop tracking.
+            </p>
+          </div>
+
+          <div className="csv-nps-next-actions csv-nps-next-actions-tight">
+            <Link className="csv-nps-button-link" to="/workspace/import">
+              Import first dataset
+            </Link>
+
+            <Link className="csv-nps-secondary-link" to="/workspace/account">
+              Check account setup
+            </Link>
+          </div>
+        </section>
+      )}
 
       <section className="csv-nps-workspace-overview-grid">
         <WorkspaceActionCard
           title="Import feedback data"
           description="Paste CSV data or JSON survey exports and turn them into a reusable NPS dataset."
           to="/workspace/import"
-          cta="Import data"
+          cta={hasDatasets ? "Import more data" : "Import first dataset"}
+          badge={hasDatasets ? "Workspace" : "Start here"}
         />
 
         <WorkspaceActionCard
           title="Review saved datasets"
           description="Reopen previous imports, review NPS performance, and inspect customer responses."
           to="/workspace/datasets"
-          cta="View datasets"
+          cta={hasDatasets ? "View datasets" : "No datasets yet"}
+          badge={hasDatasets ? "Workspace" : "Waiting for data"}
+          muted={!hasDatasets}
         />
 
         <WorkspaceActionCard
@@ -101,9 +130,11 @@ export default function WorkspaceHome() {
           to={
             latestDatasets[0]
               ? `/workspace/datasets/${latestDatasets[0].id}/closing-the-loop`
-              : "/workspace/datasets"
+              : "/workspace/import"
           }
-          cta="Open action queue"
+          cta={hasDatasets ? "Open action queue" : "Import data first"}
+          badge={hasDatasets ? "Workspace" : "Next step"}
+          muted={!hasDatasets}
         />
       </section>
 
@@ -149,10 +180,7 @@ export default function WorkspaceHome() {
                 Loading recent datasets...
               </div>
             ) : latestDatasets.length === 0 ? (
-              <div className="csv-nps-empty-state">
-                No saved datasets yet. Import your first CSV or JSON file to get
-                started.
-              </div>
+              <FirstRunChecklist />
             ) : (
               <div className="csv-nps-dataset-grid">
                 {latestDatasets.map((dataset) => (
@@ -203,14 +231,69 @@ export default function WorkspaceHome() {
   );
 }
 
-function WorkspaceActionCard({ title, description, to, cta }) {
+function WorkspaceActionCard({
+  title,
+  description,
+  to,
+  cta,
+  badge = "Workspace",
+  muted = false,
+}) {
   return (
-    <Link className="csv-nps-workspace-action-card" to={to}>
-      <span className="csv-nps-source-badge">Workspace</span>
+    <Link
+      className={`csv-nps-workspace-action-card${
+        muted ? " csv-nps-workspace-action-card-muted" : ""
+      }`}
+      to={to}
+    >
+      <span className="csv-nps-source-badge">{badge}</span>
       <h2>{title}</h2>
       <p>{description}</p>
       <strong>{cta}</strong>
     </Link>
+  );
+}
+
+function FirstRunChecklist() {
+  return (
+    <div className="csv-nps-first-run-checklist">
+      <FirstRunStep
+        number="1"
+        title="Import feedback"
+        description="Paste or upload a CSV/JSON export containing customer names, scores, dates and comments."
+        to="/workspace/import"
+        cta="Go to import"
+      />
+
+      <FirstRunStep
+        number="2"
+        title="Review performance"
+        description="Once saved, NPS Me creates performance, response and close-the-loop views for that dataset."
+      />
+
+      <FirstRunStep
+        number="3"
+        title="Act on feedback"
+        description="Use the close-the-loop queue to assign follow-up, record actions and keep customer issues visible."
+      />
+    </div>
+  );
+}
+
+function FirstRunStep({ number, title, description, to, cta }) {
+  return (
+    <article className="csv-nps-first-run-step">
+      <span>{number}</span>
+      <div>
+        <h4>{title}</h4>
+        <p>{description}</p>
+        {to && cta && (
+          <Link className="csv-nps-secondary-link" to={to}>
+            {cta}
+          </Link>
+        )}
+      </div>
+    </article>
   );
 }
 

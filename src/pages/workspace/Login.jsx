@@ -44,6 +44,7 @@ export default function WorkspaceLogin() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           email: trimmedEmail,

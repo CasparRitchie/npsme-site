@@ -54,6 +54,7 @@ import PrivateLogin from "./pages/PrivateLogin";
 import ClosingTheLoop from "./pages/ClosingTheLoop";
 import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
+import RequireWorkspaceAuth from "./components/auth/RequireWorkspaceAuth";
 
 import EnvolaPerformance from "./pages/EnvolaPerformance";
 import EnvolaResponses from "./pages/EnvolaResponses";
@@ -65,13 +66,25 @@ import CsvNpsPerformance from "./pages/CsvNpsPerformance";
 import CsvNpsResponses from "./pages/CsvNpsResponses";
 import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
 import NpsDatasets from "./pages/NpsDatasets";
+
 import WorkspaceHome from "./pages/WorkspaceHome";
 import WorkspaceLogin from "./pages/workspace/Login";
+import WorkspaceAccount from "./pages/workspace/Account";
 
 const protect = (Component) => {
   return function ProtectedPage() {
     return React.createElement(
       RequireAuth,
+      null,
+      React.createElement(Component, null)
+    );
+  };
+};
+
+const workspaceProtect = (Component) => {
+  return function ProtectedWorkspacePage() {
+    return React.createElement(
+      RequireWorkspaceAuth,
       null,
       React.createElement(Component, null)
     );
@@ -137,23 +150,26 @@ const COMPONENTS = {
   "/workspace/login": WorkspaceLogin,
   "/fr/workspace/login": WorkspaceLogin,
 
-  "/workspace": protect(WorkspaceHome),
-  "/fr/workspace": protect(WorkspaceHome),
+  "/workspace": workspaceProtect(WorkspaceHome),
+  "/fr/workspace": workspaceProtect(WorkspaceHome),
 
-  "/workspace/import": protect(CsvNpsUpload),
-  "/fr/workspace/import": protect(CsvNpsUpload),
+  "/workspace/account": workspaceProtect(WorkspaceAccount),
+  "/fr/workspace/account": workspaceProtect(WorkspaceAccount),
 
-  "/workspace/datasets": protect(NpsDatasets),
-  "/fr/workspace/datasets": protect(NpsDatasets),
+  "/workspace/import": workspaceProtect(CsvNpsUpload),
+  "/fr/workspace/import": workspaceProtect(CsvNpsUpload),
 
-  "/workspace/datasets/:datasetId/performance": protect(CsvNpsPerformance),
-  "/fr/workspace/datasets/:datasetId/performance": protect(CsvNpsPerformance),
+  "/workspace/datasets": workspaceProtect(NpsDatasets),
+  "/fr/workspace/datasets": workspaceProtect(NpsDatasets),
 
-  "/workspace/datasets/:datasetId/responses": protect(CsvNpsResponses),
-  "/fr/workspace/datasets/:datasetId/responses": protect(CsvNpsResponses),
+  "/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),
+  "/fr/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),
 
-  "/workspace/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
-  "/fr/workspace/datasets/:datasetId/closing-the-loop": protect(CsvNpsClosingTheLoop),
+  "/workspace/datasets/:datasetId/responses": workspaceProtect(CsvNpsResponses),
+  "/fr/workspace/datasets/:datasetId/responses": workspaceProtect(CsvNpsResponses),
+
+  "/workspace/datasets/:datasetId/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
+  "/fr/workspace/datasets/:datasetId/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
 
   // CSV / NPS data workspace
   // Protected because datasets and follow-up actions are now persisted in Supabase.

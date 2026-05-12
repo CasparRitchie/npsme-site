@@ -82,6 +82,9 @@ export const ROUTES_MANIFEST = [
   { path: "/workspace", label: "NPS Me Workspace", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/workspace", label: "NPS Me Espace de travail", labelKey: "routes.workspace", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 
+  { path: "/workspace/account", label: "Account", labelKey: "routes.workspaceAccount", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en" },
+  { path: "/fr/workspace/account", label: "Compte", labelKey: "routes.workspaceAccount", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr" },
+
   { path: "/workspace/import", label: "Import feedback", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "en" },
   { path: "/fr/workspace/import", label: "Importer des données", labelKey: "routes.workspaceImport", enabled: true, indexable: false, inHeader: false, inFooter: true, lang: "fr" },
 

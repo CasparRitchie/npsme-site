@@ -245,6 +245,131 @@ export async function loginWorkspaceUser({ email, password, req, res }) {
   };
 }
 
+export async function changeWorkspacePassword({
+  userId,
+  currentPassword,
+  newPassword,
+  req,
+}) {
+  if (!supabaseAdmin) {
+    throw new Error("Supabase admin client is not configured");
+  }
+
+  const rawCurrentPassword = String(currentPassword || "");
+  const rawNewPassword = String(newPassword || "");
+
+  if (!userId) {
+    return {
+      ok: false,
+      status: 401,
+      error: "Workspace authentication required",
+    };
+  }
+
+  if (!rawCurrentPassword || !rawNewPassword) {
+    return {
+      ok: false,
+      status: 400,
+      error: "Current password and new password are required",
+    };
+  }
+
+  if (rawNewPassword.length < 12) {
+    return {
+      ok: false,
+      status: 400,
+      error: "New password must be at least 12 characters",
+    };
+  }
+
+  if (rawCurrentPassword === rawNewPassword) {
+    return {
+      ok: false,
+      status: 400,
+      error: "New password must be different from the current password",
+    };
+  }
+
+  const { data: user, error: userError } = await supabaseAdmin
+    .from("app_users")
+    .select("id,email,password_hash,is_active")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (userError) {
+    console.error("[workspace-auth] Failed to load user for password change", userError);
+
+    return {
+      ok: false,
+      status: 500,
+      error: "Failed to change password",
+    };
+  }
+
+  if (!user || !user.is_active) {
+    await logAuthEvent({
+      userId,
+      eventType: "password_change_failed_user_not_found_or_inactive",
+      req,
+    });
+
+    return {
+      ok: false,
+      status: 401,
+      error: "Workspace authentication required",
+    };
+  }
+
+  const currentPasswordOk = await bcrypt.compare(
+    rawCurrentPassword,
+    user.password_hash
+  );
+
+  if (!currentPasswordOk) {
+    await logAuthEvent({
+      userId,
+      eventType: "password_change_failed_invalid_current_password",
+      req,
+    });
+
+    return {
+      ok: false,
+      status: 401,
+      error: "Current password is incorrect",
+    };
+  }
+
+  const newPasswordHash = await bcrypt.hash(rawNewPassword, 12);
+
+  const { error: updateError } = await supabaseAdmin
+    .from("app_users")
+    .update({
+      password_hash: newPasswordHash,
+    })
+    .eq("id", user.id);
+
+  if (updateError) {
+    console.error("[workspace-auth] Failed to update password", updateError);
+
+    return {
+      ok: false,
+      status: 500,
+      error: "Failed to change password",
+    };
+  }
+
+  await logAuthEvent({
+    userId: user.id,
+    eventType: "password_changed",
+    req,
+  });
+
+  return {
+    ok: true,
+    status: 200,
+  };
+}
+
 export async function logAuthEvent({
   userId = null,
   workspaceId = null,

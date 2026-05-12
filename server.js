@@ -15,6 +15,7 @@ import { supabaseAdmin } from "./supabaseClient.js";
 import cookieParser from "cookie-parser";
 
 import {
+  changeWorkspacePassword,
   clearWorkspaceAuthCookie,
   getWorkspaceAuth,
   loginWorkspaceUser,
@@ -338,6 +339,26 @@ app.get("/api/workspace-auth/me", (req, res) => {
       role: auth.role,
     },
   });
+});
+
+app.post("/api/workspace-auth/change-password", requireWorkspaceAuth, async (req, res) => {
+  try {
+    const result = await changeWorkspacePassword({
+      userId: req.auth.userId,
+      currentPassword: req.body?.currentPassword,
+      newPassword: req.body?.newPassword,
+      req,
+    });
+
+    return res.status(result.status || 200).json(result);
+  } catch (err) {
+    console.error("[workspace-auth] Change password route failed", err);
+
+    return res.status(500).json({
+      ok: false,
+      error: "Failed to change password",
+    });
+  }
 });
 
 

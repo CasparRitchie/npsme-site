@@ -366,10 +366,14 @@ app.post("/api/workspace-auth/change-password", requireWorkspaceAuth, async (req
 // CSV NPS API ROUTES
 // Base path: /api/csv-nps
 // =====================================================
-app.use("/api/csv-nps", (req, res, next) => {
-  if (req.path === "/ping") return next();
-  return requirePrivateAuth(req, res, next);
-}, createCsvNpsRouter());
+app.use(
+  "/api/csv-nps",
+  (req, res, next) => {
+    if (req.path === "/ping") return next();
+    return requireWorkspaceAuth(req, res, next);
+  },
+  createCsvNpsRouter()
+);
 
 // =====================================================
 // NPS DATA API ROUTES

@@ -1,5 +1,6 @@
 // src/pages/CsvNpsUpload.jsx
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import { workspaceFetch } from "../../utils/workspaceApi";
 
@@ -219,12 +220,41 @@ export default function CsvNpsUpload() {
             {saveError && <div className="csv-nps-error">{saveError}</div>}
 
             {savedDataset && (
-              <div className="csv-nps-success">
-                <strong>Dataset saved.</strong>
-                <span>
-                  {" "}
-                  ID: <code>{savedDataset.id}</code>
-                </span>
+              <div className="csv-nps-success csv-nps-save-success">
+                <div>
+                  <strong>Dataset saved.</strong>
+                  <span>
+                    {" "}
+                    ID: <code>{savedDataset.id}</code>
+                  </span>
+                </div>
+
+                <div className="csv-nps-dataset-actions">
+                  <Link
+                    className="csv-nps-secondary-link"
+                    to={`/workspace/datasets/${savedDataset.id}/performance`}
+                  >
+                    Open performance
+                  </Link>
+
+                  <Link
+                    className="csv-nps-secondary-link"
+                    to={`/workspace/datasets/${savedDataset.id}/responses`}
+                  >
+                    View responses
+                  </Link>
+
+                  <Link
+                    className="csv-nps-secondary-link"
+                    to={`/workspace/datasets/${savedDataset.id}/closing-the-loop`}
+                  >
+                    Open close-the-loop
+                  </Link>
+
+                  <Link className="csv-nps-secondary-link" to="/workspace/datasets">
+                    View all datasets
+                  </Link>
+                </div>
               </div>
             )}
           </section>

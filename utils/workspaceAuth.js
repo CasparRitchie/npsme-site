@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { supabaseAdmin } from "../supabaseClient.js";
 
+import { logWorkspaceEvent } from "./workspaceEvents.js";
+
 const DEFAULT_COOKIE_NAME = "npsme_workspace_access";
 const JWT_EXPIRES_IN = "7d";
 
@@ -226,6 +228,18 @@ export async function loginWorkspaceUser({ email, password, req, res }) {
       eventType: "login_success",
       req,
     }),
+
+    logWorkspaceEvent(req, {
+      workspaceId: membership.workspace_id,
+      userId: user.id,
+      eventType: "workspace_login_success",
+      entityType: "user",
+      entityId: user.id,
+      metadata: {
+        email: user.email,
+        role: membership.role || "member",
+      },
+    }),
   ]);
 
   return {
@@ -307,11 +321,23 @@ export async function changeWorkspacePassword({
   }
 
   if (!user || !user.is_active) {
-    await logAuthEvent({
-      userId,
-      eventType: "password_change_failed_user_not_found_or_inactive",
-      req,
-    });
+    await Promise.allSettled([
+      logAuthEvent({
+        userId: user.id,
+        workspaceId: req?.auth?.workspaceId || null,
+        eventType: "password_changed",
+        req,
+      }),
+
+      logWorkspaceEvent(req, {
+        eventType: "password_changed",
+        entityType: "user",
+        entityId: user.id,
+        metadata: {
+          source: "workspace_account",
+        },
+      }),
+    ]);
 
     return {
       ok: false,
@@ -363,6 +389,39 @@ export async function changeWorkspacePassword({
     eventType: "password_changed",
     req,
   });
+
+  return {
+    ok: true,
+    status: 200,
+  };
+}
+
+export async function logoutWorkspaceUser({ req, res }) {
+  const auth = getWorkspaceAuth(req);
+
+  if (auth) {
+    await Promise.allSettled([
+      logAuthEvent({
+        userId: auth.userId,
+        workspaceId: auth.workspaceId,
+        eventType: "workspace_logout",
+        req,
+      }),
+
+      logWorkspaceEvent(req, {
+        workspaceId: auth.workspaceId,
+        userId: auth.userId,
+        eventType: "workspace_logout",
+        entityType: "user",
+        entityId: auth.userId,
+        metadata: {
+          role: auth.role || "member",
+        },
+      }),
+    ]);
+  }
+
+  clearWorkspaceAuthCookie(res);
 
   return {
     ok: true,

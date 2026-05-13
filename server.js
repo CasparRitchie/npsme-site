@@ -16,9 +16,9 @@ import cookieParser from "cookie-parser";
 
 import {
   changeWorkspacePassword,
-  clearWorkspaceAuthCookie,
   getWorkspaceAuth,
   loginWorkspaceUser,
+  logoutWorkspaceUser,
   requireWorkspaceAuth,
 } from "./utils/workspaceAuth.js";
 import { createIntercomRouter } from "./intercom.routes.js";
@@ -307,12 +307,21 @@ app.post("/api/workspace-auth/login", async (req, res) => {
   }
 });
 
-app.post("/api/workspace-auth/logout", (req, res) => {
-  clearWorkspaceAuthCookie(res);
+app.post("/api/workspace-auth/logout", async (req, res) => {
+  try {
+    const result = await logoutWorkspaceUser({ req, res });
 
-  return res.json({
-    ok: true,
-  });
+    return res.status(result.status || 200).json({
+      ok: result.ok,
+    });
+  } catch (err) {
+    console.error("[workspace-auth] Logout route failed", err);
+
+    return res.status(500).json({
+      ok: false,
+      error: "Logout failed",
+    });
+  }
 });
 
 app.get("/api/workspace-auth/me", (req, res) => {

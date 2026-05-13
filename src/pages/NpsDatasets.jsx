@@ -2,28 +2,29 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
+import { workspaceFetch } from "../../utils/workspaceApi";
+import { canDeleteDatasets, formatWorkspaceRole } from "../../utils/workspaceRoles";
 
 export default function NpsDatasets() {
   const [datasets, setDatasets] = useState([]);
+  const [workspaceRole, setWorkspaceRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const userCanDeleteDatasets = canDeleteDatasets(workspaceRole);
 
   async function loadDatasets() {
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("/api/nps-data/datasets", {
-        credentials: "include",
-      });
+      const [meData, datasetsData] = await Promise.all([
+        workspaceFetch("/api/workspace-auth/me"),
+        workspaceFetch("/api/nps-data/datasets"),
+      ]);
 
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to load datasets");
-      }
-
-      setDatasets(data.datasets || []);
+      setWorkspaceRole(meData?.workspace?.role || "");
+      setDatasets(datasetsData.datasets || []);
     } catch (err) {
       console.error("Failed to load NPS datasets:", err);
       setError(err.message || "Something went wrong");
@@ -33,21 +34,23 @@ export default function NpsDatasets() {
   }
 
   async function handleDelete(datasetId) {
+    if (!userCanDeleteDatasets) {
+      setError("You do not have permission to delete datasets.");
+      return;
+    }
+
     const confirmed = window.confirm(
-      "Delete this dataset? This will also delete its saved rows and close-the-loop actions."
+      "Delete this dataset? This will also delete its saved rows and close-the-loop actions. This cannot be undone."
     );
 
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
+      const data = await workspaceFetch(`/api/nps-data/datasets/${datasetId}`, {
         method: "DELETE",
-        credentials: "include",
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
+      if (!data.ok) {
         throw new Error(data.error || "Failed to delete dataset");
       }
 
@@ -88,6 +91,14 @@ export default function NpsDatasets() {
                     datasets.length === 1 ? "" : "s"
                   } found.`}
             </p>
+
+            {!loading && workspaceRole && (
+              <p className="csv-nps-muted-note">
+                Signed in as {formatWorkspaceRole(workspaceRole)}.
+                {!userCanDeleteDatasets &&
+                  " Dataset deletion is restricted to workspace owners and admins."}
+              </p>
+            )}
           </div>
 
           <Link className="csv-nps-button-link" to="/workspace/import">
@@ -109,6 +120,7 @@ export default function NpsDatasets() {
               <DatasetCard
                 key={dataset.id}
                 dataset={dataset}
+                canDelete={userCanDeleteDatasets}
                 onDelete={() => handleDelete(dataset.id)}
               />
             ))}
@@ -119,7 +131,7 @@ export default function NpsDatasets() {
   );
 }
 
-function DatasetCard({ dataset, onDelete }) {
+function DatasetCard({ dataset, canDelete, onDelete }) {
   const summary = dataset.summary_json || {};
   const createdAt = dataset.created_at
     ? new Date(dataset.created_at).toLocaleString()
@@ -136,14 +148,22 @@ function DatasetCard({ dataset, onDelete }) {
           <p>{createdAt}</p>
         </div>
 
-        <button
-          type="button"
-          className="csv-nps-danger-button"
-          onClick={onDelete}
-        >
-          Delete
-        </button>
+        {canDelete && (
+          <button
+            type="button"
+            className="csv-nps-danger-button"
+            onClick={onDelete}
+          >
+            Delete
+          </button>
+        )}
       </div>
+
+      {!canDelete && (
+        <div className="csv-nps-empty-state csv-nps-empty-state-compact">
+          Ask a workspace owner or admin if this dataset needs to be deleted.
+        </div>
+      )}
 
       <div className="csv-nps-dataset-metrics">
         <MiniMetric

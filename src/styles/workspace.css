@@ -1117,3 +1117,17 @@
     display: grid;
   }
 }
+
+
+.csv-nps-muted-note {
+  margin-top: 6px;
+  color: var(--muted, rgba(245, 247, 251, 0.72));
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.csv-nps-empty-state-compact {
+  margin: 12px 0;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}

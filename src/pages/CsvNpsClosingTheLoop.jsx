@@ -45,11 +45,12 @@ export default function CsvNpsClosingTheLoop() {
         setDataset(normalised);
 
         const savedActionsByActionKey = {};
-          normalised.rows.forEach((row) => {
-            if (row.loopAction) {
-              savedActionsByActionKey[getActionKey(row)] = row.loopAction;
-            }
-          });
+
+        normalised.rows.forEach((row) => {
+          if (row.loopAction) {
+            savedActionsByActionKey[getActionKey(row)] = row.loopAction;
+          }
+        });
 
         const localActions = readLocalActions(datasetId);
 
@@ -532,6 +533,16 @@ function MetricCard({ label, value }) {
 }
 
 function ClosingLoopCard({ row, action, onChange, onSave }) {
+  const hasSavedAction = Boolean(action.id || action.updatedAt);
+
+  const buttonLabel = action.isSaving
+    ? "Saving..."
+    : action.isDirty
+      ? "Save follow-up"
+      : hasSavedAction
+        ? "Saved"
+        : "Save follow-up";
+
   return (
     <article className={`csv-nps-loop-card csv-nps-loop-card-${row.bucket}`}>
       <div className="csv-nps-loop-card-main">
@@ -559,9 +570,10 @@ function ClosingLoopCard({ row, action, onChange, onSave }) {
         </p>
 
         <blockquote>{row.comment || "No comment provided."}</blockquote>
-        {action.actionTaken && (
+
+        {hasSavedAction && action.actionTaken && !action.isDirty && (
           <div className="csv-nps-loop-saved-action">
-            <span>Action taken / next step</span>
+            <span>Saved follow-up action</span>
             <p>{action.actionTaken}</p>
           </div>
         )}
@@ -614,11 +626,7 @@ function ClosingLoopCard({ row, action, onChange, onSave }) {
           onClick={onSave}
           disabled={action.isSaving}
         >
-          {action.isSaving
-            ? "Saving..."
-            : action.isDirty
-              ? "Save follow-up"
-              : "Saved"}
+          {buttonLabel}
         </button>
 
         {action.saveError && (

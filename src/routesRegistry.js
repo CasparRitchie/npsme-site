@@ -15,6 +15,7 @@ import MilestoneNps from "./MilestoneNps";
 import NpsSurveyProgramme from "./NpsSurveyProgramme";
 import NpsIntelligenceLayer from "./pages/NpsIntelligenceLayer";
 import IntercomNpsAnalytics from "./pages/IntercomNpsAnalytics";
+import CustomerFeedbackWorkspace from "./pages/CustomerFeedbackWorkspace";
 import EnvolaExample from "./pages/EnvolaExample";
 import EnvolaQuestionDetail from "./pages/EnvolaQuestionDetail";
 import Book from "./Book";
@@ -70,6 +71,7 @@ import NpsDatasets from "./pages/NpsDatasets";
 import WorkspaceHome from "./pages/WorkspaceHome";
 import WorkspaceLogin from "./pages/workspace/Login";
 import WorkspaceAccount from "./pages/workspace/Account";
+
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -127,6 +129,9 @@ const COMPONENTS = {
 
   "/intercom-nps-analytics": IntercomNpsAnalytics,
   "/fr/analyse-nps-intercom": IntercomNpsAnalytics,
+
+  "/customer-feedback-workspace": CustomerFeedbackWorkspace,
+  "/fr/customer-feedback-workspace": CustomerFeedbackWorkspace,
 
   "/envola": EnvolaExample,
   "/fr/exemple-envola": EnvolaExample,

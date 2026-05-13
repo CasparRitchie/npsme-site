@@ -401,13 +401,9 @@ export function createNpsDataRouter({ openai } = {}) {
         .select(
           [
             "id",
-            "response_id",
             "submitted_at",
             "score",
             "bucket",
-            "customer_name",
-            "customer_email",
-            "company",
             "stage",
             "comment",
             "selected_options_json",
@@ -430,15 +426,16 @@ export function createNpsDataRouter({ openai } = {}) {
       const usableRows = (rows || [])
         .filter((row) => Number.isFinite(Number(row.score)))
         .slice(0, 120)
-        .map((row) => {
+        .map((row, index) => {
           const raw = row.raw_json || {};
           const extra = row.extra_scores_json || {};
 
           return {
-            response_id: row.response_id || row.id,
+            row_ref: index + 1,
             date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
             score: Number(row.score),
             bucket: row.bucket || "",
+            stage: cleanForAi(row.stage, 80),
             comment: cleanForAi(row.comment, 350),
 
             recommend_comment: cleanForAi(
@@ -534,6 +531,8 @@ Rules:
 - Example quotes must be short excerpts from comments, max 15 words each.
 - Recommended actions should be specific enough that a founder, CX lead or ops manager could act on them.
 - Close-the-loop templates should be warm, concise and human.
+- Do not refer to customers by name, email, contact ID, or any direct personal identifier.
+- Refer to respondents generically, such as "a detractor", "a passive respondent", or "several promoters".
 `.trim();
 
       const aiResponse = await openai.responses.create({

@@ -122,6 +122,16 @@ export default function CsvNpsUpload() {
           Avoid importing unnecessary sensitive data. Names and email addresses are
           useful for follow-up, but anonymised IDs may be enough for some analysis.
         </p>
+
+        <div className="csv-nps-next-actions">
+          <a
+            className="csv-nps-secondary-link"
+            href="/samples/nps-feedback-template.csv"
+            download
+          >
+            Download sample CSV template
+          </a>
+        </div>
       </section>
 
       <section className="csv-nps-panel">

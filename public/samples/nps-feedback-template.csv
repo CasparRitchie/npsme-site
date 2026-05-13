@@ -1,0 +1,6 @@
+customer_name,customer_email,score,comment,submitted_at,company,stage
+Alice Martin,alice@example.com,10,Really helpful and easy to use,2026-05-01,Example Ltd,Active customer
+Bob Smith,bob@example.com,6,Useful but response times could be better,2026-05-02,Example Ltd,Onboarding
+Claire Jones,claire@example.com,8,Good experience overall but a few rough edges,2026-05-03,Example Ltd,Active customer
+David Brown,david@example.com,3,The setup was confusing and I did not know who to contact,2026-05-04,Example Ltd,Trial
+Emma Wilson,emma@example.com,9,Great support and clear reporting,2026-05-05,Example Ltd,Active customer

@@ -2,6 +2,8 @@
 import express from "express";
 import { supabaseAdmin } from "./supabaseClient.js";
 
+import { logWorkspaceEvent } from "./utils/workspaceEvents.js";
+
 /**
  * NPS Data routes
  *
@@ -201,6 +203,17 @@ export function createNpsDataRouter({ openai } = {}) {
           });
         }
       }
+      await logWorkspaceEvent(req, {
+        eventType: "dataset_created",
+        entityType: "dataset",
+        entityId: dataset.id,
+        metadata: {
+          datasetName: dataset.dataset_name,
+          sourceType: dataset.source_type,
+          rowCount: rowPayload.length,
+          validRowCount: dataset.valid_row_count,
+        },
+      });
 
       return res.status(201).json({
         ok: true,
@@ -578,6 +591,17 @@ Rules:
         });
       }
 
+      await logWorkspaceEvent(req, {
+        eventType: "ai_insights_generated",
+        entityType: "dataset",
+        entityId: datasetId,
+        metadata: {
+          datasetName: dataset.dataset_name,
+          rowCount: usableRows.length,
+          model: "gpt-4o-mini",
+        },
+      });
+
       return res.json({
         ok: true,
         datasetId,
@@ -629,7 +653,7 @@ Rules:
       // Important: check workspace ownership before deleting.
       const { data: dataset, error: findError } = await supabaseAdmin
         .from("datasets")
-        .select("id")
+        .select("id,dataset_name")
         .eq("id", datasetId)
         .eq("workspace_id", workspaceId)
         .single();
@@ -654,6 +678,15 @@ Rules:
           error: error.message,
         });
       }
+
+      await logWorkspaceEvent(req, {
+        eventType: "dataset_deleted",
+        entityType: "dataset",
+        entityId: datasetId,
+        metadata: {
+          datasetName: dataset?.dataset_name || null,
+        },
+      });
 
       return res.json({
         ok: true,
@@ -731,6 +764,17 @@ Rules:
         });
       }
 
+      await logWorkspaceEvent(req, {
+        eventType: "close_loop_action_created",
+        entityType: "close_loop_action",
+        entityId: data.id,
+        metadata: {
+          datasetRowId,
+          status: data.status,
+          owner: data.owner || null,
+        },
+      });
+
       return res.status(201).json({
         ok: true,
         action: data,
@@ -806,6 +850,16 @@ Rules:
           error: error.message,
         });
       }
+
+      await logWorkspaceEvent(req, {
+        eventType: "close_loop_action_updated",
+        entityType: "close_loop_action",
+        entityId: actionId,
+        metadata: {
+          status: data.status,
+          owner: data.owner || null,
+        },
+      });
 
       return res.json({
         ok: true,

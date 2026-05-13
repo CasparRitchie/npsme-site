@@ -93,6 +93,7 @@ export default function SiteFooter() {
     {
       title: "Solutions",
       links: makeLinks([
+        "/customer-feedback-workspace",
         "/nps-intelligence-layer",
         "/nps-survey-programme",
         "/intercom-nps-analytics",
@@ -106,10 +107,7 @@ export default function SiteFooter() {
     {
       title: "Workspace",
       links: makeLinks([
-        "/workspace",
-        "/workspace/import",
-        "/workspace/datasets",
-        "/private/nps-responses-explorer",
+        "/workspace/login",
       ]),
     },
     {

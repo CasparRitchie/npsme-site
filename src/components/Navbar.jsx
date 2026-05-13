@@ -109,6 +109,11 @@ export default function NavBar() {
 
   const solutionItems = [
     {
+      to: lp("/customer-feedback-workspace"),
+      label: t("routes.customerFeedbackWorkspace", "Customer Feedback Workspace"),
+      desc: "Import NPS data, analyse feedback and manage close-the-loop actions in a private workspace.",
+    },
+    {
       to: lp("/nps-intelligence-layer"),
       label: t("routes.npsIntelligenceLayer", "NPS Intelligence Layer"),
       desc: "Turn feedback into themes, priorities and decision-ready insight.",

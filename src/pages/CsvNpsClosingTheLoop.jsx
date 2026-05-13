@@ -44,17 +44,17 @@ export default function CsvNpsClosingTheLoop() {
         const normalised = normaliseSavedDataset(data);
         setDataset(normalised);
 
-        const savedActionsByResponseId = {};
-        normalised.rows.forEach((row) => {
-          if (row.loopAction) {
-            savedActionsByResponseId[row.response_id] = row.loopAction;
-          }
-        });
+        const savedActionsByActionKey = {};
+          normalised.rows.forEach((row) => {
+            if (row.loopAction) {
+              savedActionsByActionKey[getActionKey(row)] = row.loopAction;
+            }
+          });
 
         const localActions = readLocalActions(datasetId);
 
         setActions({
-          ...savedActionsByResponseId,
+          ...savedActionsByActionKey,
           ...localActions,
         });
       } catch (err) {
@@ -88,11 +88,11 @@ export default function CsvNpsClosingTheLoop() {
     }
   }, [datasetId]);
 
-  function saveAction(responseId, patch) {
+  function saveAction(actionKey, patch) {
     setActions((current) => {
       const updated = {
         ...current,
-        [responseId]: {
+        [actionKey]: {
           status: "open",
           owner: "",
           actionTaken: "",
@@ -100,7 +100,7 @@ export default function CsvNpsClosingTheLoop() {
           isDirty: true,
           isSaving: false,
           saveError: "",
-          ...(current[responseId] || {}),
+          ...(current[actionKey] || {}),
           ...patch,
         },
       };
@@ -111,8 +111,8 @@ export default function CsvNpsClosingTheLoop() {
   }
 
   async function persistAction(row) {
-    const responseId = row.response_id;
-    const action = actions[responseId] || {
+    const actionKey = getActionKey(row);
+    const action = actions[actionKey] || {
       status: "open",
       owner: "",
       actionTaken: "",
@@ -130,7 +130,7 @@ export default function CsvNpsClosingTheLoop() {
       setActions((current) => {
         const updated = {
           ...current,
-          [responseId]: updatedAction,
+          [actionKey]: updatedAction,
         };
 
         writeLocalActions(datasetId || "session", updated);
@@ -142,8 +142,8 @@ export default function CsvNpsClosingTheLoop() {
 
     setActions((current) => ({
       ...current,
-      [responseId]: {
-        ...(current[responseId] || action),
+      [actionKey]: {
+        ...(current[actionKey] || action),
         isSaving: true,
         saveError: "",
       },
@@ -181,7 +181,7 @@ export default function CsvNpsClosingTheLoop() {
       setActions((current) => {
         const updated = {
           ...current,
-          [responseId]: {
+          [actionKey]: {
             ...savedAction,
             isDirty: false,
             isSaving: false,
@@ -197,8 +197,8 @@ export default function CsvNpsClosingTheLoop() {
 
       setActions((current) => ({
         ...current,
-        [responseId]: {
-          ...(current[responseId] || action),
+        [actionKey]: {
+          ...(current[actionKey] || action),
           isSaving: false,
           saveError: err.message || "Failed to save follow-up action",
         },
@@ -212,7 +212,7 @@ export default function CsvNpsClosingTheLoop() {
     return sourceRows
       .map((row) => ({
         ...row,
-        loopAction: actions[row.response_id] || {
+        loopAction: actions[getActionKey(row)] || {
           status: "open",
           owner: "",
           actionTaken: "",
@@ -253,16 +253,16 @@ export default function CsvNpsClosingTheLoop() {
     const total = sourceRows.length;
 
     const open = sourceRows.filter((row) => {
-      const action = actions[row.response_id];
+      const action = actions[getActionKey(row)];
       return !action || action.status === "open";
     }).length;
 
     const inProgress = sourceRows.filter(
-      (row) => actions[row.response_id]?.status === "in_progress"
+      (row) => actions[getActionKey(row)]?.status === "in_progress"
     ).length;
 
     const closed = sourceRows.filter(
-      (row) => actions[row.response_id]?.status === "closed"
+      (row) => actions[getActionKey(row)]?.status === "closed"
     ).length;
 
     return { total, open, inProgress, closed };
@@ -392,10 +392,10 @@ export default function CsvNpsClosingTheLoop() {
           ) : (
             rows.map((row) => (
               <ClosingLoopCard
-                key={row.response_id}
+                key={getActionKey(row)}
                 row={row}
                 action={row.loopAction}
-                onChange={(patch) => saveAction(row.response_id, patch)}
+                onChange={(patch) => saveAction(getActionKey(row), patch)}
                 onSave={() => persistAction(row)}
               />
             ))
@@ -513,6 +513,15 @@ function getActionsStorageKey(scope) {
   return `${ACTIONS_STORAGE_KEY}:${scope || "session"}`;
 }
 
+function getActionKey(row) {
+  return String(
+    row?.db_row_id ||
+      row?.response_id ||
+      row?.row_number ||
+      `${row?.customer_email || "unknown"}-${row?.submitted_at || "no-date"}-${row?.score || "no-score"}`
+  );
+}
+
 function MetricCard({ label, value }) {
   return (
     <div className="csv-nps-metric-card">
@@ -550,6 +559,12 @@ function ClosingLoopCard({ row, action, onChange, onSave }) {
         </p>
 
         <blockquote>{row.comment || "No comment provided."}</blockquote>
+        {action.actionTaken && (
+          <div className="csv-nps-loop-saved-action">
+            <span>Action taken / next step</span>
+            <p>{action.actionTaken}</p>
+          </div>
+        )}
 
         {row.selected_options?.length > 0 && (
           <div className="csv-nps-loop-options">

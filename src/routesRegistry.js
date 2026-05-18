@@ -52,7 +52,7 @@ import LiveResultsPanel from "./pages/LiveResultsPanel";
 import CxCockpit from "./pages/CxCockpit";
 
 import PrivateLogin from "./pages/PrivateLogin";
-import ClosingTheLoop from "./pages/ClosingTheLoop";
+import ClosingTheLoop from "./pages/EnvolaClosingTheLoop";
 import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
 import RequireWorkspaceAuth from "./components/auth/RequireWorkspaceAuth";
@@ -148,8 +148,8 @@ const COMPONENTS = {
   "/envola/invitations": protect(EnvolaInvitations),
   "/fr/envola/invitations": protect(EnvolaInvitations),
 
-  "/envola/closing-the-loop": EnvolaClosingTheLoop,
-  "/fr/envola/closing-the-loop": EnvolaClosingTheLoop,
+  "/envola/closing-the-loop": protect(EnvolaClosingTheLoop),
+  "/fr/envola/closing-the-loop": protect(EnvolaClosingTheLoop),
 
   // NPS Me Workspace - new product-style routes
   "/workspace/login": WorkspaceLogin,

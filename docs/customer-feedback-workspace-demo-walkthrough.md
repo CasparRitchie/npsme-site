@@ -220,6 +220,17 @@ Talk track:
 
 > This is where feedback becomes operational. Instead of simply reporting NPS, the team can track who is following up, what has been done and which issues remain open.
 
+Also show:
+
+- Follow-up actions are saved as a running log under each customer response.
+- Each new update is added underneath the previous one.
+- After saving, the text box clears so the team can add another follow-up later.
+- Status, owner and update history help show what has happened and what still needs attention.
+
+Talk track:
+
+> The important thing here is that follow-up is not just a one-off note. NPS Me keeps a simple history of what happened, who followed up, and whether the issue is still open, in progress or closed.
+
 ## 11. Show saved datasets
 
 Open:
@@ -295,6 +306,11 @@ Before a demo:
 - Confirm performance page loads.
 - Confirm responses page loads.
 - Confirm close-loop page loads.
+  - Confirm a follow-up action can be saved.
+  - Confirm the follow-up appears in the log under the customer comment.
+  - Confirm the text box clears after save.
+  - Confirm a second follow-up can be added under the first.
+  - Confirm the follow-up log persists after refresh.
 - Confirm AI insights work.
 - Confirm member delete restriction works if demonstrating roles.
 - Remove any real customer data unless authorised.

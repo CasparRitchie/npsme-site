@@ -3,12 +3,12 @@
 export const TRANSLATIONS = {
   en: {
     navbar: {
-      bookDiscovery: "Book discovery",
+      bookDiscovery: "Book CX review",
       languageEn: "EN",
       languageFr: "FR",
 
-    admin: "Admin",
-    logout: "Log out",
+      admin: "Admin",
+      logout: "Log out",
     },
     routes: {
       products: "Products",
@@ -174,47 +174,50 @@ export const TRANSLATIONS = {
     },
     book: {
       seo: {
-        title: "Book a discussion | NPS Me",
+        title: "Book a CX setup review | NPS Me",
         description:
-          "Book a discussion with NPS Me about CX Foundations, CX Embedded or a general discovery conversation.",
+          "Book a CX setup review with NPS Me to discuss CX Foundations, CX Embedded, customer feedback systems, NPS reporting and close-the-loop workflows.",
       },
       header: {
-        iconLabel: "Discussion",
+        iconLabel: "CX review",
         tag: "NPS Me / Book",
       },
       topics: {
         cxFoundations: {
           title: "Book a CX Foundations discussion",
           subtitle:
-            "Share a bit about your current setup and NPS Me will explore how to put the right customer experience foundations in place.",
-          prefill: "We’d like to discuss CX Foundations, especially around ",
+            "Share a bit about your current customer feedback setup and NPS Me will explore how to put a practical CX system in place: surveys, reporting, themes and close-the-loop actions.",
+          prefill:
+            "We’d like to discuss CX Foundations, especially around our current feedback setup, tools and CX goals: ",
           subject: "CX Foundations booking request (npsme.com)",
         },
         cxEmbedded: {
           title: "Book a CX Embedded discussion",
           subtitle:
-            "Share a bit about your business and NPS Me will explore how customer experience could be embedded into team routines, ownership and continuous improvement.",
-          prefill: "We’d like to discuss CX Embedded, especially around ",
+            "Share a bit about your business and NPS Me will explore how customer feedback could become part of your team rhythm: regular reviews, ownership, management summaries and continuous improvement.",
+          prefill:
+            "We’d like to discuss CX Embedded, especially around our feedback review rhythm, ownership and ongoing CX support: ",
           subject: "CX Embedded booking request (npsme.com)",
         },
         discovery: {
-          title: "Book a free discovery call",
+          title: "Book a free CX setup review",
           subtitle:
-            "Share a bit about your current CX and feedback setup and NPS Me will explore where support could help most - no obligation.",
-          prefill: "",
-          subject: "Discovery booking request (npsme.com)",
+            "Share a bit about your current customer feedback process, where the data lives and what you want to improve. NPS Me will suggest where support could help most — no obligation.",
+          prefill:
+            "We’d like a free CX setup review. Our current feedback setup, tools and main questions are: ",
+          subject: "CX setup review request (npsme.com)",
         },
       },
       form: {
         name: "Your name",
         email: "Your email",
-        timezone: "Time zone (e.g., Europe/Paris)",
-        context: "What would you like to focus on?",
+        timezone: "Time zone (e.g., Europe/London)",
+        context: "Tell me about your current feedback setup, tools and goals",
         sending: "Sending…",
-        submit: "Request booking",
+        submit: "Request CX review",
         success:
           "Thanks! NPS Me will confirm shortly and send a calendar invite.",
-        errorPrefix: "Sorry-something went wrong. Please email",
+        errorPrefix: "Sorry — something went wrong. Please email",
       },
     },
     blog: {
@@ -3416,7 +3419,7 @@ export const TRANSLATIONS = {
 
   fr: {
     navbar: {
-      bookDiscovery: "Prendre rendez-vous",
+      bookDiscovery: "Réserver une revue CX",
       languageEn: "EN",
       languageFr: "FR",
 
@@ -4890,47 +4893,50 @@ export const TRANSLATIONS = {
     },
     book: {
       seo: {
-        title: "Réserver un échange | NPS Me",
+        title: "Réserver une revue CX | NPS Me",
         description:
-          "Réservez un échange avec NPS Me à propos de CX Foundations, CX Embedded ou d’un appel de découverte plus général.",
+          "Réservez une revue CX avec NPS Me pour échanger sur CX Foundations, CX Embedded, les systèmes de feedback client, le reporting NPS et les workflows de close-the-loop.",
       },
       header: {
-        iconLabel: "Échange",
+        iconLabel: "Revue CX",
         tag: "NPS Me / Réserver",
       },
       topics: {
         cxFoundations: {
           title: "Réserver un échange CX Foundations",
           subtitle:
-            "Partagez quelques éléments sur votre contexte actuel et NPS Me explorera comment mettre en place les bonnes fondations d’expérience client.",
-          prefill: "Nous aimerions échanger sur CX Foundations, notamment autour de ",
+            "Partagez quelques éléments sur votre dispositif de feedback client actuel et NPS Me explorera comment mettre en place un système CX concret : enquêtes, reporting, thèmes clients et actions de close-the-loop.",
+          prefill:
+            "Nous aimerions échanger sur CX Foundations, notamment autour de notre dispositif de feedback actuel, nos outils et nos objectifs CX : ",
           subject: "Demande d’échange CX Foundations (npsme.com)",
         },
         cxEmbedded: {
           title: "Réserver un échange CX Embedded",
           subtitle:
-            "Partagez quelques éléments sur votre entreprise et NPS Me explorera comment intégrer l’expérience client dans les routines d’équipe, les responsabilités et l’amélioration continue.",
-          prefill: "Nous aimerions échanger sur CX Embedded, notamment autour de ",
+            "Partagez quelques éléments sur votre entreprise et NPS Me explorera comment intégrer le feedback client dans le rythme de l’équipe : revues régulières, responsabilités, synthèses management et amélioration continue.",
+          prefill:
+            "Nous aimerions échanger sur CX Embedded, notamment autour de notre rythme de revue du feedback, l’ownership et l’accompagnement CX continu : ",
           subject: "Demande d’échange CX Embedded (npsme.com)",
         },
         discovery: {
-          title: "Réserver un appel découverte gratuit",
+          title: "Réserver une revue CX gratuite",
           subtitle:
-            "Partagez quelques éléments sur votre dispositif CX / feedback actuel et NPS Me explorera où un accompagnement pourrait être le plus utile - sans engagement.",
-          prefill: "",
-          subject: "Demande d’appel découverte (npsme.com)",
+            "Partagez quelques éléments sur votre processus de feedback client actuel, où se trouvent les données et ce que vous souhaitez améliorer. NPS Me proposera où l’accompagnement pourrait être le plus utile — sans engagement.",
+          prefill:
+            "Nous aimerions une revue CX gratuite. Notre dispositif de feedback actuel, nos outils et nos principales questions sont : ",
+          subject: "Demande de revue CX (npsme.com)",
         },
       },
       form: {
         name: "Votre nom",
         email: "Votre email",
         timezone: "Fuseau horaire (ex. Europe/Paris)",
-        context: "Sur quoi souhaitez-vous échanger ?",
+        context: "Décrivez votre dispositif de feedback actuel, vos outils et vos objectifs",
         sending: "Envoi…",
-        submit: "Demander un échange",
+        submit: "Demander une revue CX",
         success:
           "Merci ! NPS Me vous confirmera cela rapidement et vous enverra une invitation calendrier.",
-        errorPrefix: "Désolé-un problème est survenu. Merci d’écrire à",
+        errorPrefix: "Désolé — un problème est survenu. Merci d’écrire à",
       },
     },
     dataAutomation: {

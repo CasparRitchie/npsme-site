@@ -11,10 +11,9 @@ export default function Products() {
   const { lang } = useLanguage();
   const location = useLocation();
 
-  const offersRaw = translations(lang, "products.offers", []);
   const comparison = translations(lang, "products.comparison.rows", []);
-
   const offers = translations(lang, "products.offers", []);
+  const setupSteps = translations(lang, "products.setupSteps.items", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -51,11 +50,41 @@ export default function Products() {
           </p>
         </div>
 
+        {setupSteps.length ? (
+          <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+            <div className="max-w-3xl">
+              <h2 className="text-xl font-semibold text-white md:text-2xl">
+                {translations(lang, "products.setupSteps.title")}
+              </h2>
+              <p className="mt-3 text-slate-300">
+                {translations(lang, "products.setupSteps.body")}
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {setupSteps.map((step, i) => (
+                <div
+                  key={step.title}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-5"
+                >
+                  <div className="text-xs uppercase tracking-widest text-[#86EFAC]">
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <h3 className="mt-3 font-semibold text-white">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                    {step.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           {offers.map((offer, i) => (
             <OfferCard
               key={offer.title}
-              featured={i === 1}
+              featured={i === 0}
               icon={
                 i === 0 ? (
                   <Briefcase className="h-5 w-5 text-white" />

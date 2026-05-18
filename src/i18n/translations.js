@@ -2122,23 +2122,51 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "CX Foundations and CX Intelligence Layer | NPS Me",
+      seoTitle: "CX Foundations and CX Embedded | NPS Me",
       seoDescription:
-        "Explore the two main ways to work with NPS Me: CX Foundations and CX Intelligence Layer. Consultancy-backed CX implementation and insight support to help businesses put customer feedback at the centre of how they operate.",
+        "Practical customer feedback and CX setup services for startups and SMEs. Set up surveys, NPS reporting, customer themes and close-the-loop actions with NPS Me.",
 
       header: {
         iconLabel: "NPS Me offers",
         tag: "NPS Me / Offers",
-        accent: "Two ways to work with",
-        title: "NPS Me",
+        accent: "Practical CX setup",
+        title: "for startups and SMEs",
         subtitle:
-          "Consultancy-backed CX implementation and insight support to help you embed customer experience into the way your business works.",
+          "Two ways to put a credible customer feedback system in place: a focused setup project, or ongoing support to embed CX into the way your team operates.",
       },
 
       intro: {
-        title: "Two practical ways to embed customer experience",
+        title: "Customer feedback should become a working system, not another report",
         body:
-          "NPS Me is not just another feedback tool. The software supports the process, but the real value comes from putting the right CX structure, routines and follow-through in place inside your business.",
+          "NPS Me helps startups and SMEs move from scattered comments, survey scores and support anecdotes to a practical CX process: collect the right feedback, understand the themes, assign follow-up and give founders a clearer view of what customers need.",
+      },
+
+      setupSteps: {
+        title: "What NPS Me helps you put in place",
+        body:
+          "The goal is to create a lightweight operating rhythm for customer feedback — simple enough for a startup to use, credible enough for leadership and investors to trust.",
+        items: [
+          {
+            title: "Survey and feedback structure",
+            body:
+              "Decide what to ask, who to ask, when to ask and how to avoid biased or noisy feedback.",
+          },
+          {
+            title: "Reporting and themes",
+            body:
+              "Turn NPS scores and customer comments into themes, risks, opportunities and management-ready insight.",
+          },
+          {
+            title: "Close-the-loop ownership",
+            body:
+              "Create a practical follow-up workflow so detractors, promoters and recurring issues do not disappear into a dashboard.",
+          },
+          {
+            title: "Founder-ready CX evidence",
+            body:
+              "Give the business a clear story: what customers are saying, what is being done and how the process will improve over time.",
+          },
+        ],
       },
 
       offer: {
@@ -2150,117 +2178,125 @@ export const TRANSLATIONS = {
           topic: "cx-foundations",
           title: "CX Foundations",
           badge: "Setup",
-          price: "Scoped to the work",
+          price: "Typical setup project: £2.5k–£4k",
           hint:
-            "Best for: startups and SMEs who want a practical CX system set up properly",
+            "Best for: startups and SMEs that need a credible customer feedback system set up properly",
           intro:
-            "A focused implementation offer to help you get the essentials in place: the right feedback structure, usable reporting, and a practical close-the-loop process.",
+            "A focused implementation project to put the essentials in place: survey structure, reporting, feedback themes and a practical close-the-loop workflow.",
           bullets: [
-            "NPS / feedback programme design",
-            "Survey governance and anti-bias setup",
-            "Reporting and comment analysis",
+            "NPS / customer feedback programme design",
+            "CSV, Intercom or existing-tool setup",
+            "Survey governance and anti-bias checks",
+            "NPS dashboard and response reporting",
+            "Customer comment analysis and theme grouping",
             "Close-the-loop workflow design",
-            "Team onboarding and practical handover",
+            "Team handover and founder-ready summary",
           ],
-          includesTitle: "Typical scope",
+          includesTitle: "Typical deliverables",
           includes: [
-            "Programme setup or reset",
-            "Customer feedback structure",
-            "Core reporting and workflows",
-            "Practical implementation support",
+            "A clear survey and feedback plan",
+            "A working dashboard or reporting view",
+            "Theme analysis from customer comments",
+            "Close-the-loop process with owners and next steps",
+            "Handover session and practical recommendations",
           ],
           outcome:
-            "A simple, credible CX system your team can actually use.",
-          cta: "Book a CX Foundations call",
+            "A practical CX system your team can use, and a credible way to show customers and investors that feedback is being measured and acted on.",
+          cta: "Book a CX Foundations discussion",
         },
         {
-          topic: "intelligence-layer",
-          title: "CX Intelligence Layer",
-          badge: "Insight + action",
-          price: "Implementation + ongoing support",
+          topic: "cx-embedded",
+          title: "CX Embedded",
+          badge: "Ongoing",
+          price: "Monthly support: from £750/month",
           hint:
-            "Best for: businesses who want insight, workflow and action on top of tools they already use",
+            "Best for: teams that want feedback embedded into routines, ownership and decision-making",
           intro:
-            "A deeper offer for organisations that want NPS Me to sit as an intelligence layer above tools like Intercom, HubSpot, Zendesk or structured exports, turning customer feedback into clearer insight, ownership and follow-through.",
+            "Ongoing support to help your team review feedback regularly, track themes, follow up with customers and turn insight into product, support and leadership decisions.",
           bullets: [
             "Everything in CX Foundations",
-            "Integration with existing systems and exports",
-            "Comment, theme and operational insight layer",
-            "Close-the-loop workflow support",
-            "Ongoing optimisation and advisory support",
+            "Monthly or fortnightly feedback review",
+            "Theme and issue tracking",
+            "Close-the-loop action review",
+            "Management-ready CX summaries",
+            "Product, support and customer success recommendations",
+            "Ongoing improvement of the feedback process",
           ],
-          includesTitle: "Typical scope",
+          includesTitle: "Typical support",
           includes: [
-            "CX Foundations plus intelligence-layer setup",
-            "Insight and workflow design on top of existing tools",
-            "Cross-team follow-through support",
-            "Ongoing guidance and optimisation",
+            "Regular feedback review sessions",
+            "Updated theme and action summaries",
+            "Follow-up rhythm for customer issues",
+            "Leadership summaries and recommendations",
+            "Support improving the process over time",
           ],
           outcome:
-            "Customer feedback becomes easier to interpret, manage and act on across the business.",
-          cta: "Book a CX Intelligence Layer call",
+            "Customer feedback becomes part of how the business prioritises work, follows up with customers and improves the experience over time.",
+          cta: "Book a CX Embedded discussion",
         },
       ],
 
       support: {
-        title: "What sits behind both offers",
+        title: "Why this is not just software",
         body:
-          "Both offers are consultancy-backed and system-supported. That means the work is not limited to advice or dashboards: it includes practical implementation, usable workflows, and support to help teams actually work with customer feedback.",
+          "Most startups do not need to buy a large enterprise CX platform before they understand what customers are saying. NPS Me combines hands-on CX setup, data analysis and lightweight tooling so the process works in practice, not just in a demo.",
       },
 
       fit: {
-        title: "Who this is for",
+        title: "Who this is best for",
         body:
-          "NPS Me is best suited to startups and SMEs already working digitally, especially teams using platforms like Intercom, HubSpot, Zendesk or structured exports, and who want a more formal but practical approach to customer experience.",
+          "This is designed for founders, startup teams and SMEs that know customer experience matters, but do not yet have a structured way to collect, analyse and act on feedback. It is especially useful when investors, board members or leadership teams want evidence that CX is being taken seriously.",
       },
 
       comparison: {
-        title: "Which offer is the right fit?",
+        title: "Which offer is right for you?",
         body:
-          "Start with CX Foundations if you need the basics set up properly. Choose CX Intelligence Layer if you want customer feedback interpreted and actioned more systematically on top of the systems you already use.",
+          "Start with CX Foundations if you need the system created. Choose CX Embedded if you want ongoing help running the rhythm, reviewing feedback and keeping action moving.",
         columns: {
-          topic: "Topic",
+          topic: "Area",
           foundations: "CX Foundations",
-          embedded: "CX Intelligence Layer",
+          embedded: "CX Embedded",
         },
         rows: [
           {
-            topic: "Main goal",
-            foundations: "Get a practical CX system set up properly",
-            embedded:
-              "Turn existing customer feedback tools into a clearer intelligence and action layer",
+            topic: "Main purpose",
+            foundations: "Set up the customer feedback system",
+            embedded: "Run and improve the feedback rhythm",
           },
           {
-            topic: "Best for",
-            foundations:
-              "Teams needing structure, reporting and close-the-loop basics",
-            embedded:
-              "Teams wanting better interpretation, ownership and follow-through across existing systems",
+            topic: "Best fit",
+            foundations: "Startup or SME with no clear CX process yet",
+            embedded: "Team that wants ongoing CX support and accountability",
           },
           {
-            topic: "Depth",
-            foundations: "Focused implementation",
-            embedded: "Implementation plus ongoing optimisation support",
+            topic: "Typical timeframe",
+            foundations: "2–4 week setup project",
+            embedded: "Monthly or ongoing support",
           },
           {
-            topic: "Leadership involvement",
-            foundations: "Light to moderate",
-            embedded: "Moderate to high",
+            topic: "Data sources",
+            foundations: "CSV, Intercom or existing survey tools",
+            embedded: "Same sources, reviewed and improved over time",
           },
           {
-            topic: "Ongoing support",
-            foundations: "Optional",
-            embedded: "Built in",
+            topic: "Close-the-loop",
+            foundations: "Workflow designed and handed over",
+            embedded: "Workflow reviewed, tracked and optimised",
+          },
+          {
+            topic: "Leadership value",
+            foundations: "Clear evidence that CX is being measured and structured",
+            embedded: "Regular insight on what customers are saying and what is changing",
           },
         ],
       },
 
       cta: {
-        title: "Not sure where to start?",
+        title: "Want to put a proper customer feedback system in place?",
         body:
-          "We can look at your current setup and quickly work out whether CX Foundations or CX Intelligence Layer is the better starting point.",
+          "Book a short discussion and we’ll look at your current setup, where your feedback lives, what your team needs to know and which version of NPS Me would be the best fit.",
         email: "Email hello@npsme.com",
-        book: "Book a discovery call",
+        book: "Book a CX setup review",
       },
     },
     socialListening: {
@@ -5543,146 +5579,181 @@ export const TRANSLATIONS = {
       },
     },
     products: {
-      seoTitle: "CX Foundations et Couche d’intelligence CX | NPS Me",
+      seoTitle: "CX Foundations et CX Embedded | NPS Me",
       seoDescription:
-        "Découvrez les deux principales façons de travailler avec NPS Me : CX Foundations et Couche d’intelligence CX. Un accompagnement CX soutenu par un système et par l’analyse, pour aider les entreprises à mettre le feedback client au centre de leur fonctionnement.",
+        "Services pratiques de mise en place CX et feedback client pour startups et PME. Mettez en place enquêtes, reporting NPS, thèmes clients et actions de close-the-loop avec NPS Me.",
 
       header: {
         iconLabel: "Offres NPS Me",
         tag: "NPS Me / Offres",
-        accent: "Deux façons de travailler avec",
-        title: "NPS Me",
+        accent: "Mise en place CX concrète",
+        title: "pour startups et PME",
         subtitle:
-          "Un accompagnement CX soutenu par un système et par l’analyse, pour intégrer l’expérience client dans la façon dont votre entreprise fonctionne.",
+          "Deux façons de mettre en place un système de feedback client crédible : un projet de setup ciblé, ou un accompagnement continu pour intégrer la CX dans le fonctionnement de l’équipe.",
       },
 
       intro: {
-        title: "Deux façons concrètes d’ancrer l’expérience client",
+        title: "Le feedback client doit devenir un système de travail, pas un rapport de plus",
         body:
-          "NPS Me n’est pas simplement un outil de feedback en plus. Le logiciel soutient le process, mais la vraie valeur vient de la mise en place d’une structure CX claire, de routines utiles et d’un vrai suivi au sein de l’entreprise.",
+          "NPS Me aide les startups et PME à passer de commentaires dispersés, scores d’enquête et anecdotes support à un processus CX concret : collecter le bon feedback, comprendre les thèmes, assigner le suivi et donner aux fondateurs une vision plus claire de ce dont les clients ont besoin.",
+      },
+
+      setupSteps: {
+        title: "Ce que NPS Me vous aide à mettre en place",
+        body:
+          "L’objectif est de créer un rythme opérationnel léger autour du feedback client — assez simple pour une startup, assez crédible pour les dirigeants et investisseurs.",
+        items: [
+          {
+            title: "Structure d’enquête et de feedback",
+            body:
+              "Décider quoi demander, à qui, quand, et comment éviter un feedback biaisé ou trop bruité.",
+          },
+          {
+            title: "Reporting et thèmes",
+            body:
+              "Transformer scores NPS et commentaires clients en thèmes, risques, opportunités et insights lisibles par le management.",
+          },
+          {
+            title: "Ownership du close-the-loop",
+            body:
+              "Créer un workflow de suivi concret pour que détracteurs, promoteurs et problèmes récurrents ne disparaissent pas dans un dashboard.",
+          },
+          {
+            title: "Preuves CX pour fondateurs",
+            body:
+              "Donner à l’entreprise une histoire claire : ce que disent les clients, ce qui est fait et comment le processus va s’améliorer dans le temps.",
+          },
+        ],
       },
 
       offer: {
-        outcomeLabel: "Résultat recherché",
+        outcomeLabel: "Résultat attendu",
       },
 
       offers: [
         {
           topic: "cx-foundations",
           title: "CX Foundations",
-          badge: "Mise en place",
-          price: "Périmètre défini selon le besoin",
+          badge: "Setup",
+          price: "Projet de setup typique : £2.5k–£4k",
           hint:
-            "Idéal pour : les startups et PME qui veulent mettre en place un système CX simple et crédible",
+            "Idéal pour : startups et PME qui ont besoin d’un système de feedback client crédible",
           intro:
-            "Une offre de mise en place ciblée pour installer les fondamentaux : une bonne structure de feedback, un reporting exploitable et un process de close-the-loop concret.",
+            "Un projet de mise en place ciblé pour structurer les essentiels : enquête, reporting, thèmes de feedback et workflow de close-the-loop.",
           bullets: [
-            "Conception du programme NPS / feedback",
+            "Conception du programme NPS / feedback client",
+            "Mise en place CSV, Intercom ou outils existants",
             "Gouvernance d’enquête et réduction des biais",
-            "Reporting et analyse des verbatims",
+            "Dashboard NPS et reporting des réponses",
+            "Analyse des commentaires et regroupement par thèmes",
             "Conception du workflow de close-the-loop",
-            "Onboarding des équipes et passage de relais",
+            "Passage de relais équipe et résumé pour fondateur",
           ],
-          includesTitle: "Périmètre typique",
+          includesTitle: "Livrables typiques",
           includes: [
-            "Mise en place ou refonte du programme",
-            "Structure de feedback client",
-            "Reporting et workflows de base",
-            "Accompagnement concret à la mise en œuvre",
+            "Un plan clair d’enquête et de feedback",
+            "Un dashboard ou une vue de reporting fonctionnelle",
+            "Une analyse des thèmes issus des commentaires clients",
+            "Un processus de close-the-loop avec responsables et prochaines étapes",
+            "Une session de handover et des recommandations pratiques",
           ],
           outcome:
-            "Un système CX simple, crédible et réellement utilisable par vos équipes.",
-          cta: "Réserver un échange CX Foundations",
+            "Un système CX concret que votre équipe peut utiliser, et une façon crédible de montrer aux clients et investisseurs que le feedback est mesuré et suivi d’actions.",
+          cta: "Discuter de CX Foundations",
         },
         {
-          topic: "intelligence-layer",
-          title: "Couche d’intelligence CX",
-          badge: "Insight + action",
-          price: "Mise en place + accompagnement continu",
+          topic: "cx-embedded",
+          title: "CX Embedded",
+          badge: "Continu",
+          price: "Accompagnement mensuel : à partir de £750/mois",
           hint:
-            "Idéal pour : les entreprises qui veulent mieux exploiter les outils qu’elles utilisent déjà",
+            "Idéal pour : équipes qui veulent intégrer le feedback aux routines, responsabilités et décisions",
           intro:
-            "Une offre plus approfondie pour les organisations qui veulent que NPS Me agisse comme une couche d’intelligence au-dessus d’outils comme Intercom, HubSpot, Zendesk ou d’exports structurés, afin de transformer le feedback client en insight, en responsabilités claires et en actions concrètes.",
+            "Un accompagnement continu pour aider votre équipe à revoir le feedback régulièrement, suivre les thèmes, relancer les clients et transformer l’insight en décisions produit, support et management.",
           bullets: [
             "Tout ce qui est inclus dans CX Foundations",
-            "Connexion aux systèmes et exports existants",
-            "Couche d’analyse des verbatims, thèmes et signaux opérationnels",
-            "Support au workflow de close-the-loop",
-            "Optimisation continue et accompagnement conseil",
+            "Revue mensuelle ou bimensuelle du feedback",
+            "Suivi des thèmes et problèmes récurrents",
+            "Revue des actions de close-the-loop",
+            "Synthèses CX pour le management",
+            "Recommandations produit, support et customer success",
+            "Amélioration continue du processus de feedback",
           ],
-          includesTitle: "Périmètre typique",
+          includesTitle: "Accompagnement typique",
           includes: [
-            "CX Foundations plus mise en place de la couche d’intelligence",
-            "Conception de l’insight et des workflows sur les outils existants",
-            "Accompagnement du suivi transverse entre équipes",
-            "Accompagnement et optimisation dans la durée",
+            "Sessions régulières de revue du feedback",
+            "Synthèses mises à jour des thèmes et actions",
+            "Rythme de suivi des problèmes clients",
+            "Synthèses et recommandations pour les dirigeants",
+            "Support pour améliorer le processus dans le temps",
           ],
           outcome:
-            "Le feedback client devient plus simple à interpréter, piloter et transformer en actions dans l’entreprise.",
-          cta: "Réserver un échange Couche d’intelligence CX",
+            "Le feedback client devient une partie réelle de la façon dont l’entreprise priorise, suit les clients et améliore l’expérience dans la durée.",
+          cta: "Discuter de CX Embedded",
         },
       ],
 
       support: {
-        title: "Ce qui se trouve derrière les deux offres",
+        title: "Pourquoi ce n’est pas seulement du logiciel",
         body:
-          "Les deux offres sont soutenues à la fois par un accompagnement conseil et par un système. Le travail ne se limite donc ni à des recommandations, ni à des dashboards : il inclut une mise en œuvre concrète, des workflows utilisables, et un accompagnement pour aider les équipes à vraiment travailler avec le feedback client.",
+          "La plupart des startups n’ont pas besoin d’acheter une grande plateforme CX enterprise avant de comprendre ce que disent les clients. NPS Me combine mise en place CX, analyse de données et tooling léger pour que le processus fonctionne vraiment, pas seulement dans une démo.",
       },
 
       fit: {
-        title: "Pour qui",
+        title: "Pour qui c’est le plus utile",
         body:
-          "NPS Me s’adresse surtout aux startups et PME déjà à l’aise avec des outils digitaux, notamment celles qui utilisent Intercom, HubSpot, Zendesk ou des exports structurés, et qui veulent une approche plus formelle mais concrète de l’expérience client.",
+          "C’est conçu pour les fondateurs, équipes startup et PME qui savent que l’expérience client compte, mais qui n’ont pas encore de façon structurée de collecter, analyser et agir sur le feedback. C’est particulièrement utile lorsque des investisseurs, board members ou dirigeants veulent des preuves que la CX est prise au sérieux.",
       },
 
       comparison: {
         title: "Quelle offre choisir ?",
         body:
-          "Commencez par CX Foundations si vous avez besoin de mettre en place les bases correctement. Choisissez la Couche d’intelligence CX si vous voulez mieux interpréter et piloter le feedback client à partir des systèmes que vous utilisez déjà.",
+          "Commencez avec CX Foundations si vous avez besoin de créer le système. Choisissez CX Embedded si vous voulez un accompagnement continu pour faire vivre le rythme, revoir le feedback et maintenir les actions.",
         columns: {
           topic: "Sujet",
           foundations: "CX Foundations",
-          embedded: "Couche d’intelligence CX",
+          embedded: "CX Embedded",
         },
         rows: [
           {
             topic: "Objectif principal",
-            foundations:
-              "Mettre en place un système CX concret et bien structuré",
-            embedded:
-              "Transformer les outils de feedback existants en une couche plus claire d’analyse et d’action",
+            foundations: "Mettre en place le système de feedback client",
+            embedded: "Faire vivre et améliorer le rythme de feedback",
           },
           {
-            topic: "Idéal pour",
-            foundations:
-              "Les équipes qui ont besoin de structure, de reporting et des bases du close-the-loop",
-            embedded:
-              "Les équipes qui veulent une meilleure interprétation, des responsabilités claires et un meilleur suivi à partir des systèmes existants",
+            topic: "Meilleur cas d’usage",
+            foundations: "Startup ou PME sans processus CX clair",
+            embedded: "Équipe qui veut support CX continu et accountability",
           },
           {
-            topic: "Niveau d’accompagnement",
-            foundations: "Mise en place ciblée",
-            embedded: "Mise en place plus accompagnement d’optimisation continue",
+            topic: "Durée typique",
+            foundations: "Projet de setup de 2–4 semaines",
+            embedded: "Support mensuel ou continu",
           },
           {
-            topic: "Implication du leadership",
-            foundations: "Légère à modérée",
-            embedded: "Modérée à forte",
+            topic: "Sources de données",
+            foundations: "CSV, Intercom ou outils d’enquête existants",
+            embedded: "Mêmes sources, revues et améliorées dans le temps",
           },
           {
-            topic: "Accompagnement dans la durée",
-            foundations: "Optionnel",
-            embedded: "Inclus",
+            topic: "Close-the-loop",
+            foundations: "Workflow conçu et transmis",
+            embedded: "Workflow revu, suivi et optimisé",
+          },
+          {
+            topic: "Valeur leadership",
+            foundations: "Preuve claire que la CX est mesurée et structurée",
+            embedded: "Insight régulier sur ce que disent les clients et ce qui change",
           },
         ],
       },
 
       cta: {
-        title: "Vous hésitez sur le bon point de départ ?",
+        title: "Vous voulez mettre en place un vrai système de feedback client ?",
         body:
-          "Nous pouvons regarder rapidement votre contexte actuel et voir si CX Foundations ou la Couche d’intelligence CX est le meilleur point de départ.",
+          "Réservez une courte discussion et nous regarderons votre setup actuel, où se trouve le feedback, ce que votre équipe doit comprendre et quelle version de NPS Me serait la plus adaptée.",
         email: "Écrire à hello@npsme.com",
-        book: "Réserver un appel découverte",
+        book: "Réserver une revue CX",
       },
     },
     socialListening: {

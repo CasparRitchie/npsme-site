@@ -10,6 +10,107 @@ import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 import { localizePath } from "./i18n/pathHelpers";
 
+function ScreenshotCard({ image, className = "" }) {
+  if (!image?.src) return null;
+
+  return (
+    <div
+      className={`overflow-hidden rounded-3xl border border-white/10 bg-black/30 shadow-2xl shadow-black/30 ${className}`}
+    >
+      <div className="border-b border-white/10 bg-white/5 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
+          <span className="ml-3 text-xs text-slate-400">
+            {image.title || "NPS Me"}
+          </span>
+        </div>
+      </div>
+
+      <img
+        src={image.src}
+        alt={image.alt}
+        loading="lazy"
+        className="w-full bg-[#0B0F19] object-cover"
+      />
+    </div>
+  );
+}
+
+function ProofStrip() {
+  const { lang } = useLanguage();
+  const label = translations(lang, "landing.proofStrip.label", "");
+  const items = translations(lang, "landing.proofStrip.items", []);
+
+  if (!items.length) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-6 pb-12">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+        <div className="text-xs uppercase tracking-widest text-slate-500">
+          {label}
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-white"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ScreenshotWorkflowSection() {
+  const { lang } = useLanguage();
+  const tr = (p, f) => translations(lang, p, f);
+  const cards = translations(lang, "landing.screenshots.cards", []);
+
+  if (!cards.length) return null;
+
+  return (
+    <section id="screenshots" className="mx-auto max-w-7xl px-6 pb-20">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+        <div className="max-w-3xl">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {tr("landing.screenshots.title")}
+          </h2>
+          <p className="mt-3 text-slate-300">
+            {tr("landing.screenshots.body")}
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          {cards.map((card) => (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.45 }}
+              className="rounded-3xl border border-white/10 bg-black/20 p-4"
+            >
+              <ScreenshotCard image={card} />
+              <div className="mt-5">
+                <h3 className="font-semibold text-white">{card.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                  {card.desc}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function EmbedCxSection() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
@@ -377,6 +478,8 @@ export default function NpsMeLanding() {
   const methodCards = translations(lang, "landing.method.cards", []);
   const platformCards = translations(lang, "landing.platform.cards", []);
   const aboutBullets = translations(lang, "landing.about.bullets", []);
+  const screenshotCards = translations(lang, "landing.screenshots.cards", []);
+  const heroScreenshot = screenshotCards[0];
   const chips = translations(lang, "landing.hero.chips", {
     help: [],
     worksWith: [],
@@ -482,8 +585,39 @@ export default function NpsMeLanding() {
               {tr("landing.hero.chipsNote")}
             </p>
           </div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="md:col-span-5 lg:col-span-6"
+          >
+            {heroScreenshot ? (
+              <ScreenshotCard
+                image={{
+                  ...heroScreenshot,
+                  alt: tr("landing.hero.screenshotAlt", heroScreenshot.alt),
+                }}
+                className="md:mt-2"
+              />
+            ) : null}
+
+            <div className="mt-4 rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/10 p-4">
+              <div className="text-xs uppercase tracking-widest text-[#86EFAC]">
+                {lang === "fr" ? "Ce que cela montre" : "What this shows"}
+              </div>
+              <p className="mt-2 text-sm text-slate-200">
+                {lang === "fr"
+                  ? "Un seul endroit pour voir les scores, les thèmes clients et les actions de suivi."
+                  : "One place to see scores, customer themes and follow-up actions."}
+              </p>
+            </div>
+          </motion.div>
         </div>
       </PageHeader>
+
+      <ProofStrip />
+      <ServicesSection />
+      <ScreenshotWorkflowSection />
 
       {/* Platform */}
       <section id="platform" className="mx-auto max-w-7xl px-6 py-20">
@@ -579,7 +713,6 @@ export default function NpsMeLanding() {
 
 
       <EmbedCxSection />
-      <ServicesSection />
       <NpsExplainer />
       <MilestoneNpsSection />
 

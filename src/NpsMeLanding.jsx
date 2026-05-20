@@ -496,12 +496,7 @@ export default function NpsMeLanding() {
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Home">
         <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-7 lg:col-span-6">
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white"
-            >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white">
               {tr("landing.hero.h1.lead")}{" "}
               <span className="md:whitespace-nowrap">
                 {tr("landing.hero.h1.nps")}
@@ -510,16 +505,11 @@ export default function NpsMeLanding() {
               <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
                 {tr("landing.hero.h1.accent")}
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.05 }}
-              className="mt-5 text-slate-300 max-w-xl"
-            >
+            <p className="mt-5 text-slate-300 max-w-xl">
               {tr("landing.hero.body")}
-            </motion.p>
+            </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link to={localizePath("/book", lang)}
@@ -585,12 +575,7 @@ export default function NpsMeLanding() {
               {tr("landing.hero.chipsNote")}
             </p>
           </div>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="md:col-span-5 lg:col-span-6"
-          >
+          <div className="md:col-span-5 lg:col-span-6">
             {heroScreenshot ? (
               <ScreenshotCard
                 image={{
@@ -611,7 +596,7 @@ export default function NpsMeLanding() {
                   : "One place to see scores, customer themes and follow-up actions."}
               </p>
             </div>
-          </motion.div>
+          </div>
         </div>
       </PageHeader>
 

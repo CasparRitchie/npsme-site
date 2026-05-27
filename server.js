@@ -1608,14 +1608,15 @@ app.head("/healthz", (_req, res) => {
   res.status(200).end();
 });
 
-// Supabase
-
+// Supabase health check
 app.get("/api/db/health", async (_req, res) => {
   try {
     if (!supabaseAdmin) {
       return res.status(500).json({
         ok: false,
+        database: "supabase",
         error: "Supabase is not configured",
+        checkedAt: new Date().toISOString(),
       });
     }
 
@@ -1627,19 +1628,24 @@ app.get("/api/db/health", async (_req, res) => {
     if (error) {
       return res.status(500).json({
         ok: false,
+        database: "supabase",
         error: error.message,
+        checkedAt: new Date().toISOString(),
       });
     }
 
     return res.json({
       ok: true,
       database: "supabase",
+      checkedAt: new Date().toISOString(),
     });
   } catch (err) {
     console.error("[npsme] DB health check failed", err);
     return res.status(500).json({
       ok: false,
+      database: "supabase",
       error: "Database health check failed",
+      checkedAt: new Date().toISOString(),
     });
   }
 });

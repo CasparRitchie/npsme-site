@@ -5,19 +5,18 @@ import { Link, useLocation } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import { localizePath } from "../i18n/pathHelpers";
 
 export default function BlogEthicsOfContactSelection() {
   const { lang } = useLanguage();
   const location = useLocation();
   const BASE = "blogEthicsOfContactSelection";
+  const tr = (path, fallback = "") => translations(lang, path, fallback);
   const DATE_PUBLISHED = "2025-10-23";
   const DATE_MODIFIED = "2025-10-23";
 
-  const seoTitle = translations(lang, "blogEthicsOfContactSelection.seo.title");
-  const seoDescription = translations(
-    lang,
-    "blogEthicsOfContactSelection.seo.description"
-  );
+  const seoTitle = tr(`${BASE}.seo.title`);
+  const seoDescription = tr(`${BASE}.seo.description`);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -33,7 +32,7 @@ export default function BlogEthicsOfContactSelection() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            headline: tr(`${BASE}.h1`, tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post"))),
+            headline: tr(`${BASE}.header.title`, tr(`${BASE}.seo.title`, "Blog post")),
             description: tr(`${BASE}.seo.description`, ""),
             datePublished: DATE_PUBLISHED,
             dateModified: DATE_MODIFIED,
@@ -42,7 +41,7 @@ export default function BlogEthicsOfContactSelection() {
             publisher: { "@type": "Organization", name: "NPS Me" },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": "https://npsme.com" + location.pathname,
+              "@id": "https://www.npsme.com" + location.pathname,
             },
           }),
         }}
@@ -216,13 +215,13 @@ export default function BlogEthicsOfContactSelection() {
 
             <div className="mt-5 flex flex-col sm:flex-row justify-center gap-3">
               <Link
-                to="/products"
+                to={localizePath("/products", lang)}
                 className="rounded-2xl px-6 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
               >
                 {translations(lang, "blogEthicsOfContactSelection.cta.btnServices")}
               </Link>
               <Link
-                to="/book"
+                to={localizePath("/book", lang)}
                 className="rounded-2xl px-6 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#020617] hover:bg-[#16A34A] transition"
               >
                 {translations(lang, "blogEthicsOfContactSelection.cta.btnBook")}

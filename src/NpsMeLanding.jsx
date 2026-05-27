@@ -10,7 +10,7 @@ import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 import { localizePath } from "./i18n/pathHelpers";
 
-function ScreenshotCard({ image, className = "" }) {
+function ScreenshotCard({ image, className = "", priority = false }) {
   if (!image?.src) return null;
 
   return (
@@ -31,7 +31,10 @@ function ScreenshotCard({ image, className = "" }) {
       <img
         src={image.src}
         alt={image.alt}
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        width={800}
+        height={479}
         className="w-full bg-[#0B0F19] object-cover"
       />
     </div>
@@ -580,9 +583,11 @@ export default function NpsMeLanding() {
               <ScreenshotCard
                 image={{
                   ...heroScreenshot,
+                  src: "/images/npsme/nps-me-customer-feedback-dashboard-800.webp",
                   alt: tr("landing.hero.screenshotAlt", heroScreenshot.alt),
                 }}
                 className="md:mt-2"
+                priority
               />
             ) : null}
 

@@ -1,45 +1,40 @@
 // src/NpsMeLanding.jsx
-import React from "react";
+import React, { Suspense } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, Star, LineChart, Wrench, Gauge, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Star, LineChart, Wrench } from "lucide-react";
 import Seo from "./components/Seo";
 import { computeNpsStats } from "../utils/nps";
 import PageHeader from "./components/PageHeader";
 import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 import { localizePath } from "./i18n/pathHelpers";
+import LandingScreenshotCard from "./components/landing/LandingScreenshotCard";
+import LandingSectionFallback from "./components/landing/LandingSectionFallback";
 
-function ScreenshotCard({ image, className = "", priority = false }) {
-  if (!image?.src) return null;
-
-  return (
-    <div
-      className={`overflow-hidden rounded-3xl border border-white/10 bg-black/30 shadow-2xl shadow-black/30 ${className}`}
-    >
-      <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-          <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
-          <span className="ml-3 text-xs text-slate-400">
-            {image.title || "NPS Me"}
-          </span>
-        </div>
-      </div>
-
-      <img
-        src={image.src}
-        alt={image.alt}
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
-        width={800}
-        height={479}
-        className="w-full bg-[#0B0F19] object-cover"
-      />
-    </div>
-  );
-}
+const LandingServicesSection = React.lazy(() =>
+  import("./components/landing/LandingServicesSection")
+);
+const LandingMethodSection = React.lazy(() =>
+  import("./components/landing/LandingMethodSection")
+);
+const LandingScreenshotWorkflowSection = React.lazy(() =>
+  import("./components/landing/LandingScreenshotWorkflowSection")
+);
+const LandingEmbedCxSection = React.lazy(() =>
+  import("./components/landing/LandingEmbedCxSection")
+);
+const LandingNpsExplainer = React.lazy(() =>
+  import("./components/landing/LandingNpsExplainer")
+);
+const LandingMilestoneNpsSection = React.lazy(() =>
+  import("./components/landing/LandingMilestoneNpsSection")
+);
+const LandingAboutSection = React.lazy(() =>
+  import("./components/landing/LandingAboutSection")
+);
+const LandingContactSection = React.lazy(() =>
+  import("./components/landing/LandingContactSection")
+);
 
 function ProofStrip() {
   const { lang } = useLanguage();
@@ -70,324 +65,6 @@ function ProofStrip() {
   );
 }
 
-function ScreenshotWorkflowSection() {
-  const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
-  const cards = translations(lang, "landing.screenshots.cards", []);
-
-  if (!cards.length) return null;
-
-  return (
-    <section id="screenshots" className="mx-auto max-w-7xl px-6 pb-20">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <div className="max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {tr("landing.screenshots.title")}
-          </h2>
-          <p className="mt-3 text-slate-300">
-            {tr("landing.screenshots.body")}
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          {cards.map((card) => (
-            <motion.div
-              key={card.title}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.45 }}
-              className="rounded-3xl border border-white/10 bg-black/20 p-4"
-            >
-              <ScreenshotCard image={card} />
-              <div className="mt-5">
-                <h3 className="font-semibold text-white">{card.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-300">
-                  {card.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function EmbedCxSection() {
-  const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
-  const pillars = translations(lang, "landing.embedCx.pillars", []);
-  const centerTitle = tr("landing.embedCx.centerTitle");
-  const centerBody = tr("landing.embedCx.centerBody");
-
-  const [topLeft, topRight, bottomLeft, bottomRight] = pillars;
-
-  const panelBase =
-    "min-h-[260px] rounded-[2rem] border border-[#7C3AED]/70 bg-[rgba(8,12,28,0.72)] p-8";
-  const headingClass = "text-2xl font-semibold text-[#22C55E]";
-  const bodyClass = "mt-4 max-w-[24rem] text-base leading-relaxed text-slate-200";
-
-  return (
-    <section id="embed-cx" className="mx-auto max-w-7xl px-6 pb-20">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <div className="max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {tr("landing.embedCx.title")}
-          </h2>
-          <p className="mt-3 text-slate-300">
-            {tr("landing.embedCx.body")}
-          </p>
-        </div>
-
-        <div className="mt-10">
-          <div className="relative mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div className={`${panelBase} md:pr-24 text-left`}>
-                <div className={headingClass}>{topLeft?.title}</div>
-                <p className={bodyClass}>{topLeft?.desc}</p>
-              </div>
-
-              <div className={`${panelBase} md:pl-24 text-right`}>
-                <div className={`ml-auto ${headingClass} max-w-[24rem]`}>
-                  {topRight?.title}
-                </div>
-                <p className={`mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200`}>
-                  {topRight?.desc}
-                </p>
-              </div>
-
-              <div className={`${panelBase} md:pr-24 text-left`}>
-                <div className={headingClass}>{bottomLeft?.title}</div>
-                <p className={bodyClass}>{bottomLeft?.desc}</p>
-              </div>
-
-              <div className={`${panelBase} md:pl-24 text-right`}>
-                <div className={`ml-auto ${headingClass} max-w-[24rem]`}>
-                  {bottomRight?.title}
-                </div>
-                <p className={`mt-4 ml-auto max-w-[24rem] text-base leading-relaxed text-slate-200`}>
-                  {bottomRight?.desc}
-                </p>
-              </div>
-            </div>
-
-            <div className="pointer-events-none hidden md:flex absolute left-1/2 top-1/2 z-10 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0F19] shadow-[0_0_0_14px_rgba(11,15,25,0.96)]">
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-[#7C3AED] bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.18),_rgba(11,15,25,0.96)_58%,_rgba(34,197,94,0.10)_100%)] px-7 text-center">
-                <div className="max-w-[170px] text-[1.5rem] font-semibold leading-[1.05] text-white">
-                  {centerTitle}
-                </div>
-                <p className="mt-3 max-w-[180px] text-[0.95rem] leading-[1.35] text-slate-300">
-                  {centerBody}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 md:hidden rounded-[2rem] border border-[#7C3AED] bg-gradient-to-br from-[#7C3AED]/15 to-[#22C55E]/10 p-6 text-center">
-              <div className="text-xl font-semibold text-white">
-                {centerTitle}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                {centerBody}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ServicesSection() {
-  const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
-  const offers = translations(lang, "landing.services.offers", []);
-  const ctas = translations(lang, "landing.services.ctas", {
-    products: lang === "fr" ? "Voir les offres" : "See offers",
-    about: lang === "fr" ? "Pourquoi moi" : "Why me",
-  });
-
-  return (
-    <section id="services" className="mx-auto max-w-7xl px-6 pb-20">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <div className="max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {tr("landing.services.title")}
-          </h2>
-          <p className="mt-3 text-slate-300">
-            {tr("landing.services.body")}
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          {offers.map((offer, i) => (
-            <motion.div
-              key={offer.title}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.45, delay: i * 0.05 }}
-              className="rounded-2xl border border-white/10 bg-black/20 p-6"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="text-white text-xl font-semibold">{offer.title}</div>
-                  <div className="mt-2 text-sm text-slate-300">{offer.desc}</div>
-                </div>
-                {offer.badge ? (
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-300">
-                    {offer.badge}
-                  </span>
-                ) : null}
-              </div>
-
-              {offer.bullets?.length ? (
-                <ul className="mt-5 space-y-2 list-disc pl-5 text-sm text-slate-300">
-                  {offer.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              ) : null}
-
-              {offer.outcome ? (
-                <div className="mt-5 rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/10 p-4">
-                  <div className="text-[11px] uppercase tracking-wide text-[#86EFAC]">
-                    {tr("landing.services.outcomeLabel")}
-                  </div>
-                  <div className="mt-1 text-sm text-white">{offer.outcome}</div>
-                </div>
-              ) : null}
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Link
-            to={localizePath("/products", lang)}
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
-          >
-            {ctas.products}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-
-          <Link
-            to={localizePath("/about", lang)}
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
-          >
-            {ctas.about}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-// --- NPS explainer ---
-function NpsExplainer() {
-  const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
-
-  return (
-    <section id="nps-explainer" className="mx-auto max-w-7xl px-6 pb-20">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <h3 className="text-xl md:text-2xl font-semibold text-white">
-          {tr("landing.explainer.title")}
-        </h3>
-
-        <div className="mt-3 grid gap-6 md:grid-cols-2">
-          <div className="text-slate-300 text-sm leading-relaxed">
-            <p>{tr("landing.explainer.intro")}</p>
-            <ul className="mt-3 space-y-2 list-disc pl-5">
-              <li><span className="text-white font-medium">{tr("landing.explainer.promoters")}</span>: 9–10</li>
-              <li><span className="text-white font-medium">{tr("landing.explainer.passives")}</span>: 7–8</li>
-              <li><span className="text-white font-medium">{tr("landing.explainer.detractors")}</span>: 0–6</li>
-            </ul>
-            <p className="mt-3">{tr("landing.explainer.formula")}</p>
-          </div>
-
-          <div className="text-slate-300 text-sm leading-relaxed">
-            <p className="text-white font-medium">{tr("landing.explainer.whereFits")}</p>
-            <ul className="mt-2 space-y-2 list-disc pl-5">
-              <li>{tr("landing.explainer.relationship")}</li>
-              <li>{tr("landing.explainer.transactional")}</li>
-              <li>{tr("landing.explainer.alongside")}</li>
-            </ul>
-
-            <p className="mt-3 text-white font-medium">
-              {tr("landing.explainer.cautionsTitle")}
-            </p>
-            <ul className="mt-2 space-y-2 list-disc pl-5">
-              {translations(lang, "landing.explainer.cautions", []).map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// --- Milestone NPS explainer ---
-function MilestoneNpsSection() {
-  const { lang } = useLanguage();
-  const tr = (p, f) => translations(lang, p, f);
-
-  const examples = [
-    tr("landing.milestone.examples.order"),
-    tr("landing.milestone.examples.onboarding"),
-    tr("landing.milestone.examples.firstUse"),
-  ];
-
-  return (
-    <section id="milestone-nps" className="mx-auto max-w-7xl px-6 pb-20">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-        <h2 className="text-2xl md:text-3xl font-semibold text-white">
-          {tr("landing.milestone.title")}
-        </h2>
-        <p className="mt-3 text-slate-300 max-w-3xl">
-          {tr("landing.milestone.intro")}
-        </p>
-
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {examples.map((e) => (
-            <div key={e.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
-              <div className="text-white font-semibold">{e.title}</div>
-              <div className="mt-2 text-sm text-slate-200">{e.question}</div>
-              <div className="mt-2 text-xs text-slate-400">{e.why}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-            <div className="text-white font-semibold">
-              {tr("landing.milestone.stepsTitle")}
-            </div>
-            <ol className="mt-3 space-y-2 list-decimal pl-5 text-sm text-slate-300">
-              {translations(lang, "landing.milestone.steps", []).map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ol>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-            <div className="text-white font-semibold">
-              {tr("landing.milestone.trackTitle")}
-            </div>
-            <ul className="mt-3 space-y-2 list-disc pl-5 text-sm text-slate-300">
-              {translations(lang, "landing.milestone.track", []).map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// --- Demo summary strip ---
 function DemoSummaryStrip() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
@@ -398,7 +75,6 @@ function DemoSummaryStrip() {
   const [shouldLoad, setShouldLoad] = React.useState(false);
   const ref = React.useRef(null);
 
-  // 1) Only trigger once the component is near the viewport
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -410,14 +86,13 @@ function DemoSummaryStrip() {
           obs.disconnect();
         }
       },
-      { root: null, rootMargin: "300px", threshold: 0.01 } // start loading a bit before it appears
+      { root: null, rootMargin: "300px", threshold: 0.01 }
     );
 
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
-  // 2) Fetch only after it becomes visible-ish
   React.useEffect(() => {
     if (!shouldLoad) return;
 
@@ -440,6 +115,7 @@ function DemoSummaryStrip() {
     }
 
     load();
+
     return () => {
       cancelled = true;
     };
@@ -472,15 +148,12 @@ function DemoSummaryStrip() {
   );
 }
 
-// --- Main landing page ---
 export default function NpsMeLanding() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
 
-  const methodCards = translations(lang, "landing.method.cards", []);
   const platformCards = translations(lang, "landing.platform.cards", []);
-  const aboutBullets = translations(lang, "landing.about.bullets", []);
   const screenshotCards = translations(lang, "landing.screenshots.cards", []);
   const heroScreenshot = screenshotCards[0];
   const chips = translations(lang, "landing.hero.chips", {
@@ -497,32 +170,36 @@ export default function NpsMeLanding() {
       />
 
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Home">
-        <div className="pt-4 grid md:grid-cols-12 gap-10">
+        <div className="grid gap-10 pt-4 md:grid-cols-12">
           <div className="md:col-span-7 lg:col-span-6">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight text-balance break-words font-semibold tracking-tight text-white">
+            <h1 className="text-balance break-words text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
               {tr("landing.hero.h1.lead")}{" "}
               <span className="md:whitespace-nowrap">
                 {tr("landing.hero.h1.nps")}
               </span>{" "}
               {tr("landing.hero.h1.tail")}{" "}
-              <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-[#22C55E]">
+              <span className="block bg-gradient-to-r from-[#7C3AED] to-[#22C55E] bg-clip-text text-transparent sm:inline">
                 {tr("landing.hero.h1.accent")}
               </span>
             </h1>
 
-            <p className="mt-5 text-slate-300 max-w-xl">
+            <p className="mt-5 max-w-xl text-slate-300">
               {tr("landing.hero.body")}
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <Link to={localizePath("/book", lang)}
-                className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
+            <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <Link
+                to={localizePath("/book", lang)}
+                className="group inline-flex items-center gap-2 rounded-2xl bg-[#22C55E] px-5 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-[#16A34A]"
               >
                 {tr("landing.hero.ctaPrimary")}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </Link>
 
-              <a href="#method" className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white">
+              <a
+                href="#method"
+                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+              >
                 {tr("landing.hero.ctaMethod")}
               </a>
 
@@ -535,9 +212,18 @@ export default function NpsMeLanding() {
             </div>
 
             <div className="mt-10 flex items-center gap-6 text-sm text-slate-400">
-              <div className="flex items-center gap-2"><Star className="h-4 w-4" /> {tr("landing.hero.proof.mining")}</div>
-              <div className="flex items-center gap-2"><Wrench className="h-4 w-4" /> {tr("landing.hero.proof.enablement")}</div>
-              <div className="flex items-center gap-2"><LineChart className="h-4 w-4" /> {tr("landing.hero.proof.lift")}</div>
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                {tr("landing.hero.proof.mining")}
+              </div>
+              <div className="flex items-center gap-2">
+                <Wrench className="h-4 w-4" />
+                {tr("landing.hero.proof.enablement")}
+              </div>
+              <div className="flex items-center gap-2">
+                <LineChart className="h-4 w-4" />
+                {tr("landing.hero.proof.lift")}
+              </div>
             </div>
 
             <div className="mt-6 space-y-4 text-xs">
@@ -574,13 +260,14 @@ export default function NpsMeLanding() {
               </div>
             </div>
 
-            <p className="mt-3 text-[11px] text-slate-500 max-w-xl">
+            <p className="mt-3 max-w-xl text-[11px] text-slate-500">
               {tr("landing.hero.chipsNote")}
             </p>
           </div>
+
           <div className="md:col-span-5 lg:col-span-6">
             {heroScreenshot ? (
-              <ScreenshotCard
+              <LandingScreenshotCard
                 image={{
                   ...heroScreenshot,
                   src: "/images/npsme/nps-me-customer-feedback-dashboard-800.webp",
@@ -606,16 +293,17 @@ export default function NpsMeLanding() {
       </PageHeader>
 
       <ProofStrip />
-      <ServicesSection />
-      <ScreenshotWorkflowSection />
 
-      {/* Platform */}
+      <Suspense fallback={<LandingSectionFallback minHeight="420px" />}>
+        <LandingServicesSection />
+      </Suspense>
+
       <section id="platform" className="mx-auto max-w-7xl px-6 py-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-white md:text-3xl">
             {tr("landing.platform.title")}
           </h2>
-          <p className="mt-3 text-slate-300 max-w-3xl">
+          <p className="mt-3 max-w-3xl text-slate-300">
             {tr("landing.platform.body")}{" "}
             <Link
               to={localizePath("/intercom-nps-analytics", lang)}
@@ -628,7 +316,7 @@ export default function NpsMeLanding() {
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {platformCards.map((card) => (
               <div key={card.title} className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                <div className="text-white font-semibold">{card.title}</div>
+                <div className="font-semibold text-white">{card.title}</div>
                 <div className="mt-2 text-sm text-slate-300">{card.desc}</div>
               </div>
             ))}
@@ -636,50 +324,17 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
-      {/* Method */}
-      <section id="method" className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
-            {tr("landing.method.title")}
-          </h2>
-          <p className="mt-3 text-slate-300">
-            {tr("landing.method.body")}
-          </p>
-        </div>
+      <Suspense fallback={<LandingSectionFallback minHeight="320px" />}>
+        <LandingMethodSection />
+      </Suspense>
 
-        <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {methodCards.map((card, i) => {
-            const Icon = [Star, LineChart, Wrench, Gauge][i] || Star;
-            return (
-              <motion.div
-                key={card.title}
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E] flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-white">{card.title}</h3>
-                </div>
-                <p className="mt-3 text-sm text-slate-300">{card.desc}</p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Demo */}
       <section id="demo" className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
-            <h3 className="text-xl md:text-2xl font-semibold text-white">
+            <h3 className="text-xl font-semibold text-white md:text-2xl">
               {tr("landing.demoBlock.title")}
             </h3>
-            <p className="mt-2 text-slate-300 max-w-xl">
+            <p className="mt-2 max-w-xl text-slate-300">
               {tr("landing.demoBlock.body")}
             </p>
             <div className="mt-4">
@@ -687,79 +342,44 @@ export default function NpsMeLanding() {
             </div>
           </div>
 
-          <div className="mt-4 md:mt-0 flex flex-col items-start gap-3">
-            <Link to={localizePath("/demo-survey-page", lang)}
-              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white"
-              >
+          <div className="mt-4 flex flex-col items-start gap-3 md:mt-0">
+            <Link
+              to={localizePath("/demo-survey-page", lang)}
+              className="inline-flex items-center gap-2 rounded-2xl bg-[#7C3AED] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#6D28D9]"
+            >
               {tr("landing.demoBlock.cta")}
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="text-xs text-slate-400 max-w-xs">
+            <p className="max-w-xs text-xs text-slate-400">
               {tr("landing.demoBlock.note")}
             </p>
           </div>
         </div>
       </section>
 
+      <Suspense fallback={<LandingSectionFallback minHeight="560px" />}>
+        <LandingScreenshotWorkflowSection />
+      </Suspense>
 
-      <EmbedCxSection />
-      <NpsExplainer />
-      <MilestoneNpsSection />
+      <Suspense fallback={<LandingSectionFallback minHeight="700px" />}>
+        <LandingEmbedCxSection />
+      </Suspense>
 
-      {/* About */}
-      <section id="about" className="mx-auto max-w-7xl px-6 pb-20">
-        <h2 className="text-2xl md:text-3xl font-semibold text-white">
-          {tr("landing.about.title")}
-        </h2>
-        <p className="mt-3 text-slate-300 max-w-2xl">
-          {tr("landing.about.body")}
-        </p>
+      <Suspense fallback={<LandingSectionFallback minHeight="360px" />}>
+        <LandingNpsExplainer />
+      </Suspense>
 
-        <ul className="mt-6 space-y-3 text-sm text-slate-300">
-          {aboutBullets.map((t) => (
-            <li key={t} className="flex items-start gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#22C55E]" />
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
-        <Link
-          to={localizePath("/about", lang)}
-          className="mt-6 inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold bg-white/10 hover:bg-white/15 transition"
-        >
-          {tr("landing.about.cta", "Read more")}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </section>
+      <Suspense fallback={<LandingSectionFallback minHeight="420px" />}>
+        <LandingMilestoneNpsSection />
+      </Suspense>
 
-      {/* Contact */}
-      <section id="contact" className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-8 md:p-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white">
-            {tr("landing.contact.title")}
-          </h2>
-          <p className="mt-3 text-slate-300 max-w-2xl mx-auto">
-            {tr("landing.contact.body")}
-          </p>
+      <Suspense fallback={<LandingSectionFallback minHeight="280px" />}>
+        <LandingAboutSection />
+      </Suspense>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:hello@npsme.com"
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
-            >
-              {tr("landing.contact.emailCta")}
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </a>
-
-            <Link to={localizePath("/book", lang)}
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
-              >
-              {tr("landing.contact.bookCta")}
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<LandingSectionFallback minHeight="260px" />}>
+        <LandingContactSection />
+      </Suspense>
     </div>
   );
 }

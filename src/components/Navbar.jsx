@@ -7,6 +7,41 @@ import { useLanguage } from "../i18n/LanguageContext.jsx";
 import { translations } from "../i18n/translations.js";
 import { localizePath, stripLangPrefix } from "../i18n/pathHelpers.js";
 
+function normalizePath(pathname = "") {
+  if (!pathname) return "/";
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    return pathname.slice(0, -1);
+  }
+  return pathname;
+}
+
+function matchRoutePath(routePath, pathname) {
+  const route = normalizePath(routePath);
+  const current = normalizePath(pathname);
+
+  const routeParts = route.split("/").filter(Boolean);
+  const currentParts = current.split("/").filter(Boolean);
+
+  if (routeParts.length !== currentParts.length) return false;
+
+  for (let i = 0; i < routeParts.length; i += 1) {
+    const routePart = routeParts[i];
+    const currentPart = currentParts[i];
+
+    if (routePart.startsWith(":")) continue;
+    if (routePart !== currentPart) return false;
+  }
+
+  return true;
+}
+
+function getCurrentRoute(pathname) {
+  return ROUTES.find((route) => {
+    if (!route?.path || route.isHash) return false;
+    return matchRoutePath(route.path, pathname);
+  }) || null;
+}
+
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
 
@@ -14,7 +49,11 @@ export default function NavBar() {
   const location = useLocation();
   const { lang, setLang } = useLanguage();
 
-  const [isAuthed, setIsAuthed] = React.useState(null);
+  const [authState, setAuthState] = React.useState({
+    checked: false,
+    authed: false,
+    authMode: "none", // "none" | "private_cookie" | "workspace_cookie"
+  });
 
   const t = React.useCallback(
     (key, fallback) => translations(lang, key, fallback),
@@ -26,34 +65,73 @@ export default function NavBar() {
     [lang]
   );
 
+  const currentRoute = React.useMemo(
+    () => getCurrentRoute(location.pathname),
+    [location.pathname]
+  );
+
+  const currentAuthMode = currentRoute?.authMode || "none";
+
   const checkAuth = React.useCallback(async () => {
+    if (currentAuthMode === "none") {
+      setAuthState({
+        checked: true,
+        authed: false,
+        authMode: "none",
+      });
+      return;
+    }
+
+    const endpoint =
+      currentAuthMode === "workspace_cookie"
+        ? "/api/workspace-auth/me"
+        : "/api/auth/me";
+
     try {
-      const r = await fetch("/api/auth/me", {
+      const r = await fetch(endpoint, {
         credentials: "include",
         cache: "no-store",
       });
 
       if (!r.ok) {
-        setIsAuthed(false);
+        setAuthState({
+          checked: true,
+          authed: false,
+          authMode: currentAuthMode,
+        });
         return;
       }
 
-      const j = await r.json();
-      setIsAuthed(Boolean(j?.authed));
-    } catch (e) {
-      setIsAuthed(false);
-    }
-  }, []);
+      const j = await r.json().catch(() => null);
 
-  // Re-check auth when the navbar mounts and when the route changes.
+      setAuthState({
+        checked: true,
+        authed: Boolean(j?.authed),
+        authMode: currentAuthMode,
+      });
+    } catch (_e) {
+      setAuthState({
+        checked: true,
+        authed: false,
+        authMode: currentAuthMode,
+      });
+    }
+  }, [currentAuthMode]);
+
   React.useEffect(() => {
     checkAuth();
-  }, [checkAuth, location.pathname]);
+  }, [checkAuth]);
 
-  // Allows login/logout pages to tell the navbar to refresh immediately.
   React.useEffect(() => {
-    const handleAuthChanged = () => checkAuth();
-    const handleFocus = () => checkAuth();
+    const handleAuthChanged = () => {
+      if (currentAuthMode !== "none") checkAuth();
+    };
+
+    const handleFocus = () => {
+      if (authState.authed && currentAuthMode !== "none") {
+        checkAuth();
+      }
+    };
 
     window.addEventListener("npsme-auth-changed", handleAuthChanged);
     window.addEventListener("focus", handleFocus);
@@ -62,26 +140,33 @@ export default function NavBar() {
       window.removeEventListener("npsme-auth-changed", handleAuthChanged);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [checkAuth]);
+  }, [checkAuth, authState.authed, currentAuthMode]);
 
   async function handleLogout() {
+    const isWorkspace = authState.authMode === "workspace_cookie";
+
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (e) {
-      // Even if it fails, we still "log out" locally to keep UX simple.
+      await fetch(
+        isWorkspace ? "/api/workspace-auth/logout" : "/api/auth/logout",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } catch (_e) {
+      // Keep UX simple even if the request fails.
     } finally {
-      setIsAuthed(false);
+      setAuthState((prev) => ({
+        ...prev,
+        authed: false,
+      }));
       setOpen(false);
       window.dispatchEvent(new Event("npsme-auth-changed"));
-      navigate(lp("/private/login"));
+      navigate(isWorkspace ? lp("/workspace/login") : lp("/private/login"));
     }
   }
 
-  // Still used for mobile: simple full list from route registry.
   const headerLinks = ROUTES.filter(
     (r) => r.enabled && r.inHeader && (r.lang ? r.lang === lang : true)
   );
@@ -177,7 +262,6 @@ export default function NavBar() {
     <>
       <header className="fixed top-0 left-0 right-0 z-[1000] isolate backdrop-blur supports-[backdrop-filter]:bg-white/5 bg-[#0B0F19]/90 border-b border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          {/* Brand */}
           <Link
             to={lp("/")}
             className="flex items-center gap-3 shrink-0"
@@ -189,7 +273,6 @@ export default function NavBar() {
             </span>
           </Link>
 
-          {/* Desktop */}
           <nav className="hidden md:flex items-center gap-2 text-sm text-slate-300 min-w-0">
             <NavItem to={lp("/products")}>
               {t("routes.products", "Products")}
@@ -210,13 +293,24 @@ export default function NavBar() {
             />
 
             <div className="ml-2 flex items-center gap-2">
-              {/* Logged-in area */}
-              {isAuthed === true && (
+              {authState.authed === true && authState.authMode === "workspace_cookie" && (
                 <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-1">
                   <NavItem to={lp("/workspace")}>
                     {t("routes.workspace", "Workspace")}
                   </NavItem>
 
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="shrink-0 inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
+                  >
+                    {t("navbar.logout", "Log out")}
+                  </button>
+                </div>
+              )}
+
+              {authState.authed === true && authState.authMode === "private_cookie" && (
+                <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-1">
                   <NavItem to={lp("/private/closing-the-loop")}>
                     {t("navbar.admin", "Admin")}
                   </NavItem>
@@ -237,15 +331,11 @@ export default function NavBar() {
                 className="shrink-0 inline-flex items-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition"
                 aria-label="Toggle language"
               >
-                <span
-                  className={lang === "en" ? "font-semibold" : "opacity-60"}
-                >
+                <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
                   {t("navbar.languageEn", "EN")}
                 </span>
                 <span className="mx-1 text-slate-500">/</span>
-                <span
-                  className={lang === "fr" ? "font-semibold" : "opacity-60"}
-                >
+                <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
                   {t("navbar.languageFr", "FR")}
                 </span>
               </button>
@@ -261,7 +351,6 @@ export default function NavBar() {
             </div>
           </nav>
 
-          {/* Mobile burger */}
           <button
             className="md:hidden inline-flex items-center justify-center p-2 rounded-lg hover:bg-white/10 shrink-0 text-white"
             aria-label="Toggle menu"
@@ -272,7 +361,6 @@ export default function NavBar() {
           </button>
         </div>
 
-        {/* Mobile panel */}
         {open && (
           <div className="md:hidden border-t border-white/10 bg-[#0B0F19]/95 backdrop-blur">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-col gap-2">
@@ -282,8 +370,7 @@ export default function NavBar() {
                 </NavItem>
               ))}
 
-              {/* Useful mobile shortcuts for newer workspace/data routes */}
-              {isAuthed === true && (
+              {authState.authed === true && authState.authMode === "workspace_cookie" && (
                 <div className="mt-3 border-t border-white/10 pt-3 flex flex-col gap-2">
                   <p className="px-2 text-xs uppercase tracking-[0.18em] text-slate-500">
                     {t("routes.workspace", "Workspace")}
@@ -300,6 +387,22 @@ export default function NavBar() {
                   <NavItem to={lp("/workspace/datasets")} mobile>
                     {t("routes.workspaceDatasets", "Saved datasets")}
                   </NavItem>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="mt-1 inline-flex items-center justify-center rounded-2xl border border-white/15 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 transition self-start"
+                  >
+                    {t("navbar.logout", "Log out")}
+                  </button>
+                </div>
+              )}
+
+              {authState.authed === true && authState.authMode === "private_cookie" && (
+                <div className="mt-3 border-t border-white/10 pt-3 flex flex-col gap-2">
+                  <p className="px-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                    {t("navbar.admin", "Admin")}
+                  </p>
 
                   <NavItem to={lp("/private/closing-the-loop")} mobile>
                     {t("navbar.admin", "Admin")}
@@ -321,15 +424,11 @@ export default function NavBar() {
                 className="mt-3 inline-flex items-center justify-center gap-1 rounded-2xl border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-white/10 transition self-start"
                 aria-label="Toggle language"
               >
-                <span
-                  className={lang === "en" ? "font-semibold" : "opacity-60"}
-                >
+                <span className={lang === "en" ? "font-semibold" : "opacity-60"}>
                   {t("navbar.languageEn", "EN")}
                 </span>
                 <span className="mx-1 text-slate-500">/</span>
-                <span
-                  className={lang === "fr" ? "font-semibold" : "opacity-60"}
-                >
+                <span className={lang === "fr" ? "font-semibold" : "opacity-60"}>
                   {t("navbar.languageFr", "FR")}
                 </span>
               </button>
@@ -347,7 +446,6 @@ export default function NavBar() {
         )}
       </header>
 
-      {/* Spacer so the fixed navbar does not cover the top of the page */}
       <div className="h-[65px]" aria-hidden="true" />
     </>
   );

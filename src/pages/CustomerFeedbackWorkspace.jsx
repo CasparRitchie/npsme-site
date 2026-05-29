@@ -19,6 +19,13 @@ export default function CustomerFeedbackWorkspace() {
   const pricingLines = tr("customerFeedbackWorkspace.commercialSimple.pricing", []);
   const setupSteps = tr("customerFeedbackWorkspace.setupSteps.items", []);
 
+  const setupDiscussionLink = {
+    pathname: localizePath("/book", lang),
+    search: "?topic=nps-programme-setup",
+  };
+
+  const workspaceLoginLink = localizePath("/workspace/login", lang);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
@@ -79,7 +86,7 @@ export default function CustomerFeedbackWorkspace() {
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                to={localizePath("/book?topic=nps-programme-setup", lang)}
+                to={setupDiscussionLink}
                 className="rounded-full bg-[#22C55E] px-5 py-3 text-sm font-bold text-[#06110B] shadow-lg shadow-[#22C55E]/20 transition hover:-translate-y-0.5 hover:bg-[#86EFAC]"
               >
                 {tr(
@@ -89,7 +96,7 @@ export default function CustomerFeedbackWorkspace() {
               </Link>
 
               <Link
-                to={localizePath("/workspace/login", lang)}
+                to={workspaceLoginLink}
                 className="rounded-full border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:border-[#22C55E]/60"
               >
                 {tr(
@@ -224,7 +231,7 @@ export default function CustomerFeedbackWorkspace() {
               ))}
 
               <Link
-                to={localizePath("/book?topic=nps-programme-setup", lang)}
+                to={setupDiscussionLink}
                 className="mt-6 inline-flex w-full justify-center rounded-full bg-[#22C55E] px-5 py-3 text-sm font-bold text-[#06110B] transition hover:bg-[#86EFAC]"
               >
                 {tr(
@@ -269,7 +276,7 @@ export default function CustomerFeedbackWorkspace() {
 
           <div className="mt-6 flex justify-center">
             <Link
-              to={localizePath("/book?topic=nps-programme-setup", lang)}
+              to={setupDiscussionLink}
               className="rounded-full bg-[#22C55E] px-6 py-3 text-sm font-bold text-[#06110B] shadow-lg shadow-[#22C55E]/20 transition hover:-translate-y-0.5 hover:bg-[#86EFAC]"
             >
               {tr(

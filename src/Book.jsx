@@ -113,8 +113,7 @@ export default function Book() {
         title={tr("book.seo.title", "Book a discussion | NPS Me")}
         description={tr(
           "book.seo.description",
-          "Book a discussion with NPS Me about CX Foundations, CX Embedded or a general discovery conversation."
-        )}
+          "Book a discussion with NPS Me about practical NPS and customer feedback setup, reporting, close-the-loop workflows and ongoing CX support for startups and SMEs.")}
       />
 
       <PageHeader
@@ -232,7 +231,7 @@ export default function Book() {
 
           {status === "error" && (
             <p className="mt-2 text-sm text-red-400">
-              {tr("book.form.errorPrefix", "Sorry-something went wrong. Please email")}{" "}
+              {tr("book.form.errorPrefix", "Sorry - something went wrong. Please email")}{" "}
               <a href="mailto:hello@npsme.com" className="underline">
                 hello@npsme.com
               </a>

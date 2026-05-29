@@ -9,7 +9,11 @@ import { ROUTES } from "./routesRegistry";
 
 function RouteFallback() {
   return (
-    <div className="min-h-[40vh]" aria-busy="true" />
+    <div
+      className="min-h-[1400px] md:min-h-[1200px]"
+      aria-busy="true"
+      aria-label="Loading page"
+    />
   );
 }
 

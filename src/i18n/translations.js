@@ -1486,6 +1486,182 @@ export const TRANSLATIONS = {
         secondary: "Book a discovery call",
       },
     },
+    customerFeedbackWorkspace: {
+      seo: {
+        title: "Customer Feedback Workspace for Startups & SMEs | NPS Me",
+        description:
+          "A private customer feedback workspace for importing NPS data, analysing responses, generating AI-assisted insights, and managing close-the-loop actions.",
+      },
+
+      header: {
+        iconLabel: "Workspace",
+        tag: "NPS Me / Customer Feedback Workspace",
+        accent: "Private feedback workspace",
+        title: "Turn customer feedback into clear actions",
+        subtitle:
+          "A practical, private workspace for startups and SMEs who want to import NPS data, understand what customers are saying, and manage close-the-loop follow-up without buying an enterprise CX platform.",
+      },
+
+      hero: {
+        kicker: "Productised setup + workspace",
+        title: "A working feedback system, not another vague dashboard.",
+        body:
+          "NPS Me helps you move from scattered survey exports, NPS scores and customer comments to a private workspace where feedback can be imported, analysed and turned into visible follow-up actions.",
+        ctaPrimary: "Book a setup discussion",
+        ctaSecondary: "Workspace login",
+      },
+
+      sidebar: {
+        title: "Typical starting point",
+        items: [
+          "You already collect NPS or survey feedback.",
+          "Feedback lives in CSV exports, Intercom, forms or spreadsheets.",
+          "Comments are useful, but no one has time to review them properly.",
+          "Follow-up happens inconsistently or disappears into Slack or email.",
+          "You are not ready for Medallia, Qualtrics or a heavy CX platform.",
+        ],
+        priceLabel: "Setup from",
+        priceValue: "£2,500",
+        priceNote: "Optional monthly support from £350/month.",
+      },
+
+      featureCards: [
+        {
+          title: "Import feedback data",
+          text:
+            "Start with CSV or JSON exports. NPS Me normalises scores, dates, comments, customer fields and selected options into a reusable dataset.",
+        },
+        {
+          title: "Understand the story",
+          text:
+            "Review NPS performance, response patterns, promoters, passives, detractors and the comments behind the score.",
+        },
+        {
+          title: "Close the loop",
+          text:
+            "Turn feedback into a visible follow-up queue so detractors, risks and important comments do not disappear.",
+        },
+      ],
+
+      checklist: {
+        kicker: "What you get",
+        title: "A practical customer feedback operating layer",
+        body:
+          "The workspace is designed to sit on top of tools you already use. It does not replace Intercom, HubSpot, Zendesk or spreadsheets. It gives founders, CX leads and operations teams a clearer way to turn feedback into decisions and action.",
+        items: [
+          {
+            title: "Private workspace",
+            text:
+              "Individual logins, workspace-scoped data and role-based controls.",
+          },
+          {
+            title: "Dataset import",
+            text:
+              "Upload or paste feedback exports and save them for ongoing analysis.",
+          },
+          {
+            title: "NPS performance view",
+            text:
+              "See score, distribution, buckets and trends from saved feedback.",
+          },
+          {
+            title: "Response explorer",
+            text: "Inspect the actual comments behind the numbers.",
+          },
+          {
+            title: "AI-assisted insight summary",
+            text:
+              "Generate practical themes, risks and recommended actions.",
+          },
+          {
+            title: "Close-the-loop workflow",
+            text:
+              "Track follow-up actions for customers and issues that need attention.",
+          },
+          {
+            title: "Setup support",
+            text:
+              "NPS Me helps you get the first dataset imported and interpreted.",
+          },
+          {
+            title: "Optional monthly review",
+            text:
+              "Add ongoing insight support, reporting and workflow improvement.",
+          },
+        ],
+      },
+
+      whoItsFor: {
+        title: "Who this is for",
+        items: [
+          "Startup founders who want to “tick the CX box” properly.",
+          "SMEs with feedback data but no dedicated CX team.",
+          "Customer success or operations leads who need a simple workflow.",
+          "Teams using Intercom, spreadsheets, CSV exports or survey tools.",
+          "Companies that need something lighter than an enterprise CX suite.",
+        ],
+      },
+
+      whatItsNot: {
+        title: "What this is not",
+        items: [
+          "Not a replacement for your CRM or support platform.",
+          "Not a heavy enterprise research programme.",
+          "Not just an AI summary tool.",
+          "Not a dashboard that leaves you to work out what to do next.",
+        ],
+      },
+
+      commercialSimple: {
+        kicker: "Commercially simple",
+        title: "Start with a setup. Add support if it proves useful.",
+        body:
+          "The first version is intentionally practical: set up the workspace, import the first dataset, review the findings, and agree how your team will close the loop. If the rhythm works, you can add monthly support, regular reporting or deeper integrations.",
+        pricing: [
+          { label: "Workspace setup", value: "from £2,500" },
+          { label: "Monthly support", value: "from £350/month" },
+          { label: "Integration work", value: "quoted separately" },
+        ],
+        cta: "Book a setup discussion",
+      },
+
+      setupSteps: {
+        title: "How setup works",
+        items: [
+          {
+            number: "1",
+            title: "Review your feedback source",
+            text:
+              "We look at what you already collect: CSV, Intercom, survey tools, spreadsheets or exports.",
+          },
+          {
+            number: "2",
+            title: "Create your workspace",
+            text:
+              "You get a private workspace with individual user access and a simple import flow.",
+          },
+          {
+            number: "3",
+            title: "Import the first dataset",
+            text:
+              "We help map columns, check the data and create your first saved dataset.",
+          },
+          {
+            number: "4",
+            title: "Turn insight into action",
+            text:
+              "We review performance, comments, AI-assisted insights and close-the-loop priorities.",
+          },
+        ],
+      },
+
+      finalCta: {
+        title: "Want to see if this fits your team?",
+        body:
+          "Book a short setup discussion. Bring a sample export or describe your current feedback process, and NPS Me will suggest the simplest route to a working feedback workflow.",
+        cta: "Book a setup discussion",
+      },
+    },
     dataAutomation: {
       seoTitle: "Data, Automation & Insight - Transform Your Reporting | NPS Me",
       seoDescription:
@@ -4841,6 +5017,183 @@ export const TRANSLATIONS = {
           "Si votre NPS semble bloqué alors que vos équipes travaillent dur, nous pouvons vous aider à diagnostiquer ce qui se passe réellement.",
         primary: "Découvrir les services NPS Me",
         secondary: "Réserver un appel découverte",
+      },
+    },
+    customerFeedbackWorkspace: {
+      seo: {
+        title: "Espace feedback client pour startups et PME | NPS Me",
+        description:
+          "Un espace privé de feedback client pour importer des données NPS, analyser les réponses, générer des insights assistés par IA et gérer les actions de close-the-loop.",
+      },
+
+      header: {
+        iconLabel: "Workspace",
+        tag: "NPS Me / Espace feedback client",
+        accent: "Espace privé de feedback",
+        title: "Transformez le feedback client en actions claires",
+        subtitle:
+          "Un espace privé et pratique pour les startups et PME qui veulent importer des données NPS, comprendre ce que disent leurs clients et gérer le suivi close-the-loop sans acheter une plateforme CX enterprise.",
+      },
+
+      hero: {
+        kicker: "Setup packagé + workspace",
+        title: "Un système de feedback qui fonctionne, pas un dashboard flou de plus.",
+        body:
+          "NPS Me vous aide à passer d’exports d’enquêtes dispersés, de scores NPS et de commentaires clients à un espace privé où le feedback peut être importé, analysé et transformé en actions de suivi visibles.",
+        ctaPrimary: "Réserver un échange de setup",
+        ctaSecondary: "Connexion workspace",
+      },
+
+      sidebar: {
+        title: "Point de départ typique",
+        items: [
+          "Vous collectez déjà du NPS ou du feedback d’enquête.",
+          "Le feedback vit dans des exports CSV, Intercom, des formulaires ou des feuilles de calcul.",
+          "Les commentaires sont utiles, mais personne n’a vraiment le temps de les relire correctement.",
+          "Le suivi se fait de façon irrégulière ou disparaît dans Slack ou les emails.",
+          "Vous n’êtes pas prêt pour Medallia, Qualtrics ou une plateforme CX lourde.",
+        ],
+        priceLabel: "Setup à partir de",
+        priceValue: "£2,500",
+        priceNote: "Support mensuel optionnel à partir de £350/mois.",
+      },
+
+      featureCards: [
+        {
+          title: "Importer les données de feedback",
+          text:
+            "Commencez avec des exports CSV ou JSON. NPS Me normalise les scores, dates, commentaires, champs clients et options sélectionnées dans un dataset réutilisable.",
+        },
+        {
+          title: "Comprendre l’histoire",
+          text:
+            "Consultez la performance NPS, les schémas de réponse, les promoteurs, passifs, détracteurs et les commentaires derrière le score.",
+        },
+        {
+          title: "Boucler la boucle",
+          text:
+            "Transformez le feedback en file de suivi visible pour que les détracteurs, risques et commentaires importants ne disparaissent pas.",
+        },
+      ],
+
+      checklist: {
+        kicker: "Ce que vous obtenez",
+        title: "Une couche opérationnelle pratique pour le feedback client",
+        body:
+          "Le workspace est conçu pour s’ajouter aux outils que vous utilisez déjà. Il ne remplace ni Intercom, ni HubSpot, ni Zendesk, ni les feuilles de calcul. Il donne aux fondateurs, responsables CX et équipes opérations une façon plus claire de transformer le feedback en décisions et en actions.",
+        items: [
+          {
+            title: "Workspace privé",
+            text:
+              "Connexions individuelles, données cloisonnées par workspace et contrôles par rôle.",
+          },
+          {
+            title: "Import de datasets",
+            text:
+              "Importez ou collez des exports de feedback et enregistrez-les pour une analyse continue.",
+          },
+          {
+            title: "Vue de performance NPS",
+            text:
+              "Consultez score, répartition, buckets et tendances à partir du feedback enregistré.",
+          },
+          {
+            title: "Explorateur de réponses",
+            text:
+              "Consultez les vrais commentaires derrière les chiffres.",
+          },
+          {
+            title: "Synthèse assistée par IA",
+            text:
+              "Générez des thèmes pratiques, des risques et des actions recommandées.",
+          },
+          {
+            title: "Workflow de close-the-loop",
+            text:
+              "Suivez les actions de relance pour les clients et les sujets qui demandent de l’attention.",
+          },
+          {
+            title: "Support au setup",
+            text:
+              "NPS Me vous aide à importer et interpréter le premier dataset.",
+          },
+          {
+            title: "Revue mensuelle optionnelle",
+            text:
+              "Ajoutez un support continu, du reporting et l’amélioration du workflow.",
+          },
+        ],
+      },
+
+      whoItsFor: {
+        title: "Pour qui c’est fait",
+        items: [
+          "Les fondateurs de startups qui veulent vraiment “cocher la case CX” correctement.",
+          "Les PME qui ont des données de feedback mais pas d’équipe CX dédiée.",
+          "Les responsables customer success ou opérations qui ont besoin d’un workflow simple.",
+          "Les équipes qui utilisent Intercom, des tableurs, des exports CSV ou des outils d’enquête.",
+          "Les entreprises qui ont besoin de quelque chose de plus léger qu’une suite CX enterprise.",
+        ],
+      },
+
+      whatItsNot: {
+        title: "Ce que ce n’est pas",
+        items: [
+          "Ce n’est pas un remplacement de votre CRM ou de votre plateforme support.",
+          "Ce n’est pas un programme de recherche enterprise lourd.",
+          "Ce n’est pas seulement un outil de résumé IA.",
+          "Ce n’est pas un dashboard qui vous laisse deviner quoi faire ensuite.",
+        ],
+      },
+
+      commercialSimple: {
+        kicker: "Commercialement simple",
+        title: "Commencez par un setup. Ajoutez du support si cela prouve sa valeur.",
+        body:
+          "La première version est volontairement pratique : mettre en place le workspace, importer le premier dataset, revoir les enseignements, puis convenir de la manière dont votre équipe bouclera la boucle. Si le rythme fonctionne, vous pouvez ajouter un support mensuel, du reporting régulier ou des intégrations plus poussées.",
+        pricing: [
+          { label: "Setup du workspace", value: "à partir de £2,500" },
+          { label: "Support mensuel", value: "à partir de £350/mois" },
+          { label: "Travail d’intégration", value: "sur devis" },
+        ],
+        cta: "Réserver un échange de setup",
+      },
+
+      setupSteps: {
+        title: "Comment le setup fonctionne",
+        items: [
+          {
+            number: "1",
+            title: "Revoir votre source de feedback",
+            text:
+              "Nous regardons ce que vous collectez déjà : CSV, Intercom, outils d’enquête, tableurs ou exports.",
+          },
+          {
+            number: "2",
+            title: "Créer votre workspace",
+            text:
+              "Vous obtenez un espace privé avec accès utilisateur individuel et un flux d’import simple.",
+          },
+          {
+            number: "3",
+            title: "Importer le premier dataset",
+            text:
+              "Nous vous aidons à mapper les colonnes, vérifier les données et créer votre premier dataset enregistré.",
+          },
+          {
+            number: "4",
+            title: "Transformer l’insight en action",
+            text:
+              "Nous revoyons la performance, les commentaires, les insights assistés par IA et les priorités de close-the-loop.",
+          },
+        ],
+      },
+
+      finalCta: {
+        title: "Vous voulez voir si cela convient à votre équipe ?",
+        body:
+          "Réservez un court échange de setup. Apportez un exemple d’export ou décrivez votre processus de feedback actuel, et NPS Me vous proposera la route la plus simple vers un workflow de feedback réellement opérationnel.",
+        cta: "Réserver un échange de setup",
       },
     },
     cxCockpit: {

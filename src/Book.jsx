@@ -9,32 +9,32 @@ import { translations } from "./i18n/translations";
 const BOOK_TOPICS = {
   discovery: {
     key: "discovery",
-    fallbackTitle: "Book a discovery call",
+    fallbackTitle: "Book a free CX setup review",
     fallbackSubtitle:
-      "Share a bit about your current customer feedback, support and CX setup and NPS Me will explore where support could help most.",
+      "Share a bit about your current customer feedback process, where your data lives, and what you want to improve. NPS Me will explore where support could be most useful.",
     fallbackPrefill:
-      "We’d like to discuss our current customer feedback / CX setup, especially around ",
-    fallbackSubject: "Discovery call request (npsme.com)",
+      "We’d like to book a free CX setup review. Our current feedback process, tools and main questions are: ",
+    fallbackSubject: "CX setup review request (npsme.com)",
   },
 
-  "cx-foundations": {
-    key: "cxFoundations",
-    fallbackTitle: "Book a CX Foundations discussion",
+  "nps-programme-setup": {
+    key: "npsProgrammeSetup",
+    fallbackTitle: "Book an NPS Programme Setup discussion",
     fallbackSubtitle:
-      "Share a bit about your current setup and NPS Me will explore how to put the right customer experience foundations in place.",
+      "Share a bit about your current setup and NPS Me will explore how to put a practical NPS and customer feedback programme in place.",
     fallbackPrefill:
-      "We’d like to discuss CX Foundations, especially around ",
-    fallbackSubject: "CX Foundations discussion request (npsme.com)",
+      "We’d like to discuss NPS Programme Setup, especially around our current feedback setup, tools and goals: ",
+    fallbackSubject: "NPS Programme Setup discussion request (npsme.com)",
   },
 
-  "intelligence-layer": {
-    key: "intelligenceLayer",
-    fallbackTitle: "Book a CX Intelligence Layer discussion",
+  "ongoing-cx-support": {
+    key: "ongoingCxSupport",
+    fallbackTitle: "Book an Ongoing CX Support discussion",
     fallbackSubtitle:
-      "Share a bit about your current tools and NPS Me will explore how an intelligence layer could sit on top of your existing setup to turn feedback into clearer insight and action.",
+      "Share a bit about your business and NPS Me will explore how ongoing support could help your team review feedback regularly, track themes and keep close-the-loop actions moving.",
     fallbackPrefill:
-      "We’d like to discuss a CX Intelligence Layer, especially around ",
-    fallbackSubject: "CX Intelligence Layer discussion request (npsme.com)",
+      "We’d like to discuss Ongoing CX Support, especially around our feedback review rhythm, ownership and ongoing CX support needs: ",
+    fallbackSubject: "Ongoing CX Support discussion request (npsme.com)",
   },
 };
 

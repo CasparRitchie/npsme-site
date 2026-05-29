@@ -176,47 +176,48 @@ export const TRANSLATIONS = {
       seo: {
         title: "Book a CX setup review | NPS Me",
         description:
-          "Book a CX setup review with NPS Me to discuss CX Foundations, CX Embedded, customer feedback systems, NPS reporting and close-the-loop workflows.",
+          "Book a discussion with NPS Me about practical NPS and customer feedback setup, reporting, close-the-loop workflows and ongoing CX support for startups and SMEs.",
       },
       header: {
-        iconLabel: "CX review",
+        iconLabel: "CX setup review",
         tag: "NPS Me / Book",
       },
       topics: {
-        cxFoundations: {
-          title: "Book a CX Foundations discussion",
-          subtitle:
-            "Share a bit about your current customer feedback setup and NPS Me will explore how to put a practical CX system in place: surveys, reporting, themes and close-the-loop actions.",
-          prefill:
-            "We’d like to discuss CX Foundations, especially around our current feedback setup, tools and CX goals: ",
-          subject: "CX Foundations booking request (npsme.com)",
-        },
-        cxEmbedded: {
-          title: "Book a CX Embedded discussion",
-          subtitle:
-            "Share a bit about your business and NPS Me will explore how customer feedback could become part of your team rhythm: regular reviews, ownership, management summaries and continuous improvement.",
-          prefill:
-            "We’d like to discuss CX Embedded, especially around our feedback review rhythm, ownership and ongoing CX support: ",
-          subject: "CX Embedded booking request (npsme.com)",
-        },
         discovery: {
           title: "Book a free CX setup review",
           subtitle:
-            "Share a bit about your current customer feedback process, where the data lives and what you want to improve. NPS Me will suggest where support could help most — no obligation.",
+            "Share a bit about your current customer feedback process, where your data lives and what you want to improve. NPS Me will suggest where support could be most useful — with no obligation.",
           prefill:
-            "We’d like a free CX setup review. Our current feedback setup, tools and main questions are: ",
+            "We’d like a free CX setup review. Our current feedback process, tools and main questions are: ",
           subject: "CX setup review request (npsme.com)",
+        },
+        npsProgrammeSetup: {
+          title: "Book an NPS Programme Setup discussion",
+          subtitle:
+            "Share a bit about your current setup and NPS Me will explore how to put a practical NPS and customer feedback programme in place: survey approach, reporting, customer themes and close-the-loop workflow.",
+          prefill:
+            "We’d like to discuss NPS Programme Setup, especially around our current feedback setup, tools and goals: ",
+          subject: "NPS Programme Setup discussion request (npsme.com)",
+        },
+        ongoingCxSupport: {
+          title: "Book an Ongoing CX Support discussion",
+          subtitle:
+            "Share a bit about your business and NPS Me will explore how ongoing support could help your team review feedback regularly, track themes, keep ownership clear and build a more consistent customer feedback rhythm.",
+          prefill:
+            "We’d like to discuss Ongoing CX Support, especially around our feedback review rhythm, ownership and ongoing CX support needs: ",
+          subject: "Ongoing CX Support discussion request (npsme.com)",
         },
       },
       form: {
         name: "Your name",
         email: "Your email",
-        timezone: "Time zone (e.g., Europe/London)",
-        context: "Tell me about your current feedback setup, tools and goals",
+        timezone: "Time zone (e.g. Europe/London)",
+        context:
+          "Describe your current feedback setup, tools and what you would like to improve",
         sending: "Sending…",
-        submit: "Request CX review",
+        submit: "Request a CX setup review",
         success:
-          "Thanks! NPS Me will confirm shortly and send a calendar invite.",
+          "Thanks! NPS Me will reply shortly and confirm the next step.",
         errorPrefix: "Sorry — something went wrong. Please email",
       },
     },
@@ -3310,16 +3311,16 @@ export const TRANSLATIONS = {
       },
     },
     whyNpsMe: {
-      seoTitle: "Why NPS Me: Pragmatic CX consulting for real business impact",
+      seoTitle: "Why NPS Me | Practical NPS and customer feedback support for startups and SMEs",
       seoDescription:
-        "NPS Me helps you turn customer feedback into measurable outcomes: higher retention, more repeat revenue, and lower support costs, without big-consultancy overhead.",
+        "NPS Me helps startups and SMEs put a practical NPS and customer feedback process in place, turn responses into useful insight, and build close-the-loop habits without heavyweight consulting overhead.",
 
       header: {
         iconLabel: "Why NPS Me",
         tag: "NPS Me / Why NPS Me",
-        title: "CX consulting that connects feedback to the bottom line",
+        title: "Practical NPS and customer feedback support that teams can actually use",
         intro:
-          "NPS Me exists to bridge a gap. Many teams collect NPS and survey data. Not so many turn it into fewer churn events, more repeat revenue, and less firefighting in support. We help you do that, quickly, without a huge consulting army on your payroll.",
+          "NPS Me exists to fill a common gap. Many businesses collect customer feedback, but far fewer turn it into a simple, credible process for listening, learning and acting. We help startups and SMEs put that process in place without turning it into a slow, expensive CX project.",
         ctaBook: "Book a discovery call",
         ctaDemo: "See example outputs",
       },
@@ -3327,71 +3328,71 @@ export const TRANSLATIONS = {
       whatYouGet: {
         title: "What you get when you work with NPS Me",
         body:
-          "We combine CX strategy, data analysis, and hands on enablement. That means we do not only tell you where the problems are. We help fix them with you. That can include survey design, review mining, workflow changes, scripts, training, dashboards, and even changes to your digital journeys and internal tools.",
+          "NPS Me combines practical setup, customer feedback analysis and close-the-loop support. The goal is not just to tell you what the score is. It is to help you collect the right feedback, understand what customers are really saying, and make sure someone follows up and acts on it.",
         cards: {
-          pnl: {
-            title: "From feedback to P and L",
+          programme: {
+            title: "A credible feedback programme",
             points: [
-              "Tie customer feedback to repeat rate, churn, and ticket volume.",
-              "Prioritise changes by commercial impact, not loudest voice.",
-              "Make it easy for Finance and CX to speak the same language.",
+              "Support designing a practical NPS and customer feedback approach.",
+              "Help structuring when to ask, who to ask and how to keep the programme useful.",
+              "A setup that fits a growing business rather than a heavyweight enterprise model.",
             ],
           },
-          teams: {
-            title: "Practical help for your teams",
+          insight: {
+            title: "Clearer customer insight",
             points: [
-              "Coaching for account, support, and product teams.",
-              "Templates, playbooks, and scripts that fit your tone of voice.",
-              "Support to embed new routines, not just one off workshops.",
+              "Turn survey scores and comments into understandable themes and priorities.",
+              "Move beyond the score to see what is driving promoters, passives and detractors.",
+              "Give founders and teams a clearer picture of what customers are experiencing.",
             ],
           },
-          systems: {
-            title: "Systems and journeys that work",
+          action: {
+            title: "A practical close-the-loop process",
             points: [
-              "Help to tune surveys, journeys, forms, and messaging.",
-              "Partner with your product or IT teams on small but high impact changes.",
-              "Make better use of the tools you already own before buying new ones.",
+              "Create a simple follow-up rhythm around customer feedback.",
+              "Make ownership and next steps clearer for the team.",
+              "Help customer feedback become part of how the business improves over time.",
             ],
           },
         },
       },
 
       vs: {
-        title: "Why choose us instead of a big consulting firm",
+        title: "Why choose NPS Me instead of a larger consulting firm",
         body:
-          "Large audit and consulting firms can do great work, but they also come with high overhead, long lead times, and a lot of people in the room. NPS Me is built to be lean, expert, and focused on movement, not theatre.",
+          "Large consulting firms can produce strong strategy work, but they often come with more overhead, more layers and more complexity than a startup or SME really needs. NPS Me is designed to be more direct, more practical and closer to implementation.",
 
         leftTitle: "Typical big consultancy",
         leftPoints: [
-          "Layers of partners, directors, and juniors on projects.",
-          "Set piece reports and frameworks that may not fit your reality.",
-          "High day rates and long commitments before you see value.",
-          "Focus on the slide deck more than on your teams changing how they work.",
+          "More people, more layers and more overhead around the work.",
+          "Frameworks and reports that can feel too generic or too heavy.",
+          "Longer lead times before the work becomes useful day to day.",
+          "A greater risk of ending with recommendations rather than changed behaviour.",
         ],
 
         rightTitle: "NPS Me approach",
         rightPoints: [
-          "Direct access to an experienced CX lead, not a revolving junior team.",
-          "Work shaped around your existing tools and data, not a generic template.",
-          "Transparent, scoped engagements that respect your budget.",
-          "Hands on support for implementation, not just recommendations.",
+          "Direct access to experienced CX and feedback support.",
+          "Work shaped around your actual tools, team and stage of growth.",
+          "Clearer scope, lighter setup and more practical delivery.",
+          "Support focused on getting a real process in place, not just presenting findings.",
         ],
 
         footnote:
-          "NPS Me is part of the cxms.fr group, which combines customer experience expertise with practical digital and data skills. That means we can help you both understand the story in your feedback and build the processes, content, and journeys that move the numbers.",
+          "NPS Me combines customer feedback thinking, practical setup and lightweight tooling. That means the work is designed not just to explain what customers are saying, but to help your team do something useful with it.",
       },
 
       reassurance: {
-        title: "How working with us feels",
+        title: "How working with NPS Me feels",
         items: [
-          "Clear framing of the problem and what success looks like.",
-          "Regular, honest check ins. No hiding behind jargon.",
-          "Simple artefacts your teams actually read and use.",
-          "Respect for your constraints, culture, and in house expertise.",
-          "A focus on sustainable change, not one quarter spikes.",
-          "A partner who can speak to execs and practitioners in the same week.",
+          "Clear, practical conversations without unnecessary jargon.",
+          "A focus on what your team can realistically implement.",
+          "Simple outputs that people actually read and use.",
+          "Respect for your stage, constraints and existing tools.",
+          "A lighter and more flexible way to get CX properly covered.",
+          "Support that helps feedback become part of the way the business runs.",
         ],
-        ctaProducts: "Explore productized services",
+        ctaProducts: "Explore offers",
         ctaBook: "Book discovery",
       },
     },
@@ -4873,49 +4874,50 @@ export const TRANSLATIONS = {
     },
     book: {
       seo: {
-        title: "Réserver une revue CX | NPS Me",
+        title: "Réserver une revue de setup CX | NPS Me",
         description:
-          "Réservez une revue CX avec NPS Me pour échanger sur CX Foundations, CX Embedded, les systèmes de feedback client, le reporting NPS et les workflows de close-the-loop.",
+          "Réservez un échange avec NPS Me à propos de la mise en place pratique du NPS et du feedback client, du reporting, des workflows de close-the-loop et du support CX continu pour startups et PME.",
       },
       header: {
-        iconLabel: "Revue CX",
+        iconLabel: "Revue de setup CX",
         tag: "NPS Me / Réserver",
       },
       topics: {
-        cxFoundations: {
-          title: "Réserver un échange CX Foundations",
-          subtitle:
-            "Partagez quelques éléments sur votre dispositif de feedback client actuel et NPS Me explorera comment mettre en place un système CX concret : enquêtes, reporting, thèmes clients et actions de close-the-loop.",
-          prefill:
-            "Nous aimerions échanger sur CX Foundations, notamment autour de notre dispositif de feedback actuel, nos outils et nos objectifs CX : ",
-          subject: "Demande d’échange CX Foundations (npsme.com)",
-        },
-        cxEmbedded: {
-          title: "Réserver un échange CX Embedded",
-          subtitle:
-            "Partagez quelques éléments sur votre entreprise et NPS Me explorera comment intégrer le feedback client dans le rythme de l’équipe : revues régulières, responsabilités, synthèses management et amélioration continue.",
-          prefill:
-            "Nous aimerions échanger sur CX Embedded, notamment autour de notre rythme de revue du feedback, l’ownership et l’accompagnement CX continu : ",
-          subject: "Demande d’échange CX Embedded (npsme.com)",
-        },
         discovery: {
           title: "Réserver une revue CX gratuite",
           subtitle:
-            "Partagez quelques éléments sur votre processus de feedback client actuel, où se trouvent les données et ce que vous souhaitez améliorer. NPS Me proposera où l’accompagnement pourrait être le plus utile — sans engagement.",
+            "Partagez quelques éléments sur votre processus actuel de feedback client, où se trouvent vos données et ce que vous souhaitez améliorer. NPS Me vous indiquera où l’accompagnement pourrait être le plus utile — sans engagement.",
           prefill:
-            "Nous aimerions une revue CX gratuite. Notre dispositif de feedback actuel, nos outils et nos principales questions sont : ",
+            "Nous aimerions une revue CX gratuite. Notre processus actuel de feedback, nos outils et nos principales questions sont : ",
           subject: "Demande de revue CX (npsme.com)",
+        },
+        npsProgrammeSetup: {
+          title: "Réserver un échange sur la mise en place du programme NPS",
+          subtitle:
+            "Partagez quelques éléments sur votre setup actuel et NPS Me explorera comment mettre en place un programme NPS et feedback client concret : logique d’enquête, reporting, thèmes clients et workflow de close-the-loop.",
+          prefill:
+            "Nous aimerions échanger sur la mise en place du programme NPS, notamment autour de notre setup actuel, de nos outils et de nos objectifs : ",
+          subject: "Demande d’échange sur la mise en place du programme NPS (npsme.com)",
+        },
+        ongoingCxSupport: {
+          title: "Réserver un échange sur le support CX continu",
+          subtitle:
+            "Partagez quelques éléments sur votre entreprise et NPS Me explorera comment un accompagnement continu pourrait aider votre équipe à revoir le feedback régulièrement, suivre les thèmes, clarifier l’ownership et installer un rythme plus cohérent.",
+          prefill:
+            "Nous aimerions échanger sur le support CX continu, notamment autour de notre rythme de revue du feedback, de l’ownership et de nos besoins d’accompagnement : ",
+          subject: "Demande d’échange sur le support CX continu (npsme.com)",
         },
       },
       form: {
         name: "Votre nom",
         email: "Votre email",
         timezone: "Fuseau horaire (ex. Europe/Paris)",
-        context: "Décrivez votre dispositif de feedback actuel, vos outils et vos objectifs",
+        context:
+          "Décrivez votre processus de feedback actuel, vos outils et ce que vous aimeriez améliorer",
         sending: "Envoi…",
         submit: "Demander une revue CX",
         success:
-          "Merci ! NPS Me vous confirmera cela rapidement et vous enverra une invitation calendrier.",
+          "Merci ! NPS Me vous répondra rapidement pour confirmer la suite.",
         errorPrefix: "Désolé — un problème est survenu. Merci d’écrire à",
       },
     },
@@ -6760,88 +6762,88 @@ export const TRANSLATIONS = {
       },
     },
     whyNpsMe: {
-      seoTitle: "Pourquoi NPS Me : un conseil CX pragmatique pour un impact business réel",
+      seoTitle: "Pourquoi NPS Me | Un accompagnement NPS et feedback client concret pour startups et PME",
       seoDescription:
-        "NPS Me vous aide à transformer le feedback client en résultats mesurables : plus de rétention, plus de revenus récurrents, et moins de coûts support, sans l’overhead des grands cabinets.",
+        "NPS Me aide les startups et PME à mettre en place un processus NPS et feedback client concret, transformer les réponses en insights utiles, et installer des habitudes de close-the-loop sans le poids d’un grand cabinet.",
 
       header: {
         iconLabel: "Pourquoi NPS Me",
         tag: "NPS Me / Pourquoi NPS Me",
-        title: "Un conseil CX qui relie le feedback à l’impact business",
+        title: "Un accompagnement NPS et feedback client que les équipes peuvent réellement utiliser",
         intro:
-          "NPS Me existe pour combler un écart. Beaucoup d’équipes collectent du NPS et des données d’enquête. Peu les transforment en moins de churn, plus de revenus récurrents, et moins de “firefighting” côté support. Nous vous aidons à y arriver, rapidement, sans une armée de consultants sur votre payroll.",
+          "NPS Me existe pour répondre à un problème courant. Beaucoup d’entreprises collectent du feedback client, mais beaucoup moins en font un processus simple et crédible pour écouter, comprendre et agir. Nous aidons les startups et PME à mettre ce fonctionnement en place sans en faire un projet CX lourd, lent ou coûteux.",
         ctaBook: "Prendre un appel découverte",
-        ctaDemo: "Tester la démo NPS",
+        ctaDemo: "Voir des exemples de résultats",
       },
 
       whatYouGet: {
         title: "Ce que vous obtenez en travaillant avec NPS Me",
         body:
-          "Nous combinons stratégie CX, analyse de données et accompagnement terrain. Concrètement : on ne se contente pas d’indiquer où sont les problèmes. On vous aide à les résoudre. Cela peut inclure la conception d’enquêtes, l’analyse des avis, des ajustements de workflows, des scripts et formations, des dashboards, et des évolutions de parcours digitaux ou d’outils internes.",
+          "NPS Me combine mise en place pratique, analyse du feedback client et support au close-the-loop. L’objectif n’est pas seulement de vous dire quel est le score. Il s’agit de vous aider à collecter le bon feedback, comprendre ce que disent réellement les clients, et faire en sorte qu’il y ait un vrai suivi derrière.",
         cards: {
-          pnl: {
-            title: "Du feedback au P&L",
+          programme: {
+            title: "Un programme de feedback crédible",
             points: [
-              "Relier le feedback client à la rétention, au churn et au volume de tickets.",
-              "Prioriser par impact commercial, pas par “la voix la plus forte”.",
-              "Aligner Finance et CX avec un langage commun et des métriques actionnables.",
+              "Un accompagnement pour définir une approche NPS et feedback client vraiment utile.",
+              "Une aide pour structurer quand interroger, qui interroger et comment garder le programme crédible.",
+              "Une mise en place adaptée à une entreprise en croissance, pas à un modèle enterprise trop lourd.",
             ],
           },
-          teams: {
-            title: "De l’aide concrète pour vos équipes",
+          insight: {
+            title: "Des insights clients plus clairs",
             points: [
-              "Coaching pour les équipes account, support et produit.",
-              "Templates, playbooks et scripts adaptés à votre ton de marque.",
-              "Accompagnement pour ancrer de nouvelles routines, pas seulement des ateliers ponctuels.",
+              "Transformer scores d’enquête et commentaires clients en thèmes et priorités compréhensibles.",
+              "Aller au-delà du score pour voir ce qui motive promoteurs, passifs et détracteurs.",
+              "Donner aux fondateurs et aux équipes une vision plus claire de ce que vivent les clients.",
             ],
           },
-          systems: {
-            title: "Des systèmes et parcours qui fonctionnent",
+          action: {
+            title: "Un vrai processus de close-the-loop",
             points: [
-              "Optimisation des enquêtes, parcours, formulaires et messages.",
-              "Partenariat avec vos équipes produit ou IT sur des changements petits mais à fort impact.",
-              "Mieux exploiter les outils que vous avez déjà avant d’en acheter de nouveaux.",
+              "Mettre en place un rythme simple de suivi autour du feedback client.",
+              "Rendre plus clairs les responsables et les prochaines étapes.",
+              "Aider le feedback client à devenir une partie réelle de la manière dont l’entreprise s’améliore dans le temps.",
             ],
           },
         },
       },
 
       vs: {
-        title: "Pourquoi nous choisir plutôt qu’un grand cabinet",
+        title: "Pourquoi choisir NPS Me plutôt qu’un grand cabinet",
         body:
-          "Les grands cabinets peuvent faire du très bon travail, mais ils viennent aussi avec une structure coûteuse, des délais longs, et beaucoup de monde dans la pièce. NPS Me est construit pour être lean, expert, et focalisé sur le mouvement, pas sur le théâtre.",
+          "Les grands cabinets peuvent produire un travail stratégique solide, mais ils apportent souvent plus de structure, plus de couches et plus de complexité que ce dont une startup ou une PME a réellement besoin. NPS Me a été conçu pour être plus direct, plus pratique et plus proche de la mise en œuvre.",
 
-        leftTitle: "Cabinet “classique”",
+        leftTitle: "Grand cabinet classique",
         leftPoints: [
-          "Couches de partners, directeurs et juniors sur les missions.",
-          "Rapports et frameworks “standard” qui ne collent pas toujours à votre réalité.",
-          "TJM élevés et engagements longs avant de voir de la valeur.",
-          "Focus sur le deck plus que sur le changement réel dans les équipes.",
+          "Davantage de personnes, de couches et d’overhead autour du travail.",
+          "Des frameworks et rapports parfois trop génériques ou trop lourds.",
+          "Des délais plus longs avant que le travail soit réellement utile au quotidien.",
+          "Un risque plus fort de finir avec des recommandations plutôt qu’avec des changements concrets.",
         ],
 
         rightTitle: "Approche NPS Me",
         rightPoints: [
-          "Accès direct à un lead CX expérimenté, pas une équipe junior qui tourne.",
-          "Travail construit autour de vos outils et données existants, pas un template générique.",
-          "Missions cadrées et transparentes, compatibles avec votre budget.",
-          "Aide à l’implémentation, pas seulement des recommandations.",
+          "Un accès direct à un accompagnement CX et feedback expérimenté.",
+          "Un travail construit autour de vos outils, de votre équipe et de votre stade de croissance.",
+          "Un cadrage plus clair, une mise en place plus légère et une exécution plus concrète.",
+          "Un support centré sur la mise en place d’un vrai processus, pas seulement sur la restitution d’analyses.",
         ],
 
         footnote:
-          "NPS Me fait partie du groupe cxms.fr, qui combine expertise CX et compétences data/digital concrètes. Cela permet de comprendre l’histoire dans vos feedbacks et de construire les process, contenus et parcours qui font bouger les chiffres.",
+          "NPS Me combine réflexion sur le feedback client, mise en place pratique et tooling léger. Le travail ne sert donc pas seulement à expliquer ce que disent les clients, mais à aider votre équipe à en faire quelque chose d’utile.",
       },
 
       reassurance: {
-        title: "Ce que ça fait de travailler avec nous",
+        title: "Ce que cela fait de travailler avec NPS Me",
         items: [
-          "Un cadrage clair : problème, objectifs, et définition du succès.",
-          "Des points réguliers, honnêtes. Pas de jargon pour se cacher.",
-          "Des livrables simples que les équipes lisent vraiment et utilisent.",
-          "Respect de vos contraintes, de votre culture et de l’expertise interne.",
-          "Un focus sur le changement durable, pas des pics sur un trimestre.",
-          "Un partenaire capable de parler aux execs et aux opérationnels la même semaine.",
+          "Des échanges clairs et concrets, sans jargon inutile.",
+          "Un focus sur ce que votre équipe peut réellement mettre en place.",
+          "Des livrables simples que les gens lisent et utilisent vraiment.",
+          "Du respect pour votre stade de croissance, vos contraintes et vos outils existants.",
+          "Une manière plus légère et plus flexible de couvrir sérieusement la CX.",
+          "Un accompagnement qui aide le feedback à devenir une partie du fonctionnement de l’entreprise.",
         ],
-        ctaProducts: "Découvrir les offres packagées",
+        ctaProducts: "Voir les offres",
         ctaBook: "Prendre rendez-vous",
       },
     },

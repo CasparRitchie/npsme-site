@@ -7,9 +7,13 @@ import SiteFooter from "./components/SiteFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { ROUTES } from "./routesRegistry";
 
+function RouteFallback() {
+  return (
+    <div className="min-h-[40vh]" aria-busy="true" />
+  );
+}
+
 function AppShell() {
-
-
   const location = useLocation();
 
   const bareRoutes = [
@@ -33,18 +37,21 @@ function AppShell() {
         >
           Skip to content
         </a>
+
         {!isBare && <NavBar />}
         <ScrollToTop />
 
         <main id="main-content">
-          <Routes>
-            {ROUTES.filter((r) => r.enabled && r.component).map(
-              ({ path, component: C }) => (
-                <Route key={path} path={path} element={<C />} />
-              )
-            )}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <React.Suspense fallback={<RouteFallback />}>
+            <Routes>
+              {ROUTES.filter((r) => r.enabled && r.component).map(
+                ({ path, component: C }) => (
+                  <Route key={path} path={path} element={<C />} />
+                )
+              )}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </React.Suspense>
         </main>
 
         {!isBare && <SiteFooter />}

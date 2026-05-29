@@ -1,77 +1,76 @@
 // src/routesRegistry.js
 import React from "react";
 import { ROUTES_MANIFEST } from "./routesManifest";
-
-// React components (browser-only)
-import NpsMeLanding from "./NpsMeLanding";
-import Products from "./Products";
-import Training from "./Training";
-import Speaking from "./Speaking";
-import WhatIsNps from "./pages/WhatIsNps";
-import ImpactPage from "./ImpactPage";
-import About from "./About";
-import WhyNpsMe from "./pages/WhyNpsMe";
-import MilestoneNps from "./MilestoneNps";
-import NpsSurveyProgramme from "./NpsSurveyProgramme";
-import NpsIntelligenceLayer from "./pages/NpsIntelligenceLayer";
-import IntercomNpsAnalytics from "./pages/IntercomNpsAnalytics";
-import CustomerFeedbackWorkspace from "./pages/CustomerFeedbackWorkspace";
-import EnvolaExample from "./pages/EnvolaExample";
-import EnvolaQuestionDetail from "./pages/EnvolaQuestionDetail";
-import Book from "./Book";
-import CxPulseSample from "./CxPulseSample";
-import Privacy from "./Privacy";
-import Terms from "./Terms";
-
-import SocialListening from "./SocialListening";
-import SocialListeningIndex from "./pages/SocialListeningIndex";
-import SocialListeningReport from "./pages/SocialListeningReport";
-
-import BlogClosingTheLoop from "./pages/BlogClosingTheLoop";
-import BlogDataVisualisation from "./pages/BlogDataVisualisation";
-import BlogEthicalSurveys from "./pages/BlogEthicalSurveys";
-import BlogEthicsOfContactSelection from "./pages/BlogEthicsOfContactSelection";
-import BlogIndex from "./pages/BlogIndex";
-import BlogIntercomNpsBeyondTheScore from "./pages/BlogIntercomNpsBeyondTheScore";
-import BlogSendingNpsBeforeChristmas from "./pages/BlogSendingNpsBeforeChristmas";
-import BlogWhatToDoWithNpsScores from "./pages/BlogWhatToDoWithNpsScores";
-import BlogWhyNpsIsntImproving from "./pages/BlogWhyNpsIsntImproving";
-
-import DataAutomationPage from "./pages/DataAutomationPage";
-import DemoSurvey from "./pages/DemoSurvey";
-import DemoSurveyPage from "./pages/DemoSurveyPage";
-import DemoInvitationSurvey from "./pages/DemoInvitationSurvey";
-import DemoThankYou from "./pages/DemoThankYou";
-
-import LiveInvitationSurvey from "./pages/LiveInvitationSurvey";
-import LiveSurveyAdminPage from "./pages/LiveSurveyAdminPage";
-import LiveSurveyPage from "./pages/LiveSurveyPage";
-import LiveThankYou from "./pages/LiveThankYou";
-import LiveResultsPanel from "./pages/LiveResultsPanel";
-
-import CxCockpit from "./pages/CxCockpit";
-
-import PrivateLogin from "./pages/PrivateLogin";
-import ClosingTheLoop from "./pages/EnvolaClosingTheLoop";
-import NpsResponsesExplorer from "./pages/NpsResponsesExplorer";
 import RequireAuth from "./components/auth/RequireAuth";
 import RequireWorkspaceAuth from "./components/auth/RequireWorkspaceAuth";
 
-import EnvolaPerformance from "./pages/EnvolaPerformance";
-import EnvolaResponses from "./pages/EnvolaResponses";
-import EnvolaInvitations from "./pages/EnvolaInvitations";
-import EnvolaClosingTheLoop from "./pages/EnvolaClosingTheLoop";
+// React.lazy route components
+const NpsMeLanding = React.lazy(() => import("./NpsMeLanding"));
+const Products = React.lazy(() => import("./Products"));
+const Training = React.lazy(() => import("./Training"));
+const Speaking = React.lazy(() => import("./Speaking"));
+const WhatIsNps = React.lazy(() => import("./pages/WhatIsNps"));
+const ImpactPage = React.lazy(() => import("./ImpactPage"));
+const About = React.lazy(() => import("./About"));
+const WhyNpsMe = React.lazy(() => import("./pages/WhyNpsMe"));
+const MilestoneNps = React.lazy(() => import("./MilestoneNps"));
+const NpsSurveyProgramme = React.lazy(() => import("./NpsSurveyProgramme"));
+const NpsIntelligenceLayer = React.lazy(() => import("./pages/NpsIntelligenceLayer"));
+const IntercomNpsAnalytics = React.lazy(() => import("./pages/IntercomNpsAnalytics"));
+const CustomerFeedbackWorkspace = React.lazy(() => import("./pages/CustomerFeedbackWorkspace"));
+const EnvolaExample = React.lazy(() => import("./pages/EnvolaExample"));
+const EnvolaQuestionDetail = React.lazy(() => import("./pages/EnvolaQuestionDetail"));
+const Book = React.lazy(() => import("./Book"));
+const CxPulseSample = React.lazy(() => import("./CxPulseSample"));
+const Privacy = React.lazy(() => import("./Privacy"));
+const Terms = React.lazy(() => import("./Terms"));
 
-import CsvNpsUpload from "./pages/CsvNpsUpload";
-import CsvNpsPerformance from "./pages/CsvNpsPerformance";
-import CsvNpsResponses from "./pages/CsvNpsResponses";
-import CsvNpsClosingTheLoop from "./pages/CsvNpsClosingTheLoop";
-import NpsDatasets from "./pages/NpsDatasets";
+const SocialListening = React.lazy(() => import("./SocialListening"));
+const SocialListeningIndex = React.lazy(() => import("./pages/SocialListeningIndex"));
+const SocialListeningReport = React.lazy(() => import("./pages/SocialListeningReport"));
 
-import WorkspaceHome from "./pages/WorkspaceHome";
-import WorkspaceLogin from "./pages/workspace/Login";
-import WorkspaceAccount from "./pages/workspace/Account";
+const BlogClosingTheLoop = React.lazy(() => import("./pages/BlogClosingTheLoop"));
+const BlogDataVisualisation = React.lazy(() => import("./pages/BlogDataVisualisation"));
+const BlogEthicalSurveys = React.lazy(() => import("./pages/BlogEthicalSurveys"));
+const BlogEthicsOfContactSelection = React.lazy(() => import("./pages/BlogEthicsOfContactSelection"));
+const BlogIndex = React.lazy(() => import("./pages/BlogIndex"));
+const BlogIntercomNpsBeyondTheScore = React.lazy(() => import("./pages/BlogIntercomNpsBeyondTheScore"));
+const BlogSendingNpsBeforeChristmas = React.lazy(() => import("./pages/BlogSendingNpsBeforeChristmas"));
+const BlogWhatToDoWithNpsScores = React.lazy(() => import("./pages/BlogWhatToDoWithNpsScores"));
+const BlogWhyNpsIsntImproving = React.lazy(() => import("./pages/BlogWhyNpsIsntImproving"));
 
+const DataAutomationPage = React.lazy(() => import("./pages/DataAutomationPage"));
+const DemoSurvey = React.lazy(() => import("./pages/DemoSurvey"));
+const DemoSurveyPage = React.lazy(() => import("./pages/DemoSurveyPage"));
+const DemoInvitationSurvey = React.lazy(() => import("./pages/DemoInvitationSurvey"));
+const DemoThankYou = React.lazy(() => import("./pages/DemoThankYou"));
+
+const LiveInvitationSurvey = React.lazy(() => import("./pages/LiveInvitationSurvey"));
+const LiveSurveyAdminPage = React.lazy(() => import("./pages/LiveSurveyAdminPage"));
+const LiveSurveyPage = React.lazy(() => import("./pages/LiveSurveyPage"));
+const LiveThankYou = React.lazy(() => import("./pages/LiveThankYou"));
+const LiveResultsPanel = React.lazy(() => import("./pages/LiveResultsPanel"));
+
+const CxCockpit = React.lazy(() => import("./pages/CxCockpit"));
+
+const PrivateLogin = React.lazy(() => import("./pages/PrivateLogin"));
+const ClosingTheLoop = React.lazy(() => import("./pages/EnvolaClosingTheLoop"));
+const NpsResponsesExplorer = React.lazy(() => import("./pages/NpsResponsesExplorer"));
+
+const EnvolaPerformance = React.lazy(() => import("./pages/EnvolaPerformance"));
+const EnvolaResponses = React.lazy(() => import("./pages/EnvolaResponses"));
+const EnvolaInvitations = React.lazy(() => import("./pages/EnvolaInvitations"));
+const EnvolaClosingTheLoop = React.lazy(() => import("./pages/EnvolaClosingTheLoop"));
+
+const CsvNpsUpload = React.lazy(() => import("./pages/CsvNpsUpload"));
+const CsvNpsPerformance = React.lazy(() => import("./pages/CsvNpsPerformance"));
+const CsvNpsResponses = React.lazy(() => import("./pages/CsvNpsResponses"));
+const CsvNpsClosingTheLoop = React.lazy(() => import("./pages/CsvNpsClosingTheLoop"));
+const NpsDatasets = React.lazy(() => import("./pages/NpsDatasets"));
+
+const WorkspaceHome = React.lazy(() => import("./pages/WorkspaceHome"));
+const WorkspaceLogin = React.lazy(() => import("./pages/workspace/Login"));
+const WorkspaceAccount = React.lazy(() => import("./pages/workspace/Account"));
 
 const protect = (Component) => {
   return function ProtectedPage() {
@@ -177,7 +176,6 @@ const COMPONENTS = {
   "/fr/workspace/datasets/:datasetId/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
 
   // CSV / NPS data workspace
-  // Protected because datasets and follow-up actions are now persisted in Supabase.
   "/csv-nps/upload": protect(CsvNpsUpload),
   "/fr/csv-nps/upload": protect(CsvNpsUpload),
 
@@ -300,7 +298,6 @@ const COMPONENTS = {
   "/private/nps-responses-explorer": protect(NpsResponsesExplorer),
   "/fr/private/nps-responses-explorer": protect(NpsResponsesExplorer),
 };
-
 
 export const ROUTES = ROUTES_MANIFEST.map((r) => ({
   ...r,

@@ -1,5 +1,5 @@
 // src/NpsMeLanding.jsx
-import React, { Suspense } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Star, LineChart, Wrench } from "lucide-react";
 import Seo from "./components/Seo";
@@ -9,32 +9,15 @@ import { useLanguage } from "./i18n/LanguageContext";
 import { translations } from "./i18n/translations";
 import { localizePath } from "./i18n/pathHelpers";
 import LandingScreenshotCard from "./components/landing/LandingScreenshotCard";
-import LandingSectionFallback from "./components/landing/LandingSectionFallback";
 
-const LandingServicesSection = React.lazy(() =>
-  import("./components/landing/LandingServicesSection")
-);
-const LandingMethodSection = React.lazy(() =>
-  import("./components/landing/LandingMethodSection")
-);
-const LandingScreenshotWorkflowSection = React.lazy(() =>
-  import("./components/landing/LandingScreenshotWorkflowSection")
-);
-const LandingEmbedCxSection = React.lazy(() =>
-  import("./components/landing/LandingEmbedCxSection")
-);
-const LandingNpsExplainer = React.lazy(() =>
-  import("./components/landing/LandingNpsExplainer")
-);
-const LandingMilestoneNpsSection = React.lazy(() =>
-  import("./components/landing/LandingMilestoneNpsSection")
-);
-const LandingAboutSection = React.lazy(() =>
-  import("./components/landing/LandingAboutSection")
-);
-const LandingContactSection = React.lazy(() =>
-  import("./components/landing/LandingContactSection")
-);
+import LandingServicesSection from "./components/landing/LandingServicesSection";
+import LandingMethodSection from "./components/landing/LandingMethodSection";
+import LandingScreenshotWorkflowSection from "./components/landing/LandingScreenshotWorkflowSection";
+import LandingEmbedCxSection from "./components/landing/LandingEmbedCxSection";
+import LandingNpsExplainer from "./components/landing/LandingNpsExplainer";
+import LandingMilestoneNpsSection from "./components/landing/LandingMilestoneNpsSection";
+import LandingAboutSection from "./components/landing/LandingAboutSection";
+import LandingContactSection from "./components/landing/LandingContactSection";
 
 function ProofStrip() {
   const { lang } = useLanguage();
@@ -294,9 +277,7 @@ export default function NpsMeLanding() {
 
       <ProofStrip />
 
-      <Suspense fallback={<LandingSectionFallback minHeight="420px" />}>
-        <LandingServicesSection />
-      </Suspense>
+      <LandingServicesSection />
 
       <section id="platform" className="mx-auto max-w-7xl px-6 py-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -324,9 +305,7 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
-      <Suspense fallback={<LandingSectionFallback minHeight="320px" />}>
-        <LandingMethodSection />
-      </Suspense>
+      <LandingMethodSection />
 
       <section id="demo" className="mx-auto max-w-7xl px-6 pb-20">
         <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 md:flex-row md:items-center md:justify-between md:p-8">
@@ -357,29 +336,12 @@ export default function NpsMeLanding() {
         </div>
       </section>
 
-      <Suspense fallback={<LandingSectionFallback minHeight="560px" />}>
-        <LandingScreenshotWorkflowSection />
-      </Suspense>
-
-      <Suspense fallback={<LandingSectionFallback minHeight="700px" />}>
-        <LandingEmbedCxSection />
-      </Suspense>
-
-      <Suspense fallback={<LandingSectionFallback minHeight="360px" />}>
-        <LandingNpsExplainer />
-      </Suspense>
-
-      <Suspense fallback={<LandingSectionFallback minHeight="420px" />}>
-        <LandingMilestoneNpsSection />
-      </Suspense>
-
-      <Suspense fallback={<LandingSectionFallback minHeight="280px" />}>
-        <LandingAboutSection />
-      </Suspense>
-
-      <Suspense fallback={<LandingSectionFallback minHeight="260px" />}>
-        <LandingContactSection />
-      </Suspense>
+      <LandingScreenshotWorkflowSection />
+      <LandingEmbedCxSection />
+      <LandingNpsExplainer />
+      <LandingMilestoneNpsSection />
+      <LandingAboutSection />
+      <LandingContactSection />
     </div>
   );
 }

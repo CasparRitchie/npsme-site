@@ -5131,157 +5131,158 @@ export const TRANSLATIONS = {
     },
     landing: {
       seo: {
-        title: "Systèmes de feedback client pour startups | NPS Me",
+        title: "Mise en place pratique du NPS et du feedback client pour startups et PME | NPS Me",
         description:
-          "NPS Me aide les startups et PME à mettre en place un système de feedback client concret : enquêtes, reporting NPS, thèmes clients et actions de close-the-loop avec Intercom, CSV ou les outils existants.",
+          "NPS Me aide les startups et PME à mettre en place un programme de feedback client concret : conception d’enquêtes, reporting, analyse des retours et workflows de close-the-loop réellement utilisés par les équipes.",
       },
 
       hero: {
         h1: {
-          lead: "Des systèmes de feedback client",
-          nps: "pour les startups",
-          tail: "qui veulent structurer leur CX.",
-          accent: "Montrez à vos clients, vos équipes et vos investisseurs que le feedback est mesuré, compris et suivi d’actions.",
+          lead: "Une mise en place pratique du NPS et du feedback client",
+          nps: "pour les startups et les PME",
+          tail: "qui veulent vraiment structurer leur CX.",
+          accent:
+            "Mettez en place un processus de feedback crédible, transformez les retours en actions et installez de meilleures habitudes CX à mesure que votre activité grandit.",
         },
         body:
-          "NPS Me aide les équipes en croissance à mettre en place un processus de feedback client concret : enquêtes, reporting NPS, analyse des thèmes clients et workflows de close-the-loop, avec Intercom, des exports CSV ou vos outils existants. L’objectif n’est pas d’ajouter un dashboard de plus, mais de créer un système CX crédible et utilisable.",
+          "NPS Me aide les entreprises en croissance à mettre en place un programme de feedback client concret : enquêtes, reporting, analyse des retours et workflows de close-the-loop que les équipes utilisent réellement. L’objectif n’est pas d’ajouter un tableau de bord de plus, mais de créer un processus clair et crédible pour écouter les clients, agir sur leurs retours et améliorer la fidélisation dans le temps.",
         ctaPrimary: "Réserver une revue CX gratuite",
-        ctaMethod: "Voir comment ça marche",
-        ctaDemo: "Voir des exemples d’insights",
+        ctaMethod: "Voir comment cela fonctionne",
+        ctaDemo: "Voir un exemple d’insights",
         proof: {
-          mining: "Feedback transformé en thèmes",
-          enablement: "Responsables assignés au suivi",
-          lift: "Preuves CX pour investisseurs",
+          mining: "Du feedback transformé en insight",
+          enablement: "Des workflows de close-the-loop en place",
+          lift: "Un processus CX plus crédible",
         },
         chips: {
           help: [
-            "Mise en place CX pour startups",
-            "Design de programme NPS",
-            "Analyse du feedback",
+            "Mise en place de programme NPS",
+            "Reporting feedback client",
             "Workflows de close-the-loop",
+            "Support CX pour équipes en croissance",
           ],
-          worksWith: ["Intercom", "Exports CSV", "APIs", "Outils d’enquête existants"],
+          worksWith: ["Intercom", "Imports CSV", "Outils d’enquête existants", "APIs"],
         },
         chipsNote:
-          "Commencez avec un simple upload CSV, connectez Intercom, ou utilisez des APIs pour intégrer le feedback depuis d’autres systèmes. La technologie soutient le processus, mais la vraie valeur est d’aider l’entreprise à agir sur ce que les clients expriment.",
+          "Commencez avec les outils que vous utilisez déjà. NPS Me peut fonctionner avec Intercom, des exports CSV, vos plateformes d’enquête existantes ou des flux API. Le plus important n’est pas la source de données, mais la mise en place d’un processus de feedback client réellement utilisable par votre équipe.",
         screenshotAlt:
-          "Dashboard NPS Me montrant le score NPS, les tendances de réponses, les thèmes clients et les actions de close-the-loop.",
+          "Tableau de bord NPS Me montrant le score NPS, les tendances de réponses, les thèmes clients et les actions de close-the-loop.",
       },
 
       proofStrip: {
         label: "Conçu pour les startups et PME qui ont besoin de",
         items: [
-          "Preuves CX pour investisseurs",
-          "Reporting de feedback client",
-          "Ownership du close-the-loop",
-          "Mise en place Intercom, CSV ou outils existants",
+          "Un processus NPS crédible",
+          "Un reporting clair sur le feedback client",
+          "Une vraie logique de close-the-loop",
+          "Une alternative plus légère aux plateformes CX lourdes",
         ],
       },
 
       method: {
-        title: "Un processus CX concret, pas seulement un dashboard NPS",
+        title: "Un vrai programme de feedback client, pas seulement un tableau de bord",
         body:
-          "La plupart des startups n’ont pas besoin d’une plateforme CX enterprise lourde. Elles ont besoin d’une façon claire de collecter le feedback client, comprendre ce qui influence le score, décider quoi corriger et s’assurer que quelqu’un est responsable du suivi. NPS Me vous aide à mettre ce processus en place.",
+          "La plupart des entreprises en croissance n’ont pas besoin d’une plateforme CX d’entreprise. Elles ont besoin d’une manière simple et crédible de collecter les retours clients, de comprendre ce qu’ils signifient, de décider quoi corriger et de s’assurer qu’un suivi existe. NPS Me vous aide à mettre en place ce rythme opérationnel.",
         cards: [
           {
-            title: "1) Collecter le bon feedback",
+            title: "1) Mettre en place la bonne approche d’enquête",
             desc:
-              "Utilisez des uploads CSV, des enquêtes Intercom, vos outils d’enquête existants ou des APIs pour capturer scores NPS et commentaires clients de manière structurée et reproductible.",
+              "Définir comment collecter le feedback, quand interroger, qui interroger, et comment rendre le programme crédible et utile.",
           },
           {
-            title: "2) Comprendre ce qui influence le score",
+            title: "2) Transformer les réponses en insights exploitables",
             desc:
-              "Transformez les commentaires bruts en thèmes, drivers, risques et opportunités pour que les fondateurs et les équipes comprennent pourquoi les clients recommandent, hésitent ou partent.",
+              "Aller au-delà du score. Regrouper les commentaires en thèmes, identifier les risques et opportunités, et rendre visible ce qui motive promoteurs, passifs et détracteurs.",
           },
           {
-            title: "3) Créer le processus de close-the-loop",
+            title: "3) Construire le workflow de close-the-loop",
             desc:
-              "Mettez en place des workflows clairs pour que les bonnes personnes répondent aux détracteurs, apprennent des promoteurs et suivent rapidement les problèmes clients.",
+              "Mettre en place des processus de suivi simples pour permettre à votre équipe de répondre aux clients, suivre les actions et éviter que les problèmes ne soient ignorés.",
           },
           {
-            title: "4) Reporter les progrès clairement",
+            title: "4) Ancrer la CX dans les habitudes de l’équipe",
             desc:
-              "Donnez aux fondateurs, dirigeants et investisseurs une vue simple de ce que disent les clients, de ce qui demande attention et des actions en cours.",
+              "Créer un rythme répétable pour les fondateurs, équipes produit, support ou ops afin que le feedback client fasse partie de la manière dont l’entreprise s’améliore dans le temps.",
           },
         ],
       },
 
       screenshots: {
-        title: "Du feedback brut au suivi visible",
+        title: "Du feedback client à l’action",
         body:
-          "Les meilleurs programmes CX ne s’arrêtent pas au score. NPS Me aide à relier feedback, analyse et ownership pour que les équipes voient ce que disent les clients et ce qui est fait ensuite.",
+          "Les meilleurs programmes ne s’arrêtent pas à la mesure. NPS Me aide à relier scores, commentaires, thèmes et responsabilités pour que les équipes voient ce que disent les clients et ce qu’il faut faire ensuite.",
         cards: [
           {
-            title: "Dashboard de feedback client",
+            title: "Tableau de bord feedback client",
             desc:
-              "Suivez le NPS, les volumes de réponses, la répartition des scores et les commentaires clients au même endroit.",
+              "Visualisez le NPS, les tendances de réponses, la répartition des scores et les commentaires clients au même endroit.",
             src: "/images/npsme/nps-me-customer-feedback-dashboard.png",
             alt:
-              "Dashboard NPS Me montrant les thèmes de feedback client, le score NPS et la répartition des réponses pour un programme CX startup.",
+              "Tableau de bord NPS Me affichant les thèmes de feedback client, le score NPS et la répartition des réponses.",
           },
           {
             title: "Actions de close-the-loop",
             desc:
-              "Assignez des responsables, enregistrez les prochaines étapes et suivez les actions pour rendre le feedback opérationnel.",
+              "Attribuez des responsables, consignez les prochaines étapes et suivez les actions pour rendre le feedback client réellement opérationnel.",
             src: "/images/npsme/nps-me-close-the-loop-actions.png",
             alt:
-              "Tracker de close-the-loop montrant le statut de suivi du feedback client, le responsable et la prochaine étape.",
+              "Suivi des actions de close-the-loop montrant le statut du suivi client, le responsable et la prochaine étape.",
           },
           {
             title: "Analyse NPS Intercom",
             desc:
-              "Utilisez les réponses Intercom comme point de départ, puis ajoutez analyse, priorisation et action.",
+              "Conservez l’envoi d’enquêtes dans Intercom si nécessaire, puis ajoutez par-dessus une couche plus claire d’analyse, de priorisation et de workflow.",
             src: "/images/npsme/intercom-nps-response-analysis-dashboard.png",
             alt:
-              "Dashboard d’analyse NPS Intercom montrant scores, commentaires et thèmes de feedback client.",
+              "Tableau de bord d’analyse des réponses NPS Intercom avec scores, commentaires et thèmes de feedback client.",
           },
           {
             title: "Thèmes de feedback client",
             desc:
-              "Regroupez les commentaires en thèmes clairs pour voir les problèmes, demandes et signaux positifs derrière le score.",
+              "Regroupez les commentaires en thèmes clairs afin que les dirigeants voient les problèmes, demandes et signaux positifs derrière le score.",
             src: "/images/npsme/customer-feedback-themes-dashboard-startups.png",
             alt:
-              "Dashboard de thèmes de feedback client pour startups montrant les commentaires groupés, les problèmes récurrents et les catégories d’insight client.",
+              "Tableau de bord des thèmes de feedback client montrant les commentaires regroupés, problèmes récurrents et catégories d’insights.",
           },
         ],
       },
 
       demoBlock: {
-        title: "Tester la démo NPS en direct et explorer des insights",
+        title: "Explorer un exemple NPS en direct",
         body:
-          "Voyez comment les invitations, les réponses aux enquêtes, les scores NPS et les vues par étape s’articulent. En production, l’envoi peut rester dans Intercom ou votre plateforme existante pendant que NPS Me ajoute l’analyse, la priorisation et l’action.",
+          "Voyez comment invitations, réponses d’enquête, scores NPS et vues de suivi se relient entre eux. Dans des déploiements réels, l’envoi d’enquêtes peut rester dans Intercom ou votre plateforme existante, tandis que NPS Me ajoute la couche d’insight et de close-the-loop autour.",
         cta: "Ouvrir la démo NPS en direct",
         note:
-          "Envoyez-vous une invitation, répondez à l’enquête, puis explorez comment les réponses deviennent des métriques NPS, des scores par étape et des insights actionnables.",
+          "Utile pour voir comment de simples données d’enquête peuvent devenir un reporting plus clair et un workflow réellement exploitable.",
       },
 
       demo: {
-        label: "Démo NPS® en direct",
+        label: "NPS® de la démo en direct",
         basedOn: "Basé sur {count} réponses",
-        loading: "Chargement du résumé de démo…",
-        error: "Résumé de démo indisponible",
-        empty: "Aucune réponse de démo pour le moment",
+        loading: "Chargement du résumé de la démo…",
+        error: "Résumé de la démo indisponible",
+        empty: "Pas encore de réponses dans la démo",
       },
 
       platform: {
-        title: "Utilisez les données de feedback que vous avez déjà",
+        title: "Travaillez avec les outils et données que vous avez déjà",
         body:
-          "NPS Me est conçu pour fonctionner avec vos données clients, outils d’enquête et plateformes support existants. Vous n’avez pas besoin d’acheter une grande plateforme CX enterprise pour commencer à apprendre de vos clients.",
+          "NPS Me est conçu pour s’intégrer à votre organisation actuelle. Vous n’avez pas besoin de remplacer vos outils pour commencer à construire un meilleur processus de feedback client.",
         cards: [
           {
-            title: "Upload CSV",
+            title: "Import CSV",
             desc:
-              "Importez des listes clients, réponses d’enquête ou exports de feedback. Une façon simple de commencer à analyser vos données NPS sans projet d’intégration complexe.",
+              "Une manière simple de démarrer rapidement à partir de listes clients, d’exports d’enquêtes ou de fichiers de feedback.",
           },
           {
-            title: "Lien avec Intercom NPS",
+            title: "Connexion avec Intercom NPS",
             desc:
-              "Connectez les réponses NPS et commentaires Intercom pour analyser, prioriser et relier le feedback au suivi opérationnel.",
+              "Utilisez Intercom comme couche de collecte, puis ajoutez une meilleure analyse, une meilleure priorisation et un meilleur support de close-the-loop.",
           },
           {
-            title: "Ingestion via API",
+            title: "Intégration API de feedback",
             desc:
-              "Utilisez des APIs pour intégrer le feedback depuis CRM, plateformes support, outils d’enquête ou bases internes au fur et à mesure que votre processus CX mûrit.",
+              "Faites remonter les données depuis vos CRM, plateformes support, outils d’enquête ou systèmes internes à mesure que votre programme mûrit.",
           },
         ],
         linkIntercomText: "Voir comment cela fonctionne avec Intercom NPS.",
@@ -5290,166 +5291,140 @@ export const TRANSLATIONS = {
       about: {
         title: "À propos de Caspar",
         body:
-          "CX pragmatique, résultats mesurables, moins de théâtre et plus de progrès. J’aide les équipes à concevoir de meilleurs programmes NPS, analyser correctement les retours clients et transformer les insights en actions qui améliorent rétention, recommandation et chiffre d’affaires.",
+          "J’aide les équipes à mettre en place des programmes NPS et feedback client concrets, à interpréter ce que disent réellement les clients, et à transformer cela en actions. L’objectif reste toujours un progrès mesurable, pas du théâtre CX.",
         bullets: [
-          "Programmes NPS decision-grade avec meilleur échantillonnage, contrôle des biais et comparabilité",
-          "Verbatims clients traduits en thèmes, drivers et priorités",
-          "Roadmaps avec responsables et scoring impact/effort",
-          "Playbooks, templates, scripts et formation pour les équipes",
-          "Workflows de close-the-loop reliés à des résultats concrets",
+          "Conception et mise en place pratique de programmes NPS",
+          "Commentaires clients traduits en thèmes, leviers et priorités",
+          "Workflows de close-the-loop avec responsables et prochaines étapes",
+          "Support pour fondateurs et équipes qui veulent vraiment structurer leur CX",
+          "Une alternative plus légère et plus orientée mise en œuvre que les grands projets de conseil CX",
         ],
         cta: "En savoir plus sur moi",
       },
 
       contact: {
-        title: "Prêt à montrer que l’expérience client est couverte ?",
+        title: "Prêt à mettre en place un processus de feedback client crédible ?",
         body:
-          "Réservez une revue CX gratuite de 30 minutes. Nous regarderons votre processus de feedback actuel, où se trouvent les données, quelles décisions vous devez prendre et comment NPS Me pourrait transformer le feedback client en rythme opérationnel concret.",
+          "Réservez une revue CX gratuite de 30 minutes. Nous examinerons votre processus actuel de feedback, où se trouvent les données, ce qui manque aujourd’hui, et comment NPS Me pourrait vous aider à installer un rythme NPS et feedback client plus pratique.",
         emailCta: "Écrire à hello@npsme.com",
         bookCta: "Réserver une revue CX gratuite",
       },
 
       explainer: {
-        title: "Ce que le Net Promoter Score (NPS®) mesure réellement",
+        title: "Ce que mesure réellement le Net Promoter Score (NPS®)",
         intro:
-          "Le Net Promoter Score est un indicateur simple visant à mesurer le ressenti et la fidélité des clients. Il repose sur une question unique et classe les répondants en trois catégories.",
+          "Le Net Promoter Score est un indicateur simple conçu pour mesurer le sentiment client et la loyauté. Il repose sur une question centrale et classe les répondants en trois catégories.",
         promoters: "Promoteurs",
         passives: "Passifs",
         detractors: "Détracteurs",
         formula:
-          "Le NPS® est calculé en soustrayant le pourcentage de détracteurs au pourcentage de promoteurs.",
+          "Le NPS® se calcule en soustrayant le pourcentage de détracteurs du pourcentage de promoteurs.",
         whereFits:
-          "Le NPS est particulièrement utile lorsqu’il est appliqué de manière cohérente aux moments clés du parcours client :",
+          "Le NPS est particulièrement utile lorsqu’il est appliqué de manière cohérente à des moments clés du parcours client :",
         relationship:
-          "NPS relationnel pour mesurer la fidélité globale dans le temps",
+          "Le NPS relationnel pour comprendre la fidélité globale dans le temps",
         transactional:
-          "NPS transactionnel ou par étape après des interactions clés",
+          "Le NPS transactionnel ou milestone après des moments importants",
         alongside:
-          "En complément du verbatim pour expliquer les variations de score",
-        cautionsTitle: "Quelques points de vigilance :",
+          "En complément du feedback qualitatif pour comprendre pourquoi les scores évoluent",
+        cautionsTitle: "Quelques points d’attention importants :",
         cautions: [
-          "Des échantillons trop faibles ou biaisés faussent le score",
-          "Un score seul n’indique pas quoi corriger",
-          "La sur-sollicitation dégrade la confiance et la qualité des réponses",
+          "Des échantillons faibles ou biaisés peuvent produire des scores trompeurs",
+          "Le score seul ne dit pas quoi corriger",
+          "Sur-solliciter ou “jouer” avec le dispositif dégrade la confiance et la qualité des données",
         ],
       },
 
       milestone: {
-        title: "NPS par étape : mesurer le ressenti aux moments qui comptent",
+        title: "Milestone NPS : mesurer le ressenti aux moments qui comptent",
         intro:
-          "Au lieu de s’appuyer sur un score global trop large, le NPS par étape permet de suivre le ressenti client aux moments critiques du parcours, comme l’onboarding, la première commande ou le premier usage significatif.",
+          "Plutôt que de s’appuyer sur un score global unique, le milestone NPS permet de suivre le ressenti client à des étapes critiques du parcours, comme l’onboarding, la première commande ou la première vraie utilisation.",
         examples: {
           order: {
             title: "Après la première commande",
             question:
-              "Quelle est la probabilité que vous nous recommandiez après votre premier achat ?",
-            why:
-              "Les frictions à ce stade sont fortement corrélées au churn.",
+              "Quelle est la probabilité que vous nous recommandiez suite à votre première commande ?",
+            why: "Les irritants précoces à ce stade annoncent souvent le churn.",
           },
           onboarding: {
             title: "Après l’onboarding",
-            question:
-              "Avez-vous trouvé la prise en main simple et fluide ?",
-            why:
-              "La qualité de l’onboarding conditionne l’adoption à long terme.",
+            question: "Dans quelle mesure la prise en main a-t-elle été simple ?",
+            why: "La qualité de l’onboarding influence fortement l’adoption dans la durée.",
           },
           firstUse: {
-            title: "Après la première utilisation clé",
-            question:
-              "Le produit a-t-il répondu à vos attentes ?",
-            why:
-              "Ce moment façonne la perception de valeur durable.",
+            title: "Après la première vraie utilisation",
+            question: "Le produit a-t-il répondu à vos attentes ?",
+            why: "Ce moment détermine souvent la perception durable de la valeur.",
           },
         },
-        stepsTitle: "Comment fonctionne le NPS par étape",
+        stepsTitle: "Comment fonctionne le milestone NPS",
         steps: [
-          "Identifier les moments clés pour la rétention",
-          "Déclencher les enquêtes au bon moment",
-          "Analyser thèmes et drivers par étape",
-          "Prioriser les actions à fort impact",
+          "Identifier les moments les plus importants pour la fidélisation",
+          "Déclencher les enquêtes à ces moments, pas au hasard",
+          "Analyser les thèmes et leviers par étape",
+          "Prioriser les corrections ayant le plus d’impact en aval",
         ],
         trackTitle: "Ce que vous pouvez suivre dans le temps",
         track: [
-          "Évolution du NPS par étape",
-          "Drivers des promoteurs et détracteurs",
-          "Impact des actions sur les scores ultérieurs",
+          "L’évolution du NPS par étape",
+          "Les moteurs des promoteurs et des détracteurs",
+          "L’impact des corrections sur les scores des étapes suivantes",
         ],
       },
 
       services: {
-        title: "Mise en place CX concrète, sans plateforme enterprise lourde",
+        title: "Une mise en place CX concrète, sans le poids d’une plateforme enterprise",
         body:
-          "NPS Me aide les startups et PME à mettre rapidement en place les bonnes fondations de feedback client. Le logiciel soutient le processus, mais la vraie valeur est dans la mise en place : ce que vous demandez, comment vous l’analysez, qui possède le suivi et comment l’insight nourrit les décisions.",
-        outcomeLabel: "Résultat attendu",
+          "NPS Me aide les startups et PME à mettre rapidement en place un processus de feedback client crédible. La valeur n’est pas seulement dans la couche logicielle. Elle est dans le setup : ce que vous demandez, comment vous l’analysez, qui porte le suivi, et comment le feedback client est utilisé dans les décisions.",
+        outcomeLabel: "Meilleur résultat",
         offers: [
           {
-            title: "CX Foundations",
-            badge: "Mise en place",
+            title: "Mise en place du programme NPS",
+            badge: "Setup",
             desc:
-              "Un projet de setup ciblé pour les startups et PME qui ont besoin d’un système de feedback client crédible.",
+              "Un projet ciblé pour vous aider à lancer un programme NPS et feedback client crédible.",
             bullets: [
-              "Conception du programme NPS / feedback",
-              "Mise en place CSV, Intercom ou outils existants",
-              "Gouvernance d’enquête et réduction des biais",
-              "Analyse des commentaires et reporting des thèmes",
-              "Conception du workflow de close-the-loop",
-              "Passage de relais équipe et résumé fondateur",
+              "Approche d’enquête et logique de ciblage",
+              "Mise en place du reporting",
+              "Première revue des retours",
+              "Recommandations concrètes",
             ],
             outcome:
-              "Un système CX concret que votre équipe peut utiliser, et une façon crédible de montrer que les clients sont écoutés et que des actions sont suivies.",
+              "Un programme de feedback opérationnel que votre équipe peut réellement utiliser.",
           },
           {
-            title: "CX Embedded",
-            badge: "Continu",
+            title: "Setup + Closing the Loop",
+            badge: "Le plus utile",
             desc:
-              "Un accompagnement continu pour les équipes qui veulent intégrer le feedback client dans leur fonctionnement quotidien.",
+              "Pour les équipes qui veulent non seulement du reporting, mais aussi un vrai processus de suivi autour du feedback client.",
             bullets: [
-              "Tout ce qui est inclus dans CX Foundations",
-              "Revue mensuelle du feedback",
-              "Suivi des thèmes et problèmes récurrents",
-              "Ownership des actions et rythme de suivi",
-              "Synthèses pour le management",
-              "Recommandations produit, support et CX",
+              "Tout ce qui est inclus dans le setup",
+              "Conception du workflow de suivi",
+              "Attribution des responsabilités et suivi des actions",
+              "Support au close-the-loop",
             ],
             outcome:
-              "Le feedback client devient une partie réelle de la façon dont l’équipe priorise, suit les actions et s’améliore.",
+              "Une manière plus claire de répondre aux clients et d’agir sur ce qu’ils disent.",
+          },
+          {
+            title: "Support CX continu",
+            badge: "Continu",
+            desc:
+              "Un accompagnement léger mais régulier pour les équipes qui veulent progresser sans recruter un responsable CX à temps plein.",
+            bullets: [
+              "Revue régulière du feedback client",
+              "Synthèses d’insights",
+              "Ajustement du programme",
+              "Conseil CX concret",
+            ],
+            outcome:
+              "Un rythme plus cohérent autour du feedback client à mesure que l’entreprise grandit.",
           },
         ],
         ctas: {
           products: "Voir les offres",
-          about: "Pourquoi moi",
+          about: "Pourquoi travailler avec moi",
         },
-      },
-
-      embedCx: {
-        title: "Comment j’aide à ancrer l’expérience client dans l’entreprise",
-        body:
-          "Le feedback client ne crée de la valeur que s’il est intégré à la façon dont l’entreprise fonctionne. NPS Me vous aide à rendre la CX visible, concrète et actionnable à travers les process, la performance, les équipes et l’état d’esprit.",
-        centerTitle: "Le client",
-        centerBody:
-          "Au centre du système : une meilleure écoute, un meilleur suivi et une meilleure expérience client dans la durée.",
-        pillars: [
-          {
-            title: "Process",
-            desc:
-              "Concevoir des workflows de feedback et de suivi qui soient concrets, visibles, reproductibles et simples à exécuter.",
-          },
-          {
-            title: "Performance",
-            desc:
-              "Rendre l’expérience client mesurable, pour que les équipes et les dirigeants voient ce qui s’améliore et ce qui doit être traité.",
-          },
-          {
-            title: "Équipes",
-            desc:
-              "Clarifier les rôles, les responsabilités et les routines pour que les équipes sachent concrètement comment travailler avec le feedback client.",
-          },
-          {
-            title: "État d’esprit",
-            desc:
-              "Faire émerger une culture où le feedback client nourrit les décisions, les priorités et l’amélioration continue.",
-          },
-        ],
       },
     },
     surveyProgramme: {

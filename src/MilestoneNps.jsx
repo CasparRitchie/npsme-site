@@ -26,8 +26,7 @@ export default function MilestoneNps() {
   const trackItems = translations(lang, "milestonePage.track.items", []);
 
   const impactPath = localizePath("/impact", lang);
-  const homeWithContactHash = `${localizePath("/", lang)}#contact`;
-
+  const bookPath = localizePath("/book?topic=nps-programme-setup", lang);
   const relatedLinks = [
     {
       path: "/what-is-nps",
@@ -70,6 +69,8 @@ export default function MilestoneNps() {
       ),
     },
   ];
+  const comparisonRows = translations(lang, "milestonePage.comparison.rows", []);
+  const faqItems = translations(lang, "milestonePage.faq.items", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -101,7 +102,7 @@ export default function MilestoneNps() {
             {translations(
               lang,
               "milestonePage.header.title",
-              "Transactional NPS and milestone survey signals"
+              "Transactional NPS and milestone surveys"
             )}
           </h1>
 
@@ -122,7 +123,7 @@ export default function MilestoneNps() {
             </Link>
 
             <Link
-              to={homeWithContactHash}
+              to={bookPath}
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] transition"
             >
               {translations(lang, "milestonePage.header.ctaBook", "Book a free NPS review")}
@@ -145,6 +146,72 @@ export default function MilestoneNps() {
           <p className="mt-3 text-slate-300 max-w-3xl">
             {translations(lang, "milestonePage.definition.p2")}
           </p>
+
+          <p className="mt-3 text-slate-300 max-w-3xl">
+            {translations(lang, "milestonePage.definition.p3")}
+          </p>
+        </div>
+      </section>
+
+      {/* Transactional vs relationship NPS */}
+      <section className="mx-auto max-w-7xl px-6 pb-8">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            {translations(
+              lang,
+              "milestonePage.comparison.title",
+              "Transactional NPS vs relationship NPS"
+            )}
+          </h2>
+
+          <p className="mt-3 max-w-3xl text-slate-300">
+            {translations(
+              lang,
+              "milestonePage.comparison.intro",
+              "Both approaches are useful, but they answer different questions."
+            )}
+          </p>
+
+          <div className="mt-6 overflow-x-auto">
+            <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl border border-white/10 text-sm">
+              <thead>
+                <tr className="bg-black/30">
+                  <th className="border-b border-white/10 px-4 py-3 text-left text-slate-200">
+                    {translations(lang, "milestonePage.comparison.columns.topic", "Area")}
+                  </th>
+                  <th className="border-b border-white/10 px-4 py-3 text-left text-slate-200">
+                    {translations(
+                      lang,
+                      "milestonePage.comparison.columns.transactional",
+                      "Transactional / milestone NPS"
+                    )}
+                  </th>
+                  <th className="border-b border-white/10 px-4 py-3 text-left text-slate-200">
+                    {translations(
+                      lang,
+                      "milestonePage.comparison.columns.relationship",
+                      "Relationship NPS"
+                    )}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonRows.map((row, idx) => (
+                  <tr key={row.topic || idx} className="bg-white/[0.02]">
+                    <td className="border-b border-white/10 px-4 py-3 text-white">
+                      {row.topic}
+                    </td>
+                    <td className="border-b border-white/10 px-4 py-3 text-slate-300">
+                      {row.transactional}
+                    </td>
+                    <td className="border-b border-white/10 px-4 py-3 text-slate-300">
+                      {row.relationship}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -287,6 +354,31 @@ export default function MilestoneNps() {
                 <li key={`${i}-${t}`}>{t}</li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="rounded-3xl border border-white/10 bg-black/20 p-6 md:p-8">
+          <h3 className="text-xl md:text-2xl font-semibold text-white">
+            {translations(
+              lang,
+              "milestonePage.faq.title",
+              "Common questions about transactional NPS"
+            )}
+          </h3>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {faqItems.map((item, idx) => (
+              <div
+                key={item.q || idx}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
+              >
+                <h4 className="font-semibold text-white">{item.q}</h4>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

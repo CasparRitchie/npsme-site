@@ -1765,16 +1765,16 @@ export const TRANSLATIONS = {
       },
     },
     milestonePage: {
-      seoTitle: "Transactional NPS and milestone surveys | NPS Me",
+      seoTitle: "Transactional NPS vs Relationship NPS | Milestone NPS Guide | NPS Me",
       seoDescription:
-        "Learn how transactional NPS and milestone surveys help teams measure customer sentiment at key journey moments and turn feedback into action.",
+        "Learn what transactional NPS is, how milestone surveys work, when to use transactional vs relationship NPS, and how to turn feedback at key journey moments into action.",
 
       header: {
-        iconLabel: "Milestone / transactional NPS",
-        tag: "NPS Me / Milestone NPS",
-        title: "Transactional NPS and milestone survey signals",
+        iconLabel: "Transactional / milestone NPS",
+        tag: "NPS Me / Transactional NPS",
+        title: "Transactional NPS and milestone surveys",
         intro:
-          "A practical framework for transactional NPS and milestone surveys. Capture feedback at key journey moments, turn it into prioritised work, and measure lift over time alongside CSAT, CES and behavioural data.",
+          "A practical guide to transactional NPS, also called milestone NPS. Measure customer sentiment after key journey moments, understand where friction appears, and turn milestone feedback into prioritised action alongside CSAT, CES and behavioural data.",
         ctaImpact: "Estimate your impact",
         ctaBook: "Book a free NPS review",
       },
@@ -1782,40 +1782,80 @@ export const TRANSLATIONS = {
       definition: {
         title: "What is transactional NPS?",
         p1:
-          "Transactional NPS, or milestone NPS, measures customer sentiment immediately after a specific journey moment such as an order, onboarding step or support interaction.",
+          "Transactional NPS measures customer sentiment after a specific interaction or journey moment, such as a first order, onboarding step, delivery, installation or support case.",
         p2:
-          "It complements relationship NPS by helping teams connect scores to specific friction points and improvement actions.",
+          "It is often called milestone NPS because the survey is triggered at a meaningful point in the customer journey rather than sent as a broad relationship survey.",
+        p3:
+          "Used well, transactional NPS helps teams identify where the experience is breaking down, which moments create promoters or detractors, and what should be fixed first.",
+      },
+
+      comparison: {
+        title: "Transactional NPS vs relationship NPS",
+        intro:
+          "Both approaches are useful, but they answer different questions. Relationship NPS tells you how customers feel overall. Transactional NPS tells you how they felt after a specific moment.",
+        columns: {
+          topic: "Area",
+          transactional: "Transactional / milestone NPS",
+          relationship: "Relationship NPS",
+        },
+        rows: [
+          {
+            topic: "Main purpose",
+            transactional: "Measure sentiment after a specific interaction or milestone",
+            relationship: "Measure overall customer loyalty and brand sentiment",
+          },
+          {
+            topic: "Typical trigger",
+            transactional: "After onboarding, delivery, support, renewal or first use",
+            relationship: "Periodic survey sent to a broader customer sample",
+          },
+          {
+            topic: "Best for",
+            transactional: "Finding journey friction and prioritising improvements",
+            relationship: "Tracking overall direction over time",
+          },
+          {
+            topic: "Level of insight",
+            transactional: "Specific and operational",
+            relationship: "Broader and more strategic",
+          },
+          {
+            topic: "Best question",
+            transactional: "How did that moment feel?",
+            relationship: "How do customers feel about us overall?",
+          },
+        ],
       },
 
       method: {
-        title: "The 4-stage method (simple, repeatable)",
+        title: "How transactional NPS works in practice",
         intro:
-          "Clear steps, fast wins, and compounding improvements. We meet you where you are and prioritise what moves the needle.",
-        linkPrefix: "If you want the bigger picture, start with the",
+          "The goal is not just to collect a score. It is to measure key moments in the journey, interpret what customers are saying, and connect milestone feedback to action.",
+        linkPrefix: "If you want the bigger strategic layer, start with the",
         linkText: "NPS intelligence layer",
         linkSuffix: ", then apply it here to milestone surveys.",
         cards: [
           {
             title: "1) Identify the moments that matter",
-            desc: "Pinpoint the journey stages most closely linked to retention, adoption, cost-to-serve or churn risk.",
+            desc: "Pinpoint the journey stages most closely linked to retention, activation, adoption, cost-to-serve or churn risk.",
           },
           {
-            title: "2) Trigger at the right time",
-            desc: "Run milestone surveys after specific interactions, not on an arbitrary calendar schedule.",
+            title: "2) Trigger feedback at the right time",
+            desc: "Run milestone surveys after meaningful moments, not on an arbitrary calendar schedule.",
           },
           {
-            title: "3) Interpret the feedback",
-            desc: "Analyse scores, comments and recurring themes in context so the causes of friction become clearer.",
+            title: "3) Interpret the score in context",
+            desc: "Analyse comments, themes and customer segments so the causes of friction become clearer.",
           },
           {
-            title: "4) Turn insight into action",
-            desc: "Prioritise fixes, assign owners and track whether improvements change later-stage outcomes.",
+            title: "4) Turn milestone feedback into action",
+            desc: "Prioritise fixes, assign owners and check whether later-stage sentiment and behaviour improve.",
           },
         ],
       },
 
       fit: {
-        title: "Where milestone surveys fit",
+        title: "Examples of milestone survey moments",
         linkPrefix: "If you run NPS in a tool like Intercom, see",
         linkText: "how we turn Intercom comments into prioritised actions",
         linkSuffix: ".",
@@ -1823,17 +1863,17 @@ export const TRANSLATIONS = {
           {
             title: "After first order",
             q: "How likely are you to recommend us based on your first purchase?",
-            why: "Early friction here is often a strong predictor of churn.",
+            why: "Early friction here is often a strong predictor of churn or repeat purchase risk.",
           },
           {
             title: "After onboarding",
             q: "How easy was it to get started?",
-            why: "Onboarding quality strongly influences long-term adoption.",
+            why: "Onboarding quality often shapes adoption, confidence and long-term retention.",
           },
           {
             title: "After first meaningful use",
-            q: "Did the product meet your expectations?",
-            why: "This often shapes long-term value perception.",
+            q: "Did the product or service meet your expectations?",
+            why: "This moment often determines whether customers feel real value or early disappointment.",
           },
         ],
       },
@@ -1850,19 +1890,41 @@ export const TRANSLATIONS = {
       },
 
       track: {
-        title: "What we track",
+        title: "What transactional NPS helps you track",
         items: [
           "NPS movement by milestone",
-          "Drivers of promoters, passives and detractors",
+          "Drivers of promoters, passives and detractors at each stage",
           "Recurring friction themes across the journey",
           "Impact of fixes on later-stage sentiment and behaviour",
+        ],
+      },
+
+      faq: {
+        title: "Common questions about transactional NPS",
+        items: [
+          {
+            q: "What is the difference between transactional NPS and relationship NPS?",
+            a: "Transactional NPS measures sentiment after a specific journey moment. Relationship NPS measures how customers feel overall about your company or brand.",
+          },
+          {
+            q: "When should transactional NPS be used?",
+            a: "Use it after meaningful moments such as onboarding, first order, delivery, installation, support interactions or renewal points.",
+          },
+          {
+            q: "Is milestone NPS the same as transactional NPS?",
+            a: "Usually yes. Milestone NPS is a practical way of describing transactional NPS triggered at key stages in the customer journey.",
+          },
+          {
+            q: "Can transactional NPS replace relationship NPS?",
+            a: "Not usually. Transactional NPS and relationship NPS work best together: one helps diagnose specific moments, the other helps track overall loyalty over time.",
+          },
         ],
       },
 
       related: {
         title: "Related insights",
         intro:
-          "If you’re implementing milestone NPS, these pages help you connect measurement to interpretation, prioritisation, and action.",
+          "If you’re implementing transactional NPS or milestone surveys, these pages help you connect measurement to interpretation, prioritisation and action.",
         links: {
           whatIsNps: "What is NPS?",
           npsSurveyProgramme: "NPS survey programme",
@@ -5414,9 +5476,9 @@ export const TRANSLATIONS = {
       header: {
         iconLabel: "NPS transactionnel / par étape",
         tag: "NPS Me / NPS par étape",
-        title: "NPS transactionnel et signaux d’enquêtes par étape",
+        title: "NPS transactionnel et enquêtes par étape",
         intro:
-          "Un cadre pratique pour le NPS transactionnel et les enquêtes par étape. Capturez le feedback aux moments clés du parcours, transformez-le en travail priorisé et mesurez les progrès dans le temps aux côtés du CSAT, du CES et des données comportementales.",
+          "Un cadre pratique pour le NPS transactionnel et les enquêtes par étape. Capturez le feedback aux moments clés du parcours, transformez-le en actions prioritaires et mesurez les progrès dans le temps, aux côtés du CSAT, du CES et des données comportementales.",
         ctaImpact: "Estimer votre impact",
         ctaBook: "Réserver une revue NPS gratuite",
       },
@@ -5427,6 +5489,56 @@ export const TRANSLATIONS = {
           "Le NPS transactionnel, ou NPS par étape, mesure le ressenti client juste après un moment précis du parcours, comme une commande, un onboarding ou une interaction de support.",
         p2:
           "Il complète le NPS relationnel en aidant les équipes à relier les scores à des frictions concrètes et à des actions d’amélioration.",
+        p3:
+          "En pratique, il permet de comprendre où l’expérience se dégrade réellement, plutôt que de s’appuyer uniquement sur un score global plus large et plus difficile à interpréter.",
+      },
+
+      comparison: {
+        title: "NPS transactionnel vs NPS relationnel",
+        intro:
+          "Les deux approches sont utiles, mais elles ne répondent pas aux mêmes questions.",
+        columns: {
+          topic: "Sujet",
+          transactional: "NPS transactionnel / par étape",
+          relationship: "NPS relationnel",
+        },
+        rows: [
+          {
+            topic: "Question principale",
+            transactional:
+              "Que ressent le client juste après une interaction ou une étape précise ?",
+            relationship:
+              "Que pense globalement le client de la relation avec la marque ?",
+          },
+          {
+            topic: "Meilleur usage",
+            transactional:
+              "Identifier les frictions à des moments précis du parcours",
+            relationship:
+              "Suivre l’évolution globale de la loyauté et du ressenti client",
+          },
+          {
+            topic: "Temporalité",
+            transactional:
+              "Déclenché après une étape ou un événement précis",
+            relationship:
+              "Envoyé de façon périodique sur un échantillon de clients",
+          },
+          {
+            topic: "Type d’insight",
+            transactional:
+              "Plus précis, plus opérationnel, plus facile à relier à une action",
+            relationship:
+              "Plus large, plus stratégique, mais moins précis sur les causes",
+          },
+          {
+            topic: "Ce que cela aide à faire",
+            transactional:
+              "Prioriser des améliorations concrètes sur le parcours",
+            relationship:
+              "Suivre la perception globale de l’expérience dans le temps",
+          },
+        ],
       },
 
       method: {
@@ -5439,19 +5551,23 @@ export const TRANSLATIONS = {
         cards: [
           {
             title: "1) Identifier les moments clés",
-            desc: "Repérez les étapes du parcours les plus liées à la rétention, à l’adoption, au coût de service ou au risque de churn.",
+            desc:
+              "Repérez les étapes du parcours les plus liées à la rétention, à l’adoption, au coût de service ou au risque de churn.",
           },
           {
             title: "2) Déclencher au bon moment",
-            desc: "Lancez les enquêtes au bon moment du parcours, et non selon un calendrier arbitraire.",
+            desc:
+              "Lancez les enquêtes au bon moment du parcours, et non selon un calendrier arbitraire.",
           },
           {
             title: "3) Interpréter le feedback",
-            desc: "Analysez les scores, les verbatims et les thèmes récurrents dans leur contexte pour mieux comprendre les causes des frictions.",
+            desc:
+              "Analysez les scores, les verbatims et les thèmes récurrents dans leur contexte pour mieux comprendre les causes des frictions.",
           },
           {
             title: "4) Transformer l’insight en action",
-            desc: "Priorisez les corrections, attribuez les responsabilités et mesurez si les améliorations changent les résultats ultérieurs.",
+            desc:
+              "Priorisez les corrections, attribuez les responsabilités et mesurez si les améliorations changent les résultats ultérieurs.",
           },
         ],
       },
@@ -5459,23 +5575,28 @@ export const TRANSLATIONS = {
       fit: {
         title: "Où les enquêtes par étape sont utiles",
         linkPrefix: "Si vous utilisez le NPS dans un outil comme Intercom, voyez",
-        linkText: "comment nous transformons les commentaires Intercom en actions priorisées",
+        linkText:
+          "comment nous transformons les commentaires Intercom en actions priorisées",
         linkSuffix: ".",
         cards: [
           {
             title: "Après la première commande",
-            q: "Quelle est la probabilité que vous nous recommandiez après votre premier achat ?",
-            why: "Les frictions à ce stade sont souvent fortement corrélées au churn.",
+            q:
+              "Quelle est la probabilité que vous nous recommandiez après votre premier achat ?",
+            why:
+              "Les frictions à ce stade sont souvent fortement corrélées au churn.",
           },
           {
             title: "Après l’onboarding",
             q: "Avez-vous trouvé la prise en main simple et fluide ?",
-            why: "La qualité de l’onboarding influence fortement l’adoption à long terme.",
+            why:
+              "La qualité de l’onboarding influence fortement l’adoption à long terme.",
           },
           {
             title: "Après la première utilisation significative",
             q: "Le produit a-t-il répondu à vos attentes ?",
-            why: "Ce moment façonne souvent la perception de valeur durable.",
+            why:
+              "Ce moment façonne souvent la perception de valeur durable.",
           },
         ],
       },
@@ -5501,6 +5622,32 @@ export const TRANSLATIONS = {
         ],
       },
 
+      faq: {
+        title: "Questions fréquentes sur le NPS transactionnel",
+        items: [
+          {
+            q: "Le NPS transactionnel remplace-t-il le NPS relationnel ?",
+            a:
+              "Non. Le NPS transactionnel et le NPS relationnel sont complémentaires. Le premier aide à comprendre des moments précis du parcours, tandis que le second donne une lecture plus globale de la relation client.",
+          },
+          {
+            q: "À quel moment faut-il envoyer une enquête par étape ?",
+            a:
+              "Le meilleur moment est juste après une interaction significative, quand l’expérience est encore fraîche dans l’esprit du client et que le feedback reste précis et exploitable.",
+          },
+          {
+            q: "Combien de moments du parcours faut-il mesurer ?",
+            a:
+              "Mieux vaut commencer par quelques moments vraiment importants plutôt que de tout mesurer d’un coup. L’objectif est de choisir les étapes les plus liées à la rétention, à l’adoption ou aux frictions récurrentes.",
+          },
+          {
+            q: "Que faire si les scores sont très différents selon les étapes ?",
+            a:
+              "C’est justement là que le NPS par étape devient utile. Des écarts entre moments du parcours indiquent souvent où l’expérience se dégrade, où les attentes ne sont pas tenues, ou où une amélioration ciblée aurait le plus d’impact.",
+          },
+        ],
+      },
+
       related: {
         title: "À lire ensuite",
         intro:
@@ -5509,8 +5656,8 @@ export const TRANSLATIONS = {
           whatIsNps: "Qu’est-ce que le NPS ?",
           npsSurveyProgramme: "Programme d’enquête NPS",
           intelligenceLayer: "Couche d’analyse NPS",
-          intercomNpsAnalytics: "Intercom NPS analytics",
-          socialListening: "Social listening",
+          intercomNpsAnalytics: "Analyse NPS Intercom",
+          socialListening: "Écoute sociale",
         },
       },
     },

@@ -1,12 +1,11 @@
+# Sitemap
+Sitemap: https://www.npsme.com/sitemap.xml
+
 # Default policy: allow everything needed for rendering
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /healthz
-
-User-agent: Bingbot
-Allow: /
-Sitemap: https://www.npsme.com/sitemap.xml
 
 # Allow search-oriented AI crawlers
 User-agent: OAI-SearchBot
@@ -21,9 +20,12 @@ Allow: /
 # Block bulk training crawlers (privacy-friendly)
 User-agent: GPTBot
 Disallow: /
+
 User-agent: ClaudeBot
 Disallow: /
+
 User-agent: CommonCrawl
 Disallow: /
+
 User-agent: CCBot
 Disallow: /

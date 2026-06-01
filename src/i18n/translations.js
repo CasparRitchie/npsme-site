@@ -1990,6 +1990,36 @@ export const TRANSLATIONS = {
         ],
       },
 
+      embedCx: {
+        title: "Embed customer experience into how the business runs",
+        body:
+          "Customer feedback is most useful when it becomes part of the way teams work: what gets reviewed, what gets prioritised, and what gets followed up.",
+        centerTitle: "The customer at the centre",
+        centerBody:
+          "A practical customer feedback rhythm helps teams stay closer to what customers need and respond more consistently.",
+        pillars: [
+          {
+            title: "Listen properly",
+            desc:
+              "Collect customer feedback in a structured way, with the right survey logic, timing and audience.",
+          },
+          {
+            title: "Understand what matters",
+            desc:
+              "Turn scores and comments into themes, risks and opportunities that leadership and teams can understand.",
+          },
+          {
+            title: "Act on the feedback",
+            desc:
+              "Create ownership, follow-up and close-the-loop actions so important issues do not disappear into a dashboard.",
+          },
+          {
+            title: "Build better habits",
+            desc:
+              "Make customer feedback part of regular team rhythms, product decisions and operational improvement.",
+          },
+        ],
+      },
       demoBlock: {
         title: "Explore a live NPS example",
         body:
@@ -5598,6 +5628,37 @@ export const TRANSLATIONS = {
             src: "/images/npsme/customer-feedback-themes-dashboard-startups.png",
             alt:
               "Tableau de bord des thèmes de feedback client montrant les commentaires regroupés, problèmes récurrents et catégories d’insights.",
+          },
+        ],
+      },
+
+      embedCx: {
+        title: "Intégrer l’expérience client dans le fonctionnement de l’entreprise",
+        body:
+          "Le feedback client est le plus utile lorsqu’il devient une partie du fonctionnement quotidien des équipes : ce qui est revu, ce qui est priorisé, et ce qui fait l’objet d’un suivi.",
+        centerTitle: "Le client au centre",
+        centerBody:
+          "Un rythme simple et concret autour du feedback aide les équipes à rester plus proches des besoins clients et à réagir plus régulièrement.",
+        pillars: [
+          {
+            title: "Mieux écouter",
+            desc:
+              "Collecter le feedback client de façon structurée, avec la bonne logique d’enquête, le bon moment et la bonne cible.",
+          },
+          {
+            title: "Comprendre ce qui compte",
+            desc:
+              "Transformer les scores et commentaires en thèmes, risques et opportunités compréhensibles par les équipes et le management.",
+          },
+          {
+            title: "Agir sur le feedback",
+            desc:
+              "Mettre en place de l’ownership, du suivi et des actions de close-the-loop pour que les sujets importants ne disparaissent pas dans un dashboard.",
+          },
+          {
+            title: "Créer de meilleures habitudes",
+            desc:
+              "Faire du feedback client une partie des routines d’équipe, des décisions produit et de l’amélioration opérationnelle.",
           },
         ],
       },

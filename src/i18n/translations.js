@@ -44,7 +44,7 @@ export const TRANSLATIONS = {
     about: {
       seoTitle: "About Caspar Ritchie | NPS Me",
       seoDescription:
-        "Meet Caspar Ritchie. CX & NPS specialist helping teams turn feedback into measurable growth.",
+        "Meet Caspar Ritchie. Practical CX and customer feedback specialist helping teams turn feedback into measurable improvement.",
 
       header: {
         iconLabel: "About",
@@ -56,9 +56,9 @@ export const TRANSLATIONS = {
 
       hero: {
         kicker: "Caspar Ritchie",
-        headline: "Turn customer feedback into measurable growth",
+        headline: "Turn customer feedback into measurable improvement",
         body:
-          "I help teams implement NPS®, uncover what really frustrates customers, and ship improvements that increase retention, referrals, and revenue.",
+          "I help startups and SMEs turn surveys, customer comments and operational feedback into clearer priorities, practical workflows and measurable progress.",
         scrollNote: "Scroll to see how NPS Me can help →",
         ctaPrimary: "Book a call",
         ctaSecondary: "See services",
@@ -66,11 +66,11 @@ export const TRANSLATIONS = {
 
       why: {
         title: "Why work with me?",
-        subtitle: "Most consultants advise. I implement.",
+        subtitle: "Most consultants advise. I help put the system in place.",
         bullets: [
-          "Less slides, more action: diagnose → prioritise → ship",
-          "Feedback programmes that are statistically sound (and usable)",
-          "Close-the-loop systems that actually change outcomes",
+          "Less slides, more practical progress: diagnose → prioritise → implement",
+          "Customer feedback programmes that are credible, usable and proportionate",
+          "Close-the-loop workflows that help teams actually follow up and act",
         ],
       },
 
@@ -78,10 +78,10 @@ export const TRANSLATIONS = {
         title: "A rare mix of skills",
         subtitle: "Strategy + data + delivery + technical execution.",
         bullets: [
-          "CX strategy & NPS programme design",
-          "Insight extraction from verbatims + behavioural data",
-          "Hands-on delivery inside real teams",
-          "Technical capability to build / integrate the tooling when needed",
+          "CX and customer feedback strategy",
+          "Theme and insight extraction from comments and operational data",
+          "Hands-on implementation inside real teams",
+          "Technical capability to build, adapt or integrate lightweight tooling when needed",
         ],
       },
 
@@ -89,10 +89,10 @@ export const TRANSLATIONS = {
         title: "What teams bring me in for",
         subtitle: "Concrete problems → practical outcomes.",
         bullets: [
-          "Launching a first NPS programme (without survey spam or bad data)",
-          "Fixing flat/declining NPS with a focused action plan",
-          "Turning support, reviews and Intercom comments into themes & priorities",
-          "Aligning leadership, product and ops around customer outcomes",
+          "Launching a first NPS or customer feedback setup without creating noise or bias",
+          "Turning scattered responses into clearer themes, priorities and actions",
+          "Making Intercom, CSV exports or existing tools more useful for decision-making",
+          "Helping founders and teams build a lighter, more credible CX rhythm",
         ],
       },
 
@@ -103,25 +103,25 @@ export const TRANSLATIONS = {
         consulting: {
           title: "Consulting",
           body:
-            "Hands-on NPS & CX programme design + implementation. We diagnose friction, prioritise fixes, and ship improvements.",
+            "Hands-on CX and customer feedback setup. We diagnose friction, prioritise what matters and help put the right workflow in place.",
           cta: "Explore consulting",
         },
         training: {
           title: "Workshops & training",
           body:
-            "Practical training to help teams run NPS well: survey design, sampling, analysis, close-the-loop, and action planning.",
+            "Practical training to help teams run surveys properly, interpret feedback well and turn customer insight into action.",
           cta: "View training",
         },
         speaking: {
           title: "Speaking",
           body:
-            "Keynotes and talks on practical customer experience: what actually moves NPS, and how to build momentum across teams.",
+            "Talks and sessions on practical customer experience, customer feedback and what really helps teams make better decisions.",
           cta: "View speaking",
         },
         insight: {
           title: "Ongoing insight",
           body:
-            "A lightweight CX intelligence feed (Pulse / Intercom analytics) you can act on week by week - themes, risk flags, and clear next steps.",
+            "A lightweight CX intelligence layer you can act on week by week - themes, risk signals, reporting and next steps.",
           cta: "View insight products",
         },
       },
@@ -129,16 +129,17 @@ export const TRANSLATIONS = {
       human: {
         title: "A bit about me",
         p1:
-          "I’ve always been obsessed with why customers behave the way they do - and what teams can realistically change to improve outcomes.",
+          "I’ve always been interested in why customers behave the way they do - and what teams can realistically change to improve outcomes.",
         p2:
-          "Over the years I’ve worked across product, data, operations and engineering. That’s shaped my approach: measure experience properly, then fix the root causes, not the symptoms.",
+          "Over the years I’ve worked across product, data, operations and engineering. That has shaped how I work now: measure experience properly, understand the real causes behind customer friction, then focus on improvements teams can actually deliver.",
         p3:
-          "I now help teams cut through dashboards and focus on the few actions that genuinely improve customers’ lives (and business results).",
+          "Today, through NPS Me, I help startups and SMEs move beyond dashboards and vague CX ambition toward something more useful: a practical customer feedback process, clearer insight and better follow-through.",
       },
 
       cta: {
         title: "Want to improve CX without the theatre?",
-        body: "If you want clearer insight, faster action, and measurable impact - let’s talk.",
+        body:
+          "If you want clearer insight, a more practical setup and better customer follow-through, let’s talk.",
         primary: "Book a call",
         secondary: "Email hello@npsme.com",
       },
@@ -3917,7 +3918,7 @@ export const TRANSLATIONS = {
     about: {
       seoTitle: "À propos - Caspar Ritchie | NPS Me",
       seoDescription:
-        "Découvrez Caspar Ritchie. Spécialiste CX & NPS : transformer le feedback en croissance mesurable.",
+        "Découvrez Caspar Ritchie. Spécialiste CX et feedback client, orienté mise en place concrète et amélioration mesurable.",
 
       header: {
         iconLabel: "À propos",
@@ -3929,9 +3930,9 @@ export const TRANSLATIONS = {
 
       hero: {
         kicker: "Caspar Ritchie",
-        headline: "Transformer le feedback client en croissance mesurable",
+        headline: "Transformer le feedback client en amélioration mesurable",
         body:
-          "J’aide les équipes à mettre en place le NPS®, comprendre les vraies frictions, et déployer des améliorations qui augmentent la rétention, la recommandation et le chiffre d’affaires.",
+          "J’aide les startups et PME à transformer enquêtes, verbatims clients et feedback opérationnel en priorités plus claires, workflows concrets et progrès mesurables.",
         scrollNote: "Faites défiler pour voir comment NPS Me peut aider →",
         ctaPrimary: "Prendre rendez-vous",
         ctaSecondary: "Voir les offres",
@@ -3939,11 +3940,11 @@ export const TRANSLATIONS = {
 
       why: {
         title: "Pourquoi travailler avec moi ?",
-        subtitle: "Beaucoup conseillent. Moi, j’implémente.",
+        subtitle: "Beaucoup conseillent. Moi, j’aide à mettre le système en place.",
         bullets: [
-          "Moins de slides, plus d’action : diagnostiquer → prioriser → déployer",
-          "Des programmes de feedback solides (et réellement utilisables)",
-          "Un close-the-loop qui change les résultats, pas juste les dashboards",
+          "Moins de slides, plus de progrès concrets : diagnostiquer → prioriser → mettre en place",
+          "Des dispositifs de feedback client crédibles, utilisables et proportionnés",
+          "Des workflows de close-the-loop qui aident vraiment les équipes à suivre et agir",
         ],
       },
 
@@ -3951,50 +3952,50 @@ export const TRANSLATIONS = {
         title: "Un mix rare de compétences",
         subtitle: "Stratégie + data + delivery + exécution technique.",
         bullets: [
-          "Stratégie CX & conception de programmes NPS",
-          "Extraction d’insights à partir des verbatims + données comportementales",
+          "Stratégie CX et feedback client",
+          "Extraction de thèmes et d’insights à partir des verbatims et des données opérationnelles",
           "Mise en œuvre concrète avec les équipes",
-          "Capacité technique pour construire / intégrer les outils si nécessaire",
+          "Capacité technique pour construire, adapter ou intégrer des outils légers si nécessaire",
         ],
       },
 
       proof: {
-        title: "Pourquoi on me sollicite",
+        title: "Pourquoi les équipes me sollicitent",
         subtitle: "Problèmes concrets → résultats concrets.",
         bullets: [
-          "Lancer un programme NPS (sans spam ni mauvaise donnée)",
-          "Relancer un NPS stable/en baisse avec un plan d’action focalisé",
-          "Transformer support, avis et commentaires Intercom en priorités",
-          "Aligner direction, produit et ops sur les résultats clients",
+          "Lancer un premier dispositif NPS ou feedback client sans créer de bruit ni de biais",
+          "Transformer des réponses dispersées en thèmes, priorités et actions plus clairs",
+          "Rendre Intercom, les exports CSV ou les outils existants plus utiles pour la décision",
+          "Aider les fondateurs et les équipes à mettre en place un rythme CX plus léger et plus crédible",
         ],
       },
 
       work: {
         title: "Quatre façons de travailler ensemble",
         subtitle:
-          "Choisissez le format adapté : accompagnement, montée en compétence, inspiration ou suivi continu.",
+          "Choisissez le format adapté à votre stade : mise en œuvre, montée en compétence, inspiration ou suivi continu.",
         consulting: {
           title: "Conseil / accompagnement",
           body:
-            "Conception + mise en œuvre d’un programme NPS & CX. On diagnostique, priorise, puis on déploie des améliorations.",
+            "Mise en place concrète de la CX et du feedback client. On diagnostique les frictions, on priorise l’essentiel et on aide à mettre le bon workflow en place.",
           cta: "Voir le conseil",
         },
         training: {
           title: "Ateliers & formation",
           body:
-            "Formation pratique pour bien faire du NPS : design du survey, échantillonnage, analyse, close-the-loop, plan d’actions.",
+            "Une formation pratique pour aider les équipes à bien utiliser les enquêtes, bien interpréter le feedback et transformer l’insight en action.",
           cta: "Voir la formation",
         },
         speaking: {
           title: "Conférences",
           body:
-            "Keynotes et interventions sur une CX pragmatique : ce qui fait bouger le NPS, et comment créer une dynamique cross-équipes.",
+            "Des interventions sur une expérience client pragmatique, le feedback client et ce qui aide vraiment les équipes à prendre de meilleures décisions.",
           cta: "Voir les conférences",
         },
         insight: {
           title: "Suivi continu",
           body:
-            "Un flux d’insights CX léger (Pulse / analytics Intercom) actionnable semaine après semaine : thèmes, signaux de risque, prochaines étapes.",
+            "Une couche d’intelligence CX légère et actionnable semaine après semaine : thèmes, signaux de risque, reporting et prochaines étapes.",
           cta: "Voir les offres d’insights",
         },
       },
@@ -4002,16 +4003,17 @@ export const TRANSLATIONS = {
       human: {
         title: "Quelques mots sur moi",
         p1:
-          "Je suis obsédé par une question : pourquoi les clients agissent comme ils le font - et ce que les équipes peuvent réellement changer pour améliorer les résultats.",
+          "J’ai toujours été intéressé par une question simple : pourquoi les clients se comportent comme ils le font, et ce que les équipes peuvent réellement changer pour améliorer les résultats.",
         p2:
-          "J’ai travaillé entre produit, data, opérations et engineering. Résultat : une approche simple - mesurer correctement, puis traiter les causes racines.",
+          "J’ai travaillé entre produit, data, opérations et engineering. Cela a façonné ma manière de travailler aujourd’hui : bien mesurer l’expérience, comprendre les vraies causes des frictions, puis se concentrer sur des améliorations que les équipes peuvent réellement mettre en œuvre.",
         p3:
-          "Aujourd’hui, j’aide les équipes à sortir du “dashboard theatre” pour se concentrer sur les actions qui améliorent vraiment la vie des clients (et la performance business).",
+          "Aujourd’hui, avec NPS Me, j’aide les startups et PME à sortir des dashboards et des ambitions CX vagues pour aller vers quelque chose de plus utile : un processus de feedback client concret, des insights plus clairs et un meilleur suivi des actions.",
       },
 
       cta: {
         title: "Envie d’améliorer la CX sans théâtre ?",
-        body: "Si vous voulez des insights clairs, des actions rapides et un impact mesurable - parlons-en.",
+        body:
+          "Si vous voulez des insights plus clairs, un setup plus concret et un meilleur suivi client, parlons-en.",
         primary: "Prendre rendez-vous",
         secondary: "Écrire à hello@npsme.com",
       },

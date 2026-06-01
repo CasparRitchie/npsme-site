@@ -5,19 +5,20 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 import Seo from "../components/Seo";
 import PageHeader from "../components/PageHeader";
-import { useLanguage } from "../i18n/LanguageContext.jsx";
-import { TRANSLATIONS, translations } from "../i18n/translations.js";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations.js";
 import { localizePath } from "../i18n/pathHelpers.js";
 
 export default function NpsIntelligenceLayer() {
   const location = useLocation();
   const { lang } = useLanguage();
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
-  const bulletsPain = dict?.npsIntelligenceLayer?.sections?.pain?.bullets || [];
-  const bulletsLayer = dict?.npsIntelligenceLayer?.sections?.layer?.bullets || [];
-  const bulletsDeliver = dict?.npsIntelligenceLayer?.sections?.deliver?.bullets || [];
-  const bulletsFit = dict?.npsIntelligenceLayer?.sections?.fit?.bullets || [];
+  const bulletsPain = translations(lang, "npsIntelligenceLayer.sections.pain.bullets", []);
+  const bulletsLayer = translations(lang, "npsIntelligenceLayer.sections.layer.bullets", []);
+  const bulletsDeliver = translations(lang, "npsIntelligenceLayer.sections.deliver.bullets", []);
+  const bulletsFit = translations(lang, "npsIntelligenceLayer.sections.fit.bullets", []);
+  const intercomLeft = translations(lang, "npsIntelligenceLayer.sections.intercom.left", []);
+  const intercomRight = translations(lang, "npsIntelligenceLayer.sections.intercom.right", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -81,7 +82,7 @@ export default function NpsIntelligenceLayer() {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <Link
-              to={localizePath("/book", lang)}
+              to={localizePath("/book?topic=ongoing-cx-support", lang)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {translations(lang, "npsIntelligenceLayer.hero.ctaPrimary", "Book a CX review")}
@@ -213,7 +214,7 @@ export default function NpsIntelligenceLayer() {
                 )}
               </div>
               <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                {(dict?.npsIntelligenceLayer?.sections?.intercom?.left || []).map((x) => (
+                {intercomLeft.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
@@ -228,7 +229,7 @@ export default function NpsIntelligenceLayer() {
                 )}
               </div>
               <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                {(dict?.npsIntelligenceLayer?.sections?.intercom?.right || []).map((x) => (
+                {intercomRight.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>

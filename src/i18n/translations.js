@@ -1753,6 +1753,55 @@ export const TRANSLATIONS = {
         note:
           "These are not off-the-shelf products. They are tailored to your stack and maturity, and built to be maintained by your own team rather than a long term external dependency.",
       },
+      useCases: {
+        title: "What this looks like in practice",
+        intro:
+          "This kind of work is usually most valuable when teams already have the data, but not yet a clean, repeatable way to connect it, trust it and use it in decisions.",
+        items: [
+          {
+            title: "Weekly CX and ops reporting packs",
+            text:
+              "Replace manual copy-paste reporting with a repeatable flow that joins survey, ticketing, CRM or billing data and produces the same clear weekly pack each time.",
+          },
+          {
+            title: "NPS linked to revenue and churn",
+            text:
+              "Connect customer sentiment to retention, repeat purchase, refunds or support cost so teams can see which issues matter commercially, not just emotionally.",
+          },
+          {
+            title: "Dashboard cleanup and single-source views",
+            text:
+              "Reduce confusion caused by multiple overlapping dashboards by aligning definitions, keys and logic so teams are looking at the same numbers.",
+          },
+          {
+            title: "Lighter automation without a huge rebuild",
+            text:
+              "Add practical scripts, scheduled refreshes or API-based flows on top of the systems you already use, instead of launching a large replacement programme.",
+          },
+        ],
+      },
+
+      faq: {
+        title: "Common questions about data automation and reporting",
+        items: [
+          {
+            q: "Do we need a whole new BI stack to improve reporting?",
+            a: "Not necessarily. In many cases the biggest gains come from cleaning joins, aligning definitions and automating a few high-value reporting flows rather than replacing everything.",
+          },
+          {
+            q: "Is this only relevant for large companies?",
+            a: "No. It is often especially useful for startups and SMEs because small teams feel manual reporting pain more quickly and benefit more from simple, reliable automation.",
+          },
+          {
+            q: "Can you work with the tools we already use?",
+            a: "Yes. The aim is usually to improve the value you get from your current CRM, survey, support and spreadsheet setup before introducing anything heavier.",
+          },
+          {
+            q: "What kind of outcomes should we expect?",
+            a: "Usually faster reporting, fewer manual errors, clearer trust in the numbers, and a better link between customer signals and business decisions.",
+          },
+        ],
+      },
 
       cta: {
         title: "Most companies do not need more dashboards. They need better data.",
@@ -5615,6 +5664,55 @@ export const TRANSLATIONS = {
         ],
         note:
           "Ce ne sont pas des produits “sur étagère”. C’est adapté à votre stack et à votre maturité, et conçu pour être maintenu par votre équipe plutôt que de créer une dépendance externe longue durée.",
+      },
+      useCases: {
+  title: "À quoi cela ressemble concrètement",
+  intro:
+    "Ce type de travail crée souvent le plus de valeur quand les équipes ont déjà les données, mais pas encore une façon propre, reproductible et fiable de les connecter, leur faire confiance et les utiliser pour décider.",
+  items: [
+    {
+      title: "Packs hebdomadaires CX et ops",
+      text:
+        "Remplacer le reporting manuel par un flux reproductible qui relie enquêtes, tickets, CRM ou facturation et produit chaque semaine un pack clair et cohérent.",
+    },
+    {
+      title: "Relier le NPS au revenu et au churn",
+      text:
+        "Connecter le ressenti client à la rétention, au repeat purchase, aux remboursements ou aux coûts support pour voir quels sujets comptent commercialement, pas seulement émotionnellement.",
+    },
+    {
+      title: "Nettoyage des dashboards et vue unique",
+      text:
+        "Réduire la confusion créée par plusieurs dashboards qui se recouvrent en alignant les définitions, les clés et la logique pour que tout le monde regarde les mêmes chiffres.",
+    },
+    {
+      title: "Une automatisation légère sans grand chantier",
+      text:
+        "Ajouter des scripts pratiques, des rafraîchissements planifiés ou des flux via API sur vos systèmes actuels, plutôt que lancer un programme de remplacement lourd.",
+    },
+  ],
+      },
+
+      faq: {
+        title: "Questions fréquentes sur l’automatisation data et le reporting",
+        items: [
+          {
+            q: "Faut-il une nouvelle stack BI complète pour améliorer le reporting ?",
+            a: "Pas forcément. Dans beaucoup de cas, les gains les plus forts viennent d’abord d’un nettoyage des jointures, d’un alignement des définitions et de l’automatisation de quelques flux de reporting à forte valeur.",
+          },
+          {
+            q: "Est-ce seulement utile pour les grandes entreprises ?",
+            a: "Non. C’est souvent particulièrement utile pour les startups et PME, car les petites équipes ressentent plus vite la douleur du reporting manuel et gagnent davantage avec une automatisation simple et fiable.",
+          },
+          {
+            q: "Pouvez-vous travailler avec nos outils actuels ?",
+            a: "Oui. L’objectif est généralement d’améliorer la valeur tirée de votre CRM, de vos enquêtes, de votre support et de vos fichiers existants avant d’ajouter quelque chose de plus lourd.",
+          },
+          {
+            q: "Quels résultats peut-on attendre ?",
+            a: "En général : un reporting plus rapide, moins d’erreurs manuelles, plus de confiance dans les chiffres, et un lien plus clair entre signaux clients et décisions business.",
+          },
+        ],
       },
 
       cta: {

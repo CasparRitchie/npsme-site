@@ -22,13 +22,11 @@ export default function DataAutomationPage() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
 
-  const problemBullets = translations(lang, "dataAutomation.problem.bullets", []);
-  const outcomesBullets = translations(lang, "dataAutomation.outcomes.bullets", []);
-  const outcomesRightBullets = translations(
-    lang,
-    "dataAutomation.outcomes.rightBullets",
-    []
-  );
+  const problemBullets = tr("dataAutomation.problem.bullets", []);
+  const outcomesBullets = tr("dataAutomation.outcomes.bullets", []);
+  const outcomesRightBullets = tr("dataAutomation.outcomes.rightBullets", []);
+  const useCases = tr("dataAutomation.useCases.items", []);
+  const faqItems = tr("dataAutomation.faq.items", []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
@@ -38,7 +36,6 @@ export default function DataAutomationPage() {
         description={tr("dataAutomation.seoDescription")}
       />
 
-      {/* Hero */}
       <PageHeader
         iconLabel={tr("dataAutomation.header.iconLabel")}
         tag={tr("dataAutomation.header.tag")}
@@ -52,7 +49,6 @@ export default function DataAutomationPage() {
             {tr("dataAutomation.header.subtitle")}
           </p>
 
-          {/* CTA buttons - preserved structure */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
               to={localizePath("/book", lang)}
@@ -199,6 +195,30 @@ export default function DataAutomationPage() {
         </div>
       </section>
 
+      {/* What this looks like in practice */}
+      <section className="mx-auto max-w-7xl px-6 pb-12">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {tr("dataAutomation.useCases.title")}
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm md:text-base text-slate-300">
+            {tr("dataAutomation.useCases.intro")}
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {useCases.map((item, idx) => (
+              <div
+                key={item.title || idx}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
+              >
+                <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm text-slate-300">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Outcomes */}
       <section className="mx-auto max-w-7xl px-6 pb-12">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8 grid gap-8 md:grid-cols-2">
@@ -230,6 +250,27 @@ export default function DataAutomationPage() {
             <p className="text-xs text-slate-400">
               {tr("dataAutomation.outcomes.note")}
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-7xl px-6 pb-12">
+        <div className="rounded-3xl border border-white/10 bg-black/20 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white">
+            {tr("dataAutomation.faq.title")}
+          </h2>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {faqItems.map((item, idx) => (
+              <div
+                key={item.q || idx}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
+              >
+                <h3 className="font-semibold text-white">{item.q}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

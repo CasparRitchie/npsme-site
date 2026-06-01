@@ -260,6 +260,43 @@ app.use((req, res, next) => {
   next();
 });
 
+// Security headers (CSP off so we don’t break your current inline styles/scripts)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  })
+);
+
+// HSTS (only in production)
+if (PROD) {
+  app.use(
+    helmet.hsts({
+      maxAge: 31536000, // 1 year in seconds
+      includeSubDomains: true,
+      preload: true,
+    })
+  );
+}
+
+// Redirect HTTP → HTTPS and non-canonical hosts → canonical host
+app.use((req, res, next) => {
+  if (!PROD) return next();
+
+  const proto = req.headers["x-forwarded-proto"];
+  const host = req.headers.host;
+
+  if (proto !== "https") {
+    return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
+  }
+
+  if (host !== CANONICAL_HOST) {
+    return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
+  }
+
+  return next();
+});
 
 // Mount Intercom router ONCE, before express.json()
 app.use("/api/intercom", createIntercomRouter());
@@ -525,43 +562,11 @@ app.get("/api/auth/me", (req, res) => {
   return res.json({ ok: true, authed: hasPrivateAuth(req) });
 });
 
-// Security headers (CSP off so we don’t break your current inline styles/scripts)
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-  })
-);
 
-// HSTS (only in production)
-if (PROD) {
-  app.use(
-    helmet.hsts({
-      maxAge: 31536000, // 1 year in seconds
-      includeSubDomains: true,
-      preload: true,
-    })
-  );
-}
 
-// Redirect HTTP → HTTPS and non-canonical hosts → canonical host
-app.use((req, res, next) => {
-  if (!PROD) return next();
 
-  const proto = req.headers["x-forwarded-proto"];
-  const host = req.headers.host;
 
-  if (proto !== "https") {
-    return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
-  }
 
-  if (host !== CANONICAL_HOST) {
-    return res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
-  }
-
-  return next();
-});
 
 const BLOCKED_PREFIXES = [
   // secrets / env
@@ -2797,6 +2802,26 @@ app.use((err, req, res, next) => {
 
   return next(err);
 });
+
+// Block common fake/probed folders before React fallback.
+// Do NOT block /images/* because public/images is used for real site assets.
+app.get(
+  [
+    "/uploads",
+    "/uploads/",
+    "/uploads/*",
+    "/files",
+    "/files/",
+    "/files/*",
+
+    // Only block the bare images folder URL, not actual image files.
+    "/images",
+    "/images/",
+  ],
+  (req, res) => {
+    res.status(404).type("text/plain").send("Not found");
+  }
+);
 
 /* -----------------------------
    SPA HTML: inject canonical + og:url + per-route meta + hreflang

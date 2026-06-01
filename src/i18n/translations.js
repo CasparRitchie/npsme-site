@@ -3737,6 +3737,31 @@ export const TRANSLATIONS = {
         ctaBook: "Book discovery",
       },
     },
+    workspaceLogin: {
+      hero: {
+        eyebrow: "NPS Me Workspace",
+        title: "Workspace login",
+        body:
+          "Sign in with your individual NPS Me workspace account to access saved datasets, AI insights, customer responses and close-the-loop actions.",
+      },
+      form: {
+        title: "Sign in",
+        intro:
+          "Use your workspace account details to access your secure NPS Me workspace.",
+        emailLabel: "Email",
+        emailPlaceholder: "you@example.com",
+        passwordLabel: "Password",
+        passwordPlaceholder: "Enter your password",
+        submit: "Sign in to workspace",
+        submitting: "Signing in...",
+      },
+      errors: {
+        missingFields: "Please enter your email and password.",
+        unexpectedResponse:
+          "Login failed because the server returned an unexpected response.",
+        loginFailed: "Login failed.",
+      },
+    },
   },
 
   fr: {
@@ -7551,6 +7576,31 @@ export const TRANSLATIONS = {
         ],
         ctaProducts: "Découvrir les offres",
         ctaBook: "Prendre rendez-vous",
+      },
+    },
+    workspaceLogin: {
+      hero: {
+        eyebrow: "Espace de travail NPS Me",
+        title: "Connexion workspace",
+        body:
+          "Connectez-vous avec votre compte workspace NPS Me pour accéder à vos datasets enregistrés, aux insights IA, aux réponses clients et aux actions de close-the-loop.",
+      },
+      form: {
+        title: "Se connecter",
+        intro:
+          "Utilisez les identifiants de votre compte workspace pour accéder à votre espace NPS Me sécurisé.",
+        emailLabel: "Email",
+        emailPlaceholder: "vous@exemple.com",
+        passwordLabel: "Mot de passe",
+        passwordPlaceholder: "Saisissez votre mot de passe",
+        submit: "Se connecter au workspace",
+        submitting: "Connexion...",
+      },
+      errors: {
+        missingFields: "Merci de saisir votre email et votre mot de passe.",
+        unexpectedResponse:
+          "La connexion a échoué car le serveur a renvoyé une réponse inattendue.",
+        loginFailed: "La connexion a échoué.",
       },
     },
   },

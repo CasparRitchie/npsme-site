@@ -505,12 +505,12 @@ export default function NpsIntelligenceLayer() {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to={localizePath("/book?topic=ongoing-cx-support", lang)}
+              to={`${localizePath("/book", lang)}?topic=ongoing-cx-support`}
               className="rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition inline-flex items-center justify-center gap-2"
             >
               {tr(
                 "npsIntelligenceLayer.cta.primary",
-                "Book a CX intelligence discussion"
+                "Book a CX support discussion"
               )}
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -527,7 +527,7 @@ export default function NpsIntelligenceLayer() {
           <p className="mt-4 text-xs text-slate-400">
             {tr(
               "npsIntelligenceLayer.cta.note",
-              "No platform rip-out required. No survey rebuild required."
+              "No platform switch required. No survey rebuild required."
             )}
           </p>
         </div>

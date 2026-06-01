@@ -20,3 +20,8 @@ context-pack.zip
 *.tgz
 repo.zip
 site_brain.tgz
+
+cookies.txt
+member-cookies.txt
+new-password-test.txt
+old-password-test.txt

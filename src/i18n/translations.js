@@ -2840,6 +2840,49 @@ export const TRANSLATIONS = {
       pillarLinkPrefix: "This is one example. The core approach is explained in the",
       pillarLinkText: "NPS intelligence layer",
       pillarLinkSuffix: ".",
+      header: {
+      iconLabel: "NPS Me",
+      tag: "NPS Me / Intercom NPS",
+    },
+    comparison: {
+      title: "Intercom gives you the collection layer. NPS Me adds the decision layer.",
+      body: "Intercom is useful for sending surveys and viewing raw responses. NPS Me helps teams interpret what the feedback means, decide what matters most, and move from comments to action.",
+      intercomTitle: "Intercom gives you",
+      intercom: [
+        "Survey delivery inside a familiar customer messaging environment",
+        "Scores, comments and user-level response visibility",
+        "Basic filtering and operational follow-up inside the tool",
+        "A straightforward way to start collecting NPS without adding another platform",
+      ],
+      npsMeTitle: "NPS Me adds",
+      npsMe: [
+        "Theme and driver analysis across large volumes of comments",
+        "Sampling checks and better confidence in how scores are interpreted",
+        "Clear prioritisation based on business impact, not just comment volume",
+        "A stronger close-the-loop workflow and management-ready summaries",
+      ],
+    },
+    faq: {
+      title: "Common questions about Intercom NPS",
+      items: [
+        {
+          q: "Can Intercom collect NPS on its own?",
+          a: "Yes. Intercom is a good collection layer for NPS surveys. The gap usually appears later, when teams want stronger analysis, prioritisation and a clearer operating rhythm around the feedback.",
+        },
+        {
+          q: "What is missing from a basic Intercom NPS setup?",
+          a: "Most teams can see scores and read comments, but struggle to identify recurring themes, understand what really drives detractors, and decide what should be fixed first.",
+        },
+        {
+          q: "Do I need to replace Intercom to improve NPS analysis?",
+          a: "No. NPS Me is designed to sit on top of Intercom, not replace it. The aim is to keep the survey collection layer you already use and add better interpretation, prioritisation and follow-up around it.",
+        },
+        {
+          q: "Who is this approach best for?",
+          a: "It is especially useful for startups and SMEs using Intercom that want something more practical and decision-ready than a basic score-and-comments view, without buying a heavyweight CX platform.",
+        },
+      ],
+    },
       sections: {
         whatIntercomDoesWell: {
           title: "What Intercom NPS already does well",
@@ -2869,6 +2912,24 @@ export const TRANSLATIONS = {
             "Ongoing tracking to connect actions to retention and revenue",
           ],
         },
+        livePreview: {
+          title: "Live preview (public demo)",
+          body:
+            "This is a real-time, anonymised snapshot pulled from Intercom survey completions. No personal data is shown.",
+          loading: "Loading…",
+          errorPrefix: "Error:",
+          kpiNps: "NPS (last {days} days)",
+          responsesConfidence: "{responses} responses • confidence: {confidence}",
+          promoters: "Promoters",
+          promotersNote: "Scores 9–10",
+          passives: "Passives",
+          passivesNote: "Scores 7–8",
+          detractors: "Detractors",
+          detractorsNote: "Scores 0–6",
+          footer:
+            "Survey ID: 189616 • Source: Intercom webhook completions → NPS Me clean store (aggregated)",
+        },
+
       },
       related: {
         title: "Related insights",
@@ -6669,6 +6730,51 @@ export const TRANSLATIONS = {
       pillarLinkPrefix: "Ceci est un exemple. L’approche centrale est expliquée dans la",
       pillarLinkText: "couche d’intelligence NPS",
       pillarLinkSuffix: ".",
+      header: {
+        iconLabel: "NPS Me",
+        tag: "NPS Me / NPS Intercom",
+      },
+      comparison: {
+        title: "Intercom vous donne la couche de collecte. NPS Me ajoute la couche de décision.",
+        body:
+          "Intercom est utile pour envoyer les enquêtes et consulter les réponses brutes. NPS Me aide les équipes à interpréter ce que le feedback veut dire, décider de ce qui compte le plus, et passer des verbatims à l’action.",
+        intercomTitle: "Intercom vous donne",
+        intercom: [
+          "L’envoi des enquêtes dans un environnement de messagerie déjà familier aux clients",
+          "Les scores, commentaires et réponses visibles au niveau utilisateur",
+          "Des filtres de base et un suivi opérationnel dans l’outil",
+          "Une manière simple de commencer à collecter le NPS sans ajouter une autre plateforme",
+        ],
+        npsMeTitle: "NPS Me ajoute",
+        npsMe: [
+          "Une analyse des thèmes et des drivers sur de gros volumes de verbatims",
+          "Des contrôles d’échantillonnage et une meilleure robustesse dans l’interprétation des scores",
+          "Une priorisation claire selon l’impact business, pas seulement le volume de commentaires",
+          "Un workflow de close-the-loop plus solide et des synthèses lisibles par le management",
+        ],
+      },
+
+      faq: {
+        title: "Questions fréquentes sur le NPS dans Intercom",
+        items: [
+          {
+            q: "Intercom peut-il collecter le NPS à lui seul ?",
+            a: "Oui. Intercom est une bonne couche de collecte pour les enquêtes NPS. Le manque apparaît surtout ensuite, quand les équipes veulent une analyse plus forte, une meilleure priorisation et un rythme plus clair autour du feedback.",
+          },
+          {
+            q: "Qu’est-ce qui manque dans un setup NPS Intercom basique ?",
+            a: "La plupart des équipes voient les scores et lisent les commentaires, mais peinent à identifier les thèmes récurrents, comprendre ce qui influence réellement les détracteurs, et décider quoi corriger en priorité.",
+          },
+          {
+            q: "Faut-il remplacer Intercom pour améliorer l’analyse NPS ?",
+            a: "Non. NPS Me est conçu pour se placer au-dessus d’Intercom, pas pour le remplacer. L’objectif est de garder la couche de collecte déjà en place et d’ajouter une meilleure interprétation, une meilleure priorisation et un meilleur suivi autour.",
+          },
+          {
+            q: "Pour qui cette approche est-elle la plus utile ?",
+            a: "Elle est particulièrement utile pour les startups et PME qui utilisent Intercom et veulent quelque chose de plus pratique et orienté décision qu’une simple vue score + commentaires, sans acheter une plateforme CX lourde.",
+          },
+        ],
+      },
       sections: {
         whatIntercomDoesWell: {
           title: "Ce qu’Intercom NPS fait déjà très bien",
@@ -6697,6 +6803,23 @@ export const TRANSLATIONS = {
             "Workflows de suivi (close-the-loop) reliés à des résultats mesurables",
             "Suivi dans le temps pour relier actions, rétention et performance",
           ],
+        },
+        livePreview: {
+          title: "Aperçu en direct (démo publique)",
+          body:
+            "Il s’agit d’un aperçu en temps réel et anonymisé, alimenté à partir des complétions d’enquêtes Intercom. Aucune donnée personnelle n’est affichée.",
+          loading: "Chargement…",
+          errorPrefix: "Erreur :",
+          kpiNps: "NPS (sur les {days} derniers jours)",
+          responsesConfidence: "{responses} réponses • confiance : {confidence}",
+          promoters: "Promoteurs",
+          promotersNote: "Scores 9–10",
+          passives: "Passifs",
+          passivesNote: "Scores 7–8",
+          detractors: "Détracteurs",
+          detractorsNote: "Scores 0–6",
+          footer:
+            "Survey ID : 189616 • Source : complétions webhook Intercom → base NPS Me nettoyée (agrégée)",
         },
       },
       related: {

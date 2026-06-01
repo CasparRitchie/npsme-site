@@ -3536,7 +3536,7 @@ export const TRANSLATIONS = {
         body:
           "NPS Me combines practical setup, customer feedback analysis and close-the-loop support. The goal is not just to tell you what the score is. It is to help you collect the right feedback, understand what customers are really saying, and make sure someone follows up and acts on it.",
         cards: {
-          programme: {
+          pnl: {
             title: "A credible feedback programme",
             points: [
               "Support designing a practical NPS and customer feedback approach.",
@@ -3544,7 +3544,7 @@ export const TRANSLATIONS = {
               "A setup that fits a growing business rather than a heavyweight enterprise model.",
             ],
           },
-          insight: {
+          teams: {
             title: "Clearer customer insight",
             points: [
               "Turn survey scores and comments into understandable themes and priorities.",
@@ -3552,7 +3552,7 @@ export const TRANSLATIONS = {
               "Give founders and teams a clearer picture of what customers are experiencing.",
             ],
           },
-          action: {
+          systems: {
             title: "A practical close-the-loop process",
             points: [
               "Create a simple follow-up rhythm around customer feedback.",
@@ -7176,88 +7176,88 @@ export const TRANSLATIONS = {
       },
     },
     whyNpsMe: {
-      seoTitle: "Pourquoi NPS Me | Un accompagnement NPS et feedback client concret pour startups et PME",
+      seoTitle: "Pourquoi NPS Me | Un accompagnement NPS et feedback client pratique pour startups et PME",
       seoDescription:
-        "NPS Me aide les startups et PME à mettre en place un processus NPS et feedback client concret, transformer les réponses en insights utiles, et installer des habitudes de close-the-loop sans le poids d’un grand cabinet.",
+        "NPS Me aide les startups et PME à mettre en place un processus NPS et feedback client concret, transformer les réponses en insights utiles, et créer de vraies habitudes de close-the-loop sans l’overhead d’un grand cabinet de conseil.",
 
       header: {
         iconLabel: "Pourquoi NPS Me",
         tag: "NPS Me / Pourquoi NPS Me",
-        title: "Un accompagnement NPS et feedback client que les équipes peuvent réellement utiliser",
+        title: "Un accompagnement NPS et feedback client concret que les équipes peuvent vraiment utiliser",
         intro:
-          "NPS Me existe pour répondre à un problème courant. Beaucoup d’entreprises collectent du feedback client, mais beaucoup moins en font un processus simple et crédible pour écouter, comprendre et agir. Nous aidons les startups et PME à mettre ce fonctionnement en place sans en faire un projet CX lourd, lent ou coûteux.",
+          "NPS Me existe pour combler un manque fréquent. Beaucoup d’entreprises collectent du feedback client, mais bien moins le transforment en un processus simple et crédible pour écouter, comprendre et agir. Nous aidons les startups et PME à mettre ce processus en place sans en faire un projet CX lent et coûteux.",
         ctaBook: "Prendre un appel découverte",
-        ctaDemo: "Voir des exemples de résultats",
+        ctaDemo: "Voir des exemples de livrables",
       },
 
       whatYouGet: {
         title: "Ce que vous obtenez en travaillant avec NPS Me",
         body:
-          "NPS Me combine mise en place pratique, analyse du feedback client et support au close-the-loop. L’objectif n’est pas seulement de vous dire quel est le score. Il s’agit de vous aider à collecter le bon feedback, comprendre ce que disent réellement les clients, et faire en sorte qu’il y ait un vrai suivi derrière.",
+          "NPS Me combine mise en place pratique, analyse du feedback client et support au close-the-loop. L’objectif n’est pas seulement de vous donner un score. C’est de vous aider à collecter le bon feedback, comprendre ce que les clients disent vraiment, et faire en sorte que quelqu’un assure le suivi et passe à l’action.",
         cards: {
-          programme: {
+          pnl: {
             title: "Un programme de feedback crédible",
             points: [
-              "Un accompagnement pour définir une approche NPS et feedback client vraiment utile.",
-              "Une aide pour structurer quand interroger, qui interroger et comment garder le programme crédible.",
-              "Une mise en place adaptée à une entreprise en croissance, pas à un modèle enterprise trop lourd.",
+              "Un accompagnement pour concevoir une approche NPS et feedback client concrète.",
+              "Une aide pour structurer quand interroger, qui interroger et comment garder le programme utile.",
+              "Une mise en place adaptée à une entreprise en croissance plutôt qu’à un modèle enterprise trop lourd.",
             ],
           },
-          insight: {
-            title: "Des insights clients plus clairs",
+          teams: {
+            title: "Des insights client plus clairs",
             points: [
-              "Transformer scores d’enquête et commentaires clients en thèmes et priorités compréhensibles.",
-              "Aller au-delà du score pour voir ce qui motive promoteurs, passifs et détracteurs.",
+              "Transformer les scores et commentaires en thèmes et priorités compréhensibles.",
+              "Aller au-delà du score pour voir ce qui explique les promoteurs, passifs et détracteurs.",
               "Donner aux fondateurs et aux équipes une vision plus claire de ce que vivent les clients.",
             ],
           },
-          action: {
-            title: "Un vrai processus de close-the-loop",
+          systems: {
+            title: "Un processus de close-the-loop concret",
             points: [
-              "Mettre en place un rythme simple de suivi autour du feedback client.",
-              "Rendre plus clairs les responsables et les prochaines étapes.",
-              "Aider le feedback client à devenir une partie réelle de la manière dont l’entreprise s’améliore dans le temps.",
+              "Créer un rythme simple de suivi autour du feedback client.",
+              "Clarifier l’ownership et les prochaines étapes pour l’équipe.",
+              "Faire du feedback client une vraie partie de l’amélioration continue de l’entreprise.",
             ],
           },
         },
       },
 
       vs: {
-        title: "Pourquoi choisir NPS Me plutôt qu’un grand cabinet",
+        title: "Pourquoi choisir NPS Me plutôt qu’un grand cabinet de conseil",
         body:
-          "Les grands cabinets peuvent produire un travail stratégique solide, mais ils apportent souvent plus de structure, plus de couches et plus de complexité que ce dont une startup ou une PME a réellement besoin. NPS Me a été conçu pour être plus direct, plus pratique et plus proche de la mise en œuvre.",
+          "Les grands cabinets peuvent produire un travail stratégique solide, mais ils apportent souvent plus d’overhead, plus de couches et plus de complexité qu’une startup ou une PME n’en a réellement besoin. NPS Me est pensé pour être plus direct, plus concret et plus proche de l’implémentation.",
 
-        leftTitle: "Grand cabinet classique",
+        leftTitle: "Cabinet de conseil classique",
         leftPoints: [
-          "Davantage de personnes, de couches et d’overhead autour du travail.",
-          "Des frameworks et rapports parfois trop génériques ou trop lourds.",
-          "Des délais plus longs avant que le travail soit réellement utile au quotidien.",
-          "Un risque plus fort de finir avec des recommandations plutôt qu’avec des changements concrets.",
+          "Plus de personnes, plus de couches et plus d’overhead autour de la mission.",
+          "Des frameworks et rapports qui peuvent sembler trop génériques ou trop lourds.",
+          "Des délais plus longs avant que le travail devienne utile au quotidien.",
+          "Un plus grand risque de finir avec des recommandations plutôt qu’un vrai changement de fonctionnement.",
         ],
 
         rightTitle: "Approche NPS Me",
         rightPoints: [
-          "Un accès direct à un accompagnement CX et feedback expérimenté.",
+          "Un accès direct à un accompagnement expérimenté en CX et feedback client.",
           "Un travail construit autour de vos outils, de votre équipe et de votre stade de croissance.",
-          "Un cadrage plus clair, une mise en place plus légère et une exécution plus concrète.",
-          "Un support centré sur la mise en place d’un vrai processus, pas seulement sur la restitution d’analyses.",
+          "Un périmètre plus clair, une mise en place plus légère et une livraison plus pratique.",
+          "Un accompagnement centré sur la mise en place d’un vrai processus, pas seulement sur la présentation de constats.",
         ],
 
         footnote:
-          "NPS Me combine réflexion sur le feedback client, mise en place pratique et tooling léger. Le travail ne sert donc pas seulement à expliquer ce que disent les clients, mais à aider votre équipe à en faire quelque chose d’utile.",
+          "NPS Me combine réflexion sur le feedback client, mise en place pratique et tooling léger. Le travail n’est donc pas seulement conçu pour expliquer ce que disent les clients, mais pour aider votre équipe à en faire quelque chose d’utile.",
       },
 
       reassurance: {
-        title: "Ce que cela fait de travailler avec NPS Me",
+        title: "Ce que ça fait de travailler avec NPS Me",
         items: [
           "Des échanges clairs et concrets, sans jargon inutile.",
           "Un focus sur ce que votre équipe peut réellement mettre en place.",
-          "Des livrables simples que les gens lisent et utilisent vraiment.",
-          "Du respect pour votre stade de croissance, vos contraintes et vos outils existants.",
-          "Une manière plus légère et plus flexible de couvrir sérieusement la CX.",
-          "Un accompagnement qui aide le feedback à devenir une partie du fonctionnement de l’entreprise.",
+          "Des livrables simples que les gens lisent vraiment et utilisent.",
+          "Le respect de votre stade, de vos contraintes et de vos outils existants.",
+          "Une manière plus légère et plus flexible de couvrir correctement la CX.",
+          "Un accompagnement qui aide le feedback à devenir une vraie partie du fonctionnement de l’entreprise.",
         ],
-        ctaProducts: "Voir les offres",
+        ctaProducts: "Découvrir les offres",
         ctaBook: "Prendre rendez-vous",
       },
     },

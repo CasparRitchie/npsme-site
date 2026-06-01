@@ -2752,102 +2752,196 @@ export const TRANSLATIONS = {
       },
     },
     npsIntelligenceLayer: {
-      seoTitle: "NPS Analytics Layer for Intercom, Medallia and CX Tools | NPS Me",
+      seoTitle: "CX Intelligence Layer for Intercom, CSV and Existing Feedback Tools | NPS Me",
       seoDescription:
-        "Already using Intercom or Medallia? NPS Me adds NPS analytics, reporting and prioritisation on top of your existing tools to turn feedback into action.",
+        "NPS Me adds a practical CX intelligence layer on top of Intercom, CSV exports and existing feedback tools to turn customer feedback into clearer priorities, reporting and action.",
 
       header: {
         iconLabel: "NPS Me / CX Intelligence",
         tag: "NPS Me / Strategy",
         accent: "Intelligence layer",
-        title: "your CX tools don’t provide",
-        subtitle: "Your tools collect signals. We turn them into decisions, priorities, and action.",
+        title: "on top of the tools you already use",
+        subtitle:
+          "Your tools collect feedback. NPS Me helps turn it into clearer priorities, reporting and action.",
       },
 
       hero: {
-        title: "NPS analytics and prioritisation on top of your existing tools",
+        title: "A practical CX intelligence layer for teams that already collect feedback",
         body1:
-          "If you already use Intercom, Medallia or another survey platform but still struggle to prioritise actions, explain scores or turn feedback into change, this page is for you.",
+          "If you already collect NPS or customer feedback in Intercom, CSV exports or another survey tool, the problem is usually not collection. It is turning responses into something the team can actually use.",
         body2:
-          "Most teams do not need another survey tool. They need a clearer way to interpret NPS, analyse comments, and decide what to do next.",
-        ctaPrimary: "Book a CX review",
+          "NPS Me sits on top of your existing setup to help you review feedback more clearly, understand recurring themes, produce better reporting and keep close-the-loop action moving.",
+        ctaPrimary: "Book a CX intelligence discussion",
         ctaSecondary: "See a sample CX Pulse",
       },
 
       sections: {
         pain: {
-          title: "Why teams still feel stuck with Intercom or Medallia",
+          title: "Why feedback programmes still feel unclear",
           body:
-            "These platforms are strong at collecting signals. The gap is turning those signals into clear priorities and decisions.",
+            "Many teams already have survey responses, comments and dashboards. What they often lack is a practical layer that helps them interpret the signal, explain what matters and decide what to do next.",
           bullets: [
-            "Plenty of dashboards, but little clarity",
-            "NPS scores without meaningful context",
-            "Transactional feedback drowning out strategic insight",
-            "Reports that do not lead to action",
-            "Leadership asking: what should we do next?",
+            "There is already feedback coming in, but it is hard to turn into priorities",
+            "Scores are visible, but the story behind them stays fuzzy",
+            "Comments are useful, but no one has time to review them consistently",
+            "Leadership sees dashboards, but still asks what the team should actually do",
+            "Follow-up happens unevenly and action can disappear into Slack, inboxes or meetings",
           ],
-          footer: "The result is too much reporting and not enough improvement.",
+          footer:
+            "The result is usually too much reporting, not enough clarity, and inconsistent follow-through.",
         },
 
         layer: {
-          title: "Introducing the NPS Me Intelligence Layer",
+          title: "What the NPS Me intelligence layer actually does",
           body:
-            "We sit on top of your existing tools. We do not replace Intercom, Medallia, or your survey platform. We connect, interpret, and elevate what they already capture.",
+            "NPS Me does not try to replace your survey tool, CRM or support platform. It adds a lighter operational layer around them so feedback becomes easier to read, easier to report and easier to act on.",
           bullets: [
-            "Interpret signals across tools",
-            "Add behavioural and strategic context",
-            "Prioritise what matters",
-            "Produce action-focused insight",
+            "Pull feedback into a clearer operating view",
+            "Group responses into themes, issues and priorities",
+            "Support management-ready reporting and summaries",
+            "Keep close-the-loop action more visible and consistent",
+          ],
+        },
+
+        comparison: {
+          title: "How this differs from just using the native dashboard",
+          body:
+            "Most tools are good at collecting responses. The missing layer is usually interpretation, prioritisation and workflow.",
+          columns: {
+            area: "Area",
+            native: "Typical tool / native dashboard",
+            npsme: "NPS Me intelligence layer",
+          },
+          rows: [
+            {
+              area: "Collection",
+              native: "Captures scores and comments",
+              npsme: "Works on top of existing collection",
+            },
+            {
+              area: "Interpretation",
+              native: "Basic filtering and individual review",
+              npsme: "Clearer themes, summaries and issue patterns",
+            },
+            {
+              area: "Prioritisation",
+              native: "Often manual or inconsistent",
+              npsme: "More explicit priorities and next-step thinking",
+            },
+            {
+              area: "Reporting",
+              native: "Dashboard views",
+              npsme: "Management-ready narrative and practical summaries",
+            },
+            {
+              area: "Close-the-loop",
+              native: "Not always structured",
+              npsme: "More visible follow-up rhythm and ownership",
+            },
+            {
+              area: "Commercial fit",
+              native: "Often tool-centric",
+              npsme: "A lighter implementation and operating layer",
+            },
           ],
         },
 
         intercom: {
           title: "Example: Intercom + NPS Me",
           body:
-            "Intercom can tell you who responded, what score they gave, and what they wrote. NPS Me adds the strategic layer that turns that into priorities.",
+            "Intercom can already collect the score and the comment. NPS Me adds a clearer way to interpret responses, surface themes and keep action moving.",
           boxLeftTitle: "Intercom gives you",
-          left: ["Who responded", "Score and comment", "Basic filtering and views"],
+          left: [
+            "The response, score and comment",
+            "Basic filtering and conversation context",
+            "A solid collection layer inside an existing tool",
+          ],
           boxRightTitle: "NPS Me adds",
           right: [
-            "What matters now and why",
-            "Signals linked to churn and retention",
-            "Noise vs priority issues",
-            "What to fix first and what can wait",
-            "A weekly CX Pulse leaders actually read",
+            "A clearer reading of recurring themes",
+            "More practical prioritisation of issues and opportunities",
+            "Better reporting for founders or leadership",
+            "A lighter close-the-loop operating layer",
+            "A clearer route from feedback to action",
           ],
           diagramCaption:
-            "Example loop: Intercom captures feedback → NPS Me adds intelligence → decisions → actions back into Intercom.",
-          footer: "Instead of another dashboard, teams get clarity, narrative, and priorities.",
+            "Example loop: Intercom captures feedback → NPS Me adds interpretation and workflow → actions feed back into the business.",
+          footer:
+            "The goal is not another dashboard. It is a clearer way for the team to understand what customers are saying and what should happen next.",
         },
 
         medallia: {
-          title: "Where Medallia still needs interpretation and action",
+          title: "Where enterprise tools still need interpretation",
           body1:
-            "Enterprise CX platforms are powerful and feature-rich. In large organisations, that flexibility can sometimes result in complex configurations and insight that is harder to translate into everyday decisions.",
+            "Enterprise CX platforms can be powerful, but they can also become heavy, complex and difficult to translate into everyday decisions.",
           body2:
-            "Access to more data does not automatically create clarity. NPS Me is designed to help teams focus on what matters most: turning feedback into clear priorities and practical action, without unnecessary complexity.",
+            "NPS Me is designed to help teams focus on the practical layer around the data: what matters, what to prioritise and how to keep action moving.",
         },
 
         deliver: {
-          title: "What the intelligence layer delivers",
+          title: "What you typically get",
           bullets: [
-            "CX strategy overlay for existing tools",
-            "Transactional vs relational NPS clarity",
-            "Weekly or monthly CX Pulse reporting",
-            "Cross-channel insight (surveys, listening, ops data)",
-            "Executive-ready summaries and narratives",
-            "Clear, prioritised CX actions",
+            "A clearer view of what customers are saying",
+            "Theme-based interpretation of comments and scores",
+            "Practical CX summaries for management or founders",
+            "A lighter follow-up and close-the-loop rhythm",
+            "Support using your existing tools more effectively",
           ],
-          footer: "Always grounded in your data. Always focused on what to do next.",
+          items: [
+            {
+              title: "Theme and issue summaries",
+              text:
+                "A clearer readout of the recurring themes, requests, risks and friction points appearing in feedback.",
+            },
+            {
+              title: "Reporting layer",
+              text:
+                "A more decision-friendly view for founders, leadership or CX owners who need something clearer than raw responses.",
+            },
+            {
+              title: "Close-the-loop support",
+              text:
+                "A more visible way to track what needs follow-up and how the team is responding.",
+            },
+            {
+              title: "Ongoing review rhythm",
+              text:
+                "Optional monthly or fortnightly support to keep the interpretation, reporting and action cycle alive.",
+            },
+          ],
+          footer:
+            "It stays grounded in your actual feedback data and focused on helping the team make better decisions.",
         },
 
         fit: {
           title: "Who this is for",
           bullets: [
-            "CX leaders using Intercom or Medallia",
-            "Teams overwhelmed by dashboards",
-            "Organisations with good data but limited direction",
-            "Leaders who want fewer charts and better decisions",
+            "Startups and SMEs already collecting customer feedback",
+            "Teams using Intercom, CSV exports or existing survey tools",
+            "Founders or leaders who want clearer reporting and priorities",
+            "Businesses that want something lighter than a heavyweight CX platform project",
+          ],
+        },
+
+        faq: {
+          title: "Common questions",
+          items: [
+            {
+              q: "Does this replace Intercom or our survey tool?",
+              a: "No. The point is to work on top of the tools you already use, not force a platform change.",
+            },
+            {
+              q: "Can this work with CSV exports first?",
+              a: "Yes. CSV-first is often the simplest way to get started before deciding whether deeper integrations are worth it.",
+            },
+            {
+              q: "Is this software or support?",
+              a: "It is best thought of as a practical layer of reporting, interpretation and workflow support, with software where useful.",
+            },
+            {
+              q: "Who is this most useful for?",
+              a: "Usually teams that already have feedback coming in, but do not yet have a strong way to interpret it, report it and act on it consistently.",
+            },
           ],
         },
       },
@@ -2855,9 +2949,11 @@ export const TRANSLATIONS = {
       related: {
         title: "Related insights",
         links: {
-          intercom: "Intercom NPS: what it shows, what it misses, and how to act",
+          intercom:
+            "Intercom NPS: what it shows, what it misses, and how to act",
           milestone: "Milestone NPS: measure friction across the journey",
-          pulse: "See a sample CX Pulse (what leaders actually read)",
+          workspace: "Customer Feedback Workspace",
+          pulse: "See a sample CX Pulse",
         },
       },
 
@@ -2870,12 +2966,12 @@ export const TRANSLATIONS = {
       },
 
       cta: {
-        title: "Ready to add clarity on top of your tools?",
+        title: "Want a clearer way to turn feedback into action?",
         body:
-          "We start with your current setup, the questions you struggle to answer, and the decisions you need to make. Then we build a simple, action-focused layer on top.",
-        primary: "Book a CX review",
+          "We can look at your current tools, where your feedback sits, and whether a lighter intelligence layer would help your team review, report and act more effectively.",
+        primary: "Book a CX intelligence discussion",
         secondary: "See a sample CX Pulse",
-        note: "No platform switch required. No survey rebuild required.",
+        note: "No platform rip-out required. No survey rebuild required.",
       },
     },
     intercomNps: {
@@ -6692,102 +6788,196 @@ export const TRANSLATIONS = {
       },
     },
     npsIntelligenceLayer: {
-      seoTitle: "Couche analytics NPS pour Intercom, Medallia et vos outils CX | NPS Me",
+      seoTitle: "Couche d’intelligence CX pour Intercom, CSV et outils de feedback existants | NPS Me",
       seoDescription:
-        "Vous utilisez déjà Intercom ou Medallia ? NPS Me ajoute de l’analytics NPS, du reporting et de la priorisation au-dessus de vos outils existants pour transformer le feedback en action.",
+        "NPS Me ajoute une couche d’intelligence CX pratique au-dessus d’Intercom, des exports CSV et de vos outils de feedback existants pour transformer le feedback client en priorités, reporting et actions plus clairs.",
 
       header: {
         iconLabel: "NPS Me / Intelligence CX",
         tag: "NPS Me / Stratégie",
         accent: "Couche d’intelligence",
-        title: "que vos outils CX ne fournissent pas",
-        subtitle: "Vos outils collectent des signaux. Nous les transformons en décisions, priorités et actions.",
+        title: "au-dessus des outils que vous utilisez déjà",
+        subtitle:
+          "Vos outils collectent le feedback. NPS Me vous aide à le transformer en priorités, reporting et actions plus clairs.",
       },
 
       hero: {
-        title: "Des analytics NPS et de la priorisation au-dessus de vos outils existants",
+        title: "Une couche d’intelligence CX pratique pour les équipes qui collectent déjà du feedback",
         body1:
-          "Si vous utilisez déjà Intercom, Medallia ou une autre plateforme d’enquête mais que vous avez encore du mal à prioriser les actions, expliquer les scores ou transformer le feedback en changement concret, cette page est pour vous.",
+          "Si vous collectez déjà du NPS ou du feedback client dans Intercom, via des exports CSV ou un autre outil d’enquête, le problème n’est généralement pas la collecte. Le vrai sujet est de transformer les réponses en quelque chose que l’équipe peut réellement utiliser.",
         body2:
-          "La plupart des équipes n’ont pas besoin d’un outil d’enquête supplémentaire. Elles ont besoin d’une manière plus claire d’interpréter le NPS, d’analyser les verbatims et de décider quoi faire ensuite.",
-        ctaPrimary: "Réserver une revue CX",
+          "NPS Me se place au-dessus de votre setup existant pour aider votre équipe à relire le feedback plus clairement, comprendre les thèmes récurrents, produire un meilleur reporting et maintenir le close-the-loop dans le temps.",
+        ctaPrimary: "Réserver un échange CX intelligence",
         ctaSecondary: "Voir un exemple de CX Pulse",
       },
 
       sections: {
         pain: {
-          title: "Pourquoi les équipes restent bloquées avec Intercom ou Medallia",
+          title: "Pourquoi les dispositifs de feedback restent souvent flous",
           body:
-            "Ces plateformes sont fortes pour collecter des signaux. Le manque se situe dans la transformation de ces signaux en priorités et décisions claires.",
+            "Beaucoup d’équipes ont déjà des réponses d’enquête, des verbatims et des dashboards. Ce qui manque souvent, c’est une couche pratique qui aide à interpréter le signal, expliquer ce qui compte vraiment et décider quoi faire ensuite.",
           bullets: [
-            "Beaucoup de dashboards, peu de clarté",
-            "Des scores NPS sans contexte utile",
-            "Le feedback transactionnel masque l’insight stratégique",
-            "Des rapports qui ne mènent pas à l’action",
-            "La direction demande : que fait-on maintenant ?",
+            "Le feedback existe déjà, mais il est difficile à transformer en priorités",
+            "Les scores sont visibles, mais l’histoire derrière reste floue",
+            "Les commentaires sont utiles, mais personne n’a le temps de les relire régulièrement",
+            "La direction voit les dashboards, mais demande toujours ce que l’équipe doit faire concrètement",
+            "Le suivi client se fait de manière irrégulière et l’action se perd dans Slack, les boîtes mail ou les réunions",
           ],
-          footer: "Résultat : trop de reporting, pas assez d’amélioration.",
+          footer:
+            "Le résultat, c’est souvent trop de reporting, pas assez de clarté, et un suivi trop inégal.",
         },
 
         layer: {
-          title: "La couche d’intelligence NPS Me",
+          title: "Ce que fait concrètement la couche d’intelligence NPS Me",
           body:
-            "Nous nous plaçons au-dessus de vos outils existants. Nous ne remplaçons pas Intercom, Medallia ou votre plateforme d’enquête. Nous connectons, interprétons et valorisons ce que vos outils captent déjà.",
+            "NPS Me ne cherche pas à remplacer votre outil d’enquête, votre CRM ou votre plateforme support. Il ajoute autour d’eux une couche opérationnelle plus légère pour que le feedback devienne plus simple à lire, à reporter et à transformer en action.",
           bullets: [
-            "Interpréter les signaux entre plusieurs outils",
-            "Ajouter du contexte comportemental et stratégique",
-            "Prioriser ce qui compte vraiment",
-            "Produire un insight orienté action",
+            "Regrouper le feedback dans une vue de travail plus claire",
+            "Structurer les réponses en thèmes, sujets et priorités",
+            "Soutenir un reporting plus lisible pour le management",
+            "Rendre le close-the-loop plus visible et plus régulier",
+          ],
+        },
+
+        comparison: {
+          title: "En quoi cela diffère d’un simple dashboard natif",
+          body:
+            "La plupart des outils savent bien collecter les réponses. Ce qui manque, c’est généralement l’interprétation, la priorisation et le workflow.",
+          columns: {
+            area: "Sujet",
+            native: "Outil / dashboard natif",
+            npsme: "Couche d’intelligence NPS Me",
+          },
+          rows: [
+            {
+              area: "Collecte",
+              native: "Capture les scores et commentaires",
+              npsme: "Travaille au-dessus de la collecte existante",
+            },
+            {
+              area: "Interprétation",
+              native: "Filtres de base et lecture individuelle",
+              npsme: "Thèmes, synthèses et motifs plus clairs",
+            },
+            {
+              area: "Priorisation",
+              native: "Souvent manuelle ou inégale",
+              npsme: "Priorités et prochaines étapes plus explicites",
+            },
+            {
+              area: "Reporting",
+              native: "Vues de dashboard",
+              npsme: "Narratif et synthèses plus utiles pour la décision",
+            },
+            {
+              area: "Close-the-loop",
+              native: "Pas toujours structuré",
+              npsme: "Rythme de suivi et ownership plus visibles",
+            },
+            {
+              area: "Fit commercial",
+              native: "Approche centrée outil",
+              npsme: "Couche légère de mise en œuvre et d’exploitation",
+            },
           ],
         },
 
         intercom: {
           title: "Exemple : Intercom + NPS Me",
           body:
-            "Intercom peut vous dire qui a répondu, quel score a été donné, et ce qui a été écrit. NPS Me ajoute la couche stratégique qui transforme cela en priorités.",
+            "Intercom peut déjà collecter le score et le commentaire. NPS Me ajoute une manière plus claire d’interpréter les réponses, de faire ressortir les thèmes et de maintenir l’action dans le temps.",
           boxLeftTitle: "Intercom vous donne",
-          left: ["Qui a répondu", "Score et commentaire", "Filtres et vues de base"],
+          left: [
+            "La réponse, le score et le commentaire",
+            "Des filtres de base et le contexte conversationnel",
+            "Une bonne couche de collecte dans un outil déjà en place",
+          ],
           boxRightTitle: "NPS Me ajoute",
           right: [
-            "Ce qui compte maintenant et pourquoi",
-            "Des signaux liés au churn et à la rétention",
-            "Bruit vs vrais sujets prioritaires",
-            "Quoi corriger d’abord, quoi attendre",
-            "Un CX Pulse hebdo lisible par la direction",
+            "Une lecture plus claire des thèmes récurrents",
+            "Une priorisation plus pratique des sujets et opportunités",
+            "Un meilleur reporting pour les fondateurs ou la direction",
+            "Une couche légère de close-the-loop",
+            "Une route plus claire entre feedback et action",
           ],
           diagramCaption:
-            "Exemple de boucle : Intercom capte le feedback → NPS Me ajoute l’intelligence → décisions → actions de retour dans Intercom.",
-          footer: "Au lieu d’un dashboard de plus, vous obtenez clarté, récit et priorités.",
+            "Exemple de boucle : Intercom capte le feedback → NPS Me ajoute l’interprétation et le workflow → les actions reviennent dans l’entreprise.",
+          footer:
+            "Le but n’est pas d’ajouter un dashboard. Le but est de donner à l’équipe une manière plus claire de comprendre ce que disent les clients et ce qui doit se passer ensuite.",
         },
 
         medallia: {
-          title: "Là où Medallia a encore besoin d’interprétation et d’action",
+          title: "Là où les outils enterprise ont encore besoin d’interprétation",
           body1:
-            "Les plateformes CX enterprise sont puissantes et très riches. Dans les grandes organisations, cette flexibilité peut parfois entraîner des configurations complexes et des insights plus difficiles à traduire en décisions du quotidien.",
+            "Les plateformes CX enterprise peuvent être puissantes, mais elles peuvent aussi devenir lourdes, complexes et difficiles à traduire en décisions du quotidien.",
           body2:
-            "Avoir accès à plus de données ne crée pas automatiquement de la clarté. NPS Me aide les équipes à se concentrer sur l’essentiel : transformer le feedback en priorités claires et en actions concrètes, sans complexité inutile.",
+            "NPS Me est conçu pour aider les équipes à se concentrer sur la couche pratique autour de la donnée : ce qui compte, ce qu’il faut prioriser et comment maintenir l’action dans le temps.",
         },
 
         deliver: {
-          title: "Ce que délivre la couche d’intelligence",
+          title: "Ce que vous obtenez généralement",
           bullets: [
-            "Une surcouche stratégique sur vos outils existants",
-            "Clarté entre NPS transactionnel et relationnel",
-            "CX Pulse hebdo ou mensuel",
-            "Insight multi-sources (enquêtes, listening, données ops)",
-            "Synthèses et récits prêts pour l’exécutif",
-            "Actions CX claires et priorisées",
+            "Une vision plus claire de ce que disent les clients",
+            "Une interprétation par thèmes des commentaires et des scores",
+            "Des synthèses CX plus utiles pour la direction ou les fondateurs",
+            "Un rythme de suivi et de close-the-loop plus léger",
+            "Une meilleure exploitation de vos outils existants",
           ],
-          footer: "Toujours basé sur vos données. Toujours orienté vers la prochaine action.",
+          items: [
+            {
+              title: "Synthèses par thèmes et sujets",
+              text:
+                "Une lecture plus claire des thèmes récurrents, demandes, risques et points de friction qui ressortent du feedback.",
+            },
+            {
+              title: "Couche de reporting",
+              text:
+                "Une vue plus utile pour les fondateurs, la direction ou les responsables CX qui ont besoin de quelque chose de plus clair que les réponses brutes.",
+            },
+            {
+              title: "Support close-the-loop",
+              text:
+                "Une manière plus visible de suivre ce qui doit être relancé et comment l’équipe répond.",
+            },
+            {
+              title: "Rythme de revue continu",
+              text:
+                "En option, un accompagnement mensuel ou bimensuel pour faire vivre l’interprétation, le reporting et le cycle d’action.",
+            },
+          ],
+          footer:
+            "Tout cela reste ancré dans vos vraies données de feedback et orienté vers de meilleures décisions pour l’équipe.",
         },
 
         fit: {
-          title: "Pour qui c’est fait",
+          title: "Pour qui c’est pertinent",
           bullets: [
-            "Responsables CX utilisant Intercom ou Medallia",
-            "Équipes noyées sous les dashboards",
-            "Organisations avec de bonnes données mais peu de direction",
-            "Décideurs qui veulent moins de charts et de meilleures décisions",
+            "Startups et PME qui collectent déjà du feedback client",
+            "Équipes utilisant Intercom, des exports CSV ou des outils d’enquête existants",
+            "Fondateurs ou managers qui veulent un reporting et des priorités plus clairs",
+            "Entreprises qui veulent quelque chose de plus léger qu’un projet CX lourd de type enterprise",
+          ],
+        },
+
+        faq: {
+          title: "Questions fréquentes",
+          items: [
+            {
+              q: "Est-ce que cela remplace Intercom ou notre outil d’enquête ?",
+              a: "Non. L’idée est de travailler au-dessus des outils que vous utilisez déjà, pas d’imposer un changement de plateforme.",
+            },
+            {
+              q: "Est-ce que cela peut commencer avec de simples exports CSV ?",
+              a: "Oui. Commencer en CSV est souvent la façon la plus simple de démarrer avant de décider si des intégrations plus poussées sont utiles.",
+            },
+            {
+              q: "Est-ce un logiciel ou un accompagnement ?",
+              a: "Le plus juste est d’y voir une couche pratique de reporting, d’interprétation et de workflow, avec du logiciel quand c’est utile.",
+            },
+            {
+              q: "Pour qui est-ce le plus utile ?",
+              a: "Souvent pour des équipes qui ont déjà du feedback qui remonte, mais pas encore de bonne manière de l’interpréter, le reporter et agir dessus de façon régulière.",
+            },
           ],
         },
       },
@@ -6795,9 +6985,11 @@ export const TRANSLATIONS = {
       related: {
         title: "À lire ensuite",
         links: {
-          intercom: "NPS Intercom : ce que vous voyez, ce qui manque, et comment agir",
+          intercom:
+            "NPS Intercom : ce que l’outil montre, ce qui manque, et comment agir",
           milestone: "NPS par étapes : mesurer les frictions du parcours",
-          pulse: "Voir un exemple de CX Pulse (lisible par la direction)",
+          workspace: "Workspace feedback client",
+          pulse: "Voir un exemple de CX Pulse",
         },
       },
 
@@ -6810,12 +7002,12 @@ export const TRANSLATIONS = {
       },
 
       cta: {
-        title: "Envie d’ajouter de la clarté au-dessus de vos outils ?",
+        title: "Envie d’une manière plus claire de transformer le feedback en action ?",
         body:
-          "On commence par votre setup actuel, les questions qui restent sans réponse, et les décisions que vous devez prendre. Ensuite, on construit une couche simple et orientée action au-dessus.",
-        primary: "Réserver une revue CX",
+          "Nous pouvons regarder vos outils actuels, où se trouve votre feedback, et voir si une couche d’intelligence plus légère aiderait votre équipe à mieux relire, reporter et exploiter le feedback client.",
+        primary: "Réserver un échange CX intelligence",
         secondary: "Voir un exemple de CX Pulse",
-        note: "Pas besoin de changer de plateforme. Pas besoin de refaire vos enquêtes.",
+        note: "Pas besoin de remplacer votre plateforme. Pas besoin de refaire vos enquêtes.",
       },
     },
     intercomNps: {

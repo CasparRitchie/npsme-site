@@ -30,6 +30,42 @@ const SURVEY_ORDER_BY_CONTENT_ID = {
   ],
 };
 
+function prepareAnswersForDisplay(detail) {
+  const answers = Array.isArray(detail?.answers) ? detail.answers : [];
+  const selectedOptions = Array.isArray(detail?.selected_options)
+    ? detail.selected_options.filter(Boolean)
+    : [];
+
+  if (!selectedOptions.length) return answers;
+
+  const multiSelectQuestionId = "612570";
+
+  const existingMultiSelectAnswer = answers.find(
+    (a) => String(a?.question_id || "") === multiSelectQuestionId
+  );
+
+  const questionText =
+    existingMultiSelectAnswer?.question_text ||
+    "Selected options";
+
+  const otherAnswers = answers.filter(
+    (a) => String(a?.question_id || "") !== multiSelectQuestionId
+  );
+
+  const expandedSelectedOptions = selectedOptions.map((option, index) => ({
+    question_id: multiSelectQuestionId,
+    question_text: questionText,
+    response: option,
+    answered_at:
+      existingMultiSelectAnswer?.answered_at ||
+      detail?.submitted_at ||
+      null,
+    _synthetic_id: `selected-option-${index}`,
+  }));
+
+  return [...otherAnswers, ...expandedSelectedOptions];
+}
+
 function sortAnswersForSurvey({ contentId, answers }) {
   const order = SURVEY_ORDER_BY_CONTENT_ID[String(contentId)] || [];
   const idx = new Map(order.map((qid, i) => [String(qid), i]));
@@ -170,14 +206,14 @@ function AnswerTable({ rows, compact = false, tr }) {
       <table className="min-w-full text-left text-sm">
         <thead>
           <tr className="text-xs text-slate-400">
-            <th className="py-2 pr-4">
+            <th className="w-[34%] py-2 pr-4">
               {tr("envola.closingTheLoop.modal.question", "Question")}
             </th>
-            <th className="py-2 pr-4">
+            <th className="w-[46%] py-2 pr-4">
               {tr("envola.closingTheLoop.modal.answer", "Answer")}
             </th>
             {!compact ? (
-              <th className="py-2">
+              <th className="w-[20%] py-2">
                 {tr("envola.closingTheLoop.modal.answered", "Answered")}
               </th>
             ) : null}
@@ -187,18 +223,11 @@ function AnswerTable({ rows, compact = false, tr }) {
         <tbody className="divide-y divide-white/10">
           {grouped.map((g, idx) => (
             <tr key={`${g.question_id}-${idx}`}>
-              <td className="py-3 pr-4 align-top">
-                <div className="flex items-start gap-2">
-                  {g.question_id ? (
-                    <span className="mt-0.5 rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-slate-300">
-                      {g.question_id}
-                    </span>
-                  ) : null}
-                  <div className="leading-snug text-slate-200">{g.question_text}</div>
-                </div>
+              <td className="py-4 pr-4 align-top">
+                <div className="leading-snug text-slate-100">{g.question_text}</div>
               </td>
 
-              <td className="py-3 pr-4 align-top">
+              <td className="py-4 pr-4 align-top">
                 <div className="flex flex-wrap gap-2">
                   {g.values.map((v) => (
                     <span
@@ -212,7 +241,7 @@ function AnswerTable({ rows, compact = false, tr }) {
               </td>
 
               {!compact ? (
-                <td className="whitespace-nowrap py-3 align-top text-xs text-slate-400">
+                <td className="whitespace-nowrap py-4 align-top text-xs text-slate-400">
                   {formatDate(g.answered_at)}
                 </td>
               ) : null}
@@ -1619,7 +1648,7 @@ export default function EnvolaClosingTheLoop() {
             aria-label={labels.modalClose}
           />
 
-          <div className="relative max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
+          <div className="relative max-h-[88vh] w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F19] shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-white/5 px-6 py-4">
               <div className="font-semibold text-white">{labels.modalTitle}</div>
               <button
@@ -1661,15 +1690,19 @@ export default function EnvolaClosingTheLoop() {
                     </div>
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs text-slate-400">{labels.modalSubmitted}</div>
-                      <div className="mt-2 text-white">{formatDate(detail.submitted_at)}</div>
+                      <div className="text-xs text-slate-400">
+                        {tr("envola.closingTheLoop.modal.sent", "Sent")}
+                      </div>
+                      <div className="mt-2 text-white">
+                        {formatDate(detail.sent_at || detail.invited_at || null)}
+                      </div>
                     </div>
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs text-slate-400">{labels.modalReceipt}</div>
-                      <div className="mt-2 break-all font-mono text-xs text-white">
-                        {(detail.content_id || "—") + ":" + (detail.receipt_id || "—")}
+                      <div className="text-xs text-slate-400">
+                        {tr("envola.closingTheLoop.modal.responded", "Responded")}
                       </div>
+                      <div className="mt-2 text-white">{formatDate(detail.submitted_at)}</div>
                     </div>
                   </div>
 
@@ -1685,54 +1718,8 @@ export default function EnvolaClosingTheLoop() {
                       </a>
                     </div>
                   )}
-
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="font-semibold text-white">{labels.modalOptions}</div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {Array.isArray(detail.selected_options) &&
-                      detail.selected_options.length ? (
-                        detail.selected_options.map((o) => (
-                          <span key={o} className={chipClass()}>
-                            {o}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-slate-400">{labels.dash}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="font-semibold text-white">{labels.modalVerbatims}</div>
-
-                    <div className="mt-4 space-y-4">
-                      {(() => {
-                        const groups = groupVerbatims(detail.verbatims);
-                        if (!groups.length) {
-                          return <div className="text-sm text-slate-400">{labels.dash}</div>;
-                        }
-
-                        return groups.map(([q, texts]) => (
-                          <div
-                            key={q}
-                            className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                          >
-                            <div className="text-xs text-slate-400">{q}</div>
-                            <ul className="mt-2 space-y-2 text-sm text-slate-200">
-                              {texts.map((t, idx) => (
-                                <li key={`${q}-${idx}`} className="leading-relaxed">
-                                  {t}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-                  </div>
-
                   {(() => {
-                    const allAnswers = Array.isArray(detail?.answers) ? detail.answers : [];
+                    const allAnswers = prepareAnswersForDisplay(detail);
                     const relevantQids = inferRelevantQuestionIds(detail);
 
                     const relevantAnswers = allAnswers.filter((a) => {

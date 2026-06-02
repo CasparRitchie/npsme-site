@@ -82,7 +82,7 @@ export default function NpsIntelligenceLayer() {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <Link
-              to={localizePath("/book?topic=ongoing-cx-support", lang)}
+              to={`${localizePath("/book", lang)}?topic=ongoing-cx-support`}
               className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold bg-[#22C55E] text-[#0B0F19] hover:bg-[#16A34A] transition"
             >
               {tr(

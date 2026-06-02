@@ -3412,6 +3412,7 @@ export const TRANSLATIONS = {
           inferredRelevantQuestionId: "Inferred relevant question id",
           sent: "Sent",
           responded: "Responded",
+          surveyDetail: "Survey detail",
         },
       },
 
@@ -7463,6 +7464,7 @@ export const TRANSLATIONS = {
           inferredRelevantQuestionId: "Identifiant de question pertinent déduit",
           sent: "Envoyé",
           responded: "Répondu",
+          surveyDetail: "Détail de la réponse",
         },
       },
 

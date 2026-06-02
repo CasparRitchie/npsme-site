@@ -45,8 +45,7 @@ function prepareAnswersForDisplay(detail) {
   );
 
   const questionText =
-    existingMultiSelectAnswer?.question_text ||
-    "Selected options";
+    existingMultiSelectAnswer?.question_text || "Selected options";
 
   const otherAnswers = answers.filter(
     (a) => String(a?.question_id || "") !== multiSelectQuestionId
@@ -56,10 +55,7 @@ function prepareAnswersForDisplay(detail) {
     question_id: multiSelectQuestionId,
     question_text: questionText,
     response: option,
-    answered_at:
-      existingMultiSelectAnswer?.answered_at ||
-      detail?.submitted_at ||
-      null,
+    answered_at: existingMultiSelectAnswer?.answered_at || detail?.submitted_at || null,
     _synthetic_id: `selected-option-${index}`,
   }));
 
@@ -145,25 +141,7 @@ function Chip({ children, tone = "neutral", title }) {
   );
 }
 
-function Disclosure({ title, right, children, defaultOpen = false }) {
-  return (
-    <details
-      className="group rounded-3xl border border-white/10 bg-white/5 p-5"
-      defaultOpen={defaultOpen}
-    >
-      <summary className="cursor-pointer list-none select-none flex items-center justify-between gap-3">
-        <div className="text-white font-semibold">{title}</div>
-        {right ? <div className="text-xs text-slate-400">{right}</div> : null}
-        <span className="ml-2 text-slate-400 transition group-open:rotate-180">
-          ▾
-        </span>
-      </summary>
-      <div className="mt-4">{children}</div>
-    </details>
-  );
-}
-
-function AnswerTable({ rows, compact = false, tr }) {
+function AnswerList({ rows, compact = false, tr }) {
   const grouped = React.useMemo(() => {
     const by = new Map();
 
@@ -201,54 +179,45 @@ function AnswerTable({ rows, compact = false, tr }) {
       .sort((a, b) => a._order - b._order);
   }, [rows]);
 
+  if (!grouped.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-slate-300">
+        {tr("envola.closingTheLoop.modal.noAnswers", "No answers found.")}
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-left text-sm">
-        <thead>
-          <tr className="text-xs text-slate-400">
-            <th className="w-[34%] py-2 pr-4">
-              {tr("envola.closingTheLoop.modal.question", "Question")}
-            </th>
-            <th className="w-[46%] py-2 pr-4">
-              {tr("envola.closingTheLoop.modal.answer", "Answer")}
-            </th>
+    <div className="space-y-4">
+      {grouped.map((g, idx) => (
+        <div
+          key={`${g.question_text}-${idx}`}
+          className="rounded-2xl border border-white/10 bg-black/20 p-4 md:p-5"
+        >
+          <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+            <h4 className="text-sm font-semibold leading-6 text-white md:max-w-[75%]">
+              {g.question_text}
+            </h4>
+
             {!compact ? (
-              <th className="w-[20%] py-2">
-                {tr("envola.closingTheLoop.modal.answered", "Answered")}
-              </th>
+              <div className="text-xs text-slate-400 whitespace-nowrap">
+                {formatDate(g.answered_at)}
+              </div>
             ) : null}
-          </tr>
-        </thead>
+          </div>
 
-        <tbody className="divide-y divide-white/10">
-          {grouped.map((g, idx) => (
-            <tr key={`${g.question_id}-${idx}`}>
-              <td className="py-4 pr-4 align-top">
-                <div className="leading-snug text-slate-100">{g.question_text}</div>
-              </td>
-
-              <td className="py-4 pr-4 align-top">
-                <div className="flex flex-wrap gap-2">
-                  {g.values.map((v) => (
-                    <span
-                      key={v}
-                      className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-slate-200"
-                    >
-                      {v}
-                    </span>
-                  ))}
-                </div>
-              </td>
-
-              {!compact ? (
-                <td className="whitespace-nowrap py-4 align-top text-xs text-slate-400">
-                  {formatDate(g.answered_at)}
-                </td>
-              ) : null}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {g.values.map((v) => (
+              <div
+                key={v}
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm leading-6 text-slate-200"
+              >
+                {v}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -287,25 +256,11 @@ function inferRelevantQuestionIds(detail) {
   return [scoredQid, ...followQids].filter(Boolean);
 }
 
-function groupVerbatims(verbatims) {
-  const out = new Map();
-  for (const v of verbatims || []) {
-    const q = (v?.question_text || "").trim() || "—";
-    const t = (v?.text || "").trim();
-    if (!t) continue;
-    const cur = out.get(q) || [];
-    cur.push(t);
-    out.set(q, cur);
-  }
-  return Array.from(out.entries());
-}
-
 function nextStatusOptions(currentStatus) {
   return (STATUS_TRANSITIONS[currentStatus] || []).filter(
     (status) => status !== "paused" && status !== "cancelled"
   );
 }
-
 
 function prettyStatus(status, tr) {
   return tr(
@@ -500,7 +455,7 @@ export default function EnvolaClosingTheLoop() {
     fetchCases();
   }, [fetchQueue, fetchCases]);
 
-    const queue = React.useMemo(() => {
+  const queue = React.useMemo(() => {
     const raw = Array.isArray(data?.queue) ? data.queue : [];
 
     const filtered =
@@ -533,7 +488,7 @@ export default function EnvolaClosingTheLoop() {
 
   const hasMoreQueueItems = visibleQueue.length < queue.length;
 
-    React.useEffect(() => {
+  React.useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [contentId, days, bucket, sortBy]);
 
@@ -942,14 +897,6 @@ export default function EnvolaClosingTheLoop() {
       "Couldn’t load this response."
     ),
     modalScore: tr("envola.closingTheLoop.modal.score", "Score"),
-    modalSubmitted: tr("envola.closingTheLoop.modal.submitted", "Submitted"),
-    modalReceipt: tr("envola.closingTheLoop.modal.receipt", "Receipt"),
-    modalOptions: tr(
-      "envola.closingTheLoop.modal.selectedOptions",
-      "Selected options"
-    ),
-    modalVerbatims: tr("envola.closingTheLoop.modal.verbatims", "Verbatims"),
-    modalRaw: tr("envola.closingTheLoop.modal.rawAnswers", "Raw answers"),
     modalOpenIntercom: tr(
       "envola.closingTheLoop.modal.openIntercom",
       "Open contact in Intercom"
@@ -969,6 +916,12 @@ export default function EnvolaClosingTheLoop() {
     ),
     modalView: tr("envola.closingTheLoop.modal.view", "View:"),
     modalShown: tr("envola.closingTheLoop.modal.shownSuffix", "shown"),
+    modalSurveyDetail: tr(
+      "envola.closingTheLoop.modal.surveyDetail",
+      "Survey detail"
+    ),
+    modalSent: tr("envola.closingTheLoop.modal.sent", "Sent"),
+    modalResponded: tr("envola.closingTheLoop.modal.responded", "Responded"),
 
     dash: tr("common.dash", "—"),
   };
@@ -1676,7 +1629,7 @@ export default function EnvolaClosingTheLoop() {
 
               {!detailLoading && !detailError && detail && (
                 <div className="space-y-6">
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-4">
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <div className="text-xs text-slate-400">{labels.modalScore}</div>
                       <div className="mt-2 flex items-center gap-2">
@@ -1690,34 +1643,33 @@ export default function EnvolaClosingTheLoop() {
                     </div>
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs text-slate-400">
-                        {tr("envola.closingTheLoop.modal.sent", "Sent")}
-                      </div>
+                      <div className="text-xs text-slate-400">{labels.modalSent}</div>
                       <div className="mt-2 text-white">
                         {formatDate(detail.sent_at || detail.invited_at || null)}
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs text-slate-400">
-                        {tr("envola.closingTheLoop.modal.responded", "Responded")}
-                      </div>
+                      <div className="text-xs text-slate-400">{labels.modalResponded}</div>
                       <div className="mt-2 text-white">{formatDate(detail.submitted_at)}</div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center">
+                      {detail.intercom_contact_url ? (
+                        <a
+                          href={detail.intercom_contact_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
+                        >
+                          {labels.modalOpenIntercom}
+                        </a>
+                      ) : (
+                        <div className="text-sm text-slate-400">{labels.dash}</div>
+                      )}
                     </div>
                   </div>
 
-                  {detail.intercom_contact_url && (
-                    <div>
-                      <a
-                        href={detail.intercom_contact_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center rounded-2xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15"
-                      >
-                        {labels.modalOpenIntercom}
-                      </a>
-                    </div>
-                  )}
                   {(() => {
                     const allAnswers = prepareAnswersForDisplay(detail);
                     const relevantQids = inferRelevantQuestionIds(detail);
@@ -1734,12 +1686,17 @@ export default function EnvolaClosingTheLoop() {
                     });
 
                     return (
-                      <Disclosure
-                        title={labels.modalRaw}
-                        right={`${sortedAnswers.length} ${labels.modalShown}`}
-                        defaultOpen={false}
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <div className="font-semibold text-white">
+                              {labels.modalSurveyDetail}
+                            </div>
+                            <div className="mt-1 text-xs text-slate-400">
+                              {sortedAnswers.length} {labels.modalShown}
+                            </div>
+                          </div>
+
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-xs text-slate-400">{labels.modalView}</span>
 
@@ -1767,43 +1724,20 @@ export default function EnvolaClosingTheLoop() {
                               {labels.modalAllQuestions}
                             </button>
 
-                            {relevantQids.length ? (
-                              <div className="ml-2 flex flex-wrap gap-2">
-                                {relevantQids.map((qid) => (
-                                  <Chip
-                                    key={qid}
-                                    tone="indigo"
-                                    title={tr(
-                                      "envola.closingTheLoop.modal.inferredRelevantQuestionId",
-                                      "Inferred relevant question id"
-                                    )}
-                                  >
-                                    QID {qid}
-                                  </Chip>
-                                ))}
-                              </div>
-                            ) : null}
+                            <label className="ml-2 inline-flex items-center gap-2 text-xs text-slate-300">
+                              <input
+                                type="checkbox"
+                                className="accent-indigo-500"
+                                checked={rawShowJson}
+                                onChange={(e) => setRawShowJson(e.target.checked)}
+                              />
+                              {labels.modalShowJson}
+                            </label>
                           </div>
-
-                          <label className="inline-flex items-center gap-2 text-xs text-slate-300">
-                            <input
-                              type="checkbox"
-                              className="accent-indigo-500"
-                              checked={rawShowJson}
-                              onChange={(e) => setRawShowJson(e.target.checked)}
-                            />
-                            {labels.modalShowJson}
-                          </label>
                         </div>
 
-                        <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                          {sortedAnswers.length ? (
-                            <AnswerTable rows={sortedAnswers} compact={false} tr={tr} />
-                          ) : (
-                            <div className="text-sm text-slate-300">
-                              {labels.modalNoAnswers}
-                            </div>
-                          )}
+                        <div className="mt-5">
+                          <AnswerList rows={sortedAnswers} compact={false} tr={tr} />
                         </div>
 
                         {rawShowJson ? (
@@ -1811,7 +1745,7 @@ export default function EnvolaClosingTheLoop() {
                             {JSON.stringify(sortedAnswers, null, 2)}
                           </pre>
                         ) : null}
-                      </Disclosure>
+                      </div>
                     );
                   })()}
                 </div>

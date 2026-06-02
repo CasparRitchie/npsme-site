@@ -377,9 +377,6 @@ export default function EnvolaInvitations() {
                       {tr("envola.invitations.table.contact", "Contact")}
                     </th>
                     <th className="px-4 py-3">
-                      {tr("envola.invitations.table.email", "Email")}
-                    </th>
-                    <th className="px-4 py-3">
                       {tr("envola.invitations.table.status", "Status")}
                     </th>
                     <th className="px-4 py-3">
@@ -394,7 +391,7 @@ export default function EnvolaInvitations() {
                 <tbody className="text-sm">
                   {rows.map((row, idx) => (
                     <tr
-                      key={row.invitation_id || `${row.email || "invite"}-${idx}`}
+                      key={row.invitation_id || `${row.customer_id || "invite"}-${idx}`}
                       className="border-t border-white/10"
                     >
                       <td className="px-4 py-3 text-slate-200">
@@ -402,9 +399,11 @@ export default function EnvolaInvitations() {
                       </td>
 
                       <td className="px-4 py-3 text-white">
-                        <div>{row.name || "—"}</div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-xs text-slate-300">
+                            {row.contact_label || "—"}
+                          </span>
 
-                        <div className="mt-2">
                           {row.intercom_contact_url ? (
                             <a
                               href={row.intercom_contact_url}
@@ -418,10 +417,6 @@ export default function EnvolaInvitations() {
                             <span className="text-slate-500">—</span>
                           )}
                         </div>
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-200">
-                        {row.email || "—"}
                       </td>
 
                       <td className="px-4 py-3">

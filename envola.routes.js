@@ -940,6 +940,13 @@ export function createEnvolaRouter() {
 
       const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
+      function formatContactLabel(contactId) {
+        const raw = String(contactId || "").trim();
+        if (!raw) return "";
+        const visible = raw.slice(-5);
+        return `Contact •••${visible}`;
+      }
+
       // Build latest canonical response lookup by receipt_id
       const responsesByReceiptId = new Map();
 
@@ -983,18 +990,13 @@ export function createEnvolaRouter() {
           else if (row.first_hard_bounce || row.first_soft_bounce) status = "bounced";
           else if (row.received_at) status = "sent";
 
-          const contactId = row.user_id || matchedResponse?.contact_id || null;
+          const contactId = String(row.user_id || matchedResponse?.contact_id || "").trim();
 
           return {
             invitation_id: receiptId,
-            customer_id: String(row.user_id || "").trim(),
-            name: row.name || matchedResponse?.name || "",
-            business_name: "",
-            email: row.email || matchedResponse?.email || "",
-            stage: "",
+            customer_id: contactId,
             survey_id: String(row.content_id || "").trim(),
             type_of_device: row.device || "",
-            assistante_maternelle: "",
             sent_at: sentAtRaw || null,
             sent_at_ms: sentAtMs,
             resent_count: 0,
@@ -1008,9 +1010,8 @@ export function createEnvolaRouter() {
               typeof matchedResponse?.score_0_10 === "number"
                 ? matchedResponse.score_0_10
                 : null,
-            comment: matchedResponse?.comment || "",
             responded_at: respondedAt,
-            contact_id: contactId,
+            contact_label: formatContactLabel(contactId),
             intercom_contact_url: contactId ? intercomContactUrl(contactId) : null,
           };
         })
@@ -1024,7 +1025,6 @@ export function createEnvolaRouter() {
           const ar = a.responded_at ? Date.parse(a.responded_at) || 0 : 0;
           const br = b.responded_at ? Date.parse(b.responded_at) || 0 : 0;
 
-          // responded most recent first, otherwise sent most recent first
           return Math.max(br, b.sent_at_ms || 0) - Math.max(ar, a.sent_at_ms || 0);
         });
 

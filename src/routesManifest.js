@@ -42,8 +42,8 @@ export const ROUTES_MANIFEST = [
   { path: "/fr/customer-feedback-workspace",                    label: "Espace feedback client",    labelKey: "routes.customerFeedbackWorkspace", enabled: true, indexable: true, inHeader: true, inFooter: true, lang: "fr", authMode: "none" },
 
   // Client example (public)
-  { path: "/envola",                                            label: "Envola (example)",     labelKey: "routes.envola",               enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "en", authMode: "none" },
-  { path: "/fr/exemple-envola",                                 label: "Envola (exemple)",     labelKey: "routes.envola",               enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "fr", authMode: "none" },
+  { path: "/envola",                                            label: "Customer (example)",     labelKey: "routes.envola",               enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "en", authMode: "none" },
+  { path: "/fr/exemple-envola",                                 label: "Client (exemple)",     labelKey: "routes.envola",               enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "fr", authMode: "none" },
 
   { path: "/data-automation",                                   label: "Data & Automation",    labelKey: "routes.dataAutomation",       enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "en", authMode: "none" },
   { path: "/fr/data-automation",                                label: "Data & Automatisation", labelKey: "routes.dataAutomation",      enabled: true,  indexable: true,  inHeader: true,  inFooter: true,  lang: "fr", authMode: "none" },

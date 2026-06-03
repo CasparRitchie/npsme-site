@@ -21,11 +21,6 @@ export function createWorkspaceRouter() {
   const router = express.Router();
 
   // --------------------------------------------------
-  // Enforce workspace auth for all workspace routes
-  // --------------------------------------------------
-  router.use(requireWorkspaceAuth);
-
-  // --------------------------------------------------
   // GET /api/workspace/ping
   // --------------------------------------------------
   router.get("/ping", (_req, res) => {
@@ -36,6 +31,14 @@ export function createWorkspaceRouter() {
       piiMode: "minimised",
     });
   });
+
+
+  // --------------------------------------------------
+  // Enforce workspace auth for all workspace routes
+  // --------------------------------------------------
+  router.use(requireWorkspaceAuth);
+
+
 
   // --------------------------------------------------
   // GET /api/workspace/home

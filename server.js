@@ -25,6 +25,7 @@ import { createIntercomRouter } from "./intercom.routes.js";
 import { createEnvolaRouter } from "./envola.routes.js";
 import { createCsvNpsRouter } from "./csvNps.routes.js";
 import { createNpsDataRouter } from "./npsData.routes.js";
+import { createWorkspaceRouter } from "./workspace.routes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -422,6 +423,8 @@ app.use(
 );
 
 
+
+
 // =====================================================
 // NPS DATA API ROUTES
 // Persistent saved NPS datasets + rows + close-loop data
@@ -435,6 +438,13 @@ app.use("/api/nps-data",
   createNpsDataRouter({ openai })
 );
 
+
+
+
+app.use(
+  "/api/workspace",
+  createWorkspaceRouter()
+);
 
 // ---------------------------------------------------------------------------
 // Simple shared-password protection (Option B)

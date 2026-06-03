@@ -3224,9 +3224,9 @@ export const TRANSLATIONS = {
         duplicatesRemovedSuffix: "duplicates removed",
       },
       performance: {
-        seoTitle: "Envola - Performance | NPS Me",
-        seoDesc: "Private Envola performance dashboard with consistent global filters.",
-        title: "Envola - Performance",
+        seoTitle: "Performance | NPS Me",
+        seoDesc: "Private performance dashboard with consistent global filters.",
+        title: "Performance",
         subtitle: "Consolidated view of NPS programme performance, with global filters applied to all KPIs and charts.",
         kpiNps: "NPS",
       },
@@ -7131,12 +7131,12 @@ export const TRANSLATIONS = {
     },
     envola: {
       seo: {
-        title: "Envola - Analyse NPS Intercom (exemple live) | NPS Me",
+        title: "Analyse NPS Intercom (exemple live) | NPS Me",
         description:
           "Un exemple live et anonymisé montrant comment NPS Me ajoute une couche d’analyse au-dessus du NPS Intercom.",
       },
-      tag: "Exemple client / Envola",
-      h1: "Envola - Analyse NPS Intercom",
+      tag: "Exemple client / Customer",
+      h1: "Analyse NPS Intercom",
       intro:
         "Ceci est un exemple live et anonymisé. Il illustre ce que NPS Me peut révéler lorsqu’une enquête NPS tourne dans Intercom - d’abord score + répartition, puis drivers, thèmes et recommandations.",
       ctaPrimary: "Voir comment ça marche",
@@ -7265,9 +7265,9 @@ export const TRANSLATIONS = {
         duplicatesRemovedSuffix: "doublons supprimés",
       },
       performance: {
-        seoTitle: "Envola - Performance | NPS Me",
+        seoTitle: "Performance | NPS Me",
         seoDesc: "Tableau de bord privé Envola avec des filtres globaux cohérents.",
-        title: "Envola - Performance",
+        title: "Performance",
         subtitle:
           "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les KPI et graphiques.",
         kpiNps: "NPS",

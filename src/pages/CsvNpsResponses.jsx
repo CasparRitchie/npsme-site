@@ -1,4 +1,3 @@
-// src/pages/CsvNpsResponses.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
@@ -29,7 +28,7 @@ export default function CsvNpsResponses() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
+        const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
           credentials: "include",
         });
         const data = await res.json();
@@ -40,7 +39,7 @@ export default function CsvNpsResponses() {
 
         setDataset(normaliseSavedDataset(data));
       } catch (err) {
-        console.error("Failed to load saved NPS dataset:", err);
+        console.error("Failed to load saved workspace dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
@@ -79,18 +78,14 @@ export default function CsvNpsResponses() {
         bucketFilter === "all" || row.bucket === bucketFilter;
 
       const haystack = [
-        row.customer_name,
-        row.customer_email,
+        row.contact_label,
         row.company,
         row.stage,
         row.comment,
         row.score,
         row.bucket,
-        row.contact_id,
-        row.intercom_contact_url,
         ...(row.selected_options || []),
         JSON.stringify(row.extra_scores || {}),
-        JSON.stringify(row.raw || {}),
       ]
         .join(" ")
         .toLowerCase();
@@ -115,7 +110,7 @@ export default function CsvNpsResponses() {
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading response data from Supabase.</p>
+          <p>Loading response data from workspace storage.</p>
         </section>
       </main>
     );
@@ -191,7 +186,7 @@ export default function CsvNpsResponses() {
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search customer, email, comment, benefit..."
+              placeholder="Search comment, score, bucket or selected option..."
             />
           </label>
 
@@ -214,12 +209,12 @@ export default function CsvNpsResponses() {
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Customer</th>
-                <th>Email</th>
+                <th>Contact</th>
                 <th>Score</th>
                 <th>Bucket</th>
                 <th>Comment</th>
                 <th>Selected options</th>
+                <th>Intercom</th>
               </tr>
             </thead>
 
@@ -230,11 +225,10 @@ export default function CsvNpsResponses() {
                 </tr>
               ) : (
                 filteredRows.map((row) => (
-                  <tr key={row.response_id}>
+                  <tr key={row.response_id || row.id}>
                     <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
-                    <td>{row.customer_name || "—"}</td>
-                    <td>{row.customer_email || "—"}</td>
-                    <td>{row.score}</td>
+                    <td>{row.contact_label || "Contact"}</td>
+                    <td>{row.score ?? "—"}</td>
                     <td>
                       <span
                         className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}
@@ -247,6 +241,20 @@ export default function CsvNpsResponses() {
                       {row.selected_options?.length
                         ? row.selected_options.join(", ")
                         : "—"}
+                    </td>
+                    <td>
+                      {row.intercom_contact_url ? (
+                        <a
+                          href={row.intercom_contact_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-link"
+                        >
+                          Open
+                        </a>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                   </tr>
                 ))
@@ -264,22 +272,21 @@ function normaliseSavedDataset(apiResponse) {
   const savedRows = apiResponse.rows || [];
 
   const rows = savedRows.map((row) => ({
+    id: row.id,
     response_id: row.response_id || row.id,
     source: row.source,
     row_number: row.row_number,
     submitted_at: row.submitted_at,
     score: row.score,
     bucket: row.bucket,
-    customer_name: row.customer_name,
-    customer_email: row.customer_email,
-    company: row.company,
-    stage: row.stage,
-    comment: row.comment,
-    contact_id: row.contact_id,
-    intercom_contact_url: row.intercom_contact_url,
+    company: row.company || null,
+    stage: row.stage || null,
+    comment: row.comment || "",
+    contact_label: row.contact_label || "Contact",
+    intercom_contact_url: row.intercom_contact_url || null,
     selected_options: row.selected_options_json || [],
     extra_scores: row.extra_scores_json || {},
-    raw: row.raw_json || {},
+    created_at: row.created_at || null,
   }));
 
   return {

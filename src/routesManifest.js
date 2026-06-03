@@ -52,8 +52,8 @@ export const ROUTES_MANIFEST = [
   { path: "/fr/book",                                           label: "Prendre rendez-vous",  labelKey: "routes.book",                 enabled: true,  indexable: true,  inHeader: false, inFooter: true,  lang: "fr", authMode: "none" },
 
   // Envola question drilldown (private-ish UX, not indexable)
-  { path: "/envola/questions/:questionId",                      label: "Envola Question",      labelKey: "routes.envolaQuestion",       enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
-  { path: "/fr/exemple-envola/questions/:questionId",           label: "Envola Question",      labelKey: "routes.envolaQuestion",       enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
+  { path: "/envola/questions/:questionId",                      label: "Customer Question",      labelKey: "routes.envolaQuestion",       enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
+  { path: "/fr/exemple-envola/questions/:questionId",           label: "Question Client",      labelKey: "routes.envolaQuestion",       enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
 
   // Private (auth)
   { path: "/private/login",                                     label: "Private login",        labelKey: "routes.privateLogin",         enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "none" },
@@ -63,17 +63,17 @@ export const ROUTES_MANIFEST = [
   { path: "/fr/private/closing-the-loop",                       label: "Boucler la boucle",    labelKey: "routes.closingTheLoop",       enabled: true,  indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
 
   // Envola private workspace
-  { path: "/envola/performance",                                label: "Envola Performance",   enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "en", authMode: "private_cookie" },
-  { path: "/fr/envola/performance",                             label: "Performance Envola",   enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "fr", authMode: "private_cookie" },
+  { path: "/envola/performance",                                label: "Customer Performance",   enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "en", authMode: "private_cookie" },
+  { path: "/fr/envola/performance",                             label: "Performance Client",   enabled: true, indexable: false, inHeader: false, inFooter: true,  lang: "fr", authMode: "private_cookie" },
 
-  { path: "/envola/responses",                                  label: "Envola Responses",     enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
-  { path: "/fr/envola/responses",                               label: "Réponses Envola",      enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
+  { path: "/envola/responses",                                  label: "Customer Responses",     enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
+  { path: "/fr/envola/responses",                               label: "Réponses Client",      enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
 
-  { path: "/envola/invitations",                                label: "Envola Invitations",   enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
-  { path: "/fr/envola/invitations",                             label: "Invitations Envola",   enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
+  { path: "/envola/invitations",                                label: "Customer Invitations",   enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
+  { path: "/fr/envola/invitations",                             label: "Invitations Client",   enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
 
-  { path: "/envola/closing-the-loop",                           label: "Envola Closing the Loop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
-  { path: "/fr/envola/closing-the-loop",                        label: "Boucle de feedback Envola", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
+  { path: "/envola/closing-the-loop",                           label: "Customer Closing the Loop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "private_cookie" },
+  { path: "/fr/envola/closing-the-loop",                        label: "Boucle de feedback Client", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "private_cookie" },
 
   // NPS Me Workspace
   // Product-style protected workspace routes.

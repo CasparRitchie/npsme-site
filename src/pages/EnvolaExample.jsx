@@ -789,7 +789,7 @@ export default function EnvolaExample() {
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr("envola.seo.title", "Envola — Intercom NPS Analytics (Live Example) | NPSme")}
+        title={tr("envola.seo.title", "Intercom NPS Analytics (Live Example) | NPSme")}
         description={tr(
           "envola.seo.description",
           "A live, anonymised example showing how NPSme layers analytics on top of Intercom NPS."
@@ -797,11 +797,11 @@ export default function EnvolaExample() {
         altPaths={{ en: "/envola", fr: "/fr/exemple-envola" }}
       />
 
-      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client example / Envola")}>
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client example")}>
         <div className="pt-4 grid md:grid-cols-12 gap-10">
           <div className="md:col-span-8">
             <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-semibold tracking-tight text-white">
-              {tr("envola.h1", "Envola — Intercom NPS Analytics")}
+              {tr("envola.h1", "Intercom NPS Analytics")}
             </h1>
 
             <p className="mt-5 text-slate-300 max-w-2xl">

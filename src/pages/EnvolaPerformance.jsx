@@ -445,17 +445,17 @@ export default function EnvolaPerformance() {
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr("envola.performance.seoTitle", "Envola — Performance | NPS Me")}
+        title={tr("envola.performance.seoTitle", "Performance | NPS Me")}
         description={tr(
           "envola.performance.seoDesc",
-          "Private Envola performance dashboard with consistent global filters."
+          "Private performance dashboard with consistent global filters."
         )}
       />
 
-      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace / Envola")}>
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace")}>
         <div className="pt-4">
           <h1 className="text-3xl md:text-4xl font-semibold text-white">
-            {tr("envola.performance.title", "Envola — Performance")}
+            {tr("envola.performance.title", "Performance")}
           </h1>
 
           <p className="mt-3 max-w-3xl text-slate-300">

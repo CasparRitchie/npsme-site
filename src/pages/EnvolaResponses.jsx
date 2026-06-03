@@ -341,17 +341,17 @@ export default function EnvolaResponses() {
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr("envola.responses.seoTitle", "Envola — Responses | NPS Me")}
+        title={tr("envola.responses.seoTitle", "Responses | NPS Me")}
         description={tr(
           "envola.responses.seoDesc",
-          "Private Envola responses explorer with one row per response."
+          "Private responses explorer with one row per response."
         )}
       />
 
-      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace / Envola")}>
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace")}>
         <div className="pt-4">
           <h1 className="text-3xl md:text-4xl font-semibold text-white">
-            {tr("envola.responses.title", "Envola — Responses")}
+            {tr("envola.responses.title", "Responses")}
           </h1>
 
           <p className="mt-3 max-w-3xl text-slate-300">

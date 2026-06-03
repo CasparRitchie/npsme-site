@@ -726,12 +726,12 @@ export default function EnvolaQuestionDetail() {
       <Seo
         path={location.pathname}
         lang={lang}
-        title={tr("envola.qd.seoTitle", "Envola — Question detail | NPSme")}
+        title={tr("envola.qd.seoTitle", "Question detail | NPSme")}
         description={tr("envola.qd.seoDesc", "Question-level evidence and verbatims.")}
         altPaths={{ en: "/envola", fr: "/fr/exemple-envola" }}
       />
 
-      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client example / Envola")}>
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client example")}>
         <div className="pt-4">
           <h1 className="text-3xl md:text-4xl font-semibold text-white">
             {tr("envola.qd.title", "Question detail")}

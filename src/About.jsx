@@ -54,7 +54,7 @@ export default function About() {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
               <div className="aspect-[4/5] rounded-2xl border border-white/10 bg-gradient-to-br from-[#141B2E] to-[#0F172A] overflow-hidden">
                 <img
-                  src="/about1.png"
+                  src="/about1.png?v=2"
                   alt="Caspar Ritchie, founder of NPS Me"
                   className="h-full w-full object-cover"
                 />

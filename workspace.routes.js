@@ -197,22 +197,28 @@ export function createWorkspaceRouter() {
 
       const { data: rows, error: rowsError } = await supabaseAdmin
         .from("dataset_rows")
-        .select(
-          [
-            "id",
-            "dataset_id",
-            "response_id",
-            "source",
-            "row_number",
-            "submitted_at",
-            "score",
-            "bucket",
-            "comment",
-            "contact_id",
-            "intercom_contact_url",
-            "created_at",
-          ].join(",")
-        )
+        .select(`
+          id,
+          dataset_id,
+          response_id,
+          source,
+          row_number,
+          submitted_at,
+          score,
+          bucket,
+          comment,
+          contact_id,
+          intercom_contact_url,
+          created_at,
+          close_loop_actions (
+            id,
+            status,
+            owner,
+            action_taken,
+            updated_at,
+            created_at
+          )
+        `)
         .eq("dataset_id", datasetId)
         .order("submitted_at", { ascending: false, nullsFirst: false })
         .limit(limit);
@@ -347,26 +353,32 @@ export function createWorkspaceRouter() {
 
       let query = supabaseAdmin
         .from("dataset_rows")
-        .select(
-          [
-            "id",
-            "dataset_id",
-            "response_id",
-            "source",
-            "row_number",
-            "submitted_at",
-            "score",
-            "bucket",
-            "company",
-            "stage",
-            "comment",
-            "contact_id",
-            "intercom_contact_url",
-            "selected_options_json",
-            "extra_scores_json",
-            "created_at",
-          ].join(",")
-        )
+        .select(`
+          id,
+          dataset_id,
+          response_id,
+          source,
+          row_number,
+          submitted_at,
+          score,
+          bucket,
+          company,
+          stage,
+          comment,
+          contact_id,
+          intercom_contact_url,
+          selected_options_json,
+          extra_scores_json,
+          created_at,
+          close_loop_actions (
+            id,
+            status,
+            owner,
+            action_taken,
+            updated_at,
+            created_at
+          )
+        `)
         .eq("dataset_id", datasetId)
         .order("submitted_at", { ascending: false, nullsFirst: false })
         .limit(limit);
@@ -466,26 +478,32 @@ export function createWorkspaceRouter() {
 
       const { data: row, error: rowError } = await supabaseAdmin
         .from("dataset_rows")
-        .select(
-          [
-            "id",
-            "dataset_id",
-            "response_id",
-            "source",
-            "row_number",
-            "submitted_at",
-            "score",
-            "bucket",
-            "company",
-            "stage",
-            "comment",
-            "contact_id",
-            "intercom_contact_url",
-            "selected_options_json",
-            "extra_scores_json",
-            "created_at",
-          ].join(",")
-        )
+        .select(`
+          id,
+          dataset_id,
+          response_id,
+          source,
+          row_number,
+          submitted_at,
+          score,
+          bucket,
+          company,
+          stage,
+          comment,
+          contact_id,
+          intercom_contact_url,
+          selected_options_json,
+          extra_scores_json,
+          created_at,
+          close_loop_actions (
+            id,
+            status,
+            owner,
+            action_taken,
+            updated_at,
+            created_at
+          )
+        `)
         .eq("dataset_id", datasetId)
         .eq("response_id", responseId)
         .single();
@@ -532,6 +550,25 @@ function getRequestWorkspaceId(req) {
   }
 
   return workspaceId;
+}
+
+function toSafeCloseLoopActions(actions = []) {
+  if (!Array.isArray(actions)) return [];
+
+  return actions
+    .map((action) => ({
+      id: action.id,
+      status: action.status || "open",
+      owner: action.owner || "",
+      action_taken: action.action_taken || "",
+      updated_at: action.updated_at || action.created_at || null,
+      created_at: action.created_at || null,
+    }))
+    .sort((a, b) => {
+      const aDate = new Date(a.updated_at || a.created_at || 0).getTime();
+      const bDate = new Date(b.updated_at || b.created_at || 0).getTime();
+      return aDate - bDate;
+    });
 }
 
 function clampInt(v, def, min, max) {
@@ -607,16 +644,15 @@ function toSafeWorkspaceRow(row) {
     score: Number.isFinite(Number(row.score)) ? Number(row.score) : null,
     bucket: row.bucket || null,
 
-    // Keep list rows deliberately light
     comment: redactFreeText(row.comment, 280),
 
-    // Never expose direct PII by default
     customer_name: null,
     customer_email: null,
 
-    // Prefer label + deep-link rather than raw identifier
     contact_label: formatRedactedContactLabel(row.contact_id),
     intercom_contact_url: row.intercom_contact_url || null,
+
+    close_loop_actions: toSafeCloseLoopActions(row.close_loop_actions),
 
     created_at: row.created_at || null,
   };
@@ -648,6 +684,7 @@ function toSafeWorkspaceResponseListRow(row) {
       : [],
 
     extra_scores_json: row.extra_scores_json || {},
+    close_loop_actions: toSafeCloseLoopActions(row.close_loop_actions),
     created_at: row.created_at || null,
   };
 }
@@ -663,7 +700,6 @@ function toSafeWorkspaceResponseDetail(row) {
     score: Number.isFinite(Number(row.score)) ? Number(row.score) : null,
     bucket: row.bucket || null,
 
-    // Safe-ish business context retained only in detail view
     company: row.company || null,
     stage: row.stage || null,
 
@@ -680,6 +716,7 @@ function toSafeWorkspaceResponseDetail(row) {
       : [],
 
     extra_scores_json: row.extra_scores_json || {},
+    close_loop_actions: toSafeCloseLoopActions(row.close_loop_actions),
     created_at: row.created_at || null,
   };
 }

@@ -1321,6 +1321,7 @@ export function createEnvolaRouter() {
         byContact.set(cid, arr);
       }
 
+      
       const rows = filtered.map((r) => {
         const cid = String(r?.contact_id || "").trim();
         const history = cid ? byContact.get(cid) || [] : [];

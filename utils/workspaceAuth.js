@@ -323,16 +323,18 @@ export async function changeWorkspacePassword({
   if (!user || !user.is_active) {
     await Promise.allSettled([
       logAuthEvent({
-        userId: user.id,
+        userId: user?.id || userId || null,
         workspaceId: req?.auth?.workspaceId || null,
-        eventType: "password_changed",
+        eventType: "password_change_failed_user_not_found_or_inactive",
         req,
       }),
 
       logWorkspaceEvent(req, {
-        eventType: "password_changed",
+        workspaceId: req?.auth?.workspaceId || null,
+        userId: user?.id || userId || null,
+        eventType: "password_change_failed_user_not_found_or_inactive",
         entityType: "user",
-        entityId: user.id,
+        entityId: user?.id || userId || null,
         metadata: {
           source: "workspace_account",
         },

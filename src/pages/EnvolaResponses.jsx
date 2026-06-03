@@ -357,7 +357,7 @@ export default function EnvolaResponses() {
           <p className="mt-3 max-w-3xl text-slate-300">
             {tr(
               "envola.responses.subtitle",
-              "Vue détaillée des réponses, une ligne par réponse, avec tri et filtres globaux."
+              "Detailed response view, with one row per response plus global sorting and filters."
             )}
           </p>
         </div>

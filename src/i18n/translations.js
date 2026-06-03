@@ -3245,16 +3245,17 @@ export const TRANSLATIONS = {
         title: "Word cloud",
         subtitle: "Word cloud filtered by the same period and bucket.",
       },
-      responses: {
-        none: "No verbatims stored for this response.",
-      },
       exports: {
         downloadCsv: "Download CSV",
       },
       responses: {
+        title: "Responses",
+        subtitle: "Detailed response view, with one row per response plus global sorting and filters.",
+        filtersSubtitle: "Filter and sort responses before exploring the table.",
         tableTitle: "Responses",
         tableSubtitle: "Export the currently filtered response set as CSV.",
         sortTip: "Tip: click any column header to sort. Sticky headers and first columns stay visible while scrolling.",
+        none: "No verbatims stored for this response.",
       },
       closingTheLoop: {
         title: "Closing the loop",
@@ -7135,6 +7136,7 @@ export const TRANSLATIONS = {
         description:
           "Un exemple live et anonymisé montrant comment NPS Me ajoute une couche d’analyse au-dessus du NPS Intercom.",
       },
+
       tag: "Exemple client / Customer",
       h1: "Analyse NPS Intercom",
       intro:
@@ -7292,18 +7294,18 @@ export const TRANSLATIONS = {
         subtitle: "Nuage de mots filtré par la même période et le même bucket.",
       },
 
-      responses: {
-        none: "Aucun verbatim enregistré pour cette réponse.",
-      },
-
       exports: {
         downloadCsv: "Télécharger le CSV",
       },
 
       responses: {
+        title: "Réponses",
+        subtitle: "Vue détaillée des réponses, une ligne par réponse, avec tri et filtres globaux.",
+        filtersSubtitle: "Filtrez et triez les réponses avant d’explorer le tableau.",
         tableTitle: "Réponses",
-        tableSubtitle: "Exporter en CSV l’ensemble des réponses correspondant aux filtres actuels.",
+        tableSubtitle: "Exporter l’ensemble de réponses filtré en CSV.",
         sortTip: "Astuce : cliquez sur un en-tête de colonne pour trier. Les en-têtes et les premières colonnes restent visibles pendant le défilement.",
+        none: "Aucun verbatim enregistré pour cette réponse.",
       },
 
       closingTheLoop: {

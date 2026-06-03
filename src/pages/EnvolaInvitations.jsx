@@ -194,16 +194,16 @@ export default function EnvolaInvitations() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
-      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace / Envola")}>
+      <PageHeader iconLabel="NPS Me" tag={tr("envola.tag", "Client workspace")}>
         <div className="pt-4">
           <h1 className="text-3xl md:text-4xl font-semibold text-white">
-            {tr("envola.invitations.title", "Envola — Invitations")}
+            {tr("envola.invitations.title", "Invitations")}
           </h1>
 
           <p className="mt-3 max-w-3xl text-slate-300">
             {tr(
               "envola.invitations.subtitle",
-              "Track invitations sent, delivery status, responses and response rate for the Envola programme."
+              "Track invitations sent, delivery status, responses and response rate for the survey programme."
             )}
           </p>
         </div>

@@ -198,6 +198,13 @@ function intercomContactUrl(contactId) {
   return `https://app.intercom.com/a/apps/${ENVOLA_INTERCOM_APP_ID}/users/${contactId}`;
 }
 
+function formatRedactedContactLabel(contactId) {
+  const raw = String(contactId || "").trim();
+  if (!raw) return "-";
+  const visible = raw.slice(-5);
+  return `Contact •••${visible}`;
+}
+
 function splitMultiSelect(value) {
   if (Array.isArray(value)) return value.filter(Boolean).map(String);
   return String(value || "")
@@ -644,8 +651,7 @@ function flattenResponseForTable(r, allRowsForContact = []) {
     bucket: scoreBucket(r?.score_0_10),
 
     contact_id: r?.contact_id || null,
-    contact_name:
-      r?.name || r?.email || r?.external_id || (r?.contact_id ? `Contact ${r.contact_id}` : "-"),
+    contact_name: formatRedactedContactLabel(r?.contact_id),
     intercom_contact_url: r?.contact_id ? intercomContactUrl(r.contact_id) : null,
 
     pioupiou: r?.pioupiou_label || r?.custom_attributes?.pioupiou_label || "-",
@@ -940,13 +946,6 @@ export function createEnvolaRouter() {
 
       const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
-      function formatContactLabel(contactId) {
-        const raw = String(contactId || "").trim();
-        if (!raw) return "";
-        const visible = raw.slice(-5);
-        return `Contact •••${visible}`;
-      }
-
       // Build latest canonical response lookup by receipt_id
       const responsesByReceiptId = new Map();
 
@@ -1011,7 +1010,7 @@ export function createEnvolaRouter() {
                 ? matchedResponse.score_0_10
                 : null,
             responded_at: respondedAt,
-            contact_label: formatContactLabel(contactId),
+            contact_label: formatRedactedContactLabel(contactId),
             intercom_contact_url: contactId ? intercomContactUrl(contactId) : null,
           };
         })
@@ -1217,11 +1216,7 @@ export function createEnvolaRouter() {
         .slice(0, limit)
         .map((r) => ({
           ...r,
-          contact_name:
-            r?.name ||
-            r?.email ||
-            r?.external_id ||
-            (r?.contact_id ? `Contact ${r.contact_id}` : "-"),
+          contact_name: formatRedactedContactLabel(r?.contact_id),
           intercom_contact_url: r?.contact_id ? intercomContactUrl(r.contact_id) : null,
         }));
 
@@ -1336,8 +1331,7 @@ export function createEnvolaRouter() {
           submitted_at: flat.submitted_at,
           nps_score: flat.nps_score,
           bucket: flat.bucket,
-          contact_id: flat.contact_id,
-          contact_name: flat.contact_name,
+          contact_label: flat.contact_name,
           intercom_contact_url: flat.intercom_contact_url,
           pioupiou: flat.pioupiou,
           reader_serial: flat.reader_serial,
@@ -1401,11 +1395,7 @@ export function createEnvolaRouter() {
           const verbatims = Array.isArray(r?.verbatims) ? r.verbatims : [];
           const score = r?.score_0_10 ?? null;
           const rowBucket = scoreBucket(score);
-          const contactName =
-            r?.name ||
-            r?.email ||
-            r?.external_id ||
-            (r?.contact_id ? `Contact ${r.contact_id}` : "-");
+          const contactName = formatRedactedContactLabel(r?.contact_id);
           const contactUrl = r?.contact_id ? intercomContactUrl(r.contact_id) : null;
 
           if (verbatims.length > 0) {
@@ -1639,7 +1629,7 @@ export function createEnvolaRouter() {
         missing_score_samples: missingScore.slice(0, 10).map((r) => ({
           response_id: r?.response_id || null,
           submitted_at: r?.submitted_at || null,
-          contact_name: r?.name || r?.email || null,
+          contact_name: formatRedactedContactLabel(r?.contact_id),
           score_0_10: r?.score_0_10 ?? null,
         })),
       });

@@ -21,8 +21,17 @@ function prettyDate(iso) {
   });
 }
 
+function formatRedactedContactLabel(contactId) {
+  const raw = String(contactId || "").trim();
+  if (!raw) return "—";
+  const visible = raw.slice(-5);
+  return `Contact •••${visible}`;
+}
+
 function IntercomContactPill({ id, url }) {
   if (!id) return null;
+
+  const label = formatRedactedContactLabel(id);
 
   if (url) {
     return (
@@ -33,7 +42,7 @@ function IntercomContactPill({ id, url }) {
         className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-900"
         title="Open contact in Intercom"
       >
-        Intercom contact: {id}
+        {label}
       </a>
     );
   }
@@ -41,9 +50,9 @@ function IntercomContactPill({ id, url }) {
   return (
     <span
       className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200"
-      title="Contact id (no Intercom URL provided by API)"
+      title="Contact available"
     >
-      Intercom contact: {id}
+      {label}
     </span>
   );
 }
@@ -1174,7 +1183,7 @@ export default function EnvolaQuestionDetail() {
                                   {
                                     response_id: r.response_id,
                                     submitted_at: r.submitted_at,
-                                    contact_id: r.contact_id,
+                                    contact_label: formatRedactedContactLabel(r.contact_id),
                                     bucket: r.bucket,
                                     score_0_10: r.score_0_10,
                                     selected_options: r.rawSelectedOptions,

@@ -32,7 +32,7 @@ export default function CsvNpsClosingTheLoop() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
+        const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
           credentials: "include",
         });
         const data = await res.json();
@@ -46,9 +46,8 @@ export default function CsvNpsClosingTheLoop() {
 
         const draftActions = readLocalActions(datasetId);
         setActions(draftActions);
-
       } catch (err) {
-        console.error("Failed to load saved NPS dataset:", err);
+        console.error("Failed to load saved workspace dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
@@ -107,7 +106,7 @@ export default function CsvNpsClosingTheLoop() {
       owner: "",
       actionTaken: "",
     };
-    
+
     const hasFollowUpText = String(action.actionTaken || "").trim();
 
     if (!hasFollowUpText) {
@@ -224,13 +223,17 @@ export default function CsvNpsClosingTheLoop() {
     }
   }
 
-  function getLatestAction(actions = []) {
-    if (!Array.isArray(actions) || actions.length === 0) return null;
+  function getLatestAction(savedActions = [], draftAction = null) {
+    const allActions = [
+      ...(Array.isArray(savedActions) ? savedActions : []),
+      ...(draftAction && draftAction.updatedAt ? [draftAction] : []),
+    ];
 
-    return [...actions].sort((a, b) => {
+    if (!allActions.length) return null;
+
+    return [...allActions].sort((a, b) => {
       const aDate = new Date(a.updatedAt || 0).getTime();
       const bDate = new Date(b.updatedAt || 0).getTime();
-
       return bDate - aDate;
     })[0];
   }
@@ -261,7 +264,8 @@ export default function CsvNpsClosingTheLoop() {
           ? row.draftAction.status
           : latestSavedAction?.status || row.draftAction?.status || "open";
 
-        const matchesStatus = statusFilter === "all" || currentStatus === statusFilter;
+        const matchesStatus =
+          statusFilter === "all" || currentStatus === statusFilter;
 
         return matchesBucket && matchesStatus;
       })
@@ -325,7 +329,7 @@ export default function CsvNpsClosingTheLoop() {
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading close-the-loop data from Supabase.</p>
+          <p>Loading close-the-loop data from workspace.</p>
         </section>
       </main>
     );
@@ -456,30 +460,27 @@ function normaliseSavedDataset(apiResponse) {
   const savedDataset = apiResponse.dataset || {};
   const savedRows = apiResponse.rows || [];
 
-  const rows = savedRows.map((row) => {
-    const loopActions = normaliseSavedActions(row.close_loop_actions);
-
-    return {
-      db_row_id: row.id,
-      response_id: row.response_id || row.id,
-      source: row.source,
-      row_number: row.row_number,
-      submitted_at: row.submitted_at,
-      score: row.score,
-      bucket: row.bucket,
-      customer_name: row.customer_name,
-      customer_email: row.customer_email,
-      company: row.company,
-      stage: row.stage,
-      comment: row.comment,
-      contact_id: row.contact_id,
-      intercom_contact_url: row.intercom_contact_url,
-      selected_options: row.selected_options_json || [],
-      extra_scores: row.extra_scores_json || {},
-      raw: row.raw_json || {},
-      loopActions,
-    };
-  });
+  const rows = savedRows.map((row) => ({
+    db_row_id: row.id,
+    response_id: row.response_id || row.id,
+    source: row.source,
+    row_number: row.row_number,
+    submitted_at: row.submitted_at,
+    score: row.score,
+    bucket: row.bucket,
+    customer_name: row.customer_name || null,
+    customer_email: row.customer_email || null,
+    contact_label: row.contact_label || "Contact",
+    company: row.company || null,
+    stage: row.stage || null,
+    comment: row.comment || "",
+    contact_id: row.contact_id || null,
+    intercom_contact_url: row.intercom_contact_url || null,
+    selected_options: row.selected_options_json || [],
+    extra_scores: row.extra_scores_json || {},
+    raw: row.raw_json || {},
+    loopActions: normaliseSavedActions(row.close_loop_actions),
+  }));
 
   return {
     id: savedDataset.id,
@@ -553,7 +554,7 @@ function getActionKey(row) {
     row?.db_row_id ||
       row?.response_id ||
       row?.row_number ||
-      `${row?.customer_email || "unknown"}-${row?.submitted_at || "no-date"}-${row?.score || "no-score"}`
+      `${row?.customer_email || row?.contact_label || "unknown"}-${row?.submitted_at || "no-date"}-${row?.score || "no-score"}`
   );
 }
 
@@ -596,14 +597,26 @@ function ClosingLoopCard({ row, action, savedActions = [], onChange, onSave }) {
           </span>
         </div>
 
-        <h3>{row.customer_name || row.customer_email || "Unknown customer"}</h3>
+        <h3>{row.contact_label || row.customer_name || "Contact"}</h3>
 
         <p className="csv-nps-loop-meta">
-          {row.customer_email || "No email"} ·{" "}
           {row.submitted_at?.slice(0, 10) || "No date"}
         </p>
 
         <blockquote>{row.comment || "No comment provided."}</blockquote>
+
+        {row.intercom_contact_url && (
+          <p className="csv-nps-loop-meta">
+            <a
+              href={row.intercom_contact_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-link"
+            >
+              Open in Intercom
+            </a>
+          </p>
+        )}
 
         {savedActions.length > 0 && (
           <div className="csv-nps-loop-saved-actions">

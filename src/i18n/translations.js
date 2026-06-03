@@ -2661,9 +2661,9 @@ export const TRANSLATIONS = {
     },
     liveAdmin: {
       seoTitle: "Live Survey Admin | NPS Me",
-      seoDescription: "Review and send live NPS invitations from your Envola customer list.",
+      seoDescription: "Review and send live NPS invitations from your customer list.",
 
-      eyebrow: "Live programme · Envola",
+      eyebrow: "Live programme · Customer",
       title: "Live survey admin",
       intro:
         "Track invitations through the full lifecycle, resend when needed, and review completed scores.",
@@ -3259,7 +3259,7 @@ export const TRANSLATIONS = {
       closingTheLoop: {
         title: "Closing the loop",
         subtitle:
-          "Track follow-up, ownership, improvements and impact for Envola survey responses.",
+          "Track follow-up, ownership, improvements and impact for survey responses.",
 
         controls: {
           refresh: "Refresh",
@@ -6699,9 +6699,9 @@ export const TRANSLATIONS = {
     liveAdmin: {
       seoTitle: "Admin enquête live | NPS Me",
       seoDescription:
-        "Gérez et envoyez des invitations NPS en direct depuis votre liste clients Envola.",
+        "Gérez et envoyez des invitations NPS en direct depuis votre liste clients.",
 
-      eyebrow: "Programme live · Envola",
+      eyebrow: "Programme live",
       title: "Administration enquête live",
       intro:
         "Suivez les invitations de bout en bout, renvoyez si besoin, et consultez les scores terminés.",
@@ -7266,7 +7266,7 @@ export const TRANSLATIONS = {
       },
       performance: {
         seoTitle: "Performance | NPS Me",
-        seoDesc: "Tableau de bord privé Envola avec des filtres globaux cohérents.",
+        seoDesc: "Tableau de bord privé avec des filtres globaux cohérents.",
         title: "Performance",
         subtitle:
           "Vue consolidée de la performance du programme NPS, avec des filtres globaux appliqués à tous les KPI et graphiques.",
@@ -7309,7 +7309,7 @@ export const TRANSLATIONS = {
       closingTheLoop: {
         title: "Boucler la boucle",
         subtitle:
-          "Suivez les relances, les responsables, les améliorations et leur impact pour les réponses Envola.",
+          "Suivez les relances, les responsables, les améliorations et leur impact pour les réponses.",
 
         controls: {
           refresh: "Rafraîchir",

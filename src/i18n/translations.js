@@ -3091,12 +3091,12 @@ export const TRANSLATIONS = {
     },
     envola: {
       seo: {
-        title: "Envola - Intercom NPS Analytics (Live Example) | NPS Me",
+        title: "Intercom NPS Analytics (Live Example) | NPS Me",
         description:
           "A live, anonymised example showing how NPS Me layers analytics on top of Intercom NPS.",
       },
-      tag: "Client example / Envola",
-      h1: "Envola - Intercom NPS Analytics",
+      tag: "Client example / Customer1",
+      h1: "Intercom NPS Analytics",
       intro:
         "This is a live, anonymised example. It shows what NPS Me can surface once an NPS survey is running in Intercom - starting with score + distribution, and soon drivers, themes, and recommendations.",
       ctaPrimary: "See how it works",

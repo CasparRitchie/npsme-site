@@ -27,18 +27,21 @@ export default function CsvNpsPerformance() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/nps-data/datasets/${datasetId}`, {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `/api/workspace/datasets/${datasetId}/performance`,
+          {
+            credentials: "include",
+          }
+        );
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
           throw new Error(data.error || "Failed to load saved dataset");
         }
 
-        setDataset(normaliseSavedDataset(data));
+        setDataset(normaliseWorkspacePerformanceDataset(data));
       } catch (err) {
-        console.error("Failed to load saved NPS dataset:", err);
+        console.error("Failed to load saved workspace performance dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
@@ -54,7 +57,8 @@ export default function CsvNpsPerformance() {
       }
 
       try {
-        setDataset(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setDataset(normaliseSessionDataset(parsed));
       } catch (err) {
         console.error("Failed to read CSV NPS dataset from sessionStorage", err);
         setDatasetError("Failed to read latest browser-session dataset");
@@ -87,65 +91,8 @@ export default function CsvNpsPerformance() {
     };
   }, [dataset]);
 
-  const scoreDistribution = useMemo(() => {
-    const rows = dataset?.rows || [];
-    const counts = Array.from({ length: 11 }, (_, score) => ({
-      score,
-      count: 0,
-    }));
-
-    rows.forEach((row) => {
-      const score = Number(row.score);
-      if (Number.isInteger(score) && score >= 0 && score <= 10) {
-        counts[score].count += 1;
-      }
-    });
-
-    const maxCount = Math.max(...counts.map((item) => item.count), 1);
-
-    return counts.map((item) => ({
-      ...item,
-      percentageOfMax: Math.round((item.count / maxCount) * 100),
-    }));
-  }, [dataset]);
-
-  const timeline = useMemo(() => {
-    const rows = dataset?.rows || [];
-    const byDate = new Map();
-
-    rows.forEach((row) => {
-      if (!row.submitted_at) return;
-
-      const dateKey = row.submitted_at.slice(0, 10);
-      if (!dateKey) return;
-
-      if (!byDate.has(dateKey)) {
-        byDate.set(dateKey, {
-          date: dateKey,
-          total: 0,
-          promoters: 0,
-          passives: 0,
-          detractors: 0,
-          nps: null,
-        });
-      }
-
-      const bucket = byDate.get(dateKey);
-      bucket.total += 1;
-
-      if (row.bucket === "promoter") bucket.promoters += 1;
-      if (row.bucket === "passive") bucket.passives += 1;
-      if (row.bucket === "detractor") bucket.detractors += 1;
-
-      bucket.nps = Math.round(
-        ((bucket.promoters - bucket.detractors) / bucket.total) * 100
-      );
-    });
-
-    return Array.from(byDate.values()).sort((a, b) =>
-      a.date > b.date ? 1 : -1
-    );
-  }, [dataset]);
+  const scoreDistribution = dataset?.scoreDistribution || [];
+  const timeline = dataset?.timeline || [];
 
   if (loadingDataset) {
     return (
@@ -159,7 +106,7 @@ export default function CsvNpsPerformance() {
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading performance data from Supabase.</p>
+          <p>Loading performance data from workspace.</p>
         </section>
       </main>
     );
@@ -330,36 +277,31 @@ export default function CsvNpsPerformance() {
             </div>
           )}
         </section>
+
         {datasetId && <DatasetAiInsights datasetId={datasetId} />}
       </section>
     </main>
   );
 }
 
-function normaliseSavedDataset(apiResponse) {
+function normaliseWorkspacePerformanceDataset(apiResponse) {
   const savedDataset = apiResponse.dataset || {};
-  const savedRows = apiResponse.rows || [];
+  const summary = apiResponse.summary || {};
+  const timeline = Array.isArray(apiResponse.timeline) ? apiResponse.timeline : [];
+  const rawScoreDistribution = Array.isArray(apiResponse.score_distribution)
+    ? apiResponse.score_distribution
+    : [];
 
-  const rows = savedRows.map((row) => ({
-    response_id: row.response_id || row.id,
-    source: row.source,
-    row_number: row.row_number,
-    submitted_at: row.submitted_at,
-    score: row.score,
-    bucket: row.bucket,
-    customer_name: row.customer_name,
-    customer_email: row.customer_email,
-    company: row.company,
-    stage: row.stage,
-    comment: row.comment,
-    contact_id: row.contact_id,
-    intercom_contact_url: row.intercom_contact_url,
-    selected_options: row.selected_options_json || [],
-    extra_scores: row.extra_scores_json || {},
-    raw: row.raw_json || {},
+  const maxCount = Math.max(
+    ...rawScoreDistribution.map((item) => Number(item.count) || 0),
+    1
+  );
+
+  const scoreDistribution = rawScoreDistribution.map((item) => ({
+    score: Number(item.score),
+    count: Number(item.count) || 0,
+    percentageOfMax: Math.round(((Number(item.count) || 0) / maxCount) * 100),
   }));
-
-  const summary = normaliseSummary(savedDataset.summary_json, rows);
 
   return {
     id: savedDataset.id,
@@ -372,8 +314,91 @@ function normaliseSavedDataset(apiResponse) {
     detectedFields: savedDataset.detected_fields_json || {},
     warnings: savedDataset.warnings_json || [],
     skippedRows: savedDataset.skipped_rows_json || [],
+    summary: {
+      total: summary.total ?? 0,
+      promoters: summary.promoters ?? 0,
+      passives: summary.passives ?? 0,
+      detractors: summary.detractors ?? 0,
+      nps: summary.nps ?? null,
+      averageScore: summary.averageScore ?? null,
+    },
+    timeline,
+    scoreDistribution,
+  };
+}
+
+function normaliseSessionDataset(sessionDataset) {
+  const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
+  const summary = normaliseSummary(sessionDataset?.summary, rows);
+
+  const counts = Array.from({ length: 11 }, (_, score) => ({
+    score,
+    count: 0,
+  }));
+
+  rows.forEach((row) => {
+    const score = Number(row.score);
+    if (Number.isInteger(score) && score >= 0 && score <= 10) {
+      counts[score].count += 1;
+    }
+  });
+
+  const maxCount = Math.max(...counts.map((item) => item.count), 1);
+
+  const scoreDistribution = counts.map((item) => ({
+    ...item,
+    percentageOfMax: Math.round((item.count / maxCount) * 100),
+  }));
+
+  const byDate = new Map();
+
+  rows.forEach((row) => {
+    if (!row.submitted_at) return;
+
+    const dateKey = String(row.submitted_at).slice(0, 10);
+    if (!dateKey) return;
+
+    if (!byDate.has(dateKey)) {
+      byDate.set(dateKey, {
+        date: dateKey,
+        total: 0,
+        promoters: 0,
+        passives: 0,
+        detractors: 0,
+        nps: null,
+      });
+    }
+
+    const bucket = byDate.get(dateKey);
+    bucket.total += 1;
+
+    if (row.bucket === "promoter") bucket.promoters += 1;
+    if (row.bucket === "passive") bucket.passives += 1;
+    if (row.bucket === "detractor") bucket.detractors += 1;
+
+    bucket.nps = Math.round(
+      ((bucket.promoters - bucket.detractors) / bucket.total) * 100
+    );
+  });
+
+  const timeline = Array.from(byDate.values()).sort((a, b) =>
+    a.date > b.date ? 1 : -1
+  );
+
+  return {
+    id: sessionDataset?.id || null,
+    datasetName: sessionDataset?.datasetName || "Latest session dataset",
+    sourceType: sessionDataset?.sourceType || "session",
+    content_id: sessionDataset?.content_id || null,
+    rawRowCount: sessionDataset?.rawRowCount || rows.length,
+    validRowCount: sessionDataset?.validRowCount || rows.length,
+    skippedRowCount: sessionDataset?.skippedRowCount || 0,
+    detectedFields: sessionDataset?.detectedFields || {},
+    warnings: sessionDataset?.warnings || [],
+    skippedRows: sessionDataset?.skippedRows || [],
     summary,
-    rows,
+    timeline,
+    scoreDistribution,
   };
 }
 

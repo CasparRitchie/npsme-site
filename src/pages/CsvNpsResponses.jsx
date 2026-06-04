@@ -1,4 +1,3 @@
-// src/pages/CsvNpsResponses.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
@@ -29,6 +28,49 @@ export default function CsvNpsResponses() {
       setDatasetError("");
 
       try {
+        const datasetMetaRes = await fetch(`/api/workspace/datasets/${datasetId}`, {
+          credentials: "include",
+        });
+
+        const datasetMeta = await datasetMetaRes.json();
+
+        if (!datasetMetaRes.ok || !datasetMeta.ok) {
+          throw new Error(datasetMeta.error || "Failed to load saved dataset");
+        }
+
+        const sourceType = String(datasetMeta?.dataset?.source_type || "").trim();
+
+        if (sourceType === "workspace_intercom") {
+          const params = new URLSearchParams();
+          params.set("limit", "500");
+
+          const intercomRes = await fetch(
+            `/api/workspace-intercom/responses?${params.toString()}`,
+            {
+              credentials: "include",
+            }
+          );
+
+          const intercomData = await intercomRes.json();
+
+          if (!intercomRes.ok || !intercomData.ok) {
+            throw new Error(
+              intercomData.error || "Failed to load workspace Intercom responses"
+            );
+          }
+
+          setDataset(
+            normaliseWorkspaceIntercomResponsesDataset({
+              dataset: datasetMeta.dataset,
+              source: intercomData.source,
+              summary: intercomData.summary,
+              rows: intercomData.rows,
+            })
+          );
+
+          return;
+        }
+
         const params = new URLSearchParams();
         params.set("limit", "500");
 
@@ -244,6 +286,19 @@ export default function CsvNpsResponses() {
                           {[row.company, row.stage].filter(Boolean).join(" · ")}
                         </div>
                       )}
+
+                      {row.intercom_contact_url && (
+                        <div className="csv-nps-muted-cell">
+                          <a
+                            href={row.intercom_contact_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-link"
+                          >
+                            Open in Intercom
+                          </a>
+                        </div>
+                      )}
                     </td>
 
                     <td>{row.score ?? "—"}</td>
@@ -297,6 +352,43 @@ function normaliseWorkspaceResponsesDataset(apiResponse) {
       bucket: row.bucket,
       company: row.company,
       stage: row.stage,
+      comment: row.comment,
+      contact_label: row.contact_label || "Contact",
+      intercom_contact_url: row.intercom_contact_url,
+      selected_options: row.selected_options_json || [],
+      extra_scores: row.extra_scores_json || {},
+      closeLoopActions: row.close_loop_actions || [],
+    })),
+  };
+}
+
+function normaliseWorkspaceIntercomResponsesDataset(apiResponse) {
+  const savedDataset = apiResponse.dataset || {};
+  const savedRows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
+  const source = apiResponse.source || {};
+
+  return {
+    id: savedDataset.id,
+    datasetName:
+      savedDataset.dataset_name ||
+      source.source_name ||
+      "Workspace Intercom dataset",
+    sourceType: savedDataset.source_type || "workspace_intercom",
+    content_id: savedDataset.content_id || source.survey_content_id || null,
+    rawRowCount: savedRows.length,
+    validRowCount: apiResponse.summary?.total ?? savedRows.length,
+    skippedRowCount: 0,
+    summary: apiResponse.summary || {},
+    rows: savedRows.map((row) => ({
+      id: row.response_id || row.id,
+      response_id: row.response_id || row.id,
+      source: row.source || "workspace_intercom",
+      row_number: row.row_number || null,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      company: row.company || null,
+      stage: row.stage || null,
       comment: row.comment,
       contact_label: row.contact_label || "Contact",
       intercom_contact_url: row.intercom_contact_url,

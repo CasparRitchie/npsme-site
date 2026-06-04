@@ -7,7 +7,6 @@ import { getCanonicalResponses } from "./envola.routes.js";
 export function createWorkspaceIntercomRouter() {
   const router = express.Router();
 
-  // Public-ish health check for the mounted router itself
   router.get("/ping", (_req, res) => {
     res.json({
       ok: true,
@@ -16,12 +15,10 @@ export function createWorkspaceIntercomRouter() {
     });
   });
 
-  // Everything below requires workspace auth
   router.use(requireWorkspaceAuth);
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources
-  // List Intercom sources configured for this workspace
   // --------------------------------------------------
   router.get("/sources", async (req, res) => {
     try {
@@ -74,7 +71,6 @@ export function createWorkspaceIntercomRouter() {
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/active
-  // Return the active source for this workspace
   // --------------------------------------------------
   router.get("/sources/active", async (req, res) => {
     try {
@@ -106,7 +102,6 @@ export function createWorkspaceIntercomRouter() {
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/:sourceId
-  // Load a specific Intercom source belonging to this workspace
   // --------------------------------------------------
   router.get("/sources/:sourceId", async (req, res) => {
     try {
@@ -175,7 +170,6 @@ export function createWorkspaceIntercomRouter() {
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/responses
-  // Shortcut to active source responses
   // --------------------------------------------------
   router.get("/responses", async (req, res) => {
     try {
@@ -213,7 +207,6 @@ export function createWorkspaceIntercomRouter() {
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/active/responses
-  // Active source responses
   // --------------------------------------------------
   router.get("/sources/active/responses", async (req, res) => {
     try {
@@ -251,7 +244,6 @@ export function createWorkspaceIntercomRouter() {
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/:sourceId/responses
-  // Specific source responses
   // --------------------------------------------------
   router.get("/sources/:sourceId/responses", async (req, res) => {
     try {
@@ -392,9 +384,27 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
 
   const canonicalRows = await getCanonicalResponses();
 
-  let rows = (canonicalRows || [])
-    .filter((row) => String(row?.content_id || "").trim() === contentId)
-    .map((row) => toWorkspaceIntercomResponseRow(row, source))
+  const contentRows = (canonicalRows || []).filter(
+    (row) => String(row?.content_id || "").trim() === contentId
+  );
+
+  const byContact = new Map();
+
+  for (const row of contentRows) {
+    const contactId = String(row?.contact_id || "").trim();
+    if (!contactId) continue;
+
+    const existing = byContact.get(contactId) || [];
+    existing.push(row);
+    byContact.set(contactId, existing);
+  }
+
+  let rows = contentRows
+    .map((row) => {
+      const contactId = String(row?.contact_id || "").trim();
+      const history = contactId ? byContact.get(contactId) || [] : [];
+      return flattenWorkspaceIntercomResponseForTable(row, history, source);
+    })
     .filter((row) => {
       if (bucket === "all") return true;
       return row.bucket === bucket;
@@ -403,15 +413,25 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
   if (q) {
     rows = rows.filter((row) => {
       const haystack = [
+        row.contact_name,
         row.response_id,
-        row.comment,
-        row.contact_label,
-        ...(Array.isArray(row.selected_options_json)
-          ? row.selected_options_json
-          : []),
+        row.pioupiou,
+        row.reader_serial,
+        row.q_recommend_score,
+        row.q_recommend_comment,
+        row.q_install_score,
+        row.q_install_comment,
+        row.q_daily_use_score,
+        row.q_benefits,
+        row.q_parent_relation_score,
+        row.q_parent_relation_comment,
+        row.q_support_score,
+        row.q_support_comment,
+        row.q_final_comment,
+        ...(Array.isArray(row.selected_options_json) ? row.selected_options_json : []),
       ]
-        .map((value) => String(value || "").toLowerCase())
-        .join(" ");
+        .join(" ")
+        .toLowerCase();
 
       return haystack.includes(q);
     });
@@ -433,6 +453,105 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
     summary,
     rows: limitedRows,
   };
+}
+
+function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], source) {
+  const answers = Array.isArray(row?.answers) ? row.answers : [];
+  const contactId = String(row?.contact_id || "").trim();
+  const sourceAppId = String(source?.intercom_app_id || "").trim();
+
+  const previousResponses = (allRowsForContact || [])
+    .filter((x) => String(x?.response_id || "") !== String(row?.response_id || ""))
+    .sort((a, b) =>
+      String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || ""))
+    );
+
+  const benefits = uniqueStrings([
+    ...(Array.isArray(row?.selected_options) ? row.selected_options : []),
+    ...allAnswersByQuestionId(answers, 612570),
+  ]);
+
+  const numericScore =
+    typeof row?.score_0_10 === "number" ? row.score_0_10 : Number(row?.score_0_10);
+
+  const score = Number.isFinite(numericScore) ? numericScore : null;
+  const bucket = scoreBucket(score);
+
+  return {
+    id: row?.response_id || null,
+    response_id: row?.response_id || null,
+    source: "workspace_intercom",
+    submitted_at: row?.submitted_at || null,
+    score,
+    bucket,
+
+    contact_id: contactId || null,
+    contact_label: formatRedactedContactLabel(contactId),
+    contact_name: formatRedactedContactLabel(contactId),
+    intercom_contact_url:
+      sourceAppId && contactId
+        ? `https://app.intercom.com/a/apps/${sourceAppId}/users/${contactId}`
+        : null,
+
+    company: null,
+    stage: null,
+    comment: redactFreeText(row?.comment, 500),
+
+    pioupiou: row?.pioupiou_label || row?.custom_attributes?.pioupiou_label || "-",
+    reader_serial: row?.reader_serial || row?.custom_attributes?.reader_serial || "-",
+
+    previous_response_dates: previousResponses
+      .map((x) => x?.submitted_at)
+      .filter(Boolean),
+
+    previous_response_links: previousResponses
+      .map((x) => x?.response_id)
+      .filter(Boolean),
+
+    q_recommend_score: firstAnswerByQuestionId(answers, 612560),
+    q_recommend_comment: firstAnswerByQuestionId(answers, 612565),
+
+    q_install_score: firstAnswerByQuestionId(answers, 612566),
+    q_install_comment: firstAnswerByQuestionId(answers, 612567),
+
+    q_daily_use_score: firstAnswerByQuestionId(answers, 612568),
+
+    q_benefits: benefits.length ? benefits.join(", ") : null,
+
+    q_parent_relation_score: firstAnswerByQuestionId(answers, 612600),
+    q_parent_relation_comment: firstAnswerByQuestionId(answers, 612571),
+
+    q_support_score: firstAnswerByQuestionId(answers, 612601),
+    q_support_comment: firstAnswerByQuestionId(answers, 612602),
+
+    q_final_comment: firstAnswerByQuestionId(answers, 612603),
+
+    selected_options_json: benefits,
+    extra_scores_json: {},
+    close_loop_actions: [],
+    source_meta: {
+      source_id: source?.id || null,
+      source_name: source?.source_name || "",
+      source_slug: source?.source_slug || "",
+      content_id: source?.survey_content_id || null,
+    },
+  };
+}
+
+function firstAnswerByQuestionId(answers, qid) {
+  const hit = (answers || []).find((a) => Number(a?.question_id) === Number(qid));
+  return hit?.response ?? null;
+}
+
+function allAnswersByQuestionId(answers, qid) {
+  return (answers || [])
+    .filter((a) => Number(a?.question_id) === Number(qid))
+    .map((a) => a?.response)
+    .filter((x) => x != null);
+}
+
+function uniqueStrings(arr) {
+  return Array.from(new Set((arr || []).filter(Boolean).map((x) => String(x))));
 }
 
 function isUuid(value) {
@@ -474,11 +593,7 @@ function redactFreeText(value, maxLength = 500) {
     "[redacted phone]"
   );
 
-  text = text.replace(
-    /\bhttps?:\/\/[^\s]+/gi,
-    "[redacted link]"
-  );
-
+  text = text.replace(/\bhttps?:\/\/[^\s]+/gi, "[redacted link]");
   text = text.replace(/\b\d{8,}\b/g, "[redacted id]");
   text = text.replace(/\s+/g, " ").trim();
 
@@ -504,44 +619,6 @@ function toWorkspaceIntercomSourceSummary(row) {
     pii_mode: row.pii_mode || "minimised",
     created_at: row.created_at || null,
     updated_at: row.updated_at || null,
-  };
-}
-
-function toWorkspaceIntercomResponseRow(row, source) {
-  const numericScore =
-    typeof row?.score_0_10 === "number" ? row.score_0_10 : Number(row?.score_0_10);
-
-  const score = Number.isFinite(numericScore) ? numericScore : null;
-  const bucket = scoreBucket(score);
-  const sourceAppId = String(source?.intercom_app_id || "").trim();
-  const contactId = String(row?.contact_id || "").trim();
-
-  const intercomContactUrl =
-    sourceAppId && contactId
-      ? `https://app.intercom.com/a/apps/${sourceAppId}/users/${contactId}`
-      : null;
-
-  return {
-    response_id: row?.response_id || null,
-    source: "workspace_intercom",
-    submitted_at: row?.submitted_at || null,
-    score,
-    bucket,
-    comment: redactFreeText(row?.comment, 500),
-    customer_name: null,
-    customer_email: null,
-    contact_label: formatRedactedContactLabel(contactId),
-    intercom_contact_url: intercomContactUrl,
-    selected_options_json: Array.isArray(row?.selected_options)
-      ? row.selected_options
-      : [],
-    extra_scores_json: {},
-    source_meta: {
-      source_id: source?.id || null,
-      source_name: source?.source_name || "",
-      source_slug: source?.source_slug || "",
-      content_id: source?.survey_content_id || null,
-    },
   };
 }
 

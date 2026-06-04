@@ -14,6 +14,104 @@ const PAGE_COPY = {
     "Review, search and filter the customer responses from the active Intercom source for this workspace.",
 };
 
+function shortDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
+
+function bucketBadge(bucket) {
+  if (bucket === "promoter") {
+    return "bg-emerald-500/15 text-emerald-200 border-emerald-500/30";
+  }
+  if (bucket === "passive") {
+    return "bg-amber-500/15 text-amber-200 border-amber-500/30";
+  }
+  if (bucket === "detractor") {
+    return "bg-rose-500/15 text-rose-200 border-rose-500/30";
+  }
+  return "bg-white/5 text-slate-200 border-white/10";
+}
+
+function scoreTextClass(score) {
+  if (!Number.isFinite(score)) return "text-slate-300";
+  if (score >= 9) return "text-emerald-300";
+  if (score >= 7) return "text-amber-300";
+  return "text-rose-300";
+}
+
+function compareValues(a, b, dir = "asc") {
+  const direction = dir === "desc" ? -1 : 1;
+
+  const av = a ?? "";
+  const bv = b ?? "";
+
+  const an = Number(av);
+  const bn = Number(bv);
+  const bothNumeric =
+    Number.isFinite(an) && Number.isFinite(bn) && av !== "" && bv !== "";
+
+  if (bothNumeric) {
+    if (an < bn) return -1 * direction;
+    if (an > bn) return 1 * direction;
+    return 0;
+  }
+
+  const ad = Date.parse(av);
+  const bd = Date.parse(bv);
+  const bothDateLike = Number.isFinite(ad) && Number.isFinite(bd);
+
+  if (bothDateLike) {
+    if (ad < bd) return -1 * direction;
+    if (ad > bd) return 1 * direction;
+    return 0;
+  }
+
+  const as = String(av).toLowerCase();
+  const bs = String(bv).toLowerCase();
+
+  if (as < bs) return -1 * direction;
+  if (as > bs) return 1 * direction;
+  return 0;
+}
+
+function SortableTh({ label, sortKey, sort, dir, onSort, className = "" }) {
+  const active = sort === sortKey;
+
+  return (
+    <th className={`px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-200 ${className}`}>
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 hover:text-white"
+        onClick={() => onSort(sortKey)}
+      >
+        <span>{label}</span>
+        <span className="text-slate-400">
+          {active ? (dir === "asc" ? "↑" : "↓") : "↕"}
+        </span>
+      </button>
+    </th>
+  );
+}
+
+function CellText({ children, className = "" }) {
+  const content =
+    children == null || children === "" || (typeof children === "string" && !children.trim())
+      ? "—"
+      : children;
+
+  return (
+    <div className={`whitespace-normal break-words leading-snug text-slate-100 ${className}`}>
+      {content}
+    </div>
+  );
+}
+
 export default function CsvNpsResponses() {
   const { datasetId } = useParams();
 
@@ -24,6 +122,8 @@ export default function CsvNpsResponses() {
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [sort, setSort] = useState("submitted_at");
+  const [dir, setDir] = useState("desc");
 
   useEffect(() => {
     async function loadSavedDataset() {
@@ -45,7 +145,7 @@ export default function CsvNpsResponses() {
 
         if (sourceType === "workspace_intercom") {
           const params = new URLSearchParams();
-          params.set("limit", "500");
+          params.set("limit", "2000");
 
           const intercomRes = await fetch(
             `/api/workspace-intercom/responses?${params.toString()}`,
@@ -103,7 +203,7 @@ export default function CsvNpsResponses() {
     async function loadActiveIntercomDataset() {
       try {
         const params = new URLSearchParams();
-        params.set("limit", "500");
+        params.set("limit", "2000");
 
         const res = await fetch(
           `/api/workspace-intercom/responses?${params.toString()}`,
@@ -184,22 +284,45 @@ export default function CsvNpsResponses() {
     }
   }, [datasetId]);
 
+  function handleSort(sortKey) {
+    if (sort === sortKey) {
+      setDir((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+
+    setSort(sortKey);
+    setDir("asc");
+  }
+
   const filteredRows = useMemo(() => {
     const rows = dataset?.rows || [];
     const q = searchTerm.trim().toLowerCase();
 
-    return rows.filter((row) => {
-      const matchesBucket =
-        bucketFilter === "all" || row.bucket === bucketFilter;
+    const filtered = rows.filter((row) => {
+      const matchesBucket = bucketFilter === "all" || row.bucket === bucketFilter;
 
       const haystack = [
         row.contact_label,
+        row.contact_name,
         row.company,
         row.stage,
         row.comment,
         row.score,
         row.bucket,
         row.response_id,
+        row.pioupiou,
+        row.reader_serial,
+        row.q_recommend_score,
+        row.q_recommend_comment,
+        row.q_install_score,
+        row.q_install_comment,
+        row.q_daily_use_score,
+        row.q_benefits,
+        row.q_parent_relation_score,
+        row.q_parent_relation_comment,
+        row.q_support_score,
+        row.q_support_comment,
+        row.q_final_comment,
         ...(row.selected_options || []),
         JSON.stringify(row.extra_scores || {}),
       ]
@@ -210,7 +333,13 @@ export default function CsvNpsResponses() {
 
       return matchesBucket && matchesSearch;
     });
-  }, [dataset, bucketFilter, searchTerm]);
+
+    return [...filtered].sort((a, b) => {
+      const result = compareValues(a?.[sort], b?.[sort], dir);
+      if (result !== 0) return result;
+      return compareValues(a?.submitted_at, b?.submitted_at, "desc");
+    });
+  }, [dataset, bucketFilter, searchTerm, sort, dir]);
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -276,6 +405,8 @@ export default function CsvNpsResponses() {
     );
   }
 
+  const isIntercomMode = mode === "intercom" || dataset?.sourceType === "workspace_intercom";
+
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
@@ -306,7 +437,11 @@ export default function CsvNpsResponses() {
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search reference, company, stage, comment, benefit..."
+              placeholder={
+                isIntercomMode
+                  ? "Search contact, response id, Pioupiou, reader, comments, benefits..."
+                  : "Search reference, company, stage, comment, benefit..."
+              }
             />
           </label>
 
@@ -324,75 +459,243 @@ export default function CsvNpsResponses() {
           </label>
         </div>
 
-        <div className="csv-nps-table-wrap">
-          <table className="csv-nps-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Reference</th>
-                <th>Score</th>
-                <th>Bucket</th>
-                <th>Comment</th>
-                <th>Selected options</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredRows.length === 0 ? (
+        {isIntercomMode ? (
+          <div className="csv-nps-table-wrap">
+            <table className="min-w-[2450px] table-fixed border-collapse text-xs csv-nps-table">
+              <thead className="sticky top-0 z-30 bg-[#0F172A]">
                 <tr>
-                  <td colSpan="6">No responses match the current filters.</td>
+                  <SortableTh
+                    label="Contact"
+                    sortKey="contact_name"
+                    sort={sort}
+                    dir={dir}
+                    onSort={handleSort}
+                    className="sticky left-0 z-40 w-[150px] min-w-[150px] bg-[#0F172A]"
+                  />
+                  <SortableTh
+                    label="Date"
+                    sortKey="submitted_at"
+                    sort={sort}
+                    dir={dir}
+                    onSort={handleSort}
+                    className="sticky left-[150px] z-40 w-[95px] min-w-[95px] bg-[#0F172A]"
+                  />
+                  <SortableTh
+                    label="Bucket"
+                    sortKey="bucket"
+                    sort={sort}
+                    dir={dir}
+                    onSort={handleSort}
+                    className="sticky left-[245px] z-40 w-[88px] min-w-[88px] bg-[#0F172A]"
+                  />
+
+                  <SortableTh label="NPS" sortKey="score" sort={sort} dir={dir} onSort={handleSort} className="w-[70px]" />
+                  <SortableTh label="Response ID" sortKey="response_id" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
+                  <SortableTh label="Pioupiou" sortKey="pioupiou" sort={sort} dir={dir} onSort={handleSort} className="w-[120px]" />
+                  <SortableTh label="Reader" sortKey="reader_serial" sort={sort} dir={dir} onSort={handleSort} className="w-[110px]" />
+                  <SortableTh label="Recommend" sortKey="q_recommend_score" sort={sort} dir={dir} onSort={handleSort} className="w-[105px]" />
+                  <SortableTh label="Why?" sortKey="q_recommend_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[280px]" />
+                  <SortableTh label="Install" sortKey="q_install_score" sort={sort} dir={dir} onSort={handleSort} className="w-[90px]" />
+                  <SortableTh label="Install comment" sortKey="q_install_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label="Daily use" sortKey="q_daily_use_score" sort={sort} dir={dir} onSort={handleSort} className="w-[100px]" />
+                  <SortableTh label="Benefits" sortKey="q_benefits" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label="Parent relation" sortKey="q_parent_relation_score" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
+                  <SortableTh label="Parent relation comment" sortKey="q_parent_relation_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[260px]" />
+                  <SortableTh label="Support" sortKey="q_support_score" sort={sort} dir={dir} onSort={handleSort} className="w-[95px]" />
+                  <SortableTh label="Support comment" sortKey="q_support_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[220px]" />
+                  <SortableTh label="Final comment" sortKey="q_final_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label="Previous responses" sortKey="previous_response_dates" sort={sort} dir={dir} onSort={handleSort} className="w-[170px]" />
                 </tr>
-              ) : (
-                filteredRows.map((row) => (
-                  <tr key={row.response_id || row.id}>
-                    <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
+              </thead>
 
-                    <td>
-                      <div>{row.contact_label || "—"}</div>
-
-                      {(row.company || row.stage) && (
-                        <div className="csv-nps-muted-cell">
-                          {[row.company, row.stage].filter(Boolean).join(" · ")}
-                        </div>
-                      )}
-
-                      {row.intercom_contact_url && (
-                        <div className="csv-nps-muted-cell">
-                          <a
-                            href={row.intercom_contact_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-link"
-                          >
-                            Open in Intercom
-                          </a>
-                        </div>
-                      )}
-                    </td>
-
-                    <td>{row.score ?? "—"}</td>
-
-                    <td>
-                      <span
-                        className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}
-                      >
-                        {row.bucket}
-                      </span>
-                    </td>
-
-                    <td>{row.comment || "—"}</td>
-
-                    <td>
-                      {row.selected_options?.length
-                        ? row.selected_options.join(", ")
-                        : "—"}
+              <tbody>
+                {filteredRows.length === 0 ? (
+                  <tr>
+                    <td colSpan="18" className="px-3 py-4">
+                      No responses match the current filters.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  filteredRows.map((row, i) => {
+                    const rowBg = i % 2 === 0 ? "bg-slate-950/60" : "bg-slate-900/60";
+                    const stickyBg = i % 2 === 0 ? "bg-[#020817]" : "bg-[#0b1730]";
+
+                    return (
+                      <tr
+                        key={row.response_id || `${row.contact_name}-${row.submitted_at}-${i}`}
+                        className={`border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
+                      >
+                        <td className={`sticky left-0 z-20 w-[150px] min-w-[150px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
+                          <CellText>{row.contact_name}</CellText>
+
+                          <div className="mt-3">
+                            {row.intercom_contact_url ? (
+                              <a
+                                href={row.intercom_contact_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
+                              >
+                                Open
+                              </a>
+                            ) : (
+                              <span className="text-slate-500">—</span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className={`sticky left-[150px] z-20 w-[95px] min-w-[95px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
+                          <CellText>{shortDate(row.submitted_at)}</CellText>
+                        </td>
+
+                        <td className={`sticky left-[245px] z-20 w-[88px] min-w-[88px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
+                          <span className={`inline-flex rounded-full border px-2 py-1 text-[11px] font-semibold ${bucketBadge(row.bucket)}`}>
+                            {row.bucket || "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={`font-semibold ${scoreTextClass(Number(row.score))}`}>
+                            {row.score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.response_id}</CellText></td>
+                        <td className="px-3 py-3"><CellText>{row.pioupiou}</CellText></td>
+                        <td className="px-3 py-3"><CellText>{row.reader_serial}</CellText></td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={scoreTextClass(Number(row.q_recommend_score))}>
+                            {row.q_recommend_score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_recommend_comment}</CellText></td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={scoreTextClass(Number(row.q_install_score))}>
+                            {row.q_install_score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_install_comment}</CellText></td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={scoreTextClass(Number(row.q_daily_use_score))}>
+                            {row.q_daily_use_score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_benefits}</CellText></td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={scoreTextClass(Number(row.q_parent_relation_score))}>
+                            {row.q_parent_relation_score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_parent_relation_comment}</CellText></td>
+
+                        <td className="px-3 py-3 text-center">
+                          <span className={scoreTextClass(Number(row.q_support_score))}>
+                            {row.q_support_score ?? "—"}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_support_comment}</CellText></td>
+
+                        <td className="px-3 py-3"><CellText>{row.q_final_comment}</CellText></td>
+
+                        <td className="px-3 py-3 text-[11px] text-slate-300">
+                          {Array.isArray(row.previous_response_dates) &&
+                          row.previous_response_dates.length > 0 ? (
+                            <div className="space-y-1">
+                              {row.previous_response_dates.map((d, idx) => (
+                                <div key={`${row.response_id || i}-prev-${idx}`}>
+                                  {shortDate(d)}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="csv-nps-table-wrap">
+            <table className="csv-nps-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Reference</th>
+                  <th>Score</th>
+                  <th>Bucket</th>
+                  <th>Comment</th>
+                  <th>Selected options</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredRows.length === 0 ? (
+                  <tr>
+                    <td colSpan="6">No responses match the current filters.</td>
+                  </tr>
+                ) : (
+                  filteredRows.map((row) => (
+                    <tr key={row.response_id || row.id}>
+                      <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
+
+                      <td>
+                        <div>{row.contact_label || "—"}</div>
+
+                        {(row.company || row.stage) && (
+                          <div className="csv-nps-muted-cell">
+                            {[row.company, row.stage].filter(Boolean).join(" · ")}
+                          </div>
+                        )}
+
+                        {row.intercom_contact_url && (
+                          <div className="csv-nps-muted-cell">
+                            <a
+                              href={row.intercom_contact_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-link"
+                            >
+                              Open in Intercom
+                            </a>
+                          </div>
+                        )}
+                      </td>
+
+                      <td>{row.score ?? "—"}</td>
+
+                      <td>
+                        <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
+                          {row.bucket}
+                        </span>
+                      </td>
+
+                      <td>{row.comment || "—"}</td>
+
+                      <td>
+                        {row.selected_options?.length
+                          ? row.selected_options.join(", ")
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </main>
   );
@@ -460,10 +763,30 @@ function normaliseWorkspaceIntercomResponsesDataset(apiResponse) {
       stage: row.stage || null,
       comment: row.comment,
       contact_label: row.contact_label || "Contact",
+      contact_name: row.contact_name || row.contact_label || "Contact",
       intercom_contact_url: row.intercom_contact_url,
       selected_options: row.selected_options_json || [],
       extra_scores: row.extra_scores_json || {},
       closeLoopActions: row.close_loop_actions || [],
+      pioupiou: row.pioupiou || "-",
+      reader_serial: row.reader_serial || "-",
+      q_recommend_score: row.q_recommend_score ?? null,
+      q_recommend_comment: row.q_recommend_comment ?? null,
+      q_install_score: row.q_install_score ?? null,
+      q_install_comment: row.q_install_comment ?? null,
+      q_daily_use_score: row.q_daily_use_score ?? null,
+      q_benefits: row.q_benefits ?? null,
+      q_parent_relation_score: row.q_parent_relation_score ?? null,
+      q_parent_relation_comment: row.q_parent_relation_comment ?? null,
+      q_support_score: row.q_support_score ?? null,
+      q_support_comment: row.q_support_comment ?? null,
+      q_final_comment: row.q_final_comment ?? null,
+      previous_response_dates: Array.isArray(row.previous_response_dates)
+        ? row.previous_response_dates
+        : [],
+      previous_response_links: Array.isArray(row.previous_response_links)
+        ? row.previous_response_links
+        : [],
     })),
   };
 }

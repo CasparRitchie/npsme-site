@@ -1,3 +1,4 @@
+// src/pages/CsvNpsResponses.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
@@ -28,18 +29,25 @@ export default function CsvNpsResponses() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
-          credentials: "include",
-        });
+        const params = new URLSearchParams();
+        params.set("limit", "500");
+
+        const res = await fetch(
+          `/api/workspace/datasets/${datasetId}/responses?${params.toString()}`,
+          {
+            credentials: "include",
+          }
+        );
+
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
           throw new Error(data.error || "Failed to load saved dataset");
         }
 
-        setDataset(normaliseSavedDataset(data));
+        setDataset(normaliseWorkspaceResponsesDataset(data));
       } catch (err) {
-        console.error("Failed to load saved workspace dataset:", err);
+        console.error("Failed to load saved workspace responses dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
@@ -55,7 +63,8 @@ export default function CsvNpsResponses() {
       }
 
       try {
-        setDataset(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setDataset(normaliseSessionDataset(parsed));
       } catch (err) {
         console.error("Failed to read CSV NPS dataset from sessionStorage", err);
         setDatasetError("Failed to read latest browser-session dataset");
@@ -72,6 +81,7 @@ export default function CsvNpsResponses() {
 
   const filteredRows = useMemo(() => {
     const rows = dataset?.rows || [];
+    const q = searchTerm.trim().toLowerCase();
 
     return rows.filter((row) => {
       const matchesBucket =
@@ -84,15 +94,14 @@ export default function CsvNpsResponses() {
         row.comment,
         row.score,
         row.bucket,
+        row.response_id,
         ...(row.selected_options || []),
         JSON.stringify(row.extra_scores || {}),
       ]
-        .join(" ")
-        .toLowerCase();
+        .map((x) => String(x || "").toLowerCase())
+        .join(" ");
 
-      const matchesSearch =
-        !searchTerm.trim() ||
-        haystack.includes(searchTerm.trim().toLowerCase());
+      const matchesSearch = !q || haystack.includes(q);
 
       return matchesBucket && matchesSearch;
     });
@@ -110,7 +119,7 @@ export default function CsvNpsResponses() {
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading response data from workspace storage.</p>
+          <p>Loading response data from workspace.</p>
         </section>
       </main>
     );
@@ -186,7 +195,7 @@ export default function CsvNpsResponses() {
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search comment, score, bucket or selected option..."
+              placeholder="Search reference, company, stage, comment, benefit..."
             />
           </label>
 
@@ -209,26 +218,36 @@ export default function CsvNpsResponses() {
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Contact</th>
+                <th>Reference</th>
                 <th>Score</th>
                 <th>Bucket</th>
                 <th>Comment</th>
                 <th>Selected options</th>
-                <th>Intercom</th>
               </tr>
             </thead>
 
             <tbody>
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan="7">No responses match the current filters.</td>
+                  <td colSpan="6">No responses match the current filters.</td>
                 </tr>
               ) : (
                 filteredRows.map((row) => (
                   <tr key={row.response_id || row.id}>
                     <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
-                    <td>{row.contact_label || "Contact"}</td>
+
+                    <td>
+                      <div>{row.contact_label || "—"}</div>
+
+                      {(row.company || row.stage) && (
+                        <div className="csv-nps-muted-cell">
+                          {[row.company, row.stage].filter(Boolean).join(" · ")}
+                        </div>
+                      )}
+                    </td>
+
                     <td>{row.score ?? "—"}</td>
+
                     <td>
                       <span
                         className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}
@@ -236,25 +255,13 @@ export default function CsvNpsResponses() {
                         {row.bucket}
                       </span>
                     </td>
+
                     <td>{row.comment || "—"}</td>
+
                     <td>
                       {row.selected_options?.length
                         ? row.selected_options.join(", ")
                         : "—"}
-                    </td>
-                    <td>
-                      {row.intercom_contact_url ? (
-                        <a
-                          href={row.intercom_contact_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-link"
-                        >
-                          Open
-                        </a>
-                      ) : (
-                        "—"
-                      )}
                     </td>
                   </tr>
                 ))
@@ -267,27 +274,9 @@ export default function CsvNpsResponses() {
   );
 }
 
-function normaliseSavedDataset(apiResponse) {
+function normaliseWorkspaceResponsesDataset(apiResponse) {
   const savedDataset = apiResponse.dataset || {};
-  const savedRows = apiResponse.rows || [];
-
-  const rows = savedRows.map((row) => ({
-    id: row.id,
-    response_id: row.response_id || row.id,
-    source: row.source,
-    row_number: row.row_number,
-    submitted_at: row.submitted_at,
-    score: row.score,
-    bucket: row.bucket,
-    company: row.company || null,
-    stage: row.stage || null,
-    comment: row.comment || "",
-    contact_label: row.contact_label || "Contact",
-    intercom_contact_url: row.intercom_contact_url || null,
-    selected_options: row.selected_options_json || [],
-    extra_scores: row.extra_scores_json || {},
-    created_at: row.created_at || null,
-  }));
+  const savedRows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
 
   return {
     id: savedDataset.id,
@@ -297,49 +286,60 @@ function normaliseSavedDataset(apiResponse) {
     rawRowCount: savedDataset.raw_row_count,
     validRowCount: savedDataset.valid_row_count,
     skippedRowCount: savedDataset.skipped_row_count,
-    detectedFields: savedDataset.detected_fields_json || {},
-    warnings: savedDataset.warnings_json || [],
-    skippedRows: savedDataset.skipped_rows_json || [],
-    summary: normaliseSummary(savedDataset.summary_json, rows),
-    rows,
+    summary: savedDataset.summary_json || {},
+    rows: savedRows.map((row) => ({
+      id: row.id,
+      response_id: row.response_id || row.id,
+      source: row.source,
+      row_number: row.row_number,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      company: row.company,
+      stage: row.stage,
+      comment: row.comment,
+      contact_label: row.contact_label || "Contact",
+      intercom_contact_url: row.intercom_contact_url,
+      selected_options: row.selected_options_json || [],
+      extra_scores: row.extra_scores_json || {},
+      closeLoopActions: row.close_loop_actions || [],
+    })),
   };
 }
 
-function normaliseSummary(summaryJson, rows) {
-  const summary = summaryJson || {};
+function normaliseSessionDataset(sessionDataset) {
+  const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
 
   return {
-    total: summary.total ?? rows.length,
-    promoters:
-      summary.promoters ?? rows.filter((row) => row.bucket === "promoter").length,
-    passives:
-      summary.passives ?? rows.filter((row) => row.bucket === "passive").length,
-    detractors:
-      summary.detractors ??
-      rows.filter((row) => row.bucket === "detractor").length,
-    nps: summary.nps ?? calculateNps(rows),
-    averageScore: summary.averageScore ?? calculateAverageScore(rows),
+    id: sessionDataset?.id || null,
+    datasetName: sessionDataset?.datasetName || "Latest session dataset",
+    sourceType: sessionDataset?.sourceType || "session",
+    content_id: sessionDataset?.content_id || null,
+    rawRowCount: sessionDataset?.rawRowCount || rows.length,
+    validRowCount: sessionDataset?.validRowCount || rows.length,
+    skippedRowCount: sessionDataset?.skippedRowCount || 0,
+    summary: sessionDataset?.summary || {},
+    rows: rows.map((row) => ({
+      id: row.id || row.response_id,
+      response_id: row.response_id || row.id,
+      source: row.source,
+      row_number: row.row_number,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      company: row.company || null,
+      stage: row.stage || null,
+      comment: row.comment,
+      contact_label:
+        row.contact_label ||
+        row.company ||
+        row.stage ||
+        row.response_id ||
+        "Contact",
+      intercom_contact_url: row.intercom_contact_url || null,
+      selected_options: row.selected_options || [],
+      extra_scores: row.extra_scores || {},
+      closeLoopActions: row.loopActions || [],
+    })),
   };
-}
-
-function calculateNps(rows) {
-  const total = rows.length;
-  if (!total) return null;
-
-  const promoters = rows.filter((row) => row.bucket === "promoter").length;
-  const detractors = rows.filter((row) => row.bucket === "detractor").length;
-
-  return Math.round(((promoters - detractors) / total) * 100);
-}
-
-function calculateAverageScore(rows) {
-  const scores = rows
-    .map((row) => Number(row.score))
-    .filter((score) => Number.isFinite(score));
-
-  if (!scores.length) return null;
-
-  return Math.round(
-    (scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10
-  ) / 10;
 }

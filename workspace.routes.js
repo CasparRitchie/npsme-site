@@ -32,13 +32,10 @@ export function createWorkspaceRouter() {
     });
   });
 
-
   // --------------------------------------------------
   // Enforce workspace auth for all workspace routes
   // --------------------------------------------------
   router.use(requireWorkspaceAuth);
-
-
 
   // --------------------------------------------------
   // GET /api/workspace/home
@@ -206,9 +203,13 @@ export function createWorkspaceRouter() {
           submitted_at,
           score,
           bucket,
+          company,
+          stage,
           comment,
           contact_id,
           intercom_contact_url,
+          selected_options_json,
+          extra_scores_json,
           created_at,
           close_loop_actions (
             id,
@@ -583,10 +584,41 @@ function isUuid(value) {
   );
 }
 
-function formatRedactedContactLabel(contactId) {
-  const raw = String(contactId || "").trim();
-  if (!raw) return "Contact";
-  return `Contact •••${raw.slice(-5)}`;
+function buildOperationalReferenceLabel(row) {
+  const contactId = String(row?.contact_id || "").trim();
+  const company = String(row?.company || "").trim();
+  const stage = String(row?.stage || "").trim();
+  const responseId = String(row?.response_id || "").trim();
+  const rowNumber =
+    row?.row_number !== null && row?.row_number !== undefined
+      ? String(row.row_number).trim()
+      : "";
+
+  if (contactId) {
+    return `Contact •••${contactId.slice(-5)}`;
+  }
+
+  if (company && stage) {
+    return `${company} · ${stage}`;
+  }
+
+  if (company) {
+    return company;
+  }
+
+  if (stage && responseId) {
+    return `${stage} · ${responseId}`;
+  }
+
+  if (responseId) {
+    return `Response ${responseId}`;
+  }
+
+  if (rowNumber) {
+    return `Response row ${rowNumber}`;
+  }
+
+  return "Contact";
 }
 
 function redactFreeText(value, maxLength = 500) {
@@ -644,14 +676,21 @@ function toSafeWorkspaceRow(row) {
     score: Number.isFinite(Number(row.score)) ? Number(row.score) : null,
     bucket: row.bucket || null,
 
+    company: row.company || null,
+    stage: row.stage || null,
     comment: redactFreeText(row.comment, 280),
 
     customer_name: null,
     customer_email: null,
 
-    contact_label: formatRedactedContactLabel(row.contact_id),
+    contact_label: buildOperationalReferenceLabel(row),
     intercom_contact_url: row.intercom_contact_url || null,
 
+    selected_options_json: Array.isArray(row.selected_options_json)
+      ? row.selected_options_json
+      : [],
+
+    extra_scores_json: row.extra_scores_json || {},
     close_loop_actions: toSafeCloseLoopActions(row.close_loop_actions),
 
     created_at: row.created_at || null,
@@ -676,7 +715,7 @@ function toSafeWorkspaceResponseListRow(row) {
     customer_name: null,
     customer_email: null,
 
-    contact_label: formatRedactedContactLabel(row.contact_id),
+    contact_label: buildOperationalReferenceLabel(row),
     intercom_contact_url: row.intercom_contact_url || null,
 
     selected_options_json: Array.isArray(row.selected_options_json)
@@ -702,13 +741,12 @@ function toSafeWorkspaceResponseDetail(row) {
 
     company: row.company || null,
     stage: row.stage || null,
-
     comment: redactFreeText(row.comment, 1200),
 
     customer_name: null,
     customer_email: null,
 
-    contact_label: formatRedactedContactLabel(row.contact_id),
+    contact_label: buildOperationalReferenceLabel(row),
     intercom_contact_url: row.intercom_contact_url || null,
 
     selected_options_json: Array.isArray(row.selected_options_json)

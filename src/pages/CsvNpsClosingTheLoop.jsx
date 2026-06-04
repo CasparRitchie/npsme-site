@@ -33,7 +33,7 @@ export default function CsvNpsClosingTheLoop() {
 
       try {
         const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
-            credentials: "include",
+          credentials: "include",
         });
 
         const data = await res.json();
@@ -459,7 +459,7 @@ export default function CsvNpsClosingTheLoop() {
 
 function normaliseSavedDataset(apiResponse) {
   const savedDataset = apiResponse.dataset || {};
-  const savedRows = apiResponse.rows || [];
+  const savedRows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
 
   const rows = savedRows.map((row) => {
     const loopActions = normaliseSavedActions(row.close_loop_actions);
@@ -472,9 +472,13 @@ function normaliseSavedDataset(apiResponse) {
       submitted_at: row.submitted_at,
       score: row.score,
       bucket: row.bucket,
+      company: row.company || null,
+      stage: row.stage || null,
       comment: row.comment,
       contact_label: row.contact_label || "Contact",
       intercom_contact_url: row.intercom_contact_url,
+      selected_options: row.selected_options_json || [],
+      extra_scores: row.extra_scores_json || {},
       loopActions,
     };
   });
@@ -548,7 +552,7 @@ function getActionKey(row) {
     row?.db_row_id ||
       row?.response_id ||
       row?.row_number ||
-      `${row?.customer_email || row?.contact_label || "unknown"}-${row?.submitted_at || "no-date"}-${row?.score || "no-score"}`
+      `${row?.contact_label || "unknown"}-${row?.submitted_at || "no-date"}-${row?.score || "no-score"}`
   );
 }
 
@@ -593,9 +597,10 @@ function ClosingLoopCard({ row, action, savedActions = [], onChange, onSave }) {
 
         <h3>{row.contact_label || "Contact"}</h3>
 
-          <p className="csv-nps-loop-meta">
-            {row.submitted_at?.slice(0, 10) || "No date"}
-          </p>
+        <p className="csv-nps-loop-meta">
+          {[row.company, row.stage].filter(Boolean).join(" · ") || "No business context"}{" "}
+          · {row.submitted_at?.slice(0, 10) || "No date"}
+        </p>
 
         <blockquote>{row.comment || "No comment provided."}</blockquote>
 

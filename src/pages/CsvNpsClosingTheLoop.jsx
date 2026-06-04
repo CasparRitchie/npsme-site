@@ -33,8 +33,9 @@ export default function CsvNpsClosingTheLoop() {
 
       try {
         const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
-          credentials: "include",
+            credentials: "include",
         });
+
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
@@ -460,27 +461,23 @@ function normaliseSavedDataset(apiResponse) {
   const savedDataset = apiResponse.dataset || {};
   const savedRows = apiResponse.rows || [];
 
-  const rows = savedRows.map((row) => ({
-    db_row_id: row.id,
-    response_id: row.response_id || row.id,
-    source: row.source,
-    row_number: row.row_number,
-    submitted_at: row.submitted_at,
-    score: row.score,
-    bucket: row.bucket,
-    customer_name: row.customer_name || null,
-    customer_email: row.customer_email || null,
-    contact_label: row.contact_label || "Contact",
-    company: row.company || null,
-    stage: row.stage || null,
-    comment: row.comment || "",
-    contact_id: row.contact_id || null,
-    intercom_contact_url: row.intercom_contact_url || null,
-    selected_options: row.selected_options_json || [],
-    extra_scores: row.extra_scores_json || {},
-    raw: row.raw_json || {},
-    loopActions: normaliseSavedActions(row.close_loop_actions),
-  }));
+  const rows = savedRows.map((row) => {
+    const loopActions = normaliseSavedActions(row.close_loop_actions);
+
+    return {
+      db_row_id: row.id,
+      response_id: row.response_id || row.id,
+      source: row.source,
+      row_number: row.row_number,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      comment: row.comment,
+      contact_label: row.contact_label || "Contact",
+      intercom_contact_url: row.intercom_contact_url,
+      loopActions,
+    };
+  });
 
   return {
     id: savedDataset.id,
@@ -490,9 +487,6 @@ function normaliseSavedDataset(apiResponse) {
     rawRowCount: savedDataset.raw_row_count,
     validRowCount: savedDataset.valid_row_count,
     skippedRowCount: savedDataset.skipped_row_count,
-    detectedFields: savedDataset.detected_fields_json || {},
-    warnings: savedDataset.warnings_json || [],
-    skippedRows: savedDataset.skipped_rows_json || [],
     summary: savedDataset.summary_json || {},
     rows,
   };
@@ -597,11 +591,11 @@ function ClosingLoopCard({ row, action, savedActions = [], onChange, onSave }) {
           </span>
         </div>
 
-        <h3>{row.contact_label || row.customer_name || "Contact"}</h3>
+        <h3>{row.contact_label || "Contact"}</h3>
 
-        <p className="csv-nps-loop-meta">
-          {row.submitted_at?.slice(0, 10) || "No date"}
-        </p>
+          <p className="csv-nps-loop-meta">
+            {row.submitted_at?.slice(0, 10) || "No date"}
+          </p>
 
         <blockquote>{row.comment || "No comment provided."}</blockquote>
 

@@ -166,6 +166,15 @@ const COMPONENTS = {
   "/workspace/datasets": workspaceProtect(NpsDatasets),
   "/fr/workspace/datasets": workspaceProtect(NpsDatasets),
 
+  "/workspace/performance": workspaceProtect(CsvNpsPerformance),
+  "/fr/workspace/performance": workspaceProtect(CsvNpsPerformance),
+
+  "/workspace/responses": workspaceProtect(CsvNpsResponses),
+  "/fr/workspace/responses": workspaceProtect(CsvNpsResponses),
+
+  "/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
+  "/fr/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
+
   "/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),
   "/fr/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),
 

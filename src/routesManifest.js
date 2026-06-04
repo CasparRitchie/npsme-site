@@ -93,6 +93,15 @@ export const ROUTES_MANIFEST = [
   { path: "/workspace/datasets",                                label: "Saved datasets",       labelKey: "routes.workspaceDatasets",    enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/datasets",                             label: "Datasets",             labelKey: "routes.workspaceDatasets",    enabled: true,  indexable: false, inHeader: false, inFooter: true,  lang: "fr", authMode: "workspace_cookie" },
 
+  { path: "/workspace/performance",                            label: "Workspace Performance", labelKey: "routes.workspacePerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/performance",                         label: "Performance workspace", labelKey: "routes.workspacePerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
+  { path: "/workspace/responses",                              label: "Workspace Responses",   labelKey: "routes.workspaceResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/responses",                           label: "Réponses workspace",    labelKey: "routes.workspaceResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
+  { path: "/workspace/closing-the-loop",                       label: "Workspace Closing the Loop", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/closing-the-loop",                    label: "Boucle de feedback workspace", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
   { path: "/workspace/datasets/:datasetId/performance",         label: "Dataset Performance",  labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/datasets/:datasetId/performance",      label: "Performance dataset",  labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 

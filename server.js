@@ -26,6 +26,7 @@ import { createEnvolaRouter } from "./envola.routes.js";
 import { createCsvNpsRouter } from "./csvNps.routes.js";
 import { createNpsDataRouter } from "./npsData.routes.js";
 import { createWorkspaceRouter } from "./workspace.routes.js";
+import { createWorkspaceIntercomRouter } from "./workspaceIntercom.routes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -409,6 +410,8 @@ app.post("/api/workspace-auth/change-password", requireWorkspaceAuth, async (req
 });
 
 
+
+
 // =====================================================
 // CSV NPS API ROUTES
 // Base path: /api/csv-nps
@@ -444,6 +447,15 @@ app.use("/api/nps-data",
 app.use(
   "/api/workspace",
   createWorkspaceRouter()
+);
+
+app.use(
+  "/api/workspace-intercom",
+  (req, res, next) => {
+    if (req.path === "/ping") return next();
+    return requireWorkspaceAuth(req, res, next);
+  },
+  createWorkspaceIntercomRouter()
 );
 
 // ---------------------------------------------------------------------------

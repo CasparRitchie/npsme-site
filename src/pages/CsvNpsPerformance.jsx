@@ -466,4 +466,4 @@ function getScoreClass(score) {
   if (score >= 9) return "csv-nps-score-fill-promoter";
   if (score >= 7) return "csv-nps-score-fill-passive";
   return "csv-nps-score-fill-detractor";
-
+}

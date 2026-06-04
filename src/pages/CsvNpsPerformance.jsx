@@ -33,6 +33,7 @@ export default function CsvNpsPerformance() {
             credentials: "include",
           }
         );
+
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
@@ -41,7 +42,7 @@ export default function CsvNpsPerformance() {
 
         setDataset(normaliseWorkspacePerformanceDataset(data));
       } catch (err) {
-        console.error("Failed to load saved workspace performance dataset:", err);
+        console.error("Failed to load saved workspace dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
@@ -91,8 +92,25 @@ export default function CsvNpsPerformance() {
     };
   }, [dataset]);
 
-  const scoreDistribution = dataset?.scoreDistribution || [];
-  const timeline = dataset?.timeline || [];
+  const scoreDistribution = useMemo(() => {
+    const counts = Array.isArray(dataset?.scoreDistribution)
+      ? dataset.scoreDistribution
+      : Array.from({ length: 11 }, (_, score) => ({
+          score,
+          count: 0,
+        }));
+
+    const maxCount = Math.max(...counts.map((item) => item.count || 0), 1);
+
+    return counts.map((item) => ({
+      ...item,
+      percentageOfMax: Math.round(((item.count || 0) / maxCount) * 100),
+    }));
+  }, [dataset]);
+
+  const timeline = useMemo(() => {
+    return Array.isArray(dataset?.timeline) ? dataset.timeline : [];
+  }, [dataset]);
 
   if (loadingDataset) {
     return (
@@ -285,35 +303,21 @@ export default function CsvNpsPerformance() {
 }
 
 function normaliseWorkspacePerformanceDataset(apiResponse) {
-  const savedDataset = apiResponse.dataset || {};
+  const dataset = apiResponse.dataset || {};
   const summary = apiResponse.summary || {};
   const timeline = Array.isArray(apiResponse.timeline) ? apiResponse.timeline : [];
-  const rawScoreDistribution = Array.isArray(apiResponse.score_distribution)
+  const scoreDistribution = Array.isArray(apiResponse.score_distribution)
     ? apiResponse.score_distribution
     : [];
 
-  const maxCount = Math.max(
-    ...rawScoreDistribution.map((item) => Number(item.count) || 0),
-    1
-  );
-
-  const scoreDistribution = rawScoreDistribution.map((item) => ({
-    score: Number(item.score),
-    count: Number(item.count) || 0,
-    percentageOfMax: Math.round(((Number(item.count) || 0) / maxCount) * 100),
-  }));
-
   return {
-    id: savedDataset.id,
-    datasetName: savedDataset.dataset_name,
-    sourceType: savedDataset.source_type,
-    content_id: savedDataset.content_id,
-    rawRowCount: savedDataset.raw_row_count,
-    validRowCount: savedDataset.valid_row_count,
-    skippedRowCount: savedDataset.skipped_row_count,
-    detectedFields: savedDataset.detected_fields_json || {},
-    warnings: savedDataset.warnings_json || [],
-    skippedRows: savedDataset.skipped_rows_json || [],
+    id: dataset.id,
+    datasetName: dataset.dataset_name,
+    sourceType: dataset.source_type,
+    content_id: dataset.content_id,
+    rawRowCount: dataset.raw_row_count,
+    validRowCount: dataset.valid_row_count,
+    skippedRowCount: dataset.skipped_row_count,
     summary: {
       total: summary.total ?? 0,
       promoters: summary.promoters ?? 0,
@@ -330,25 +334,6 @@ function normaliseWorkspacePerformanceDataset(apiResponse) {
 function normaliseSessionDataset(sessionDataset) {
   const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
   const summary = normaliseSummary(sessionDataset?.summary, rows);
-
-  const counts = Array.from({ length: 11 }, (_, score) => ({
-    score,
-    count: 0,
-  }));
-
-  rows.forEach((row) => {
-    const score = Number(row.score);
-    if (Number.isInteger(score) && score >= 0 && score <= 10) {
-      counts[score].count += 1;
-    }
-  });
-
-  const maxCount = Math.max(...counts.map((item) => item.count), 1);
-
-  const scoreDistribution = counts.map((item) => ({
-    ...item,
-    percentageOfMax: Math.round((item.count / maxCount) * 100),
-  }));
 
   const byDate = new Map();
 
@@ -381,23 +366,30 @@ function normaliseSessionDataset(sessionDataset) {
     );
   });
 
-  const timeline = Array.from(byDate.values()).sort((a, b) =>
-    a.date > b.date ? 1 : -1
-  );
+  const scoreDistribution = Array.from({ length: 11 }, (_, score) => ({
+    score,
+    count: 0,
+  }));
+
+  rows.forEach((row) => {
+    const score = Number(row.score);
+    if (Number.isInteger(score) && score >= 0 && score <= 10) {
+      scoreDistribution[score].count += 1;
+    }
+  });
 
   return {
     id: sessionDataset?.id || null,
-    datasetName: sessionDataset?.datasetName || "Latest session dataset",
+    datasetName: sessionDataset?.datasetName || "Session dataset",
     sourceType: sessionDataset?.sourceType || "session",
     content_id: sessionDataset?.content_id || null,
     rawRowCount: sessionDataset?.rawRowCount || rows.length,
     validRowCount: sessionDataset?.validRowCount || rows.length,
     skippedRowCount: sessionDataset?.skippedRowCount || 0,
-    detectedFields: sessionDataset?.detectedFields || {},
-    warnings: sessionDataset?.warnings || [],
-    skippedRows: sessionDataset?.skippedRows || [],
     summary,
-    timeline,
+    timeline: Array.from(byDate.values()).sort((a, b) =>
+      a.date > b.date ? 1 : -1
+    ),
     scoreDistribution,
   };
 }
@@ -474,4 +466,4 @@ function getScoreClass(score) {
   if (score >= 9) return "csv-nps-score-fill-promoter";
   if (score >= 7) return "csv-nps-score-fill-passive";
   return "csv-nps-score-fill-detractor";
-}
+

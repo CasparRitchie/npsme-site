@@ -10,6 +10,8 @@ const PAGE_COPY = {
     "Review, search and filter the customer responses in this saved feedback dataset.",
   sessionSubtitle:
     "Review, search and filter the customer responses in the latest browser-session dataset.",
+  intercomSubtitle:
+    "Review, search and filter the customer responses from the active Intercom source for this workspace.",
 };
 
 export default function CsvNpsResponses() {
@@ -18,6 +20,7 @@ export default function CsvNpsResponses() {
   const [dataset, setDataset] = useState(null);
   const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
   const [datasetError, setDatasetError] = useState("");
+  const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,7 +70,7 @@ export default function CsvNpsResponses() {
               rows: intercomData.rows,
             })
           );
-
+          setMode("intercom");
           return;
         }
 
@@ -88,6 +91,7 @@ export default function CsvNpsResponses() {
         }
 
         setDataset(normaliseWorkspaceResponsesDataset(data));
+        setMode("saved");
       } catch (err) {
         console.error("Failed to load saved workspace responses dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
@@ -96,28 +100,87 @@ export default function CsvNpsResponses() {
       }
     }
 
+    async function loadActiveIntercomDataset() {
+      try {
+        const params = new URLSearchParams();
+        params.set("limit", "500");
+
+        const res = await fetch(
+          `/api/workspace-intercom/responses?${params.toString()}`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load active Intercom responses");
+        }
+
+        setDataset(
+          normaliseWorkspaceIntercomResponsesDataset({
+            dataset: {
+              id: null,
+              dataset_name: data?.source?.source_name || "Active Intercom source",
+              source_type: "workspace_intercom",
+              content_id: data?.content_id || data?.source?.survey_content_id || null,
+              raw_row_count: data?.summary?.total || data?.rows?.length || 0,
+              valid_row_count: data?.summary?.total || data?.rows?.length || 0,
+              skipped_row_count: 0,
+              summary_json: data?.summary || {},
+            },
+            source: data.source,
+            summary: data.summary,
+            rows: data.rows,
+          })
+        );
+        setMode("intercom");
+        return true;
+      } catch (_err) {
+        return false;
+      }
+    }
+
     function loadSessionDataset() {
       const saved = sessionStorage.getItem("csvNpsLatestDataset");
 
       if (!saved) {
         setDataset(null);
-        return;
+        return false;
       }
 
       try {
         const parsed = JSON.parse(saved);
         setDataset(normaliseSessionDataset(parsed));
+        setMode("session");
+        return true;
       } catch (err) {
         console.error("Failed to read CSV NPS dataset from sessionStorage", err);
         setDatasetError("Failed to read latest browser-session dataset");
+        return false;
+      }
+    }
+
+    async function loadWithoutDatasetId() {
+      setLoadingDataset(true);
+      setDatasetError("");
+
+      try {
+        const loadedIntercom = await loadActiveIntercomDataset();
+
+        if (!loadedIntercom) {
+          loadSessionDataset();
+        }
+      } finally {
+        setLoadingDataset(false);
       }
     }
 
     if (datasetId) {
       loadSavedDataset();
     } else {
-      loadSessionDataset();
-      setLoadingDataset(false);
+      loadWithoutDatasetId();
     }
   }, [datasetId]);
 
@@ -149,13 +212,19 @@ export default function CsvNpsResponses() {
     });
   }, [dataset, bucketFilter, searchTerm]);
 
+  const subtitle = datasetId
+    ? PAGE_COPY.savedSubtitle
+    : mode === "intercom"
+      ? PAGE_COPY.intercomSubtitle
+      : PAGE_COPY.sessionSubtitle;
+
   if (loadingDataset) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
           <h1>{PAGE_COPY.title}</h1>
-          <p>Loading saved dataset...</p>
+          <p>Loading response data...</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -212,7 +281,7 @@ export default function CsvNpsResponses() {
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
         <h1>{PAGE_COPY.title}</h1>
-        <p>{datasetId ? PAGE_COPY.savedSubtitle : PAGE_COPY.sessionSubtitle}</p>
+        <p>{subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />

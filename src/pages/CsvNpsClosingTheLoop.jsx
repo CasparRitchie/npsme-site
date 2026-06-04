@@ -1,4 +1,3 @@
-// src/pages/CsvNpsClosingTheLoop.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
@@ -13,6 +12,8 @@ const PAGE_COPY = {
     "Prioritise customer follow-up, assign owners and track actions for this saved feedback dataset.",
   sessionSubtitle:
     "Prioritise customer follow-up, assign owners and track actions for the latest browser-session dataset.",
+  intercomSubtitle:
+    "Prioritise customer follow-up, assign owners and track actions for the active Intercom source in this workspace.",
 };
 
 export default function CsvNpsClosingTheLoop() {
@@ -22,6 +23,8 @@ export default function CsvNpsClosingTheLoop() {
   const [actions, setActions] = useState({});
   const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
   const [datasetError, setDatasetError] = useState("");
+  const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
+  const [actionScope, setActionScope] = useState(datasetId || "session");
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -32,26 +35,111 @@ export default function CsvNpsClosingTheLoop() {
       setDatasetError("");
 
       try {
-        const res = await fetch(`/api/workspace/datasets/${datasetId}`, {
+        const datasetMetaRes = await fetch(`/api/workspace/datasets/${datasetId}`, {
           credentials: "include",
         });
 
-        const data = await res.json();
+        const datasetMeta = await datasetMetaRes.json();
 
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load saved dataset");
+        if (!datasetMetaRes.ok || !datasetMeta.ok) {
+          throw new Error(datasetMeta.error || "Failed to load saved dataset");
         }
 
-        const normalised = normaliseSavedDataset(data);
-        setDataset(normalised);
+        const sourceType = String(datasetMeta?.dataset?.source_type || "").trim();
 
-        const draftActions = readLocalActions(datasetId);
-        setActions(draftActions);
+        if (sourceType === "workspace_intercom") {
+          const params = new URLSearchParams();
+          params.set("limit", "500");
+
+          const intercomRes = await fetch(
+            `/api/workspace-intercom/responses?${params.toString()}`,
+            {
+              credentials: "include",
+            }
+          );
+
+          const intercomData = await intercomRes.json();
+
+          if (!intercomRes.ok || !intercomData.ok) {
+            throw new Error(
+              intercomData.error || "Failed to load workspace Intercom responses"
+            );
+          }
+
+          const scope = `intercom:${intercomData?.source?.id || "active"}`;
+
+          setDataset(
+            normaliseWorkspaceIntercomDataset({
+              dataset: datasetMeta.dataset,
+              source: intercomData.source,
+              summary: intercomData.summary,
+              rows: intercomData.rows,
+            })
+          );
+          setActions(readLocalActions(scope));
+          setActionScope(scope);
+          setMode("intercom");
+          return;
+        }
+
+        const normalised = normaliseSavedDataset(datasetMeta);
+        setDataset(normalised);
+        setActions(readLocalActions(datasetId));
+        setActionScope(datasetId);
+        setMode("saved");
       } catch (err) {
         console.error("Failed to load saved workspace dataset:", err);
         setDatasetError(err.message || "Failed to load saved dataset");
       } finally {
         setLoadingDataset(false);
+      }
+    }
+
+    async function loadActiveIntercomDataset() {
+      try {
+        const params = new URLSearchParams();
+        params.set("limit", "500");
+
+        const intercomRes = await fetch(
+          `/api/workspace-intercom/responses?${params.toString()}`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const intercomData = await intercomRes.json();
+
+        if (!intercomRes.ok || !intercomData.ok) {
+          throw new Error(
+            intercomData.error || "Failed to load workspace Intercom responses"
+          );
+        }
+
+        const scope = `intercom:${intercomData?.source?.id || "active"}`;
+
+        setDataset(
+          normaliseWorkspaceIntercomDataset({
+            dataset: {
+              id: null,
+              dataset_name: intercomData?.source?.source_name || "Active Intercom source",
+              source_type: "workspace_intercom",
+              content_id: intercomData?.content_id || intercomData?.source?.survey_content_id || null,
+              raw_row_count: intercomData?.summary?.total || intercomData?.rows?.length || 0,
+              valid_row_count: intercomData?.summary?.total || intercomData?.rows?.length || 0,
+              skipped_row_count: 0,
+              summary_json: intercomData?.summary || {},
+            },
+            source: intercomData.source,
+            summary: intercomData.summary,
+            rows: intercomData.rows,
+          })
+        );
+        setActions(readLocalActions(scope));
+        setActionScope(scope);
+        setMode("intercom");
+        return true;
+      } catch (_err) {
+        return false;
       }
     }
 
@@ -62,20 +150,38 @@ export default function CsvNpsClosingTheLoop() {
         try {
           const parsed = JSON.parse(savedDataset);
           setDataset(normaliseSessionDataset(parsed));
+          setActions(readLocalActions("session"));
+          setActionScope("session");
+          setMode("session");
+          return true;
         } catch (err) {
           console.error("Failed to read CSV NPS dataset from sessionStorage", err);
           setDatasetError("Failed to read latest browser-session dataset");
         }
       }
 
-      setActions(readLocalActions("session"));
+      return false;
+    }
+
+    async function loadWithoutDatasetId() {
+      setLoadingDataset(true);
+      setDatasetError("");
+
+      try {
+        const loadedIntercom = await loadActiveIntercomDataset();
+
+        if (!loadedIntercom) {
+          loadSessionDataset();
+        }
+      } finally {
+        setLoadingDataset(false);
+      }
     }
 
     if (datasetId) {
       loadSavedDataset();
     } else {
-      loadSessionDataset();
-      setLoadingDataset(false);
+      loadWithoutDatasetId();
     }
   }, [datasetId]);
 
@@ -96,7 +202,7 @@ export default function CsvNpsClosingTheLoop() {
         },
       };
 
-      writeLocalActions(datasetId || "session", updated);
+      writeLocalActions(actionScope, updated);
       return updated;
     });
   }
@@ -119,26 +225,54 @@ export default function CsvNpsClosingTheLoop() {
           saveError: "Please write a follow-up note before saving.",
         },
       }));
-
       return;
     }
 
     if (!datasetId || !row.db_row_id) {
-      const updatedAction = {
-        ...action,
+      const localSavedAction = {
+        id: `local-${Date.now()}`,
+        status: action.status || "open",
+        owner: action.owner || "",
+        actionTaken: action.actionTaken || "",
         updatedAt: new Date().toISOString(),
         isDirty: false,
         isSaving: false,
         saveError: "",
       };
 
+      setDataset((currentDataset) => {
+        if (!currentDataset) return currentDataset;
+
+        return {
+          ...currentDataset,
+          rows: currentDataset.rows.map((datasetRow) => {
+            if (getActionKey(datasetRow) !== actionKey) {
+              return datasetRow;
+            }
+
+            return {
+              ...datasetRow,
+              loopActions: [...(datasetRow.loopActions || []), localSavedAction],
+            };
+          }),
+        };
+      });
+
       setActions((current) => {
         const updated = {
           ...current,
-          [actionKey]: updatedAction,
+          [actionKey]: {
+            status: action.status || "open",
+            owner: action.owner || "",
+            actionTaken: "",
+            updatedAt: null,
+            isDirty: false,
+            isSaving: false,
+            saveError: "",
+          },
         };
 
-        writeLocalActions(datasetId || "session", updated);
+        writeLocalActions(actionScope, updated);
         return updated;
       });
 
@@ -208,7 +342,7 @@ export default function CsvNpsClosingTheLoop() {
           },
         };
 
-        writeLocalActions(datasetId || "session", updated);
+        writeLocalActions(actionScope, updated);
         return updated;
       });
     } catch (err) {
@@ -319,13 +453,19 @@ export default function CsvNpsClosingTheLoop() {
     return { total, open, inProgress, closed };
   }, [dataset, actions]);
 
+  const subtitle = datasetId
+    ? PAGE_COPY.savedSubtitle
+    : mode === "intercom"
+      ? PAGE_COPY.intercomSubtitle
+      : PAGE_COPY.sessionSubtitle;
+
   if (loadingDataset) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
           <h1>{PAGE_COPY.title}</h1>
-          <p>Loading saved dataset...</p>
+          <p>Loading follow-up queue...</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -382,7 +522,7 @@ export default function CsvNpsClosingTheLoop() {
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
         <h1>{PAGE_COPY.title}</h1>
-        <p>{datasetId ? PAGE_COPY.savedSubtitle : PAGE_COPY.sessionSubtitle}</p>
+        <p>{subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -496,6 +636,42 @@ function normaliseSavedDataset(apiResponse) {
   };
 }
 
+function normaliseWorkspaceIntercomDataset(apiResponse) {
+  const savedDataset = apiResponse.dataset || {};
+  const savedRows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
+  const source = apiResponse.source || {};
+
+  return {
+    id: savedDataset.id,
+    datasetName:
+      savedDataset.dataset_name ||
+      source.source_name ||
+      "Workspace Intercom dataset",
+    sourceType: savedDataset.source_type || "workspace_intercom",
+    content_id: savedDataset.content_id || source.survey_content_id || null,
+    rawRowCount: savedRows.length,
+    validRowCount: apiResponse.summary?.total ?? savedRows.length,
+    skippedRowCount: 0,
+    summary: apiResponse.summary || {},
+    rows: savedRows.map((row) => ({
+      db_row_id: null,
+      response_id: row.response_id || row.id,
+      source: row.source || "workspace_intercom",
+      row_number: row.row_number || null,
+      submitted_at: row.submitted_at,
+      score: row.score,
+      bucket: row.bucket,
+      comment: row.comment || "",
+      contact_label: row.contact_label || "Contact",
+      intercom_contact_url: row.intercom_contact_url || null,
+      company: row.company || null,
+      stage: row.stage || null,
+      selected_options: row.selected_options_json || [],
+      loopActions: normaliseSavedActions(row.close_loop_actions || []),
+    })),
+  };
+}
+
 function normaliseSessionDataset(sessionDataset) {
   const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
 
@@ -548,8 +724,12 @@ function normaliseSavedActions(actions = []) {
 
   return [...actions]
     .sort((a, b) => {
-      const aDate = new Date(a.updated_at || a.created_at || 0).getTime();
-      const bDate = new Date(b.updated_at || b.created_at || 0).getTime();
+      const aDate = new Date(
+        a.updated_at || a.created_at || a.updatedAt || 0
+      ).getTime();
+      const bDate = new Date(
+        b.updated_at || b.created_at || b.updatedAt || 0
+      ).getTime();
 
       return aDate - bDate;
     })
@@ -561,8 +741,8 @@ function normaliseSavedAction(action) {
     id: action.id,
     status: action.status || "open",
     owner: action.owner || "",
-    actionTaken: action.action_taken || "",
-    updatedAt: action.updated_at || action.created_at || null,
+    actionTaken: action.action_taken || action.actionTaken || "",
+    updatedAt: action.updated_at || action.created_at || action.updatedAt || null,
     isDirty: false,
     isSaving: false,
     saveError: "",

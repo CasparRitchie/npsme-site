@@ -60,7 +60,8 @@ export default function CsvNpsClosingTheLoop() {
 
       if (savedDataset) {
         try {
-          setDataset(JSON.parse(savedDataset));
+          const parsed = JSON.parse(savedDataset);
+          setDataset(normaliseSessionDataset(parsed));
         } catch (err) {
           console.error("Failed to read CSV NPS dataset from sessionStorage", err);
           setDatasetError("Failed to read latest browser-session dataset");
@@ -472,13 +473,12 @@ function normaliseSavedDataset(apiResponse) {
       submitted_at: row.submitted_at,
       score: row.score,
       bucket: row.bucket,
-      company: row.company || null,
-      stage: row.stage || null,
       comment: row.comment,
       contact_label: row.contact_label || "Contact",
       intercom_contact_url: row.intercom_contact_url,
+      company: row.company || null,
+      stage: row.stage || null,
       selected_options: row.selected_options_json || [],
-      extra_scores: row.extra_scores_json || {},
       loopActions,
     };
   });
@@ -493,6 +493,51 @@ function normaliseSavedDataset(apiResponse) {
     skippedRowCount: savedDataset.skipped_row_count,
     summary: savedDataset.summary_json || {},
     rows,
+  };
+}
+
+function normaliseSessionDataset(sessionDataset) {
+  const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
+
+  return {
+    id: sessionDataset?.id || null,
+    datasetName: sessionDataset?.datasetName || "Latest session dataset",
+    sourceType: sessionDataset?.sourceType || "session",
+    content_id: sessionDataset?.content_id || null,
+    rawRowCount: sessionDataset?.rawRowCount || rows.length,
+    validRowCount: sessionDataset?.validRowCount || rows.length,
+    skippedRowCount: sessionDataset?.skippedRowCount || 0,
+    summary: sessionDataset?.summary || {},
+    rows: rows.map((row) => ({
+      db_row_id: row.db_row_id || row.id || null,
+      response_id: row.response_id || row.id || null,
+      source: row.source || "session",
+      row_number: row.row_number ?? null,
+      submitted_at: row.submitted_at || null,
+      score: row.score ?? null,
+      bucket: row.bucket || null,
+      comment: row.comment || "",
+      contact_label:
+        row.contact_label ||
+        row.company ||
+        row.stage ||
+        row.customer_name ||
+        row.customer_email ||
+        row.response_id ||
+        "Contact",
+      intercom_contact_url: row.intercom_contact_url || null,
+      company: row.company || null,
+      stage: row.stage || null,
+      selected_options:
+        row.selected_options ||
+        row.selected_options_json ||
+        [],
+      loopActions: Array.isArray(row.loopActions)
+        ? row.loopActions
+        : Array.isArray(row.close_loop_actions)
+          ? normaliseSavedActions(row.close_loop_actions)
+          : [],
+    })),
   };
 }
 

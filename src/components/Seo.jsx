@@ -85,16 +85,21 @@ export default function Seo({
       <link rel="canonical" href={canonicalUrl} />
       {description ? <meta name="description" content={description} /> : null}
 
-      {finalAlternates.map((alt) => (
-        <link
-          key={`${alt.lang}-${alt.href}`}
-          rel="alternate"
-          hrefLang={alt.lang}
-          href={alt.href}
-        />
-      ))}
+      {!noindex
+        ? finalAlternates.map((alt) => (
+            <link
+              key={`${alt.lang}-${alt.href}`}
+              rel="alternate"
+              hrefLang={alt.lang}
+              href={alt.href}
+            />
+          ))
+        : null}
 
-      {noindex ? <meta name="robots" content="noindex, follow" /> : null}
+      <meta
+        name="robots"
+        content={noindex ? "noindex, nofollow" : "index, follow"}
+      />
 
       <meta property="og:type" content="website" />
       <meta property="og:url" content={canonicalUrl} />

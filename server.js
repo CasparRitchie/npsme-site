@@ -27,6 +27,7 @@ import { createCsvNpsRouter } from "./csvNps.routes.js";
 import { createNpsDataRouter } from "./npsData.routes.js";
 import { createWorkspaceRouter } from "./workspace.routes.js";
 import { createWorkspaceIntercomRouter } from "./workspaceIntercom.routes.js";
+import { ROUTES_MANIFEST } from "./src/routesManifest.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -444,13 +445,11 @@ app.use("/api/nps-data",
 
 
 
-app.use(
-  "/api/workspace",
+app.use("/api/workspace",
   createWorkspaceRouter()
 );
 
-app.use(
-  "/api/workspace-intercom",
+app.use("/api/workspace-intercom",
   (req, res, next) => {
     if (req.path === "/ping") return next();
     return requireWorkspaceAuth(req, res, next);
@@ -623,7 +622,7 @@ const BLOCKED_PREFIXES = [
 app.use((req, res, next) => {
   const p = (req.path || "").toLowerCase();
 
-  if (BLOCKED_PREFIXES.some((b) => p.startsWith(b))) {
+  if (p.endsWith(".php") || BLOCKED_PREFIXES.some((b) => p.startsWith(b))) {
     return res.status(404).type("text/plain").send("Not found");
   }
 
@@ -2846,6 +2845,45 @@ app.get(
   }
 );
 
+function normalisePathname(pathname) {
+  if (!pathname) return "/";
+  if (pathname === "/") return "/";
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
+function routePatternToRegex(pattern) {
+  const cleanPattern = normalisePathname(pattern);
+
+  const escaped = cleanPattern
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\\:([^/]+)/g, "[^/]+");
+
+  return new RegExp(`^${escaped}/?$`);
+}
+
+function getManifestRoute(pathname) {
+  const cleanPath = normalisePathname(pathname);
+
+  return ROUTES_MANIFEST.find((route) => {
+    if (!route || route.isHash) return false;
+
+    const routePath = normalisePathname(route.path);
+
+    if (routePath === cleanPath) return true;
+
+    if (routePath.includes(":")) {
+      return routePatternToRegex(routePath).test(cleanPath);
+    }
+
+    return false;
+  });
+}
+
+function isRouteIndexable(pathname) {
+  const route = getManifestRoute(pathname);
+  return route?.enabled === true && route?.indexable === true;
+}
+
 /* -----------------------------
    SPA HTML: inject canonical + og:url + per-route meta + hreflang
 ------------------------------ */
@@ -2861,6 +2899,9 @@ app.get("*", (req, res, next) => {
 
   const pathOnly = req.originalUrl.split("?")[0] || "/";
   const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
+
+  const manifestRoute = getManifestRoute(pathOnly);
+  const isIndexable = manifestRoute?.enabled === true && manifestRoute?.indexable === true;
 
   // --- Language detection (simple) ---
   const isFr = pathOnly === "/fr" || pathOnly.startsWith("/fr/");
@@ -2924,18 +2965,27 @@ const ROUTE_META = {
   },
 };
 
-  const meta = ROUTE_META[pathOnly] || DEFAULT_META;
+  const PRIVATE_META = {
+    title: "NPS Me Workspace",
+    description:
+      "Secure NPS Me workspace for managing customer feedback, NPS responses, and close-the-loop workflows.",
+  };
 
+  const meta = isIndexable
+    ? ROUTE_META[pathOnly] || DEFAULT_META
+    : PRIVATE_META;
   // --- Hreflang ---
   // You can add more languages later; keep this simple for now.
   const enPath = isFr ? pathOnly.replace(/^\/fr/, "") || "/" : pathOnly;
   const frPath = isFr ? pathOnly : `/fr${pathOnly === "/" ? "" : pathOnly}`;
 
-  const hreflang = `
-  <link rel="alternate" href="https://${CANONICAL_HOST}${enPath}" hreflang="en-GB" />
-  <link rel="alternate" href="https://${CANONICAL_HOST}${frPath}" hreflang="fr-FR" />
-  <link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
-  `.trim();
+  const hreflang = isIndexable
+    ? `
+    <link rel="alternate" href="https://${CANONICAL_HOST}${enPath}" hreflang="en-GB" />
+    <link rel="alternate" href="https://${CANONICAL_HOST}${frPath}" hreflang="fr-FR" />
+    <link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
+    `.trim()
+    : "";
 
   let html = baseIndexHtml;
 
@@ -2945,6 +2995,20 @@ const ROUTE_META = {
   html = html.replace(/__LANG__/g, htmlLang);
   html = html.replace(/__INLANG__/g, inLang);
   html = html.replace(/__HREFLANG__/g, hreflang);
+
+  const robotsContent = isIndexable ? "index, follow" : "noindex, nofollow";
+
+  if (html.match(/<meta\s+name=["']robots["'][^>]*>/i)) {
+    html = html.replace(
+      /<meta\s+name=["']robots["'][^>]*>/i,
+      `<meta name="robots" content="${robotsContent}" />`
+    );
+  } else {
+    html = html.replace(
+      /<\/head>/i,
+      `  <meta name="robots" content="${robotsContent}" />\n</head>`
+    );
+  }
 
   // 2) Canonical
   if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {

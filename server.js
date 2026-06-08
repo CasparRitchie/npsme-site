@@ -585,11 +585,6 @@ app.get("/api/auth/me", (req, res) => {
 });
 
 
-
-
-
-
-
 const BLOCKED_PREFIXES = [
   // secrets / env
   "/.env",
@@ -612,11 +607,17 @@ const BLOCKED_PREFIXES = [
   // wordpress/php junk scans
   "/wp-admin",
   "/wp-login.php",
+  "/wp-content",
+  "/wp-includes",
   "/phpmyadmin",
   "/cgi-bin",
   "/vendor",
   "/xmlrpc.php",
   "/phpinfo.php",
+
+  // magento / ecommerce junk scans
+  "/magento_version",
+  "/rest/v1",
 ];
 
 app.use((req, res, next) => {
@@ -2991,7 +2992,6 @@ const ROUTE_META = {
 
   res.type("html").send(html);
 });
-
 
 /* -----------------------------
    Start server

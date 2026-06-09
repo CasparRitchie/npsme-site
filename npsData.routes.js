@@ -1113,6 +1113,60 @@ function buildReplyDraftPrompt({ row, language, tone, channel }) {
     ? row.selected_options_json
     : [];
 
+  const allKnownComments = [
+    row.comment,
+
+    // Common normalised/raw fields
+    raw.comment,
+    raw.response_comment,
+    raw.nps_comment,
+    raw.feedback,
+    raw.feedback_text,
+    raw.customer_comment,
+
+    // Envola / survey-style fields
+    raw.q_recommend_comment,
+    raw.q_install_comment,
+    raw.q_daily_use_comment,
+    raw.q_parent_relation_comment,
+    raw.q_support_comment,
+    raw.q_final_comment,
+
+    // CamelCase variants
+    raw.qRecommendComment,
+    raw.qInstallComment,
+    raw.qDailyUseComment,
+    raw.qParentRelationComment,
+    raw.qSupportComment,
+    raw.qFinalComment,
+
+    // Extra score/comment fields
+    extraScores.comment,
+    extraScores.response_comment,
+    extraScores.nps_comment,
+    extraScores.feedback,
+    extraScores.feedback_text,
+    extraScores.customer_comment,
+    extraScores.q_recommend_comment,
+    extraScores.q_install_comment,
+    extraScores.q_daily_use_comment,
+    extraScores.q_parent_relation_comment,
+    extraScores.q_support_comment,
+    extraScores.q_final_comment,
+    extraScores.qRecommendComment,
+    extraScores.qInstallComment,
+    extraScores.qDailyUseComment,
+    extraScores.qParentRelationComment,
+    extraScores.qSupportComment,
+    extraScores.qFinalComment,
+  ]
+    .map((value) => cleanForAi(value, 500))
+    .filter(Boolean)
+    .filter((value, index, array) => array.indexOf(value) === index)
+    .slice(0, 10);
+
+  const mainComment = allKnownComments[0] || cleanForAi(row.comment, 500);
+
   return {
     system: `
 You are helping a French customer success team write a short reply to an NPS survey response.
@@ -1130,7 +1184,10 @@ Rules:
 - The message is for ${channel || "Intercom"}, so keep it concise, warm and human.
 - Do not invent fixes, promises, compensation, timelines, discounts, or facts.
 - Do not mention internal labels like "detractor", "passive", or "promoter".
-- Acknowledge the customer's specific feedback.
+- If the customer gave a specific comment or issue, explicitly mention that issue in natural language.
+- Use the most specific issue from all_known_comments when writing the reply.
+- Do not give a generic dissatisfaction reply when a specific comment is available.
+- If the specific comment is unclear, ask one simple follow-up question to understand the issue better.
 - If the score is 0-6, be empathetic and ask for enough detail to help or investigate.
 - If the score is 7-8, thank them and ask what would make the experience better.
 - If the score is 9-10, thank them warmly and reinforce what is working.
@@ -1146,48 +1203,115 @@ Rules:
       score: Number.isFinite(score) ? score : null,
       bucket,
       submitted_at: row.submitted_at || null,
-      comment: cleanForAi(row.comment, 500),
+
+      comment: mainComment,
+      all_known_comments: allKnownComments,
+
       selected_options: selectedOptions.slice(0, 10),
+
       survey_details: {
         recommend_score:
-          raw.q_recommend_score ?? extraScores.q_recommend_score ?? null,
+          raw.q_recommend_score ??
+          raw.qRecommendScore ??
+          extraScores.q_recommend_score ??
+          extraScores.qRecommendScore ??
+          null,
+
         recommend_comment: cleanForAi(
           raw.q_recommend_comment ??
+            raw.qRecommendComment ??
             extraScores.q_recommend_comment ??
-            row.comment ??
+            extraScores.qRecommendComment ??
+            mainComment ??
             "",
           500
         ),
+
         install_score:
-          raw.q_install_score ?? extraScores.q_install_score ?? null,
+          raw.q_install_score ??
+          raw.qInstallScore ??
+          extraScores.q_install_score ??
+          extraScores.qInstallScore ??
+          null,
+
         install_comment: cleanForAi(
-          raw.q_install_comment ?? extraScores.q_install_comment ?? "",
+          raw.q_install_comment ??
+            raw.qInstallComment ??
+            extraScores.q_install_comment ??
+            extraScores.qInstallComment ??
+            "",
           300
         ),
+
         daily_use_score:
-          raw.q_daily_use_score ?? extraScores.q_daily_use_score ?? null,
+          raw.q_daily_use_score ??
+          raw.qDailyUseScore ??
+          extraScores.q_daily_use_score ??
+          extraScores.qDailyUseScore ??
+          null,
+
+        daily_use_comment: cleanForAi(
+          raw.q_daily_use_comment ??
+            raw.qDailyUseComment ??
+            extraScores.q_daily_use_comment ??
+            extraScores.qDailyUseComment ??
+            "",
+          300
+        ),
+
         benefits:
-          raw.q_benefits ?? extraScores.q_benefits ?? selectedOptions,
+          raw.q_benefits ??
+          raw.qBenefits ??
+          extraScores.q_benefits ??
+          extraScores.qBenefits ??
+          selectedOptions,
+
         parent_relation_score:
           raw.q_parent_relation_score ??
+          raw.qParentRelationScore ??
           extraScores.q_parent_relation_score ??
+          extraScores.qParentRelationScore ??
           null,
+
         parent_relation_comment: cleanForAi(
           raw.q_parent_relation_comment ??
+            raw.qParentRelationComment ??
             extraScores.q_parent_relation_comment ??
+            extraScores.qParentRelationComment ??
             "",
           300
         ),
+
         support_score:
-          raw.q_support_score ?? extraScores.q_support_score ?? null,
+          raw.q_support_score ??
+          raw.qSupportScore ??
+          extraScores.q_support_score ??
+          extraScores.qSupportScore ??
+          null,
+
         support_comment: cleanForAi(
-          raw.q_support_comment ?? extraScores.q_support_comment ?? "",
+          raw.q_support_comment ??
+            raw.qSupportComment ??
+            extraScores.q_support_comment ??
+            extraScores.qSupportComment ??
+            "",
           300
         ),
+
         final_comment: cleanForAi(
-          raw.q_final_comment ?? extraScores.q_final_comment ?? "",
+          raw.q_final_comment ??
+            raw.qFinalComment ??
+            extraScores.q_final_comment ??
+            extraScores.qFinalComment ??
+            "",
           500
         ),
+      },
+
+      raw_summary: {
+        comment: mainComment,
+        raw_json_keys: Object.keys(raw || {}).slice(0, 40),
+        extra_score_keys: Object.keys(extraScores || {}).slice(0, 40),
       },
     },
   };
@@ -1229,4 +1353,3 @@ function normaliseActionStatus(value) {
 function canDeleteDatasets(role) {
   return role === "owner" || role === "admin";
 }
-

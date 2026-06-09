@@ -20,6 +20,7 @@ import {
   rebuildEnvolaResponsesFile,
   getCanonicalResponses,
   } from "./envola.routes.js";
+import { refreshIntercomSurveyStatsIfStale } from "./intercom.routes.js";
 
 
 // --- Private auth (shared password cookie) ---
@@ -729,6 +730,201 @@ async function downloadExportCsv(downloadUrl, { token }) {
     }
     throw e;
   }
+}
+
+let workspaceInvitationStatsRefreshLock = null;
+let workspaceInvitationStatsLastRefreshAt = 0;
+
+export async function refreshIntercomSurveyStatsIfStale({
+  hours = 72,
+  minIntervalMs = 10 * 60 * 1000,
+  force = false,
+} = {}) {
+  const nowMs = Date.now();
+
+  if (
+    !force &&
+    workspaceInvitationStatsLastRefreshAt &&
+    nowMs - workspaceInvitationStatsLastRefreshAt < minIntervalMs
+  ) {
+    return {
+      ok: true,
+      ran: false,
+      reason: "fresh",
+      last_refresh_at: new Date(workspaceInvitationStatsLastRefreshAt).toISOString(),
+    };
+  }
+
+  if (workspaceInvitationStatsRefreshLock) {
+    await workspaceInvitationStatsRefreshLock;
+
+    return {
+      ok: true,
+      ran: false,
+      reason: "waited_for_existing_refresh",
+      last_refresh_at: workspaceInvitationStatsLastRefreshAt
+        ? new Date(workspaceInvitationStatsLastRefreshAt).toISOString()
+        : null,
+    };
+  }
+
+  workspaceInvitationStatsRefreshLock = (async () => {
+    try {
+      const out = await ingestIntercomSurveyStatsForWorkspace({ hours });
+      workspaceInvitationStatsLastRefreshAt = Date.now();
+
+      return {
+        ok: true,
+        ran: true,
+        reason: force ? "forced_refresh" : "stale_refresh",
+        refreshed_at: new Date(workspaceInvitationStatsLastRefreshAt).toISOString(),
+        ingest: out,
+      };
+    } finally {
+      workspaceInvitationStatsRefreshLock = null;
+    }
+  })();
+
+  return workspaceInvitationStatsRefreshLock;
+}
+
+async function ingestIntercomSurveyStatsForWorkspace({ hours = 72 } = {}) {
+  const token = process.env.INTERCOM_ACCESS_TOKEN;
+
+  if (!token) {
+    throw new Error("INTERCOM_ACCESS_TOKEN not configured");
+  }
+
+  const h = Math.min(Math.max(Number(hours || 72), 1), 720);
+  const now = Math.floor(Date.now() / 1000);
+
+  const created_at_after = now - h * 3600;
+  const created_at_before = now;
+
+  const createResp = await fetch("https://api.intercom.io/export/content/data", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Intercom-Version": INTERCOM_EXPORT_VERSION,
+    },
+    body: JSON.stringify({
+      created_at_after,
+      created_at_before,
+    }),
+  });
+
+  const createData = await createResp.json().catch(() => ({}));
+
+  if (!createResp.ok) {
+    throw new Error(
+      `Export job create failed: ${createResp.status} ${JSON.stringify(createData)}`
+    );
+  }
+
+  const jobId =
+    createData.job_identifier ||
+    createData.job_identfier ||
+    createData.id;
+
+  if (!jobId) {
+    throw new Error("Missing job_identifier from Intercom export job create");
+  }
+
+  let status = null;
+
+  for (let i = 0; i < 12; i += 1) {
+    const statusResp = await fetch(
+      `https://api.intercom.io/export/content/data/${jobId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Intercom-Version": INTERCOM_EXPORT_VERSION,
+        },
+      }
+    );
+
+    const statusData = await statusResp.json().catch(() => ({}));
+
+    if (!statusResp.ok) {
+      throw new Error(
+        `Export job status failed: ${statusResp.status} ${JSON.stringify(statusData)}`
+      );
+    }
+
+    status = statusData;
+
+    const st = String(status.status || "").toLowerCase();
+
+    if (["complete", "completed"].includes(st) && status.download_url) {
+      break;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+
+  const st = String(status?.status || "").toLowerCase();
+
+  if (!(["complete", "completed"].includes(st) && status?.download_url)) {
+    return {
+      ok: true,
+      completed: false,
+      job_identifier: jobId,
+      status: status?.status || "pending",
+    };
+  }
+
+  const csvText = await downloadExportCsv(status.download_url, { token });
+
+  const records = parse(csvText, {
+    columns: true,
+    skip_empty_lines: true,
+  });
+
+  const surveyRows = records.filter(
+    (row) => String(row.content_type || "").toLowerCase() === "survey"
+  );
+
+  const existingText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(
+    () => null
+  );
+
+  const existing = parseJsonl(existingText);
+
+  const key = (row) => {
+    const contentId = String(row.content_id || "");
+    const receiptId = String(row.receipt_id || "");
+    const email = String(row.email || "");
+    const receivedAt = String(row.received_at || "");
+
+    return receiptId
+      ? `${contentId}:${receiptId}`
+      : `${contentId}:${email}:${receivedAt}`;
+  };
+
+  const byKey = new Map(existing.map((row) => [key(row), row]));
+
+  for (const row of surveyRows) {
+    byKey.set(key(row), row);
+  }
+
+  const merged = Array.from(byKey.values()).sort((a, b) =>
+    String(b.received_at || "").localeCompare(String(a.received_at || ""))
+  );
+
+  await writeDropboxFile(INTERCOM_SURVEY_STATS_PATH, jsonlStringify(merged));
+
+  return {
+    ok: true,
+    completed: true,
+    job_identifier: jobId,
+    export_rows_total: records.length,
+    export_survey_rows: surveyRows.length,
+    total_stored: merged.length,
+    path: INTERCOM_SURVEY_STATS_PATH,
+  };
 }
 
 export function createIntercomRouter() {

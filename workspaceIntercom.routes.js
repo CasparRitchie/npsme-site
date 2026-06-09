@@ -726,9 +726,23 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   const days = clampInt(query?.days, 365, 1, 3650);
   const statusFilter = String(query?.status || "all").trim().toLowerCase();
 
-  if (!contentId) {
+    if (!contentId) {
     throw new Error("Active source is missing survey_content_id");
   }
+
+  const refreshInfo = await refreshIntercomSurveyStatsIfStale({
+    hours: clampInt(query?.ingest_hours, 72, 1, 720),
+    minIntervalMs: clampInt(query?.min_refresh_minutes, 10, 1, 120) * 60 * 1000,
+    force: String(query?.refresh || "").trim() === "1",
+  }).catch((err) => {
+    console.error("[workspace-intercom] invitation stats refresh failed", err);
+
+    return {
+      ok: false,
+      ran: false,
+      error: err.message || "Invitation stats refresh failed",
+    };
+  });
 
   const statsRows = await getSurveyStatsRows();
   const canonicalRows = await getCanonicalResponses();
@@ -865,6 +879,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     content_id: contentId,
     days,
     status: statusFilter,
+    refresh: refreshInfo,
     summary,
     rows,
   };

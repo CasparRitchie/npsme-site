@@ -181,6 +181,7 @@ export default function CsvNpsInvitations() {
   const summary = invites.data?.summary || {};
   const rows = Array.isArray(invites.data?.rows) ? invites.data.rows : [];
   const source = invites.data?.source || null;
+  const refresh = invites.data?.refresh || null;
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -289,9 +290,25 @@ export default function CsvNpsInvitations() {
           <div className="csv-nps-filter-field">
             <span>Source</span>
             <div className="text-sm text-slate-300">
-              {source?.source_name ||
-                dataset?.datasetName ||
-                "Active Intercom source"}
+              <div>
+                {source?.source_name ||
+                  dataset?.datasetName ||
+                  "Active Intercom source"}
+              </div>
+
+              {refresh && (
+                <div className="csv-nps-muted-cell">
+                  {refresh.ran
+                    ? "Invitation data refreshed just now"
+                    : refresh.reason === "fresh"
+                      ? "Invitation data recently refreshed"
+                      : refresh.reason === "waited_for_existing_refresh"
+                        ? "Invitation data refreshed by another request"
+                        : refresh.error
+                          ? `Refresh warning: ${refresh.error}`
+                          : "Invitation data loaded"}
+                </div>
+              )}
             </div>
           </div>
         </div>

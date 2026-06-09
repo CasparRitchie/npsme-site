@@ -2,7 +2,7 @@
 import express from "express";
 import { supabaseAdmin } from "./supabaseClient.js";
 import { requireWorkspaceAuth } from "./utils/workspaceAuth.js";
-import { getCanonicalResponses } from "./envola.routes.js";
+import { getCanonicalResponses, getSurveyStatsRows } from "./envola.routes.js";
 
 export function createWorkspaceIntercomRouter() {
   const router = express.Router();
@@ -318,6 +318,43 @@ export function createWorkspaceIntercomRouter() {
 
   return router;
 }
+
+  // --------------------------------------------------
+  // GET /api/workspace-intercom/invitations
+  // --------------------------------------------------
+  router.get("/invitations", async (req, res) => {
+    try {
+      ensureSupabase();
+
+      const workspaceId = getRequestWorkspaceId(req);
+      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+
+      if (!source) {
+        return res.status(404).json({
+          ok: false,
+          error: "No active Intercom source configured for this workspace",
+        });
+      }
+
+      const payload = await buildWorkspaceIntercomInvitationsPayload({
+        source,
+        query: req.query,
+      });
+
+      return res.json({
+        ok: true,
+        workspaceId,
+        source: toWorkspaceIntercomSourceSummary(source),
+        ...payload,
+      });
+    } catch (err) {
+      console.error("[workspace-intercom] GET /invitations error", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to load workspace Intercom invitations",
+      });
+    }
+  });
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -679,6 +716,155 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
     total_matching: rows.length,
     summary,
     rows: limitedRows,
+  };
+}
+
+async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
+  const contentId = String(source?.survey_content_id || query?.content_id || "").trim();
+  const days = clampInt(query?.days, 365, 1, 3650);
+  const statusFilter = String(query?.status || "all").trim().toLowerCase();
+
+  if (!contentId) {
+    throw new Error("Active source is missing survey_content_id");
+  }
+
+  const statsRows = await getSurveyStatsRows();
+  const canonicalRows = await getCanonicalResponses();
+
+  const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
+
+  const responsesByReceiptId = new Map();
+
+  for (const response of canonicalRows || []) {
+    if (String(response?.content_id || "").trim() !== contentId) continue;
+
+    const receiptId = String(response?.receipt_id || "").trim();
+    if (!receiptId) continue;
+
+    const existing = responsesByReceiptId.get(receiptId);
+
+    if (!existing) {
+      responsesByReceiptId.set(receiptId, response);
+      continue;
+    }
+
+    const existingTs = Date.parse(existing?.submitted_at || "") || 0;
+    const newTs = Date.parse(response?.submitted_at || "") || 0;
+
+    if (newTs >= existingTs) {
+      responsesByReceiptId.set(receiptId, response);
+    }
+  }
+
+  let rows = (statsRows || [])
+    .filter((row) => String(row?.content_id || "").trim() === contentId)
+    .map((row) => {
+      const sentAtRaw = row.received_at || "";
+      const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
+
+      const receiptId = String(row.receipt_id || "").trim();
+      const matchedResponse = receiptId
+        ? responsesByReceiptId.get(receiptId)
+        : null;
+
+      const respondedAt =
+        matchedResponse?.submitted_at ||
+        row.first_completion ||
+        null;
+
+      let status = "unknown";
+
+      if (respondedAt) {
+        status = "responded";
+      } else if (row.first_open || row.first_click) {
+        status = "opened";
+      } else if (row.first_delivery || row.delivered_at) {
+        status = "delivered";
+      } else if (row.first_hard_bounce || row.first_soft_bounce) {
+        status = "bounced";
+      } else if (row.failed_at || row.first_failure) {
+        status = "failed";
+      } else if (row.received_at) {
+        status = "sent";
+      }
+
+      const contactId = String(
+        row.user_id ||
+          row.contact_id ||
+          matchedResponse?.contact_id ||
+          ""
+      ).trim();
+
+      return {
+        invitation_id: receiptId,
+        customer_id: contactId || null,
+        survey_id: String(row.content_id || "").trim() || null,
+        type_of_device: row.device || "",
+        sent_at: sentAtRaw || null,
+        sent_at_ms: sentAtMs,
+        status,
+        response_id:
+          matchedResponse?.response_id ||
+          (respondedAt && row.content_id && row.receipt_id
+            ? `${row.content_id}:${row.receipt_id}`
+            : ""),
+        score_0_10:
+          typeof matchedResponse?.score_0_10 === "number"
+            ? matchedResponse.score_0_10
+            : null,
+        responded_at: respondedAt,
+        contact_label: formatRedactedContactLabel(contactId),
+        intercom_contact_url:
+          source?.intercom_app_id && contactId
+            ? `https://app.intercom.com/a/apps/${source.intercom_app_id}/users/${contactId}`
+            : null,
+      };
+    })
+    .filter((row) => {
+      if (!row.sent_at_ms || Number.isNaN(row.sent_at_ms)) return false;
+      if (row.sent_at_ms < cutoffMs) return false;
+      if (statusFilter !== "all" && row.status !== statusFilter) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const ar = a.responded_at ? Date.parse(a.responded_at) || 0 : 0;
+      const br = b.responded_at ? Date.parse(b.responded_at) || 0 : 0;
+
+      return Math.max(br, b.sent_at_ms || 0) - Math.max(ar, a.sent_at_ms || 0);
+    });
+
+  const sent = rows.length;
+  const delivered = rows.filter((row) =>
+    ["sent", "delivered", "opened", "responded"].includes(row.status)
+  ).length;
+  const opened = rows.filter((row) =>
+    ["opened", "responded"].includes(row.status)
+  ).length;
+  const responded = rows.filter((row) => row.status === "responded").length;
+
+  const summary = {
+    sent,
+    delivered,
+    opened,
+    responded,
+    bounced: rows.filter((row) => row.status === "bounced").length,
+    failed: rows.filter((row) => row.status === "failed").length,
+    response_rate_pct:
+      sent > 0 ? Math.round((responded / sent) * 1000) / 10 : null,
+    last_sent_at:
+      rows
+        .map((row) => row.sent_at)
+        .filter(Boolean)
+        .sort()
+        .slice(-1)[0] || null,
+  };
+
+  return {
+    content_id: contentId,
+    days,
+    status: statusFilter,
+    summary,
+    rows,
   };
 }
 

@@ -465,6 +465,17 @@ export async function getCanonicalResponses({ force = false } = {}) {
   return canonical;
 }
 
+export async function getSurveyStatsRows() {
+  const statsText = await readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(
+    (err) => {
+      console.error("[envola] Error reading survey stats JSONL", err);
+      return null;
+    }
+  );
+
+  return parseJsonl(statsText);
+}
+
 // --------------------------------------------------
 // Filtering helpers
 // --------------------------------------------------
@@ -1321,7 +1332,7 @@ export function createEnvolaRouter() {
         byContact.set(cid, arr);
       }
 
-      
+
       const rows = filtered.map((r) => {
         const cid = String(r?.contact_id || "").trim();
         const history = cid ? byContact.get(cid) || [] : [];

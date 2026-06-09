@@ -99,6 +99,9 @@ export const ROUTES_MANIFEST = [
   { path: "/workspace/responses",                              label: "Workspace Responses",   labelKey: "routes.workspaceResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/responses",                           label: "Réponses workspace",    labelKey: "routes.workspaceResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 
+  { path: "/workspace/invitations",                            label: "Workspace Invitations", labelKey: "routes.workspaceInvitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/invitations",                         label: "Invitations workspace", labelKey: "routes.workspaceInvitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
   { path: "/workspace/closing-the-loop",                       label: "Workspace Closing the Loop", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/closing-the-loop",                    label: "Boucle de feedback workspace", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 
@@ -107,6 +110,9 @@ export const ROUTES_MANIFEST = [
 
   { path: "/workspace/datasets/:datasetId/responses",           label: "Dataset Responses",    labelKey: "routes.workspaceDatasetResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/datasets/:datasetId/responses",        label: "Réponses dataset",     labelKey: "routes.workspaceDatasetResponses", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
+  { path: "/workspace/datasets/:datasetId/invitations",         label: "Dataset Invitations", labelKey: "routes.workspaceDatasetInvitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/datasets/:datasetId/invitations",      label: "Invitations dataset", labelKey: "routes.workspaceDatasetInvitations", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 
   { path: "/workspace/datasets/:datasetId/closing-the-loop",    label: "Dataset Closing the Loop", labelKey: "routes.workspaceDatasetClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/datasets/:datasetId/closing-the-loop", label: "Boucle de feedback dataset", labelKey: "routes.workspaceDatasetClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },

@@ -65,6 +65,7 @@ const EnvolaClosingTheLoop = React.lazy(() => import("./pages/EnvolaClosingTheLo
 const CsvNpsUpload = React.lazy(() => import("./pages/CsvNpsUpload"));
 const CsvNpsPerformance = React.lazy(() => import("./pages/CsvNpsPerformance"));
 const CsvNpsResponses = React.lazy(() => import("./pages/CsvNpsResponses"));
+const CsvNpsInvitations = React.lazy(() => import("./pages/CsvNpsInvitations"));
 const CsvNpsClosingTheLoop = React.lazy(() => import("./pages/CsvNpsClosingTheLoop"));
 const NpsDatasets = React.lazy(() => import("./pages/NpsDatasets"));
 
@@ -172,6 +173,9 @@ const COMPONENTS = {
   "/workspace/responses": workspaceProtect(CsvNpsResponses),
   "/fr/workspace/responses": workspaceProtect(CsvNpsResponses),
 
+  "/workspace/invitations": workspaceProtect(CsvNpsInvitations),
+  "/fr/workspace/invitations": workspaceProtect(CsvNpsInvitations),
+
   "/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
   "/fr/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
 
@@ -180,6 +184,9 @@ const COMPONENTS = {
 
   "/workspace/datasets/:datasetId/responses": workspaceProtect(CsvNpsResponses),
   "/fr/workspace/datasets/:datasetId/responses": workspaceProtect(CsvNpsResponses),
+
+  "/workspace/datasets/:datasetId/invitations": workspaceProtect(CsvNpsInvitations),
+  "/fr/workspace/datasets/:datasetId/invitations": workspaceProtect(CsvNpsInvitations),
 
   "/workspace/datasets/:datasetId/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
   "/fr/workspace/datasets/:datasetId/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),

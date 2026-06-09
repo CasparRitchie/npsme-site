@@ -46,6 +46,7 @@ export default function CsvNpsWorkspaceNav() {
       return {
         performance: `${datasetBasePath}/performance`,
         responses: `${datasetBasePath}/responses`,
+        invitations: `${datasetBasePath}/invitations`,
         closing: `${datasetBasePath}/closing-the-loop`,
       };
     }
@@ -54,6 +55,7 @@ export default function CsvNpsWorkspaceNav() {
       return {
         performance: "/workspace/performance",
         responses: "/workspace/responses",
+        invitations: "/workspace/invitations",
         closing: "/workspace/closing-the-loop",
       };
     }
@@ -61,6 +63,7 @@ export default function CsvNpsWorkspaceNav() {
     return {
       performance: "/workspace/datasets",
       responses: "/workspace/datasets",
+      invitations: "/workspace/datasets",
       closing: "/workspace/datasets",
     };
   }, [datasetBasePath, hasActiveIntercomSource]);
@@ -98,6 +101,10 @@ export default function CsvNpsWorkspaceNav() {
 
       <NavLink to={links.responses}>
         Responses
+      </NavLink>
+
+      <NavLink to={links.invitations}>
+        Invitations
       </NavLink>
 
       <NavLink to={links.closing}>

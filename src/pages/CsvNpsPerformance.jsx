@@ -114,7 +114,6 @@ export default function CsvNpsPerformance() {
               raw_row_count: data?.summary?.total || data?.rows?.length || 0,
               valid_row_count: data?.summary?.total || data?.rows?.length || 0,
               skipped_row_count: 0,
-              rows,
               summary_json: data?.summary || {},
             },
             source: data.source,
@@ -609,6 +608,7 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
     rawRowCount: rows.length,
     validRowCount: summary.total ?? rows.length,
     skippedRowCount: 0,
+    rows,
     summary: {
       total: summary.total ?? rows.length,
       promoters: summary.promoters ?? rows.filter((row) => row.bucket === "promoter").length,
@@ -681,6 +681,7 @@ function normaliseSessionDataset(sessionDataset) {
     validRowCount: sessionDataset?.validRowCount || rows.length,
     skippedRowCount: sessionDataset?.skippedRowCount || 0,
     summary,
+    rows,
     timeline: Array.from(byDate.values()).sort((a, b) =>
       a.date > b.date ? 1 : -1
     ),

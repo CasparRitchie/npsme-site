@@ -205,6 +205,44 @@ export function createWorkspaceIntercomRouter() {
     }
   });
 
+
+  // --------------------------------------------------
+  // GET /api/workspace-intercom/invitations
+  // --------------------------------------------------
+  router.get("/invitations", async (req, res) => {
+    try {
+      ensureSupabase();
+
+      const workspaceId = getRequestWorkspaceId(req);
+      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+
+      if (!source) {
+        return res.status(404).json({
+          ok: false,
+          error: "No active Intercom source configured for this workspace",
+        });
+      }
+
+      const payload = await buildWorkspaceIntercomInvitationsPayload({
+        source,
+        query: req.query,
+      });
+
+      return res.json({
+        ok: true,
+        workspaceId,
+        source: toWorkspaceIntercomSourceSummary(source),
+        ...payload,
+      });
+    } catch (err) {
+      console.error("[workspace-intercom] GET /invitations error", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to load workspace Intercom invitations",
+      });
+    }
+  });
+
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/active/responses
   // --------------------------------------------------
@@ -319,42 +357,6 @@ export function createWorkspaceIntercomRouter() {
   return router;
 }
 
-  // --------------------------------------------------
-  // GET /api/workspace-intercom/invitations
-  // --------------------------------------------------
-  router.get("/invitations", async (req, res) => {
-    try {
-      ensureSupabase();
-
-      const workspaceId = getRequestWorkspaceId(req);
-      const source = await getActiveWorkspaceIntercomSource(workspaceId);
-
-      if (!source) {
-        return res.status(404).json({
-          ok: false,
-          error: "No active Intercom source configured for this workspace",
-        });
-      }
-
-      const payload = await buildWorkspaceIntercomInvitationsPayload({
-        source,
-        query: req.query,
-      });
-
-      return res.json({
-        ok: true,
-        workspaceId,
-        source: toWorkspaceIntercomSourceSummary(source),
-        ...payload,
-      });
-    } catch (err) {
-      console.error("[workspace-intercom] GET /invitations error", err);
-      return res.status(500).json({
-        ok: false,
-        error: err.message || "Failed to load workspace Intercom invitations",
-      });
-    }
-  });
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */

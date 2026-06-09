@@ -105,6 +105,7 @@ export default function CsvNpsPerformance() {
           normaliseWorkspaceIntercomPerformanceDataset({
             dataset: {
               id: null,
+              dataset: data.dataset || fallbackDataset,
               dataset_name: data?.source?.source_name || "Active Intercom source",
               source_type: "workspace_intercom",
               content_id: data?.content_id || data?.source?.survey_content_id || null,

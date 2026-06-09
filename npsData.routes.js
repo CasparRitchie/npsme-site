@@ -1230,11 +1230,3 @@ function canDeleteDatasets(role) {
   return role === "owner" || role === "admin";
 }
 
-function workspaceHasFeature(_req, featureKey) {
-  const pilotEnabledFeatures = new Set([
-    "ai_reply_drafts",
-    "ai_dataset_insights",
-  ]);
-
-  return pilotEnabledFeatures.has(featureKey);
-}

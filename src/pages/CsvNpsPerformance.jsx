@@ -388,8 +388,8 @@ export default function CsvNpsPerformance() {
           <MetricCard label="Passives" value={summary.passives} />
           <MetricCard label="Detractors" value={summary.detractors} />
           <MetricCard label="Avg. score" value={summary.averageScore} />
-          <MetricCard label="Open follow-ups" value={closeLoopSummary.open} />
-          <MetricCard label="Open detractors" value={closeLoopSummary.openDetractors} />
+          <MetricCard label="Active follow-ups" value={closeLoopSummary.active} />
+          <MetricCard label="Active detractors" value={closeLoopSummary.activeDetractors} />
         </div>
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
@@ -833,7 +833,9 @@ function summariseCloseLoop(rows) {
   const safeRows = Array.isArray(rows) ? rows : [];
 
   const withStatus = safeRows.map((row) => {
-    const latestAction = getLatestCloseLoopAction(row.close_loop_actions || row.closeLoopActions);
+    const latestAction = getLatestCloseLoopAction(
+      row.close_loop_actions || row.closeLoopActions || row.loopActions
+    );
 
     return {
       ...row,
@@ -842,12 +844,18 @@ function summariseCloseLoop(rows) {
   });
 
   const open = withStatus.filter((row) => row.currentStatus === "open").length;
+
   const inProgress = withStatus.filter(
     (row) => row.currentStatus === "in_progress"
   ).length;
+
   const closed = withStatus.filter((row) => row.currentStatus === "closed").length;
 
-  const openDetractors = withStatus.filter(
+  const active = withStatus.filter(
+    (row) => row.currentStatus !== "closed"
+  ).length;
+
+  const activeDetractors = withStatus.filter(
     (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
   ).length;
 
@@ -855,7 +863,11 @@ function summariseCloseLoop(rows) {
     open,
     inProgress,
     closed,
-    openDetractors,
+    active,
+    activeDetractors,
+
+    // keep these aliases temporarily so existing code does not break
+    openDetractors: activeDetractors,
   };
 }
 
@@ -895,12 +907,12 @@ function buildManagementSummary({
       ? `${summary.detractors} detractor${summary.detractors === 1 ? "" : "s"}`
       : "no detractors";
 
-  const openFollowUpPart =
-    closeLoopSummary.openDetractors > 0
-      ? `${closeLoopSummary.openDetractors} open detractor follow-up${closeLoopSummary.openDetractors === 1 ? "" : "s"}`
-      : "no open detractor follow-ups";
+  const activeFollowUpPart =
+    closeLoopSummary.activeDetractors > 0
+      ? `${closeLoopSummary.activeDetractors} active detractor follow-up${closeLoopSummary.activeDetractors === 1 ? "" : "s"}`
+      : "no active detractor follow-ups";
 
-  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${openFollowUpPart}. The immediate management priority is to close open detractor cases and look for repeated issues in the latest comments.`;
+  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to close open detractor cases and look for repeated issues in the latest comments.`;
 }
 
 function formatPeriodLabel(period) {

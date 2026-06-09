@@ -787,6 +787,8 @@ function normaliseWorkspaceIntercomResponsesDataset(apiResponse) {
       previous_response_links: Array.isArray(row.previous_response_links)
         ? row.previous_response_links
         : [],
+      db_row_id: row.db_row_id || row.dataset_row_id || null,
+      dataset_row_id: row.dataset_row_id || row.db_row_id || null,
     })),
   };
 }

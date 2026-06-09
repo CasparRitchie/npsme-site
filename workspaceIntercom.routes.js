@@ -372,6 +372,196 @@ async function getActiveWorkspaceIntercomSource(workspaceId) {
   return data || null;
 }
 
+async function getOrCreateWorkspaceIntercomDataset({ source, contentId, summary, rowCount }) {
+  const workspaceId = String(source?.workspace_id || "").trim();
+
+  if (!workspaceId) {
+    throw new Error("Workspace Intercom source is missing workspace_id");
+  }
+
+  if (!contentId) {
+    throw new Error("Workspace Intercom source is missing survey_content_id");
+  }
+
+  const sourceType = "workspace_intercom";
+  const datasetName =
+    source?.source_name ||
+    source?.survey_content_title ||
+    "Active Intercom source";
+
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from("datasets")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .eq("source_type", sourceType)
+    .eq("content_id", contentId)
+    .order("updated_at", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  if (existing) {
+    const { data: updated, error: updateError } = await supabaseAdmin
+      .from("datasets")
+      .update({
+        dataset_name: datasetName,
+        raw_row_count: rowCount,
+        valid_row_count: rowCount,
+        skipped_row_count: 0,
+        summary_json: summary || {},
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existing.id)
+      .select("*")
+      .single();
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
+    return updated;
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("datasets")
+    .insert({
+      workspace_id: workspaceId,
+      dataset_name: datasetName,
+      source_type: sourceType,
+      content_id: contentId,
+      raw_row_count: rowCount,
+      valid_row_count: rowCount,
+      skipped_row_count: 0,
+      summary_json: summary || {},
+      detected_fields_json: {},
+      warnings_json: [],
+      skipped_rows_json: [],
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+async function syncWorkspaceIntercomRows({ dataset, rows }) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+
+  const rowsWithResponseIds = safeRows.filter((row) =>
+    String(row?.response_id || "").trim()
+  );
+
+  const responseIds = Array.from(
+    new Set(rowsWithResponseIds.map((row) => String(row.response_id).trim()))
+  );
+
+  if (!dataset?.id || responseIds.length === 0) {
+    return new Map();
+  }
+
+  const { data: existingRows, error: existingError } = await supabaseAdmin
+    .from("dataset_rows")
+    .select(
+      `
+      *,
+      close_loop_actions (
+        id,
+        status,
+        owner,
+        action_taken,
+        updated_at,
+        created_at
+      )
+    `
+    )
+    .eq("dataset_id", dataset.id)
+    .in("response_id", responseIds);
+
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  const existingByResponseId = new Map(
+    (existingRows || []).map((row) => [String(row.response_id), row])
+  );
+
+  const missingRows = rowsWithResponseIds.filter(
+    (row) => !existingByResponseId.has(String(row.response_id))
+  );
+
+  if (missingRows.length > 0) {
+    const payload = missingRows.map((row, index) => ({
+      dataset_id: dataset.id,
+      response_id: row.response_id,
+      source: "workspace_intercom",
+      row_number: index + 1,
+      submitted_at: row.submitted_at || null,
+      score: Number.isFinite(Number(row.score)) ? Number(row.score) : null,
+      bucket: row.bucket || "unknown",
+
+      // Keep PII minimised in the workspace dataset.
+      customer_name: null,
+      customer_email: null,
+
+      company: row.company || null,
+      stage: row.stage || null,
+      comment: row.comment || null,
+
+      // Keep the contact id for the Intercom deep link/back-office connection,
+      // but avoid showing it as the visible contact label in the frontend.
+      contact_id: row.contact_id || null,
+      intercom_contact_url: row.intercom_contact_url || null,
+
+      selected_options_json: Array.isArray(row.selected_options_json)
+        ? row.selected_options_json
+        : [],
+      extra_scores_json: row.extra_scores_json || {},
+      raw_json: row,
+    }));
+
+    const { error: insertError } = await supabaseAdmin
+      .from("dataset_rows")
+      .insert(payload);
+
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+  }
+
+  const { data: refreshedRows, error: refreshError } = await supabaseAdmin
+    .from("dataset_rows")
+    .select(
+      `
+      *,
+      close_loop_actions (
+        id,
+        status,
+        owner,
+        action_taken,
+        updated_at,
+        created_at
+      )
+    `
+    )
+    .eq("dataset_id", dataset.id)
+    .in("response_id", responseIds);
+
+  if (refreshError) {
+    throw new Error(refreshError.message);
+  }
+
+  return new Map(
+    (refreshedRows || []).map((row) => [String(row.response_id), row])
+  );
+}
+
 async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
   const contentId = String(source?.survey_content_id || "").trim();
   const bucket = String(query?.bucket || "all").trim().toLowerCase();
@@ -399,20 +589,61 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
     byContact.set(contactId, existing);
   }
 
-  let rows = contentRows
-    .map((row) => {
-      const contactId = String(row?.contact_id || "").trim();
-      const history = contactId ? byContact.get(contactId) || [] : [];
-      return flattenWorkspaceIntercomResponseForTable(row, history, source);
-    })
-    .filter((row) => {
-      if (bucket === "all") return true;
-      return row.bucket === bucket;
-    });
+  let rows = contentRows.map((row) => {
+    const contactId = String(row?.contact_id || "").trim();
+    const history = contactId ? byContact.get(contactId) || [] : [];
+
+    return flattenWorkspaceIntercomResponseForTable(row, history, source);
+  });
+
+  rows.sort((a, b) =>
+    String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
+  );
+
+  const summary = summariseWorkspaceIntercomRows(rows);
+
+  const dataset = await getOrCreateWorkspaceIntercomDataset({
+    source,
+    contentId,
+    summary,
+    rowCount: rows.length,
+  });
+
+  const persistedByResponseId = await syncWorkspaceIntercomRows({
+    dataset,
+    rows,
+  });
+
+  rows = rows.map((row) => {
+    const persisted = persistedByResponseId.get(String(row.response_id));
+
+    return {
+      ...row,
+
+      // Important: keep id/response_id as the Intercom response identity.
+      id: row.response_id || row.id || null,
+      response_id: row.response_id || row.id || null,
+
+      // Important: db_row_id is the Supabase dataset_rows.id used by
+      // POST /api/nps-data/rows/:datasetRowId/actions
+      db_row_id: persisted?.id || null,
+      dataset_row_id: persisted?.id || null,
+
+      close_loop_actions: Array.isArray(persisted?.close_loop_actions)
+        ? persisted.close_loop_actions
+        : [],
+    };
+  });
+
+  rows = rows.filter((row) => {
+    if (bucket === "all") return true;
+    return row.bucket === bucket;
+  });
 
   if (q) {
     rows = rows.filter((row) => {
       const haystack = [
+        row.contact_label,
         row.contact_name,
         row.response_id,
         row.pioupiou,
@@ -428,7 +659,9 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
         row.q_support_score,
         row.q_support_comment,
         row.q_final_comment,
-        ...(Array.isArray(row.selected_options_json) ? row.selected_options_json : []),
+        ...(Array.isArray(row.selected_options_json)
+          ? row.selected_options_json
+          : []),
       ]
         .join(" ")
         .toLowerCase();
@@ -437,14 +670,10 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
     });
   }
 
-  rows.sort((a, b) =>
-    String(b?.submitted_at || "").localeCompare(String(a?.submitted_at || ""))
-  );
-
   const limitedRows = rows.slice(0, limit);
-  const summary = summariseWorkspaceIntercomRows(rows);
 
   return {
+    dataset,
     content_id: contentId,
     bucket,
     q,

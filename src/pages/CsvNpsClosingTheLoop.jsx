@@ -228,7 +228,20 @@ export default function CsvNpsClosingTheLoop() {
       return;
     }
 
-    if (!datasetId || !row.db_row_id) {
+    if (mode === "intercom" && !row.db_row_id) {
+      setActions((current) => ({
+        ...current,
+        [actionKey]: {
+          ...(current[actionKey] || action),
+          isSaving: false,
+          saveError:
+            "This Intercom response is not linked to a saved workspace row yet, so the follow-up cannot be shared.",
+        },
+      }));
+      return;
+    }
+
+    if (mode === "session" || !row.db_row_id) {
       const localSavedAction = {
         id: `local-${Date.now()}`,
         status: action.status || "open",
@@ -272,7 +285,10 @@ export default function CsvNpsClosingTheLoop() {
           },
         };
 
-        writeLocalActions(actionScope, updated);
+        if (mode === "session") {
+          writeLocalActions(actionScope, updated);
+        }
+
         return updated;
       });
 
@@ -654,7 +670,7 @@ function normaliseWorkspaceIntercomDataset(apiResponse) {
     skippedRowCount: 0,
     summary: apiResponse.summary || {},
     rows: savedRows.map((row) => ({
-      db_row_id: null,
+      db_row_id: row.db_row_id || row.dataset_row_id || null,
       response_id: row.response_id || row.id,
       source: row.source || "workspace_intercom",
       row_number: row.row_number || null,

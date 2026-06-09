@@ -3,6 +3,8 @@ import express from "express";
 import { supabaseAdmin } from "./supabaseClient.js";
 import { requireWorkspaceAuth } from "./utils/workspaceAuth.js";
 import { getCanonicalResponses, getSurveyStatsRows } from "./envola.routes.js";
+import { refreshIntercomSurveyStatsIfStale } from "./intercom.routes.js";
+
 
 export function createWorkspaceIntercomRouter() {
   const router = express.Router();

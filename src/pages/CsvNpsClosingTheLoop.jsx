@@ -70,7 +70,7 @@ export default function CsvNpsClosingTheLoop() {
 
           setDataset(
             normaliseWorkspaceIntercomDataset({
-              dataset: datasetMeta.dataset,
+              dataset: intercomData.dataset || datasetMeta.dataset,
               source: intercomData.source,
               summary: intercomData.summary,
               rows: intercomData.rows,
@@ -119,7 +119,7 @@ export default function CsvNpsClosingTheLoop() {
 
         setDataset(
           normaliseWorkspaceIntercomDataset({
-            dataset: {
+            dataset: intercomData.dataset || {
               id: null,
               dataset_name: intercomData?.source?.source_name || "Active Intercom source",
               source_type: "workspace_intercom",
@@ -671,6 +671,7 @@ function normaliseWorkspaceIntercomDataset(apiResponse) {
     summary: apiResponse.summary || {},
     rows: savedRows.map((row) => ({
       db_row_id: row.db_row_id || row.dataset_row_id || null,
+      dataset_row_id: row.dataset_row_id || row.db_row_id || null,
       response_id: row.response_id || row.id,
       source: row.source || "workspace_intercom",
       row_number: row.row_number || null,

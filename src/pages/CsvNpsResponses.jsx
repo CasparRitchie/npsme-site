@@ -164,7 +164,7 @@ export default function CsvNpsResponses() {
 
           setDataset(
             normaliseWorkspaceIntercomResponsesDataset({
-              dataset: datasetMeta.dataset,
+              dataset: intercomData.dataset || datasetMeta.dataset,
               source: intercomData.source,
               summary: intercomData.summary,
               rows: intercomData.rows,
@@ -220,7 +220,7 @@ export default function CsvNpsResponses() {
 
         setDataset(
           normaliseWorkspaceIntercomResponsesDataset({
-            dataset: {
+            dataset: data.dataset || {
               id: null,
               dataset_name: data?.source?.source_name || "Active Intercom source",
               source_type: "workspace_intercom",
@@ -753,6 +753,8 @@ function normaliseWorkspaceIntercomResponsesDataset(apiResponse) {
     summary: apiResponse.summary || {},
     rows: savedRows.map((row) => ({
       id: row.response_id || row.id,
+      db_row_id: row.db_row_id || row.dataset_row_id || null,
+      dataset_row_id: row.dataset_row_id || row.db_row_id || null,
       response_id: row.response_id || row.id,
       source: row.source || "workspace_intercom",
       row_number: row.row_number || null,
@@ -787,8 +789,6 @@ function normaliseWorkspaceIntercomResponsesDataset(apiResponse) {
       previous_response_links: Array.isArray(row.previous_response_links)
         ? row.previous_response_links
         : [],
-      db_row_id: row.db_row_id || row.dataset_row_id || null,
-      dataset_row_id: row.dataset_row_id || row.db_row_id || null,
     })),
   };
 }

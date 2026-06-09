@@ -395,7 +395,6 @@ async function getOrCreateWorkspaceIntercomDataset({ source, contentId, summary,
     .eq("workspace_id", workspaceId)
     .eq("source_type", sourceType)
     .eq("content_id", contentId)
-    .order("updated_at", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -413,7 +412,6 @@ async function getOrCreateWorkspaceIntercomDataset({ source, contentId, summary,
         valid_row_count: rowCount,
         skipped_row_count: 0,
         summary_json: summary || {},
-        updated_at: new Date().toISOString(),
       })
       .eq("id", existing.id)
       .select("*")

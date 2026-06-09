@@ -704,6 +704,160 @@ Rules:
     }
   });
 
+
+  // --------------------------------------------------
+  // POST /api/nps-data/rows/:datasetRowId/reply-draft
+  // Generate a suggested Intercom reply draft for one saved response row
+  // --------------------------------------------------
+  router.post("/rows/:datasetRowId/reply-draft", async (req, res) => {
+    try {
+      if (!supabaseAdmin) {
+        return res.status(500).json({
+          ok: false,
+          error: "Supabase is not configured",
+        });
+      }
+
+      if (!workspaceHasFeature(req, "ai_reply_drafts")) {
+        return res.status(403).json({
+          ok: false,
+          error: "AI reply drafts are not enabled for this workspace",
+        });
+      }
+
+      const aiClient = openai || ensureOpenAI();
+
+      const workspaceId = getRequestWorkspaceId(req);
+      const datasetRowId = String(req.params.datasetRowId || "").trim();
+
+      if (!isUuid(datasetRowId)) {
+        return res.status(400).json({
+          ok: false,
+          error: "Valid datasetRowId is required",
+        });
+      }
+
+      const language = String(req.body?.language || "fr").trim().toLowerCase();
+      const tone = String(req.body?.tone || "warm_professional").trim();
+      const channel = String(req.body?.channel || "intercom").trim();
+
+      const { data: row, error } = await supabaseAdmin
+        .from("dataset_rows")
+        .select(
+          `
+          *,
+          datasets!inner (
+            id,
+            workspace_id,
+            dataset_name,
+            source_type,
+            content_id
+          )
+        `
+        )
+        .eq("id", datasetRowId)
+        .eq("datasets.workspace_id", workspaceId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("[nps-data] Failed to load row for reply draft", error);
+
+        return res.status(500).json({
+          ok: false,
+          error: error.message,
+        });
+      }
+
+      if (!row) {
+        return res.status(404).json({
+          ok: false,
+          error: "Dataset row not found",
+        });
+      }
+
+      const prompt = buildReplyDraftPrompt({
+        row,
+        language,
+        tone,
+        channel,
+      });
+
+      const aiResponse = await aiClient.responses.create({
+        model: "gpt-4o-mini",
+        max_output_tokens: 500,
+        input: [
+          {
+            role: "system",
+            content: prompt.system,
+          },
+          {
+            role: "user",
+            content: JSON.stringify(prompt.user),
+          },
+        ],
+      });
+
+      let text = String(aiResponse.output_text || "").trim();
+
+      if (text.startsWith("```")) {
+        text = text.replace(/```json|```/gi, "").trim();
+      }
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        text = jsonMatch[0];
+      }
+
+      let parsed;
+
+      try {
+        parsed = JSON.parse(text);
+      } catch (parseError) {
+        console.error("[nps-data] Failed to parse reply draft JSON", {
+          parseError,
+          raw: text,
+        });
+
+        return res.status(500).json({
+          ok: false,
+          error: "Reply draft could not be parsed",
+          raw: text,
+        });
+      }
+
+      await logWorkspaceEvent(req, {
+        eventType: "reply_draft_generated",
+        entityType: "dataset_row",
+        entityId: datasetRowId,
+        metadata: {
+          datasetId: row.dataset_id,
+          score: row.score,
+          bucket: row.bucket,
+          model: "gpt-4o-mini",
+          language,
+          channel,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        datasetRowId,
+        generatedAt: new Date().toISOString(),
+        draft: {
+          subject: parsed.subject || null,
+          body: parsed.body || "",
+        },
+      });
+    } catch (err) {
+      console.error("[nps-data] Error in POST /rows/:datasetRowId/reply-draft", err);
+
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to generate reply draft",
+      });
+    }
+  });
+
   // --------------------------------------------------
   // POST /api/nps-data/rows/:datasetRowId/actions
   // Create a close-loop action for a dataset row
@@ -949,6 +1103,115 @@ function cleanForAi(value, maxLength = 300) {
     .slice(0, maxLength);
 }
 
+function buildReplyDraftPrompt({ row, language, tone, channel }) {
+  const score = Number(row.score);
+  const bucket = row.bucket || scoreBucket(score);
+
+  const raw = row.raw_json || {};
+  const extraScores = row.extra_scores_json || {};
+  const selectedOptions = Array.isArray(row.selected_options_json)
+    ? row.selected_options_json
+    : [];
+
+  return {
+    system: `
+You are helping a French customer success team write a short reply to an NPS survey response.
+
+Return ONLY valid JSON. Do not use markdown. Do not wrap the JSON in code fences.
+
+Use this exact schema:
+{
+  "subject": string | null,
+  "body": string
+}
+
+Rules:
+- Write in ${language === "fr" ? "French" : "English"}.
+- The message is for ${channel || "Intercom"}, so keep it concise, warm and human.
+- Do not invent fixes, promises, compensation, timelines, discounts, or facts.
+- Do not mention internal labels like "detractor", "passive", or "promoter".
+- Acknowledge the customer's specific feedback.
+- If the score is 0-6, be empathetic and ask for enough detail to help or investigate.
+- If the score is 7-8, thank them and ask what would make the experience better.
+- If the score is 9-10, thank them warmly and reinforce what is working.
+- Do not include personal data, real email addresses, contact IDs, or internal identifiers.
+- Avoid sounding robotic or over-formal.
+- Use "nous" rather than "je" unless the source text clearly suggests a personal reply.
+- Keep the body under 160 words.
+- The body should be ready to copy into Intercom, but the human user will review it before sending.
+`.trim(),
+    user: {
+      channel,
+      tone,
+      score: Number.isFinite(score) ? score : null,
+      bucket,
+      submitted_at: row.submitted_at || null,
+      comment: cleanForAi(row.comment, 500),
+      selected_options: selectedOptions.slice(0, 10),
+      survey_details: {
+        recommend_score:
+          raw.q_recommend_score ?? extraScores.q_recommend_score ?? null,
+        recommend_comment: cleanForAi(
+          raw.q_recommend_comment ??
+            extraScores.q_recommend_comment ??
+            row.comment ??
+            "",
+          500
+        ),
+        install_score:
+          raw.q_install_score ?? extraScores.q_install_score ?? null,
+        install_comment: cleanForAi(
+          raw.q_install_comment ?? extraScores.q_install_comment ?? "",
+          300
+        ),
+        daily_use_score:
+          raw.q_daily_use_score ?? extraScores.q_daily_use_score ?? null,
+        benefits:
+          raw.q_benefits ?? extraScores.q_benefits ?? selectedOptions,
+        parent_relation_score:
+          raw.q_parent_relation_score ??
+          extraScores.q_parent_relation_score ??
+          null,
+        parent_relation_comment: cleanForAi(
+          raw.q_parent_relation_comment ??
+            extraScores.q_parent_relation_comment ??
+            "",
+          300
+        ),
+        support_score:
+          raw.q_support_score ?? extraScores.q_support_score ?? null,
+        support_comment: cleanForAi(
+          raw.q_support_comment ?? extraScores.q_support_comment ?? "",
+          300
+        ),
+        final_comment: cleanForAi(
+          raw.q_final_comment ?? extraScores.q_final_comment ?? "",
+          500
+        ),
+      },
+    },
+  };
+}
+
+function scoreBucket(score) {
+  if (!Number.isFinite(Number(score))) return "unknown";
+
+  const n = Number(score);
+
+  if (n >= 9) return "promoter";
+  if (n >= 7) return "passive";
+  return "detractor";
+}
+
+function workspaceHasFeature(_req, featureKey) {
+  const pilotEnabledFeatures = new Set([
+    "ai_reply_drafts",
+    "ai_dataset_insights",
+  ]);
+
+  return pilotEnabledFeatures.has(featureKey);
+}
+
 function isUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value || "").trim()
@@ -965,4 +1228,13 @@ function normaliseActionStatus(value) {
 
 function canDeleteDatasets(role) {
   return role === "owner" || role === "admin";
+}
+
+function workspaceHasFeature(_req, featureKey) {
+  const pilotEnabledFeatures = new Set([
+    "ai_reply_drafts",
+    "ai_dataset_insights",
+  ]);
+
+  return pilotEnabledFeatures.has(featureKey);
 }

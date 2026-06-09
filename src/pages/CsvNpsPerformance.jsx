@@ -23,6 +23,9 @@ export default function CsvNpsPerformance() {
   const [datasetError, setDatasetError] = useState("");
   const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
 
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [bucketFilter, setBucketFilter] = useState("all");
+
   useEffect(() => {
     async function loadSavedDataset() {
       setLoadingDataset(true);
@@ -103,15 +106,15 @@ export default function CsvNpsPerformance() {
 
         setDataset(
           normaliseWorkspaceIntercomPerformanceDataset({
-            dataset: {
+            dataset: data.dataset || {
               id: null,
-              dataset: data.dataset || fallbackDataset,
               dataset_name: data?.source?.source_name || "Active Intercom source",
               source_type: "workspace_intercom",
               content_id: data?.content_id || data?.source?.survey_content_id || null,
               raw_row_count: data?.summary?.total || data?.rows?.length || 0,
               valid_row_count: data?.summary?.total || data?.rows?.length || 0,
               skipped_row_count: 0,
+              rows,
               summary_json: data?.summary || {},
             },
             source: data.source,
@@ -206,6 +209,47 @@ export default function CsvNpsPerformance() {
     return Array.isArray(dataset?.timeline) ? dataset.timeline : [];
   }, [dataset]);
 
+  const performanceRows = useMemo(() => {
+    const sourceRows = Array.isArray(dataset?.rows) ? dataset.rows : [];
+
+    return sourceRows.filter((row) => {
+      const matchesBucket =
+        bucketFilter === "all" || row.bucket === bucketFilter;
+
+      const matchesPeriod = rowMatchesPeriod(row.submitted_at, periodFilter);
+
+      return matchesBucket && matchesPeriod;
+    });
+  }, [dataset, bucketFilter, periodFilter]);
+
+  const filteredSummary = useMemo(() => {
+    if (!performanceRows.length) {
+      return dataset?.summary || {
+        total: 0,
+        promoters: 0,
+        passives: 0,
+        detractors: 0,
+        nps: null,
+        averageScore: null,
+      };
+    }
+
+    return summariseRows(performanceRows);
+  }, [performanceRows, dataset]);
+
+  const closeLoopSummary = useMemo(() => {
+    return summariseCloseLoop(performanceRows);
+  }, [performanceRows]);
+
+  const managementSummary = useMemo(() => {
+    return buildManagementSummary({
+      summary: filteredSummary,
+      closeLoopSummary,
+      periodFilter,
+      bucketFilter,
+    });
+  }, [filteredSummary, closeLoopSummary, periodFilter, bucketFilter]);
+
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
     : mode === "intercom"
@@ -270,7 +314,7 @@ export default function CsvNpsPerformance() {
     );
   }
 
-  const { summary } = dataset;
+  const summary = filteredSummary || dataset.summary;
 
   return (
     <main className="csv-nps-page">
@@ -285,6 +329,48 @@ export default function CsvNpsPerformance() {
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
+        <div className="csv-nps-filters csv-nps-filters-three">
+          <label className="csv-nps-filter-field">
+            <span>Period</span>
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
+            >
+              <option value="all">All time</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+              <option value="this_month">This month</option>
+            </select>
+          </label>
+
+          <label className="csv-nps-filter-field">
+            <span>Bucket</span>
+            <select
+              value={bucketFilter}
+              onChange={(e) => setBucketFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="promoter">Promoters</option>
+              <option value="passive">Passives</option>
+              <option value="detractor">Detractors</option>
+            </select>
+          </label>
+
+          <div className="csv-nps-filter-field">
+            <span>Workspace actions</span>
+            <div className="flex flex-wrap gap-2">
+              <a className="text-link" href="/workspace/responses">
+                Review responses
+              </a>
+              <span className="text-slate-500">·</span>
+              <a className="text-link" href="/workspace/closing-the-loop">
+                Manage follow-up
+              </a>
+            </div>
+          </div>
+        </div>
+
         <div className="csv-nps-responses-header">
           <div>
             <h2>Summary</h2>
@@ -302,7 +388,33 @@ export default function CsvNpsPerformance() {
           <MetricCard label="Passives" value={summary.passives} />
           <MetricCard label="Detractors" value={summary.detractors} />
           <MetricCard label="Avg. score" value={summary.averageScore} />
+          <MetricCard label="Open follow-ups" value={closeLoopSummary.open} />
+          <MetricCard label="Open detractors" value={closeLoopSummary.openDetractors} />
         </div>
+
+        <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+          <div className="csv-nps-responses-header">
+            <div>
+              <h3>Management summary</h3>
+              <p>
+                Founder-level readout combining NPS performance and close-loop progress.
+              </p>
+            </div>
+          </div>
+
+          <div className="csv-nps-management-summary">
+            <p>{managementSummary}</p>
+
+            <div className="csv-nps-management-actions">
+              <a className="csv-nps-button" href="/workspace/closing-the-loop">
+                View open follow-ups
+              </a>
+              <a className="csv-nps-button csv-nps-button-secondary" href="/workspace/responses">
+                Review responses
+              </a>
+            </div>
+          </div>
+        </section>
 
         <div className="csv-nps-performance-grid">
           <section className="csv-nps-chart-card">
@@ -428,12 +540,18 @@ function normaliseWorkspacePerformanceDataset(apiResponse) {
     },
     timeline,
     scoreDistribution,
+    rows: [],
   };
 }
 
 function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
   const dataset = apiResponse.dataset || {};
-  const rows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
+  const rows = Array.isArray(apiResponse.rows)
+    ? apiResponse.rows.map((row) => ({
+        ...row,
+        closeLoopActions: row.closeLoopActions || row.close_loop_actions || [],
+      }))
+    : [];
   const summary = apiResponse.summary || {};
   const source = apiResponse.source || {};
 
@@ -526,6 +644,7 @@ function normaliseSessionDataset(sessionDataset) {
         passives: 0,
         detractors: 0,
         nps: null,
+        rows,
       });
     }
 
@@ -641,4 +760,153 @@ function getScoreClass(score) {
   if (score >= 9) return "csv-nps-score-fill-promoter";
   if (score >= 7) return "csv-nps-score-fill-passive";
   return "csv-nps-score-fill-detractor";
+}
+
+function rowMatchesPeriod(isoDate, period) {
+  if (!period || period === "all") return true;
+
+  const submittedAt = new Date(isoDate || "");
+  if (Number.isNaN(submittedAt.getTime())) return false;
+
+  const now = new Date();
+
+  if (period === "7d") {
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 7);
+    return submittedAt >= threshold;
+  }
+
+  if (period === "30d") {
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 30);
+    return submittedAt >= threshold;
+  }
+
+  if (period === "90d") {
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 90);
+    return submittedAt >= threshold;
+  }
+
+  if (period === "this_month") {
+    return (
+      submittedAt.getFullYear() === now.getFullYear() &&
+      submittedAt.getMonth() === now.getMonth()
+    );
+  }
+
+  return true;
+}
+
+function summariseRows(rows) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const total = safeRows.length;
+
+  const promoters = safeRows.filter((row) => row.bucket === "promoter").length;
+  const passives = safeRows.filter((row) => row.bucket === "passive").length;
+  const detractors = safeRows.filter((row) => row.bucket === "detractor").length;
+
+  const scores = safeRows
+    .map((row) => Number(row.score))
+    .filter((score) => Number.isFinite(score));
+
+  const averageScore = scores.length
+    ? Math.round(
+        (scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10
+      ) / 10
+    : null;
+
+  const nps =
+    total > 0 ? Math.round(((promoters - detractors) / total) * 100) : null;
+
+  return {
+    total,
+    promoters,
+    passives,
+    detractors,
+    nps,
+    averageScore,
+  };
+}
+
+function summariseCloseLoop(rows) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+
+  const withStatus = safeRows.map((row) => {
+    const latestAction = getLatestCloseLoopAction(row.close_loop_actions || row.closeLoopActions);
+
+    return {
+      ...row,
+      currentStatus: latestAction?.status || "open",
+    };
+  });
+
+  const open = withStatus.filter((row) => row.currentStatus === "open").length;
+  const inProgress = withStatus.filter(
+    (row) => row.currentStatus === "in_progress"
+  ).length;
+  const closed = withStatus.filter((row) => row.currentStatus === "closed").length;
+
+  const openDetractors = withStatus.filter(
+    (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
+  ).length;
+
+  return {
+    open,
+    inProgress,
+    closed,
+    openDetractors,
+  };
+}
+
+function getLatestCloseLoopAction(actions = []) {
+  if (!Array.isArray(actions) || actions.length === 0) {
+    return null;
+  }
+
+  return [...actions].sort((a, b) => {
+    const aDate = new Date(
+      a.updated_at || a.created_at || a.updatedAt || 0
+    ).getTime();
+
+    const bDate = new Date(
+      b.updated_at || b.created_at || b.updatedAt || 0
+    ).getTime();
+
+    return bDate - aDate;
+  })[0];
+}
+
+function buildManagementSummary({
+  summary,
+  closeLoopSummary,
+  periodFilter,
+  bucketFilter,
+}) {
+  const windowLabel = formatPeriodLabel(periodFilter);
+  const bucketLabel = bucketFilter === "all" ? "all responses" : bucketFilter;
+
+  if (!summary?.total) {
+    return `No usable responses are available for ${bucketLabel} in ${windowLabel}.`;
+  }
+
+  const detractorPart =
+    summary.detractors > 0
+      ? `${summary.detractors} detractor${summary.detractors === 1 ? "" : "s"}`
+      : "no detractors";
+
+  const openFollowUpPart =
+    closeLoopSummary.openDetractors > 0
+      ? `${closeLoopSummary.openDetractors} open detractor follow-up${closeLoopSummary.openDetractors === 1 ? "" : "s"}`
+      : "no open detractor follow-ups";
+
+  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${openFollowUpPart}. The immediate management priority is to close open detractor cases and look for repeated issues in the latest comments.`;
+}
+
+function formatPeriodLabel(period) {
+  if (period === "7d") return "the last 7 days";
+  if (period === "30d") return "the last 30 days";
+  if (period === "90d") return "the last 90 days";
+  if (period === "this_month") return "this month";
+  return "all time";
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
@@ -18,6 +18,8 @@ const PAGE_COPY = {
 
 export default function CsvNpsClosingTheLoop() {
   const { datasetId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedResponseRef = searchParams.get("response");
 
   const [dataset, setDataset] = useState(null);
   const [actions, setActions] = useState({});
@@ -29,6 +31,12 @@ export default function CsvNpsClosingTheLoop() {
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
+
+  const [replyDraft, setReplyDraft] = useState(null);
+  const [replyDraftLoading, setReplyDraftLoading] = useState(false);
+  const [replyDraftError, setReplyDraftError] = useState("");
+  const [replyDraftCopied, setReplyDraftCopied] = useState(false);
+
 
   useEffect(() => {
     async function loadSavedDataset() {
@@ -445,6 +453,29 @@ export default function CsvNpsClosingTheLoop() {
       .sort(sortClosingLoopRows);
   }, [periodRows, bucketFilter, statusFilter]);
 
+  const selectedRow = useMemo(() => {
+  if (!selectedResponseRef) return null;
+
+  return enrichedRows.find((row) => {
+    const refs = [
+      row.db_row_id,
+      row.dataset_row_id,
+      row.response_id,
+      getActionKey(row),
+    ]
+      .filter(Boolean)
+      .map((value) => String(value));
+
+    return refs.includes(String(selectedResponseRef));
+  });
+}, [enrichedRows, selectedResponseRef]);
+
+useEffect(() => {
+  setReplyDraft(null);
+  setReplyDraftError("");
+  setReplyDraftCopied(false);
+}, [selectedResponseRef]);
+
   const counts = useMemo(() => {
     const total = periodRows.length;
     const open = periodRows.filter((row) => row.currentStatus === "open").length;
@@ -489,6 +520,82 @@ export default function CsvNpsClosingTheLoop() {
     : mode === "intercom"
       ? PAGE_COPY.intercomSubtitle
       : PAGE_COPY.sessionSubtitle;
+  async function generateReplyDraft(row) {
+  const datasetRowId = row.db_row_id || row.dataset_row_id;
+
+  if (!datasetRowId) {
+    setReplyDraft(null);
+    setReplyDraftError(
+      "This response does not have a saved workspace row ID yet, so a reply draft cannot be generated."
+    );
+    return;
+  }
+
+  setReplyDraft(null);
+  setReplyDraftError("");
+  setReplyDraftCopied(false);
+  setReplyDraftLoading(true);
+
+  try {
+    const res = await fetch(`/api/nps-data/rows/${datasetRowId}/reply-draft`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        language: "fr",
+        tone: "warm_professional",
+        channel: "intercom",
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "Failed to generate reply draft");
+    }
+
+    setReplyDraft(data.draft || null);
+  } catch (err) {
+    console.error("Failed to generate reply draft:", err);
+    setReplyDraftError(err.message || "Failed to generate reply draft");
+  } finally {
+    setReplyDraftLoading(false);
+  }
+}
+
+async function copyReplyDraft() {
+  const body = replyDraft?.body || "";
+
+  if (!body) return;
+
+  try {
+    await navigator.clipboard.writeText(body);
+    setReplyDraftCopied(true);
+
+    window.setTimeout(() => {
+      setReplyDraftCopied(false);
+    }, 1800);
+  } catch (err) {
+    console.error("Failed to copy reply draft:", err);
+    setReplyDraftError("Could not copy the draft automatically. Please copy it manually.");
+  }
+}
+
+function selectRow(row) {
+  const responseRef =
+    row.db_row_id ||
+    row.dataset_row_id ||
+    row.response_id ||
+    getActionKey(row);
+
+  if (!responseRef) return;
+
+  setSearchParams({
+    response: String(responseRef),
+  });
+}
 
   if (loadingDataset) {
     return (
@@ -581,6 +688,28 @@ export default function CsvNpsClosingTheLoop() {
         <CloseLoopStatusChart counts={counts} />
 
         <UrgentDetractorsPanel rows={urgentDetractors} />
+        {selectedRow && (
+          <SelectedResponsePanel
+            row={selectedRow}
+            replyDraft={replyDraft}
+            replyDraftLoading={replyDraftLoading}
+            replyDraftError={replyDraftError}
+            replyDraftCopied={replyDraftCopied}
+            onGenerateDraft={() => generateReplyDraft(selectedRow)}
+            onCopyDraft={copyReplyDraft}
+            onDraftChange={(body) =>
+              setReplyDraft((current) => ({
+                ...(current || {}),
+                body,
+              }))
+            }
+            action={selectedRow.draftAction}
+            savedActions={selectedRow.loopActions || []}
+            currentStatus={selectedRow.currentStatus}
+            onActionChange={(patch) => saveAction(getActionKey(selectedRow), patch)}
+            onSaveAction={() => persistAction(selectedRow)}
+          />
+        )}
 
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
@@ -636,6 +765,10 @@ export default function CsvNpsClosingTheLoop() {
                 action={row.draftAction}
                 savedActions={row.loopActions || []}
                 currentStatus={row.currentStatus}
+                isSelected={
+                  selectedRow && getActionKey(selectedRow) === getActionKey(row)
+                }
+                onSelect={() => selectRow(row)}
                 onChange={(patch) => saveAction(getActionKey(row), patch)}
                 onSave={() => persistAction(row)}
               />
@@ -713,11 +846,32 @@ function normaliseWorkspaceIntercomDataset(apiResponse) {
       bucket: row.bucket,
       comment: row.comment || "",
       contact_label: row.contact_label || "Contact",
+      contact_name: row.contact_name || row.contact_label || "Contact",
       intercom_contact_url: row.intercom_contact_url || null,
       company: row.company || null,
       stage: row.stage || null,
       selected_options: row.selected_options_json || [],
       loopActions: normaliseSavedActions(row.close_loop_actions || []),
+
+      pioupiou: row.pioupiou || "-",
+      reader_serial: row.reader_serial || "-",
+      q_recommend_score: row.q_recommend_score ?? null,
+      q_recommend_comment: row.q_recommend_comment ?? null,
+      q_install_score: row.q_install_score ?? null,
+      q_install_comment: row.q_install_comment ?? null,
+      q_daily_use_score: row.q_daily_use_score ?? null,
+      q_benefits: row.q_benefits ?? null,
+      q_parent_relation_score: row.q_parent_relation_score ?? null,
+      q_parent_relation_comment: row.q_parent_relation_comment ?? null,
+      q_support_score: row.q_support_score ?? null,
+      q_support_comment: row.q_support_comment ?? null,
+      q_final_comment: row.q_final_comment ?? null,
+      previous_response_dates: Array.isArray(row.previous_response_dates)
+        ? row.previous_response_dates
+        : [],
+      previous_response_links: Array.isArray(row.previous_response_links)
+        ? row.previous_response_links
+        : [],
     })),
   };
 }
@@ -1026,6 +1180,8 @@ function ClosingLoopCard({
   action,
   savedActions = [],
   currentStatus = "open",
+  isSelected = false,
+  onSelect,
   onChange,
   onSave,
 }) {
@@ -1040,7 +1196,11 @@ function ClosingLoopCard({
         : "Save follow-up";
 
   return (
-    <article className={`csv-nps-loop-card csv-nps-loop-card-${row.bucket}`}>
+    <article
+      className={`csv-nps-loop-card csv-nps-loop-card-${row.bucket} ${
+        isSelected ? "csv-nps-loop-card-selected" : ""
+      }`}
+    >
       <div className="csv-nps-loop-card-main">
         <div className="csv-nps-loop-card-topline">
           <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
@@ -1118,6 +1278,13 @@ function ClosingLoopCard({
 
       <div className="csv-nps-loop-card-actions">
         <label className="csv-nps-filter-field">
+          <button
+            type="button"
+            className="csv-nps-button csv-nps-button-secondary"
+            onClick={onSelect}
+          >
+            View details
+          </button>
           <span>Status</span>
           <select
             value={action.status || "open"}
@@ -1165,6 +1332,225 @@ function ClosingLoopCard({
         )}
       </div>
     </article>
+  );
+}
+
+function SelectedResponsePanel({
+  row,
+  replyDraft,
+  replyDraftLoading,
+  replyDraftError,
+  replyDraftCopied,
+  onGenerateDraft,
+  onCopyDraft,
+  onDraftChange,
+  action,
+  savedActions = [],
+  currentStatus,
+  onActionChange,
+  onSaveAction,
+}) {
+  const buttonLabel = action?.isSaving
+    ? "Saving..."
+    : action?.isDirty
+      ? "Save follow-up"
+      : savedActions.length
+        ? "Add another follow-up"
+        : "Save follow-up";
+
+  return (
+    <section className="csv-nps-panel csv-nps-selected-response-panel">
+      <div className="csv-nps-responses-header">
+        <div>
+          <p className="eyebrow">Selected response</p>
+          <h2>{row.contact_label || "Contact"}</h2>
+          <p>
+            Score {row.score ?? "—"} · {row.bucket || "unknown"} ·{" "}
+            {row.submitted_at?.slice(0, 10) || "No date"} ·{" "}
+            {formatStatus(currentStatus)}
+          </p>
+        </div>
+
+        {row.intercom_contact_url && (
+          <a
+            href={row.intercom_contact_url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-link"
+          >
+            Open in Intercom
+          </a>
+        )}
+      </div>
+
+      <div className="csv-nps-selected-response-grid">
+        <div className="csv-nps-selected-response-card">
+          <h3>Full survey response</h3>
+
+          <ResponseDetail label="Main comment" value={row.comment} />
+          <ResponseDetail label="Recommend comment" value={row.q_recommend_comment} />
+          <ResponseDetail label="Install comment" value={row.q_install_comment} />
+          <ResponseDetail label="Benefits" value={row.q_benefits} />
+          <ResponseDetail
+            label="Parent relation comment"
+            value={row.q_parent_relation_comment}
+          />
+          <ResponseDetail label="Support comment" value={row.q_support_comment} />
+          <ResponseDetail label="Final comment" value={row.q_final_comment} />
+
+          {Array.isArray(row.selected_options) && row.selected_options.length > 0 && (
+            <div className="csv-nps-loop-options">
+              {row.selected_options.map((option) => (
+                <span key={option}>{option}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="csv-nps-selected-response-card">
+          <div className="csv-nps-selected-response-card-header">
+            <div>
+              <h3>Suggested reply draft</h3>
+              <p>Generate a French Intercom draft and review it before sending.</p>
+            </div>
+
+            <button
+              type="button"
+              className="csv-nps-button"
+              onClick={onGenerateDraft}
+              disabled={replyDraftLoading}
+            >
+              {replyDraftLoading ? "Generating..." : "Generate draft"}
+            </button>
+          </div>
+
+          {replyDraftError && (
+            <div className="csv-nps-error csv-nps-error-compact">
+              {replyDraftError}
+            </div>
+          )}
+
+          {replyDraft?.body ? (
+            <>
+              <textarea
+                value={replyDraft.body}
+                onChange={(e) => onDraftChange(e.target.value)}
+                rows={7}
+                className="csv-nps-reply-draft-textarea"
+              />
+
+              <button
+                type="button"
+                className="csv-nps-button csv-nps-button-secondary"
+                onClick={onCopyDraft}
+              >
+                {replyDraftCopied ? "Copied" : "Copy draft"}
+              </button>
+            </>
+          ) : (
+            !replyDraftLoading &&
+            !replyDraftError && (
+              <p className="csv-nps-muted-cell">
+                No draft generated yet.
+              </p>
+            )
+          )}
+
+          <p className="csv-nps-muted-cell">
+            Human-in-the-loop: this is a suggested draft only.
+          </p>
+        </div>
+
+        <div className="csv-nps-selected-response-card">
+          <h3>Manage follow-up</h3>
+
+          <label className="csv-nps-filter-field">
+            <span>Status</span>
+            <select
+              value={action?.status || "open"}
+              onChange={(e) => onActionChange({ status: e.target.value })}
+            >
+              <option value="open">Open</option>
+              <option value="in_progress">In progress</option>
+              <option value="closed">Closed</option>
+            </select>
+          </label>
+
+          <label className="csv-nps-filter-field">
+            <span>Owner</span>
+            <input
+              type="text"
+              value={action?.owner || ""}
+              onChange={(e) => onActionChange({ owner: e.target.value })}
+              placeholder="Who is following up?"
+            />
+          </label>
+
+          <label className="csv-nps-filter-field csv-nps-loop-action-field">
+            <span>Action taken or next step</span>
+            <textarea
+              value={action?.actionTaken || ""}
+              onChange={(e) => onActionChange({ actionTaken: e.target.value })}
+              placeholder="Example: Called customer, apologised, offered a fix, or escalated the issue..."
+              rows={4}
+            />
+          </label>
+
+          <button
+            type="button"
+            className="csv-nps-button"
+            onClick={onSaveAction}
+            disabled={action?.isSaving}
+          >
+            {buttonLabel}
+          </button>
+
+          {action?.saveError && (
+            <div className="csv-nps-error csv-nps-error-compact">
+              {action.saveError}
+            </div>
+          )}
+
+          {savedActions.length > 0 && (
+            <div className="csv-nps-loop-saved-actions">
+              <span className="csv-nps-loop-saved-actions-title">
+                Follow-up log
+              </span>
+
+              {savedActions.map((savedAction) => (
+                <div
+                  key={savedAction.id || savedAction.updatedAt}
+                  className="csv-nps-loop-saved-action"
+                >
+                  <div className="csv-nps-loop-saved-action-meta">
+                    <strong>{formatStatus(savedAction.status)}</strong>
+
+                    {savedAction.owner && <span>{savedAction.owner}</span>}
+
+                    {savedAction.updatedAt && (
+                      <span>{new Date(savedAction.updatedAt).toLocaleString()}</span>
+                    )}
+                  </div>
+
+                  {savedAction.actionTaken && <p>{savedAction.actionTaken}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ResponseDetail({ label, value }) {
+  if (!value) return null;
+
+  return (
+    <div className="csv-nps-response-detail">
+      <span>{label}</span>
+      <p>{String(value)}</p>
+    </div>
   );
 }
 

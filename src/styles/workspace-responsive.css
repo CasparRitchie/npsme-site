@@ -112,3 +112,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+@media (max-width: 900px) {
+  .csv-nps-selected-response-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .csv-nps-selected-response-card:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .csv-nps-selected-response-card-header {
+    flex-direction: column;
+  }
+}

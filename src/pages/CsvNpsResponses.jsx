@@ -125,17 +125,7 @@ export default function CsvNpsResponses() {
   const [sort, setSort] = useState("submitted_at");
   const [dir, setDir] = useState("desc");
 
-  const [replyDraftRow, setReplyDraftRow] = useState(null);
-  const [replyDraft, setReplyDraft] = useState(null);
-  const [replyDraftLoading, setReplyDraftLoading] = useState(false);
-  const [replyDraftError, setReplyDraftError] = useState("");
-  const [replyDraftCopied, setReplyDraftCopied] = useState(false);
-
   useEffect(() => {
-    setReplyDraftRow(null);
-    setReplyDraft(null);
-    setReplyDraftError("");
-    setReplyDraftCopied(false);
 
     async function loadSavedDataset() {
       setLoadingDataset(true);
@@ -329,71 +319,6 @@ export default function CsvNpsResponses() {
     window.location.href = getClosingLoopUrl(row);
   }
 
-  async function generateReplyDraft(row) {
-    const datasetRowId = row.db_row_id || row.dataset_row_id;
-
-    if (!datasetRowId) {
-      setReplyDraftRow(row);
-      setReplyDraft(null);
-      setReplyDraftError(
-        "This response does not have a saved workspace row ID yet, so a reply draft cannot be generated."
-      );
-      return;
-    }
-
-    setReplyDraftRow(row);
-    setReplyDraft(null);
-    setReplyDraftError("");
-    setReplyDraftCopied(false);
-    setReplyDraftLoading(true);
-
-    try {
-      const res = await fetch(`/api/nps-data/rows/${datasetRowId}/reply-draft`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          language: "fr",
-          tone: "warm_professional",
-          channel: "intercom",
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to generate reply draft");
-      }
-
-      setReplyDraft(data.draft || null);
-    } catch (err) {
-      console.error("Failed to generate reply draft:", err);
-      setReplyDraftError(err.message || "Failed to generate reply draft");
-    } finally {
-      setReplyDraftLoading(false);
-    }
-  }
-
-  async function copyReplyDraft() {
-    const body = replyDraft?.body || "";
-
-    if (!body) return;
-
-    try {
-      await navigator.clipboard.writeText(body);
-      setReplyDraftCopied(true);
-
-      window.setTimeout(() => {
-        setReplyDraftCopied(false);
-      }, 1800);
-    } catch (err) {
-      console.error("Failed to copy reply draft:", err);
-      setReplyDraftError("Could not copy the draft automatically. Please copy it manually.");
-    }
-  }
-
   const filteredRows = useMemo(() => {
     const rows = dataset?.rows || [];
     const q = searchTerm.trim().toLowerCase();
@@ -529,100 +454,6 @@ export default function CsvNpsResponses() {
             </p>
           </div>
         </div>
-
-        {isIntercomMode && (
-          <div className="csv-nps-panel mb-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <p className="eyebrow">AI-assisted close-the-loop</p>
-                <h3 className="mt-1 text-xl font-semibold text-white">
-                  Suggested reply draft
-                </h3>
-                <p className="mt-2 max-w-3xl text-sm text-slate-300">
-                  Select a response to generate a short French draft that Clémence can
-                  review, copy and paste into Intercom.
-                </p>
-              </div>
-
-              {replyDraftRow && replyDraftRow.intercom_contact_url && (
-                <a
-                  href={replyDraftRow.intercom_contact_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-3 py-2 text-sm font-medium text-indigo-200 hover:bg-indigo-500/20"
-                >
-                  Open selected contact in Intercom
-                </a>
-              )}
-            </div>
-
-            {replyDraftRow ? (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-white">
-                      Draft for {replyDraftRow.contact_name || replyDraftRow.contact_label || "selected contact"}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      Score {replyDraftRow.score ?? "—"} · {replyDraftRow.bucket || "unknown"} ·{" "}
-                      {shortDate(replyDraftRow.submitted_at)}
-                    </p>
-                  </div>
-
-                  {replyDraft?.body && (
-                    <button
-                      type="button"
-                      onClick={copyReplyDraft}
-                      className="inline-flex items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-200 hover:bg-emerald-500/20"
-                    >
-                      {replyDraftCopied ? "Copied" : "Copy draft"}
-                    </button>
-                  )}
-                </div>
-
-                {replyDraftLoading && (
-                  <p className="mt-4 text-sm text-slate-300">
-                    Generating suggested reply...
-                  </p>
-                )}
-
-                {replyDraftError && (
-                  <div className="mt-4 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
-                    {replyDraftError}
-                  </div>
-                )}
-
-                {replyDraft?.body && (
-                  <textarea
-                    value={replyDraft.body}
-                    onChange={(e) =>
-                      setReplyDraft((current) => ({
-                        ...(current || {}),
-                        body: e.target.value,
-                      }))
-                    }
-                    rows={7}
-                    className="mt-4 w-full rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-sm leading-relaxed text-slate-100 outline-none focus:border-indigo-400/50"
-                  />
-                )}
-
-                {!replyDraftLoading && !replyDraft?.body && !replyDraftError && (
-                  <p className="mt-4 text-sm text-slate-400">
-                    The draft will appear here after you select a response.
-                  </p>
-                )}
-
-                <p className="mt-3 text-xs text-slate-500">
-                  Human-in-the-loop: this is a suggested draft only. Review before sending.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-5 rounded-2xl border border-dashed border-white/10 bg-slate-950/30 p-4 text-sm text-slate-400">
-                Choose “Draft reply” on a response row to generate a suggested message.
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="csv-nps-filters">
           <label className="csv-nps-filter-field">

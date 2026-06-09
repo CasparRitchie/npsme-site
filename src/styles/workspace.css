@@ -1370,3 +1370,96 @@
   color: rgba(245, 247, 251, 0.9);
   line-height: 1.55;
 }
+
+
+.csv-nps-selected-response-panel {
+  margin-bottom: 1.5rem;
+}
+
+.csv-nps-selected-response-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  margin-top: 1rem;
+}
+
+.csv-nps-selected-response-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.55);
+  padding: 1rem;
+}
+
+.csv-nps-selected-response-card:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.csv-nps-selected-response-card h3 {
+  margin: 0 0 0.75rem;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.csv-nps-selected-response-card-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.csv-nps-selected-response-card-header p {
+  margin: 0.25rem 0 0;
+  color: rgba(203, 213, 225, 0.85);
+  font-size: 0.85rem;
+}
+
+.csv-nps-response-detail {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 0;
+}
+
+.csv-nps-response-detail:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.csv-nps-response-detail span {
+  display: block;
+  color: rgba(148, 163, 184, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.csv-nps-response-detail p {
+  color: rgba(226, 232, 240, 0.96);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.csv-nps-reply-draft-textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.8);
+  color: rgba(241, 245, 249, 0.98);
+  font: inherit;
+  line-height: 1.55;
+  margin: 0.75rem 0;
+  outline: none;
+  padding: 0.9rem 1rem;
+  resize: vertical;
+}
+
+.csv-nps-reply-draft-textarea:focus {
+  border-color: rgba(129, 140, 248, 0.7);
+}
+
+.csv-nps-loop-card-selected {
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.55);
+}

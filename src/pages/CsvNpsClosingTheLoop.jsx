@@ -28,6 +28,7 @@ export default function CsvNpsClosingTheLoop() {
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
 
   useEffect(() => {
     async function loadSavedDataset() {
@@ -358,7 +359,10 @@ export default function CsvNpsClosingTheLoop() {
           },
         };
 
-        writeLocalActions(actionScope, updated);
+        if (mode === "session") {
+          writeLocalActions(actionScope, updated);
+        }
+
         return updated;
       });
     } catch (err) {
@@ -390,84 +394,95 @@ export default function CsvNpsClosingTheLoop() {
     })[0];
   }
 
-  const rows = useMemo(() => {
+  const enrichedRows = useMemo(() => {
     const sourceRows = dataset?.rows || [];
 
-    return sourceRows
-      .map((row) => ({
+    return sourceRows.map((row) => {
+      const actionKey = getActionKey(row);
+      const draftAction = actions[actionKey] || {
+        status: "open",
+        owner: "",
+        actionTaken: "",
+        updatedAt: null,
+        isDirty: false,
+        isSaving: false,
+        saveError: "",
+      };
+
+      const latestSavedAction = getLatestAction(row.loopActions || []);
+
+      const currentStatus = draftAction?.isDirty
+        ? draftAction.status || "open"
+        : latestSavedAction?.status || draftAction?.status || "open";
+
+      return {
         ...row,
-        draftAction: actions[getActionKey(row)] || {
-          status: "open",
-          owner: "",
-          actionTaken: "",
-          updatedAt: null,
-          isDirty: false,
-          isSaving: false,
-          saveError: "",
-        },
+        draftAction,
         loopActions: row.loopActions || [],
-      }))
+        latestSavedAction,
+        currentStatus,
+      };
+    });
+  }, [dataset, actions]);
+
+  const periodRows = useMemo(() => {
+    return enrichedRows.filter((row) =>
+      matchesPeriod(row.submitted_at, periodFilter)
+    );
+  }, [enrichedRows, periodFilter]);
+
+  const rows = useMemo(() => {
+    return periodRows
       .filter((row) => {
         const matchesBucket =
           bucketFilter === "all" || row.bucket === bucketFilter;
 
-        const latestSavedAction = getLatestAction(row.loopActions);
-        const currentStatus = row.draftAction?.isDirty
-          ? row.draftAction.status
-          : latestSavedAction?.status || row.draftAction?.status || "open";
-
         const matchesStatus =
-          statusFilter === "all" || currentStatus === statusFilter;
+          statusFilter === "all" || row.currentStatus === statusFilter;
 
         return matchesBucket && matchesStatus;
       })
-      .sort((a, b) => {
-        const bucketPriority = {
-          detractor: 0,
-          passive: 1,
-          promoter: 2,
-        };
-
-        const aBucket = bucketPriority[a.bucket] ?? 99;
-        const bBucket = bucketPriority[b.bucket] ?? 99;
-
-        if (aBucket !== bBucket) return aBucket - bBucket;
-
-        return Number(a.score) - Number(b.score);
-      });
-  }, [dataset, actions, bucketFilter, statusFilter]);
+      .sort(sortClosingLoopRows);
+  }, [periodRows, bucketFilter, statusFilter]);
 
   const counts = useMemo(() => {
-    const sourceRows = dataset?.rows || [];
+    const total = periodRows.length;
+    const open = periodRows.filter((row) => row.currentStatus === "open").length;
+    const inProgress = periodRows.filter(
+      (row) => row.currentStatus === "in_progress"
+    ).length;
+    const closed = periodRows.filter((row) => row.currentStatus === "closed").length;
 
-    const getCurrentRowStatus = (row) => {
-      const actionKey = getActionKey(row);
-      const draftAction = actions[actionKey];
+    const detractors = periodRows.filter((row) => row.bucket === "detractor").length;
+    const openDetractors = periodRows.filter(
+      (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
+    ).length;
 
-      if (draftAction?.isDirty) {
-        return draftAction.status || "open";
-      }
-
-      const latestSavedAction = getLatestAction(row.loopActions || []);
-      return latestSavedAction?.status || draftAction?.status || "open";
+    return {
+      total,
+      open,
+      inProgress,
+      closed,
+      detractors,
+      openDetractors,
     };
+  }, [periodRows]);
 
-    const total = sourceRows.length;
+  const urgentDetractors = useMemo(() => {
+    return periodRows
+      .filter(
+        (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
+      )
+      .sort((a, b) => {
+        const scoreDiff = Number(a.score ?? 999) - Number(b.score ?? 999);
+        if (scoreDiff !== 0) return scoreDiff;
 
-    const open = sourceRows.filter(
-      (row) => getCurrentRowStatus(row) === "open"
-    ).length;
-
-    const inProgress = sourceRows.filter(
-      (row) => getCurrentRowStatus(row) === "in_progress"
-    ).length;
-
-    const closed = sourceRows.filter(
-      (row) => getCurrentRowStatus(row) === "closed"
-    ).length;
-
-    return { total, open, inProgress, closed };
-  }, [dataset, actions]);
+        return String(b?.submitted_at || "").localeCompare(
+          String(a?.submitted_at || "")
+        );
+      })
+      .slice(0, 5);
+  }, [periodRows]);
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -561,9 +576,26 @@ export default function CsvNpsClosingTheLoop() {
           <MetricCard label="Open" value={counts.open} />
           <MetricCard label="In progress" value={counts.inProgress} />
           <MetricCard label="Closed" value={counts.closed} />
+          <MetricCard label="Open detractors" value={counts.openDetractors} />
         </div>
+        <CloseLoopStatusChart counts={counts} />
 
-        <div className="csv-nps-filters">
+        <UrgentDetractorsPanel rows={urgentDetractors} />
+
+        <div className="csv-nps-filters csv-nps-filters-three">
+          <label className="csv-nps-filter-field">
+            <span>Period</span>
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
+            >
+              <option value="all">All time</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="this_month">This month</option>
+            </select>
+          </label>
+
           <label className="csv-nps-filter-field">
             <span>Bucket</span>
             <select
@@ -603,6 +635,7 @@ export default function CsvNpsClosingTheLoop() {
                 row={row}
                 action={row.draftAction}
                 savedActions={row.loopActions || []}
+                currentStatus={row.currentStatus}
                 onChange={(patch) => saveAction(getActionKey(row), patch)}
                 onSave={() => persistAction(row)}
               />
@@ -798,6 +831,187 @@ function getActionKey(row) {
   );
 }
 
+function CloseLoopStatusChart({ counts }) {
+  const max = Math.max(counts.open, counts.inProgress, counts.closed, 1);
+
+  const items = [
+    { key: "open", label: "Open", value: counts.open },
+    { key: "in_progress", label: "In progress", value: counts.inProgress },
+    { key: "closed", label: "Closed", value: counts.closed },
+  ];
+
+  return (
+    <div className="csv-nps-loop-management-grid">
+      <section className="csv-nps-loop-management-card">
+        <div className="csv-nps-loop-management-header">
+          <div>
+            <h3>Follow-up status</h3>
+            <p>Shared close-the-loop progress for the selected period.</p>
+          </div>
+        </div>
+
+        <div className="csv-nps-loop-status-chart">
+          {items.map((item) => {
+            const height = Math.max(8, Math.round((item.value / max) * 100));
+
+            return (
+              <div className="csv-nps-loop-status-column" key={item.key}>
+                <div className="csv-nps-loop-status-column-plot">
+                  <div
+                    className={`csv-nps-loop-status-column-fill csv-nps-loop-status-column-fill-${item.key}`}
+                    style={{ height: `${height}%` }}
+                  />
+                </div>
+
+                <strong>{item.value}</strong>
+                <span>{item.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function UrgentDetractorsPanel({ rows }) {
+  return (
+    <section className="csv-nps-loop-urgent-panel">
+      <div className="csv-nps-loop-management-header">
+        <div>
+          <h3>Needs attention first</h3>
+          <p>
+            Lowest-scoring open detractors, prioritised for same-day follow-up
+            where possible.
+          </p>
+        </div>
+      </div>
+
+      {rows.length === 0 ? (
+        <div className="csv-nps-empty-state csv-nps-empty-state-compact">
+          No open detractors in the selected period.
+        </div>
+      ) : (
+        <div className="csv-nps-loop-urgent-list">
+          {rows.map((row) => (
+            <article
+              className="csv-nps-loop-urgent-item"
+              key={getActionKey(row)}
+            >
+              <div>
+                <div className="csv-nps-loop-urgent-topline">
+                  <span className="csv-nps-bucket csv-nps-bucket-detractor">
+                    Detractor
+                  </span>
+                  <span className="csv-nps-loop-score">
+                    Score {row.score ?? "—"}
+                  </span>
+                  <span
+                    className={`csv-nps-loop-status csv-nps-loop-status-${row.currentStatus}`}
+                  >
+                    {formatStatus(row.currentStatus)}
+                  </span>
+                </div>
+
+                <h4>{row.contact_label || "Contact"}</h4>
+
+                <p>
+                  {truncateText(
+                    row.comment || "No comment provided.",
+                    180
+                  )}
+                </p>
+              </div>
+
+              {row.intercom_contact_url && (
+                <a
+                  href={row.intercom_contact_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-link"
+                >
+                  Open in Intercom
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function sortClosingLoopRows(a, b) {
+  const statusPriority = {
+    open: 0,
+    in_progress: 1,
+    closed: 2,
+  };
+
+  const bucketPriority = {
+    detractor: 0,
+    passive: 1,
+    promoter: 2,
+  };
+
+  const aStatus = statusPriority[a.currentStatus] ?? 99;
+  const bStatus = statusPriority[b.currentStatus] ?? 99;
+
+  if (aStatus !== bStatus) return aStatus - bStatus;
+
+  const aBucket = bucketPriority[a.bucket] ?? 99;
+  const bBucket = bucketPriority[b.bucket] ?? 99;
+
+  if (aBucket !== bBucket) return aBucket - bBucket;
+
+  const scoreDiff = Number(a.score ?? 999) - Number(b.score ?? 999);
+  if (scoreDiff !== 0) return scoreDiff;
+
+  return String(b?.submitted_at || "").localeCompare(
+    String(a?.submitted_at || "")
+  );
+}
+
+function matchesPeriod(isoDate, period) {
+  if (!period || period === "all") return true;
+
+  const submittedAt = new Date(isoDate || "");
+  if (Number.isNaN(submittedAt.getTime())) return false;
+
+  const now = new Date();
+
+  if (period === "7d") {
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 7);
+    return submittedAt >= threshold;
+  }
+
+  if (period === "30d") {
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 30);
+    return submittedAt >= threshold;
+  }
+
+  if (period === "this_month") {
+    return (
+      submittedAt.getFullYear() === now.getFullYear() &&
+      submittedAt.getMonth() === now.getMonth()
+    );
+  }
+
+  return true;
+}
+
+function truncateText(text, maxLength = 180) {
+  const value = String(text || "").trim();
+
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 function MetricCard({ label, value }) {
   return (
     <div className="csv-nps-metric-card">
@@ -807,7 +1021,14 @@ function MetricCard({ label, value }) {
   );
 }
 
-function ClosingLoopCard({ row, action, savedActions = [], onChange, onSave }) {
+function ClosingLoopCard({
+  row,
+  action,
+  savedActions = [],
+  currentStatus = "open",
+  onChange,
+  onSave,
+}) {
   const hasSavedActions = savedActions.length > 0;
 
   const buttonLabel = action.isSaving
@@ -829,11 +1050,9 @@ function ClosingLoopCard({ row, action, savedActions = [], onChange, onSave }) {
           <span className="csv-nps-loop-score">Score {row.score}</span>
 
           <span
-            className={`csv-nps-loop-status csv-nps-loop-status-${
-              action.status || "open"
-            }`}
+            className={`csv-nps-loop-status csv-nps-loop-status-${currentStatus}`}
           >
-            {formatStatus(action.status)}
+            {formatStatus(currentStatus)}
           </span>
         </div>
 

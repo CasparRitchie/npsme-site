@@ -76,3 +76,39 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+@media (max-width: 760px) {
+  .csv-nps-filters-three {
+    grid-template-columns: 1fr;
+  }
+
+  .csv-nps-loop-status-chart {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .csv-nps-loop-status-column {
+    grid-template-columns: 90px minmax(0, 1fr) 70px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .csv-nps-loop-status-column-plot {
+    height: 42px;
+    padding: 8px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .csv-nps-loop-status-column-fill {
+    height: 100% !important;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 999px;
+  }
+
+  .csv-nps-loop-urgent-item {
+    grid-template-columns: 1fr;
+  }
+}

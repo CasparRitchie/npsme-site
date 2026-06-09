@@ -11,8 +11,9 @@ import OpenAI from "openai";
 import rateLimit from "express-rate-limit";
 import { LRUCache } from "lru-cache";
 import crypto from "crypto";
-import { supabaseAdmin } from "./supabaseClient.js";
 import cookieParser from "cookie-parser";
+import { openai } from "./openaiClient.js";
+import { supabaseAdmin } from "./supabaseClient.js";
 
 import {
   changeWorkspacePassword,
@@ -62,13 +63,13 @@ function cacheKey(company) {
   return company.toLowerCase();
 }
 
-/* -----------------------------
-   External clients (OpenAI / SMTP)
------------------------------- */
+// /* -----------------------------
+//    External clients (OpenAI / SMTP)
+// ------------------------------ */
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
 const mailer = nodemailer.createTransport({
   host: process.env.SMTP_HOST,

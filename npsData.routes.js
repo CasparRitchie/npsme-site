@@ -3,6 +3,7 @@ import express from "express";
 import { supabaseAdmin } from "./supabaseClient.js";
 
 import { logWorkspaceEvent } from "./utils/workspaceEvents.js";
+import { ensureOpenAI } from "./openaiClient.js";
 
 /**
  * NPS Data routes
@@ -21,6 +22,8 @@ import { logWorkspaceEvent } from "./utils/workspaceEvents.js";
  */
 
 const DEFAULT_WORKSPACE_ID = process.env.DEFAULT_WORKSPACE_ID || "";
+
+
 
 export function createNpsDataRouter({ openai } = {}) {
   const router = express.Router();
@@ -363,7 +366,7 @@ export function createNpsDataRouter({ openai } = {}) {
     }
   });
 
-    // --------------------------------------------------
+  // --------------------------------------------------
   // POST /api/nps-data/datasets/:datasetId/insights
   // Generate AI insights for a saved workspace-owned dataset
   // --------------------------------------------------
@@ -376,12 +379,7 @@ export function createNpsDataRouter({ openai } = {}) {
         });
       }
 
-      if (!openai) {
-        return res.status(500).json({
-          ok: false,
-          error: "OpenAI is not configured",
-        });
-      }
+      const aiClient = openai || ensureOpenAI();
 
       const workspaceId = getRequestWorkspaceId(req);
       const datasetId = String(req.params.datasetId || "").trim();
@@ -430,6 +428,7 @@ export function createNpsDataRouter({ openai } = {}) {
 
       if (rowsError) {
         console.error("[nps-data] Failed to load rows for insights", rowsError);
+
         return res.status(500).json({
           ok: false,
           error: rowsError.message,
@@ -445,7 +444,9 @@ export function createNpsDataRouter({ openai } = {}) {
 
           return {
             row_ref: index + 1,
-            date: row.submitted_at ? String(row.submitted_at).slice(0, 10) : null,
+            date: row.submitted_at
+              ? String(row.submitted_at).slice(0, 10)
+              : null,
             score: Number(row.score),
             bucket: row.bucket || "",
             stage: cleanForAi(row.stage, 80),
@@ -486,6 +487,7 @@ export function createNpsDataRouter({ openai } = {}) {
       }
 
       const summary = dataset.summary_json || {};
+
       const compactPayload = {
         dataset: {
           id: dataset.id,
@@ -548,7 +550,7 @@ Rules:
 - Refer to respondents generically, such as "a detractor", "a passive respondent", or "several promoters".
 `.trim();
 
-      const aiResponse = await openai.responses.create({
+      const aiResponse = await aiClient.responses.create({
         model: "gpt-4o-mini",
         max_output_tokens: 650,
         input: [
@@ -611,6 +613,7 @@ Rules:
       });
     } catch (err) {
       console.error("[nps-data] Error in POST /datasets/:datasetId/insights", err);
+
       return res.status(500).json({
         ok: false,
         error: err.message || "Failed to generate dataset insights",
@@ -861,7 +864,7 @@ Rules:
         },
       });
 
-      
+
       return res.json({
         ok: true,
         action: data,

@@ -136,7 +136,7 @@ export default function CsvNpsResponses() {
     setReplyDraft(null);
     setReplyDraftError("");
     setReplyDraftCopied(false);
-    
+
     async function loadSavedDataset() {
       setLoadingDataset(true);
       setDatasetError("");
@@ -303,6 +303,30 @@ export default function CsvNpsResponses() {
 
     setSort(sortKey);
     setDir("asc");
+  }
+
+  function getClosingLoopUrl(row) {
+    const responseRef =
+      row.db_row_id ||
+      row.dataset_row_id ||
+      row.id ||
+      row.response_id;
+
+    if (!responseRef) {
+      return "/workspace/closing-the-loop";
+    }
+
+    return `/workspace/closing-the-loop?response=${encodeURIComponent(responseRef)}`;
+  }
+
+  function handleRowClick(row, event) {
+    const interactiveTarget = event.target.closest(
+      "a, button, input, select, textarea"
+    );
+
+    if (interactiveTarget) return;
+
+    window.location.href = getClosingLoopUrl(row);
   }
 
   async function generateReplyDraft(row) {
@@ -693,20 +717,20 @@ export default function CsvNpsResponses() {
                     return (
                       <tr
                         key={row.response_id || `${row.contact_name}-${row.submitted_at}-${i}`}
-                        className={`border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
+                        onClick={(event) => handleRowClick(row, event)}
+                        title="Click to manage this response in Closing the Loop"
+                        className={`cursor-pointer border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
                       >
                         <td className={`sticky left-0 z-20 w-[150px] min-w-[150px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
                           <CellText>{row.contact_name}</CellText>
 
                           <div className="mt-3 flex flex-col gap-2">
-                            <button
-                              type="button"
-                              onClick={() => generateReplyDraft(row)}
-                              disabled={replyDraftLoading}
-                              className="inline-flex items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                            <a
+                              href={getClosingLoopUrl(row)}
+                              className="inline-flex items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/20"
                             >
-                              Draft reply
-                            </button>
+                              Manage
+                            </a>
 
                             {row.intercom_contact_url ? (
                               <a
@@ -827,7 +851,12 @@ export default function CsvNpsResponses() {
                   </tr>
                 ) : (
                   filteredRows.map((row) => (
-                    <tr key={row.response_id || row.id}>
+                    <tr
+                      key={row.response_id || row.id}
+                      onClick={(event) => handleRowClick(row, event)}
+                      title="Click to manage this response in Closing the Loop"
+                      className="cursor-pointer"
+                    >
                       <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
 
                       <td>

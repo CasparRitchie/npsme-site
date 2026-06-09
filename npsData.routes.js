@@ -1184,8 +1184,8 @@ Rules:
 - The message is for ${channel || "Intercom"}, so keep it concise, warm and human.
 - Do not invent fixes, promises, compensation, timelines, discounts, or facts.
 - Do not mention internal labels like "detractor", "passive", or "promoter".
-- If the customer gave a specific comment or issue, explicitly mention that issue in natural language.
-- Use the most specific issue from all_known_comments when writing the reply.
+- If the customer gave a specific free-text problem or issue, explicitly mention that issue in natural language.
+- Use the most specific issue from problem_comments when writing the reply.
 - Do not give a generic dissatisfaction reply when a specific comment is available.
 - If the specific comment is unclear, ask one simple follow-up question to understand the issue better.
 - If the score is 0-6, be empathetic and ask for enough detail to help or investigate.
@@ -1196,6 +1196,10 @@ Rules:
 - Use "nous" rather than "je" unless the source text clearly suggests a personal reply.
 - Keep the body under 160 words.
 - The body should be ready to copy into Intercom, but the human user will review it before sending.
+- Prioritise free-text problem comments over selected benefits/options.
+- If score is 0-6, do not frame selected benefits as the main issue unless there is no negative/free-text comment.
+- Selected options are secondary context only.
+- Do not describe selected benefits or positive desired outcomes as problems. If only benefits/options are available and no clear complaint is available, thank the customer and ask an open follow-up question without implying dissatisfaction with those benefits.
 `.trim(),
     user: {
       channel,
@@ -1205,8 +1209,8 @@ Rules:
       submitted_at: row.submitted_at || null,
 
       comment: mainComment,
-      all_known_comments: allKnownComments,
-
+      problem_comments: allKnownComments,
+      positive_or_context_options: selectedOptions.slice(0, 10),
       selected_options: selectedOptions.slice(0, 10),
 
       survey_details: {

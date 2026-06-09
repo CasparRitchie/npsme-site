@@ -833,32 +833,41 @@ function summariseRows(rows) {
 function summariseCloseLoop(rows) {
   const safeRows = Array.isArray(rows) ? rows : [];
 
-  const withStatus = safeRows.map((row) => {
+  const withLatestAction = safeRows.map((row) => {
     const latestAction = getLatestCloseLoopAction(
       row.close_loop_actions || row.closeLoopActions || row.loopActions
     );
 
     return {
       ...row,
-      currentStatus: latestAction?.status || "open",
+      latestAction,
+      currentStatus: latestAction?.status || null,
     };
   });
 
-  const open = withStatus.filter((row) => row.currentStatus === "open").length;
+  const withAnyFollowUp = withLatestAction.filter((row) => row.latestAction);
 
-  const inProgress = withStatus.filter(
+  const open = withAnyFollowUp.filter(
+    (row) => row.currentStatus === "open"
+  ).length;
+
+  const inProgress = withAnyFollowUp.filter(
     (row) => row.currentStatus === "in_progress"
   ).length;
 
-  const closed = withStatus.filter((row) => row.currentStatus === "closed").length;
+  const closed = withAnyFollowUp.filter(
+    (row) => row.currentStatus === "closed"
+  ).length;
 
-  const active = withStatus.filter(
+  const active = withAnyFollowUp.filter(
     (row) => row.currentStatus !== "closed"
   ).length;
 
-  const activeDetractors = withStatus.filter(
+  const activeDetractors = withAnyFollowUp.filter(
     (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
   ).length;
+
+  const untouched = safeRows.length - withAnyFollowUp.length;
 
   return {
     open,
@@ -866,8 +875,9 @@ function summariseCloseLoop(rows) {
     closed,
     active,
     activeDetractors,
+    untouched,
 
-    // keep these aliases temporarily so existing code does not break
+    // aliases for older UI references
     openDetractors: activeDetractors,
   };
 }
@@ -913,8 +923,7 @@ function buildManagementSummary({
       ? `${closeLoopSummary.activeDetractors} active detractor follow-up${closeLoopSummary.activeDetractors === 1 ? "" : "s"}`
       : "no active detractor follow-ups";
 
-  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to close open detractor cases and look for repeated issues in the latest comments.`;
-}
+  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to progress active follow-ups, close any unresolved detractor cases and look for repeated issues in the latest comments.`;}
 
 function formatPeriodLabel(period) {
   if (period === "7d") return "the last 7 days";

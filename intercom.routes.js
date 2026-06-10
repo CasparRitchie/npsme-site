@@ -1115,6 +1115,172 @@ export function createIntercomRouter() {
     }
   });
 
+  router.get("/debug/receipt", requirePrivateCookie, async (req, res) => {
+    try {
+      const receiptIds = String(req.query.receipt_ids || "")
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean);
+
+      if (!receiptIds.length) {
+        return res.status(400).json({
+          ok: false,
+          error: "receipt_ids is required",
+        });
+      }
+
+      const receiptSet = new Set(receiptIds);
+
+      const [eventsText, responsesText, statsText] = await Promise.all([
+        readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null),
+        readDropboxFile(INTERCOM_NPS_RESPONSES_PATH).catch(() => null),
+        readDropboxFile(INTERCOM_SURVEY_STATS_PATH).catch(() => null),
+      ]);
+
+      const events = parseJsonl(eventsText);
+      const responses = parseJsonl(responsesText);
+      const stats = parseJsonl(statsText);
+
+      const responseReceiptId = (row) => {
+        const direct = String(row?.receipt_id || "").trim();
+        if (direct) return direct;
+
+        const responseId = String(row?.response_id || "").trim();
+        if (responseId.includes(":")) {
+          return responseId.split(":").slice(1).join(":").trim();
+        }
+
+        return "";
+      };
+
+      const out = receiptIds.map((receiptId) => {
+        const matchingEvents = events.filter(
+          (row) => String(row?.receipt_id || "").trim() === receiptId
+        );
+
+        const matchingResponses = responses.filter(
+          (row) => responseReceiptId(row) === receiptId
+        );
+
+        const matchingStats = stats.filter(
+          (row) => String(row?.receipt_id || "").trim() === receiptId
+        );
+
+        return {
+          receipt_id: receiptId,
+          counts: {
+            survey_events: matchingEvents.length,
+            clean_responses: matchingResponses.length,
+            survey_stats: matchingStats.length,
+          },
+          survey_events: matchingEvents,
+          clean_responses: matchingResponses,
+          survey_stats: matchingStats,
+        };
+      });
+
+      return res.json({
+        ok: true,
+        receipt_ids: receiptIds,
+        results: out,
+      });
+    } catch (err) {
+      console.error("[intercom] debug receipt error", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to inspect receipt IDs",
+      });
+    }
+  });
+
+  router.get("/debug/export-search", requirePrivateCookie, async (req, res) => {
+    try {
+      const receiptIds = String(req.query.receipt_ids || "")
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean);
+
+      if (!receiptIds.length) {
+        return res.status(400).json({
+          ok: false,
+          error: "receipt_ids is required",
+        });
+      }
+
+      const hours = clampInt(req.query.hours, 2160, 1, 8760);
+      const receiptSet = new Set(receiptIds);
+      const now = Math.floor(Date.now() / 1000);
+
+      const job = await createExportJob({
+        created_at_after: now - hours * 3600,
+        created_at_before: now,
+      });
+
+      const jobId = job.job_identifier || job.job_identfier || job.id;
+
+      if (!jobId) {
+        return res.status(500).json({
+          ok: false,
+          error: "Missing job_identifier from Intercom export job create",
+          job,
+        });
+      }
+
+      let status = null;
+
+      for (let i = 0; i < 12; i += 1) {
+        status = await getExportJob(jobId);
+
+        const st = String(status.status || "").toLowerCase();
+
+        if (["complete", "completed"].includes(st) && status.download_url) {
+          break;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
+      const st = String(status?.status || "").toLowerCase();
+
+      if (!(["complete", "completed"].includes(st) && status?.download_url)) {
+        return res.json({
+          ok: true,
+          completed: false,
+          job_identifier: jobId,
+          status: status?.status || "pending",
+        });
+      }
+
+      const csvText = await downloadExportCsv(status.download_url, { token });
+
+      const records = parse(csvText, {
+        columns: true,
+        skip_empty_lines: true,
+      });
+
+      const matches = records.filter((row) =>
+        receiptSet.has(String(row?.receipt_id || "").trim())
+      );
+
+      return res.json({
+        ok: true,
+        job_identifier: jobId,
+        hours,
+        export_rows_total: records.length,
+        matched_rows: matches.length,
+        receipt_ids: receiptIds,
+        matches,
+      });
+    } catch (err) {
+      console.error("[intercom] debug export-search error", err);
+
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to search export",
+      });
+    }
+  });
+
   router.post("/ingest/nps", requireIngestToken, async (_req, res) => {
     try {
       const out = await ingestSurveyCompletionsToCleanStore();

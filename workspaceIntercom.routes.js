@@ -749,14 +749,20 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   const statsRows = await getSurveyStatsRows();
   const canonicalRows = await getCanonicalResponses();
 
+  const canonicalContentRows = (canonicalRows || []).filter(
+    (row) => String(row?.content_id || "").trim() === contentId
+  );
+
+  const statsContentRows = (statsRows || []).filter(
+    (row) => String(row?.content_id || "").trim() === contentId
+  );
+
   const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
   const responsesByReceiptId = new Map();
 
-  for (const response of canonicalRows || []) {
-    if (String(response?.content_id || "").trim() !== contentId) continue;
-
-    const receiptId = String(response?.receipt_id || "").trim();
+  for (const response of canonicalContentRows) {
+    const receiptId = receiptIdFromResponse(response);
     if (!receiptId) continue;
 
     const existing = responsesByReceiptId.get(receiptId);
@@ -774,8 +780,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     }
   }
 
-  let rows = (statsRows || [])
-    .filter((row) => String(row?.content_id || "").trim() === contentId)
+  let rows = statsContentRows
     .map((row) => {
       const sentAtRaw = row.received_at || "";
       const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
@@ -877,13 +882,50 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
         .slice(-1)[0] || null,
   };
 
+  const statsReceiptIds = new Set(
+    statsContentRows
+      .map((row) => normaliseReceiptId(row?.receipt_id))
+      .filter(Boolean)
+  );
+
+  const responseReceiptIds = new Set(
+    canonicalContentRows
+      .map(receiptIdFromResponse)
+      .filter(Boolean)
+  );
+
+  const responseReceiptsMissingFromStats = Array.from(responseReceiptIds)
+    .filter((receiptId) => !statsReceiptIds.has(receiptId));
+
+  const statsReceiptsMissingFromResponses = Array.from(statsReceiptIds)
+    .filter((receiptId) => !responseReceiptIds.has(receiptId));
+
+  const diagnostics =
+    String(query?.debug || "") === "1"
+      ? {
+          canonical_response_rows_for_content: canonicalContentRows.length,
+          stats_rows_for_content: statsContentRows.length,
+          response_receipt_ids: responseReceiptIds.size,
+          stats_receipt_ids: statsReceiptIds.size,
+          responded_rows_from_invitation_payload: responded,
+          response_receipts_missing_from_stats_count:
+            responseReceiptsMissingFromStats.length,
+          response_receipts_missing_from_stats:
+            responseReceiptsMissingFromStats.slice(0, 20),
+          stats_receipts_missing_from_responses_count:
+            statsReceiptsMissingFromResponses.length,
+          stats_receipts_missing_from_responses:
+            statsReceiptsMissingFromResponses.slice(0, 20),
+        }
+      : undefined;
+
   return {
     content_id: contentId,
     days,
     status: statusFilter,
-    refresh: refreshInfo,
     summary,
     rows,
+    ...(diagnostics ? { diagnostics } : {}),
   };
 }
 
@@ -1082,4 +1124,22 @@ function summariseWorkspaceIntercomRows(rows) {
     nps,
     averageScore,
   };
+}
+
+function normaliseReceiptId(value) {
+  return String(value || "").trim();
+}
+
+function receiptIdFromResponse(row) {
+  const direct = normaliseReceiptId(row?.receipt_id);
+  if (direct) return direct;
+
+  const responseId = String(row?.response_id || "").trim();
+
+  // Your response_id is usually "contentId:receiptId"
+  if (responseId.includes(":")) {
+    return normaliseReceiptId(responseId.split(":").slice(1).join(":"));
+  }
+
+  return "";
 }

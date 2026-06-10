@@ -794,7 +794,7 @@ async function ingestIntercomSurveyStatsForWorkspace({ hours = 72 } = {}) {
     throw new Error("INTERCOM_ACCESS_TOKEN not configured");
   }
 
-  const h = Math.min(Math.max(Number(hours || 72), 1), 720);
+  const h = Math.min(Math.max(Number(hours || 72), 1), 8760);
   const now = Math.floor(Date.now() / 1000);
 
   const created_at_after = now - h * 3600;
@@ -994,7 +994,7 @@ export function createIntercomRouter() {
   // Export-stats ingest function (re-usable)
   // -----------------------
   async function ingestExportStats({ hours }) {
-    const h = Math.min(Math.max(Number(hours || 72), 1), 720); // 1h..30d
+    const h = Math.min(Math.max(Number(hours || 72), 1), 8760); // 1h..365d
     const now = Math.floor(Date.now() / 1000);
 
     const job = await createExportJob({

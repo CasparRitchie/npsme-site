@@ -245,6 +245,141 @@ export function createWorkspaceIntercomRouter() {
     }
   });
 
+
+  // --------------------------------------------------
+// GET /api/workspace-intercom/invitations/reconcile
+// --------------------------------------------------
+router.get("/invitations/reconcile", async (req, res) => {
+  try {
+    ensureSupabase();
+
+    const workspaceId = getRequestWorkspaceId(req);
+    const source = await getActiveWorkspaceIntercomSource(workspaceId);
+
+    if (!source) {
+      return res.status(404).json({
+        ok: false,
+        error: "No active Intercom source configured for this workspace",
+      });
+    }
+
+    const contentId = String(source?.survey_content_id || "").trim();
+
+    if (!contentId) {
+      return res.status(400).json({
+        ok: false,
+        error: "Active source is missing survey_content_id",
+      });
+    }
+
+    const statsRows = await getSurveyStatsRows();
+    const canonicalRows = await getCanonicalResponses();
+
+    const statsContentRows = (statsRows || []).filter(
+      (row) => String(row?.content_id || "").trim() === contentId
+    );
+
+    const canonicalContentRows = (canonicalRows || []).filter(
+      (row) => String(row?.content_id || "").trim() === contentId
+    );
+
+    const statsByReceiptId = new Map();
+
+    for (const row of statsContentRows) {
+      const receiptId = normaliseReceiptId(row?.receipt_id);
+      if (!receiptId) continue;
+      statsByReceiptId.set(receiptId, row);
+    }
+
+    const responsesByReceiptId = new Map();
+
+    for (const row of canonicalContentRows) {
+      const receiptId = receiptIdFromResponse(row);
+      if (!receiptId) continue;
+      responsesByReceiptId.set(receiptId, row);
+    }
+
+    const statsReceiptIds = new Set(statsByReceiptId.keys());
+    const responseReceiptIds = new Set(responsesByReceiptId.keys());
+
+    const responseReceiptsMissingFromStats = Array.from(responseReceiptIds)
+      .filter((receiptId) => !statsReceiptIds.has(receiptId));
+
+    const statsReceiptsMissingFromResponses = Array.from(statsReceiptIds)
+      .filter((receiptId) => !responseReceiptIds.has(receiptId));
+
+    const responsesMissingStats = responseReceiptsMissingFromStats.map(
+      (receiptId) => {
+        const response = responsesByReceiptId.get(receiptId);
+
+        return {
+          receipt_id: receiptId,
+          response_id: response?.response_id || null,
+          submitted_at: response?.submitted_at || null,
+          score_0_10: response?.score_0_10 ?? null,
+          contact_id: response?.contact_id || null,
+          selected_options_count: Array.isArray(response?.selected_options)
+            ? response.selected_options.length
+            : 0,
+          verbatims_count: Array.isArray(response?.verbatims)
+            ? response.verbatims.length
+            : 0,
+          has_answers: Array.isArray(response?.answers) && response.answers.length > 0,
+          raw_keys: response ? Object.keys(response).sort() : [],
+        };
+      }
+    );
+
+    const statsMissingResponses = statsReceiptsMissingFromResponses.map(
+      (receiptId) => {
+        const stat = statsByReceiptId.get(receiptId);
+
+        return {
+          receipt_id: receiptId,
+          received_at: stat?.received_at || null,
+          first_delivery: stat?.first_delivery || null,
+          first_open: stat?.first_open || null,
+          first_click: stat?.first_click || null,
+          first_answer: stat?.first_answer || null,
+          first_completion: stat?.first_completion || null,
+          stat_type: stat?.stat_type || null,
+          content_type: stat?.content_type || null,
+          device: stat?.device || null,
+          user_id: stat?.user_id || null,
+          email_present: Boolean(stat?.email),
+          name_present: Boolean(stat?.name),
+          raw_keys: stat ? Object.keys(stat).sort() : [],
+        };
+      }
+    );
+
+    return res.json({
+      ok: true,
+      workspaceId,
+      content_id: contentId,
+      source: toWorkspaceIntercomSourceSummary(source),
+      counts: {
+        canonical_response_rows_for_content: canonicalContentRows.length,
+        stats_rows_for_content: statsContentRows.length,
+        response_receipt_ids: responseReceiptIds.size,
+        stats_receipt_ids: statsReceiptIds.size,
+        responses_missing_stats: responsesMissingStats.length,
+        stats_missing_responses: statsMissingResponses.length,
+      },
+      responses_missing_stats: responsesMissingStats,
+      stats_missing_responses: statsMissingResponses,
+    });
+  } catch (err) {
+    console.error("[workspace-intercom] GET /invitations/reconcile error", err);
+
+    return res.status(500).json({
+      ok: false,
+      error: err.message || "Failed to reconcile invitations and responses",
+    });
+  }
+});
+
+
   // --------------------------------------------------
   // GET /api/workspace-intercom/sources/active/responses
   // --------------------------------------------------

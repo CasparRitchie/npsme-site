@@ -32,17 +32,24 @@ export default function CsvNpsPerformance() {
       setDatasetError("");
 
       try {
-        const datasetMetaRes = await fetch(`/api/workspace/datasets/${datasetId}`, {
-          credentials: "include",
-        });
+        const datasetMetaRes = await fetch(
+          `/api/workspace/datasets/${datasetId}`,
+          {
+            credentials: "include",
+          }
+        );
 
         const datasetMeta = await datasetMetaRes.json();
 
         if (!datasetMetaRes.ok || !datasetMeta.ok) {
-          throw new Error(datasetMeta.error || "Failed to load saved dataset");
+          throw new Error(
+            datasetMeta.error || "Failed to load saved dataset"
+          );
         }
 
-        const sourceType = String(datasetMeta?.dataset?.source_type || "").trim();
+        const sourceType = String(
+          datasetMeta?.dataset?.source_type || ""
+        ).trim();
 
         if (sourceType === "workspace_intercom") {
           const performanceParams = new URLSearchParams();
@@ -108,14 +115,22 @@ export default function CsvNpsPerformance() {
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load saved dataset");
+          throw new Error(
+            data.error || "Failed to load saved dataset"
+          );
         }
 
         setDataset(normaliseWorkspacePerformanceDataset(data));
         setMode("saved");
       } catch (err) {
-        console.error("Failed to load saved workspace dataset:", err);
-        setDatasetError(err.message || "Failed to load saved dataset");
+        console.error(
+          "Failed to load saved workspace dataset:",
+          err
+        );
+
+        setDatasetError(
+          err.message || "Failed to load saved dataset"
+        );
       } finally {
         setLoadingDataset(false);
       }
@@ -214,12 +229,21 @@ export default function CsvNpsPerformance() {
 
       try {
         const parsed = JSON.parse(saved);
+
         setDataset(normaliseSessionDataset(parsed));
         setMode("session");
+
         return true;
       } catch (err) {
-        console.error("Failed to read CSV NPS dataset from sessionStorage", err);
-        setDatasetError("Failed to read latest browser-session dataset");
+        console.error(
+          "Failed to read CSV NPS dataset from sessionStorage",
+          err
+        );
+
+        setDatasetError(
+          "Failed to read latest browser-session dataset"
+        );
+
         return false;
       }
     }
@@ -229,7 +253,8 @@ export default function CsvNpsPerformance() {
       setDatasetError("");
 
       try {
-        const loadedIntercom = await loadActiveIntercomDataset();
+        const loadedIntercom =
+          await loadActiveIntercomDataset();
 
         if (!loadedIntercom) {
           loadSessionDataset();
@@ -246,7 +271,7 @@ export default function CsvNpsPerformance() {
     }
   }, [datasetId]);
 
-    const scoreDistribution = useMemo(() => {
+  const scoreDistribution = useMemo(() => {
     const counts = Array.isArray(dataset?.scoreDistribution)
       ? dataset.scoreDistribution
       : Array.from({ length: 11 }, (_, score) => ({
@@ -268,15 +293,26 @@ export default function CsvNpsPerformance() {
   }, [dataset]);
 
   const timeline = useMemo(() => {
-    return Array.isArray(dataset?.timeline) ? dataset.timeline : [];
+    return Array.isArray(dataset?.timeline)
+      ? dataset.timeline
+      : [];
+  }, [dataset]);
+
+  const questionScores = useMemo(() => {
+    return Array.isArray(dataset?.questionScores)
+      ? dataset.questionScores
+      : [];
   }, [dataset]);
 
   const performanceRows = useMemo(() => {
-    const sourceRows = Array.isArray(dataset?.rows) ? dataset.rows : [];
+    const sourceRows = Array.isArray(dataset?.rows)
+      ? dataset.rows
+      : [];
 
     return sourceRows.filter((row) => {
       const matchesBucket =
-        bucketFilter === "all" || row.bucket === bucketFilter;
+        bucketFilter === "all" ||
+        row.bucket === bucketFilter;
 
       const matchesPeriod = rowMatchesPeriod(
         row.submitted_at,
@@ -289,7 +325,8 @@ export default function CsvNpsPerformance() {
 
   const filteredSummary = useMemo(() => {
     const filtersActive =
-      periodFilter !== "all" || bucketFilter !== "all";
+      periodFilter !== "all" ||
+      bucketFilter !== "all";
 
     if (!filtersActive) {
       return (
@@ -313,7 +350,9 @@ export default function CsvNpsPerformance() {
   ]);
 
   const bucketPercentages = useMemo(() => {
-    const total = Number(filteredSummary?.total || 0);
+    const total = Number(
+      filteredSummary?.total || 0
+    );
 
     if (!total) {
       return {
@@ -325,13 +364,19 @@ export default function CsvNpsPerformance() {
 
     return {
       promoters: Math.round(
-        (Number(filteredSummary.promoters || 0) / total) * 100
+        (Number(filteredSummary.promoters || 0) /
+          total) *
+          100
       ),
       passives: Math.round(
-        (Number(filteredSummary.passives || 0) / total) * 100
+        (Number(filteredSummary.passives || 0) /
+          total) *
+          100
       ),
       detractors: Math.round(
-        (Number(filteredSummary.detractors || 0) / total) * 100
+        (Number(filteredSummary.detractors || 0) /
+          total) *
+          100
       ),
     };
   }, [filteredSummary]);
@@ -347,7 +392,12 @@ export default function CsvNpsPerformance() {
       periodFilter,
       bucketFilter,
     });
-  }, [filteredSummary, closeLoopSummary, periodFilter, bucketFilter]);
+  }, [
+    filteredSummary,
+    closeLoopSummary,
+    periodFilter,
+    bucketFilter,
+  ]);
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -359,15 +409,21 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
-          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <p className="eyebrow">
+            {PAGE_COPY.eyebrow}
+          </p>
+
           <h1>{PAGE_COPY.title}</h1>
+
           <p>Loading performance data...</p>
         </section>
 
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading performance data from workspace.</p>
+          <p>
+            Loading performance data from workspace.
+          </p>
         </section>
       </main>
     );
@@ -377,14 +433,22 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
-          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <p className="eyebrow">
+            {PAGE_COPY.eyebrow}
+          </p>
+
           <h1>{PAGE_COPY.title}</h1>
-          <p>There was a problem loading this dataset.</p>
+
+          <p>
+            There was a problem loading this dataset.
+          </p>
         </section>
 
         <CsvNpsWorkspaceNav />
 
-        <section className="csv-nps-error">{datasetError}</section>
+        <section className="csv-nps-error">
+          {datasetError}
+        </section>
       </main>
     );
   }
@@ -393,9 +457,15 @@ export default function CsvNpsPerformance() {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
-          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+          <p className="eyebrow">
+            {PAGE_COPY.eyebrow}
+          </p>
+
           <h1>{PAGE_COPY.title}</h1>
-          <p>No feedback dataset has been loaded yet.</p>
+
+          <p>
+            No feedback dataset has been loaded yet.
+          </p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -403,7 +473,10 @@ export default function CsvNpsPerformance() {
         <section className="csv-nps-panel">
           <p>
             Go to{" "}
-            <a className="text-link" href="/workspace/import">
+            <a
+              className="text-link"
+              href="/workspace/import"
+            >
               Import feedback data
             </a>{" "}
             and analyse or save a dataset first.
@@ -413,57 +486,106 @@ export default function CsvNpsPerformance() {
     );
   }
 
-  const summary = filteredSummary || dataset.summary;
+  const summary =
+    filteredSummary || dataset.summary;
 
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
-        <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
+        <p className="eyebrow">
+          {PAGE_COPY.eyebrow}
+        </p>
+
         <h1>{PAGE_COPY.title}</h1>
+
         <p>{subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
 
-      {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
+      {datasetId && (
+        <WorkspaceDatasetHeader dataset={dataset} />
+      )}
 
       <section className="csv-nps-results">
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
             <span>Period</span>
+
             <select
               value={periodFilter}
-              onChange={(e) => setPeriodFilter(e.target.value)}
+              onChange={(event) =>
+                setPeriodFilter(event.target.value)
+              }
             >
-              <option value="all">All time</option>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="90d">Last 90 days</option>
-              <option value="this_month">This month</option>
+              <option value="all">
+                All time
+              </option>
+
+              <option value="7d">
+                Last 7 days
+              </option>
+
+              <option value="30d">
+                Last 30 days
+              </option>
+
+              <option value="90d">
+                Last 90 days
+              </option>
+
+              <option value="this_month">
+                This month
+              </option>
             </select>
           </label>
 
           <label className="csv-nps-filter-field">
             <span>Bucket</span>
+
             <select
               value={bucketFilter}
-              onChange={(e) => setBucketFilter(e.target.value)}
+              onChange={(event) =>
+                setBucketFilter(event.target.value)
+              }
             >
-              <option value="all">All</option>
-              <option value="promoter">Promoters</option>
-              <option value="passive">Passives</option>
-              <option value="detractor">Detractors</option>
+              <option value="all">
+                All
+              </option>
+
+              <option value="promoter">
+                Promoters
+              </option>
+
+              <option value="passive">
+                Passives
+              </option>
+
+              <option value="detractor">
+                Detractors
+              </option>
             </select>
           </label>
 
           <div className="csv-nps-filter-field">
             <span>Workspace actions</span>
+
             <div className="flex flex-wrap gap-2">
-              <a className="text-link" href="/workspace/responses">
+              <a
+                className="text-link"
+                href="/workspace/responses"
+              >
                 Review responses
               </a>
-              <span className="text-slate-500">·</span>
-              <a className="text-link" href="/workspace/closing-the-loop">
+
+              <span className="text-slate-500">
+                ·
+              </span>
+
+              <a
+                className="text-link"
+                href="/workspace/closing-the-loop"
+              >
                 Manage follow-up
               </a>
             </div>
@@ -473,30 +595,67 @@ export default function CsvNpsPerformance() {
         <div className="csv-nps-responses-header">
           <div>
             <h2>Summary</h2>
+
             <p>
-              Based on {summary.total} valid NPS response
+              Based on {summary.total} valid NPS
+              response
               {summary.total === 1 ? "" : "s"}.
             </p>
           </div>
         </div>
 
         <div className="csv-nps-metric-grid">
-          <MetricCard label="Responses" value={summary.total} />
-          <MetricCard label="NPS" value={summary.nps} />
-          <MetricCard label="Promoters" value={summary.promoters} />
-          <MetricCard label="Passives" value={summary.passives} />
-          <MetricCard label="Detractors" value={summary.detractors} />
-          <MetricCard label="Avg. score" value={summary.averageScore} />
-          <MetricCard label="Active follow-ups" value={closeLoopSummary.active} />
-          <MetricCard label="Active detractors" value={closeLoopSummary.activeDetractors} />
+          <MetricCard
+            label="Responses"
+            value={summary.total}
+          />
+
+          <MetricCard
+            label="NPS"
+            value={summary.nps}
+          />
+
+          <MetricCard
+            label="Promoters"
+            value={summary.promoters}
+          />
+
+          <MetricCard
+            label="Passives"
+            value={summary.passives}
+          />
+
+          <MetricCard
+            label="Detractors"
+            value={summary.detractors}
+          />
+
+          <MetricCard
+            label="Avg. score"
+            value={summary.averageScore}
+          />
+
+          <MetricCard
+            label="Active follow-ups"
+            value={closeLoopSummary.active}
+          />
+
+          <MetricCard
+            label="Active detractors"
+            value={
+              closeLoopSummary.activeDetractors
+            }
+          />
         </div>
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
               <h3>Management summary</h3>
+
               <p>
-                Founder-level readout combining NPS performance and close-loop progress.
+                Founder-level readout combining NPS
+                performance and close-loop progress.
               </p>
             </div>
           </div>
@@ -505,10 +664,17 @@ export default function CsvNpsPerformance() {
             <p>{managementSummary}</p>
 
             <div className="csv-nps-management-actions">
-              <a className="csv-nps-button" href="/workspace/closing-the-loop">
+              <a
+                className="csv-nps-button"
+                href="/workspace/closing-the-loop"
+              >
                 View open follow-ups
               </a>
-              <a className="csv-nps-button csv-nps-button-secondary" href="/workspace/responses">
+
+              <a
+                className="csv-nps-button csv-nps-button-secondary"
+                href="/workspace/responses"
+              >
                 Review responses
               </a>
             </div>
@@ -518,27 +684,37 @@ export default function CsvNpsPerformance() {
         <div className="csv-nps-performance-grid">
           <section className="csv-nps-chart-card">
             <h3>Response mix</h3>
+
             <p>
-              Split of responses across promoters, passives and detractors.
+              Split of responses across promoters,
+              passives and detractors.
             </p>
 
             <div className="csv-nps-bucket-bars">
               <BucketBar
                 label="Promoters"
                 count={summary.promoters}
-                percentage={bucketPercentages.promoters}
+                percentage={
+                  bucketPercentages.promoters
+                }
                 bucket="promoter"
               />
+
               <BucketBar
                 label="Passives"
                 count={summary.passives}
-                percentage={bucketPercentages.passives}
+                percentage={
+                  bucketPercentages.passives
+                }
                 bucket="passive"
               />
+
               <BucketBar
                 label="Detractors"
                 count={summary.detractors}
-                percentage={bucketPercentages.detractors}
+                percentage={
+                  bucketPercentages.detractors
+                }
                 bucket="detractor"
               />
             </div>
@@ -546,21 +722,36 @@ export default function CsvNpsPerformance() {
 
           <section className="csv-nps-chart-card">
             <h3>Score distribution</h3>
-            <p>Number of responses received for each score from 0 to 10.</p>
+
+            <p>
+              Number of responses received for each
+              score from 0 to 10.
+            </p>
 
             <div className="csv-nps-score-chart">
               {scoreDistribution.map((item) => (
-                <div className="csv-nps-score-row" key={item.score}>
-                  <span className="csv-nps-score-label">{item.score}</span>
+                <div
+                  className="csv-nps-score-row"
+                  key={item.score}
+                >
+                  <span className="csv-nps-score-label">
+                    {item.score}
+                  </span>
+
                   <div className="csv-nps-score-track">
                     <div
                       className={`csv-nps-score-fill ${getScoreClass(
                         item.score
                       )}`}
-                      style={{ width: `${item.percentageOfMax}%` }}
+                      style={{
+                        width: `${item.percentageOfMax}%`,
+                      }}
                     />
                   </div>
-                  <span className="csv-nps-score-count">{item.count}</span>
+
+                  <span className="csv-nps-score-count">
+                    {item.count}
+                  </span>
                 </div>
               ))}
             </div>
@@ -571,10 +762,14 @@ export default function CsvNpsPerformance() {
           <section className="csv-nps-chart-card csv-nps-chart-card-wide">
             <div className="csv-nps-responses-header">
               <div>
-                <h3>Average score by question</h3>
+                <h3>
+                  Average score by question
+                </h3>
+
                 <p>
-                  Average rating out of 10 for each survey question.
-                  The recommendation question is also used to calculate the
+                  Average rating out of 10 for each
+                  survey question. The recommendation
+                  question is also used to calculate the
                   headline NPS result.
                 </p>
               </div>
@@ -583,11 +778,18 @@ export default function CsvNpsPerformance() {
             <div className="csv-nps-question-score-list">
               {questionScores.map((item) => (
                 <QuestionScoreBar
-                  key={item.questionId || item.question}
+                  key={
+                    item.questionId ||
+                    item.question
+                  }
                   question={item.question}
-                  averageScore={item.averageScore}
+                  averageScore={
+                    item.averageScore
+                  }
                   responses={item.responses}
-                  isNpsQuestion={item.isNpsQuestion}
+                  isNpsQuestion={
+                    item.isNpsQuestion
+                  }
                 />
               ))}
             </div>
@@ -596,13 +798,17 @@ export default function CsvNpsPerformance() {
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <h3>Timeline</h3>
+
           <p>
-            Daily NPS and response volume, where response dates were detected.
+            NPS and response volume across the selected
+            reporting periods, where usable response
+            dates were detected.
           </p>
 
           {timeline.length === 0 ? (
             <div className="csv-nps-empty-state">
-              No usable response dates were detected in this dataset.
+              No usable response dates were detected in
+              this dataset.
             </div>
           ) : (
             <div className="csv-nps-table-wrap">
@@ -617,12 +823,13 @@ export default function CsvNpsPerformance() {
                     <th>Detractors</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {timeline.map((day) => (
                     <tr key={day.date}>
                       <td>{day.date}</td>
                       <td>{day.total}</td>
-                      <td>{day.nps}</td>
+                      <td>{day.nps ?? "—"}</td>
                       <td>{day.promoters}</td>
                       <td>{day.passives}</td>
                       <td>{day.detractors}</td>
@@ -634,17 +841,31 @@ export default function CsvNpsPerformance() {
           )}
         </section>
 
-        {datasetId && mode === "saved" && <DatasetAiInsights datasetId={datasetId} />}
+        {datasetId && mode === "saved" && (
+          <DatasetAiInsights
+            datasetId={datasetId}
+          />
+        )}
       </section>
     </main>
   );
 }
 
-function normaliseWorkspacePerformanceDataset(apiResponse) {
+function normaliseWorkspacePerformanceDataset(
+  apiResponse
+) {
   const dataset = apiResponse.dataset || {};
   const summary = apiResponse.summary || {};
-  const timeline = Array.isArray(apiResponse.timeline) ? apiResponse.timeline : [];
-  const scoreDistribution = Array.isArray(apiResponse.score_distribution)
+
+  const timeline = Array.isArray(
+    apiResponse.timeline
+  )
+    ? apiResponse.timeline
+    : [];
+
+  const scoreDistribution = Array.isArray(
+    apiResponse.score_distribution
+  )
     ? apiResponse.score_distribution
     : [];
 
@@ -656,28 +877,42 @@ function normaliseWorkspacePerformanceDataset(apiResponse) {
     rawRowCount: dataset.raw_row_count,
     validRowCount: dataset.valid_row_count,
     skippedRowCount: dataset.skipped_row_count,
+
     summary: {
       total: summary.total ?? 0,
       promoters: summary.promoters ?? 0,
       passives: summary.passives ?? 0,
       detractors: summary.detractors ?? 0,
       nps: summary.nps ?? null,
-      averageScore: summary.averageScore ?? null,
+      averageScore:
+        summary.averageScore ??
+        summary.average_score ??
+        null,
     },
+
     timeline,
     scoreDistribution,
+    questionScores: [],
     rows: [],
   };
 }
 
-function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
+function normaliseWorkspaceIntercomPerformanceDataset(
+  apiResponse
+) {
   const dataset = apiResponse.dataset || {};
-  const performance = apiResponse.performance || {};
-  const source = apiResponse.source || performance.source || {};
+  const performance =
+    apiResponse.performance || {};
+
+  const source =
+    apiResponse.source ||
+    performance.source ||
+    {};
 
   const rows = Array.isArray(apiResponse.rows)
     ? apiResponse.rows.map((row) => ({
         ...row,
+
         closeLoopActions:
           row.closeLoopActions ||
           row.close_loop_actions ||
@@ -687,7 +922,9 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
 
   const summary = performance.summary || {};
 
-  const timeline = Array.isArray(performance.timeseries)
+  const timeline = Array.isArray(
+    performance.timeseries
+  )
     ? performance.timeseries.map((point) => ({
         date: point.date,
         total: point.responses ?? 0,
@@ -696,35 +933,54 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
         passives: point.passives ?? 0,
         detractors: point.detractors ?? 0,
         nps: point.nps ?? null,
-        averageScore: point.average_score ?? null,
+        averageScore:
+          point.average_score ?? null,
       }))
     : [];
 
   const scoreDistribution = Array.isArray(
     performance.score_distribution
   )
-    ? performance.score_distribution.map((item) => ({
-        score: item.score,
-        count: item.count ?? 0,
-        percentage: item.percentage ?? 0,
-        bucket: item.bucket || null,
-      }))
+    ? performance.score_distribution.map(
+        (item) => ({
+          score: item.score,
+          count: item.count ?? 0,
+          percentage:
+            item.percentage ?? 0,
+          bucket: item.bucket || null,
+        })
+      )
     : [];
 
   const questionScores = Array.isArray(
     performance.question_scores
   )
-    ? performance.question_scores.map((item) => ({
-        questionId: item.question_id || null,
-        question: item.question || "Survey question",
-        responses: item.responses ?? 0,
-        averageScore: item.average_score ?? null,
-        isNpsQuestion:
-          String(item.question_id || "") === "612560",
-      }))
+    ? performance.question_scores.map(
+        (item) => ({
+          questionId:
+            item.question_id || null,
+
+          question:
+            item.question ||
+            "Survey question",
+
+          responses:
+            item.responses ?? 0,
+
+          averageScore:
+            item.average_score ?? null,
+
+          isNpsQuestion:
+            String(
+              item.question_id || ""
+            ) === "612560",
+        })
+      )
     : [];
 
-  const benefits = Array.isArray(performance.benefits)
+  const benefits = Array.isArray(
+    performance.benefits
+  )
     ? performance.benefits
     : [];
 
@@ -753,7 +1009,8 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
       null,
 
     rawRowCount:
-      performance?.data_quality?.canonical_rows_in_period ??
+      performance?.data_quality
+        ?.canonical_rows_in_period ??
       summary.total ??
       rows.length,
 
@@ -763,47 +1020,74 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
       rows.length,
 
     skippedRowCount:
-      performance?.data_quality?.responses_without_valid_score ??
+      performance?.data_quality
+        ?.responses_without_valid_score ??
       0,
 
     rows,
 
     summary: {
       total: summary.total ?? 0,
+
       validResponses:
         summary.validResponses ??
         summary.total ??
         0,
+
       promoters: summary.promoters ?? 0,
       passives: summary.passives ?? 0,
       detractors: summary.detractors ?? 0,
       nps: summary.nps ?? null,
-      averageScore: summary.averageScore ?? null,
+
+      averageScore:
+        summary.averageScore ??
+        summary.average_score ??
+        null,
+
       latestSubmittedAt:
-        summary.latestSubmittedAt ?? null,
+        summary.latestSubmittedAt ??
+        summary.latest_submitted_at ??
+        null,
     },
 
     period: performance.period || null,
-    comparison: performance.comparison || null,
+    comparison:
+      performance.comparison || null,
+
     timeline,
     scoreDistribution,
     questionScores,
     benefits,
     recentDetractors,
-    dataQuality: performance.data_quality || null,
+
+    dataQuality:
+      performance.data_quality || null,
   };
 }
 
-function normaliseSessionDataset(sessionDataset) {
-  const rows = Array.isArray(sessionDataset?.rows) ? sessionDataset.rows : [];
-  const summary = normaliseSummary(sessionDataset?.summary, rows);
+function normaliseSessionDataset(
+  sessionDataset
+) {
+  const rows = Array.isArray(
+    sessionDataset?.rows
+  )
+    ? sessionDataset.rows
+    : [];
+
+  const summary = normaliseSummary(
+    sessionDataset?.summary,
+    rows
+  );
 
   const byDate = new Map();
 
   rows.forEach((row) => {
     if (!row.submitted_at) return;
 
-    const dateKey = String(row.submitted_at).slice(0, 10);
+    const dateKey = String(
+      row.submitted_at
+    ).slice(0, 10);
+
     if (!dateKey) return;
 
     if (!byDate.has(dateKey)) {
@@ -814,29 +1098,45 @@ function normaliseSessionDataset(sessionDataset) {
         passives: 0,
         detractors: 0,
         nps: null,
-        rows,
       });
     }
 
     const bucket = byDate.get(dateKey);
+
     bucket.total += 1;
 
-    if (row.bucket === "promoter") bucket.promoters += 1;
-    if (row.bucket === "passive") bucket.passives += 1;
-    if (row.bucket === "detractor") bucket.detractors += 1;
+    if (row.bucket === "promoter") {
+      bucket.promoters += 1;
+    }
+
+    if (row.bucket === "passive") {
+      bucket.passives += 1;
+    }
+
+    if (row.bucket === "detractor") {
+      bucket.detractors += 1;
+    }
 
     bucket.nps = Math.round(
-      ((bucket.promoters - bucket.detractors) / bucket.total) * 100
+      ((bucket.promoters -
+        bucket.detractors) /
+        bucket.total) *
+        100
     );
   });
 
-  const scoreDistribution = Array.from({ length: 11 }, (_, score) => ({
-    score,
-    count: 0,
-  }));
+  const scoreDistribution = Array.from(
+    { length: 11 },
+    (_, score) => ({
+      score,
+      count: 0,
+    })
+  );
 
   rows.forEach((row) => {
-    const score = normaliseNpsScore(row.score);
+    const score = normaliseNpsScore(
+      row.score
+    );
 
     if (Number.isInteger(score)) {
       scoreDistribution[score].count += 1;
@@ -845,35 +1145,85 @@ function normaliseSessionDataset(sessionDataset) {
 
   return {
     id: sessionDataset?.id || null,
-    datasetName: sessionDataset?.datasetName || "Session dataset",
-    sourceType: sessionDataset?.sourceType || "session",
-    content_id: sessionDataset?.content_id || null,
-    rawRowCount: sessionDataset?.rawRowCount || rows.length,
-    validRowCount: sessionDataset?.validRowCount || rows.length,
-    skippedRowCount: sessionDataset?.skippedRowCount || 0,
+
+    datasetName:
+      sessionDataset?.datasetName ||
+      "Session dataset",
+
+    sourceType:
+      sessionDataset?.sourceType ||
+      "session",
+
+    content_id:
+      sessionDataset?.content_id ||
+      null,
+
+    rawRowCount:
+      sessionDataset?.rawRowCount ||
+      rows.length,
+
+    validRowCount:
+      sessionDataset?.validRowCount ||
+      rows.length,
+
+    skippedRowCount:
+      sessionDataset?.skippedRowCount ||
+      0,
+
     summary,
     rows,
-    timeline: Array.from(byDate.values()).sort((a, b) =>
+
+    timeline: Array.from(
+      byDate.values()
+    ).sort((a, b) =>
       a.date > b.date ? 1 : -1
     ),
+
     scoreDistribution,
+    questionScores: [],
   };
 }
 
-function normaliseSummary(summaryJson, rows) {
+function normaliseSummary(
+  summaryJson,
+  rows
+) {
   const summary = summaryJson || {};
 
   return {
-    total: summary.total ?? rows.length,
+    total:
+      summary.total ??
+      rows.length,
+
     promoters:
-      summary.promoters ?? rows.filter((row) => row.bucket === "promoter").length,
+      summary.promoters ??
+      rows.filter(
+        (row) =>
+          row.bucket === "promoter"
+      ).length,
+
     passives:
-      summary.passives ?? rows.filter((row) => row.bucket === "passive").length,
+      summary.passives ??
+      rows.filter(
+        (row) =>
+          row.bucket === "passive"
+      ).length,
+
     detractors:
       summary.detractors ??
-      rows.filter((row) => row.bucket === "detractor").length,
-    nps: summary.nps ?? calculateNps(rows),
-    averageScore: summary.averageScore ?? calculateAverageScore(rows),
+      rows.filter(
+        (row) =>
+          row.bucket === "detractor"
+      ).length,
+
+    nps:
+      summary.nps ??
+      calculateNps(rows),
+
+    averageScore:
+      summary.averageScore ??
+      summary.average_score ??
+      calculateAverageScore(rows),
   };
 }
 
@@ -900,12 +1250,21 @@ function normaliseNpsScore(value) {
 }
 
 function calculateNps(rows) {
-  const validRows = (Array.isArray(rows) ? rows : [])
+  const validRows = (
+    Array.isArray(rows)
+      ? rows
+      : []
+  )
     .map((row) => ({
       ...row,
-      normalisedScore: normaliseNpsScore(row?.score),
+
+      normalisedScore:
+        normaliseNpsScore(row?.score),
     }))
-    .filter((row) => row.normalisedScore !== null);
+    .filter(
+      (row) =>
+        row.normalisedScore !== null
+    );
 
   const total = validRows.length;
 
@@ -914,22 +1273,34 @@ function calculateNps(rows) {
   }
 
   const promoters = validRows.filter(
-    (row) => row.normalisedScore >= 9
+    (row) =>
+      row.normalisedScore >= 9
   ).length;
 
   const detractors = validRows.filter(
-    (row) => row.normalisedScore <= 6
+    (row) =>
+      row.normalisedScore <= 6
   ).length;
 
   return Math.round(
-    ((promoters - detractors) / total) * 100
+    ((promoters - detractors) /
+      total) *
+      100
   );
 }
 
 function calculateAverageScore(rows) {
-  const scores = (Array.isArray(rows) ? rows : [])
-    .map((row) => normaliseNpsScore(row?.score))
-    .filter((score) => score !== null);
+  const scores = (
+    Array.isArray(rows)
+      ? rows
+      : []
+  )
+    .map((row) =>
+      normaliseNpsScore(row?.score)
+    )
+    .filter(
+      (score) => score !== null
+    );
 
   if (!scores.length) {
     return null;
@@ -937,27 +1308,45 @@ function calculateAverageScore(rows) {
 
   return (
     Math.round(
-      (scores.reduce((sum, score) => sum + score, 0) /
+      (scores.reduce(
+        (sum, score) =>
+          sum + score,
+        0
+      ) /
         scores.length) *
         10
     ) / 10
   );
 }
 
-function MetricCard({ label, value }) {
+function MetricCard({
+  label,
+  value,
+}) {
   return (
     <div className="csv-nps-metric-card">
-      <div className="csv-nps-metric-label">{label}</div>
-      <div className="csv-nps-metric-value">{value ?? "—"}</div>
+      <div className="csv-nps-metric-label">
+        {label}
+      </div>
+
+      <div className="csv-nps-metric-value">
+        {value ?? "—"}
+      </div>
     </div>
   );
 }
 
-function BucketBar({ label, count, percentage, bucket }) {
+function BucketBar({
+  label,
+  count,
+  percentage,
+  bucket,
+}) {
   return (
     <div className="csv-nps-bucket-bar-row">
       <div className="csv-nps-bucket-bar-topline">
         <span>{label}</span>
+
         <span>
           {count} responses · {percentage}%
         </span>
@@ -966,7 +1355,9 @@ function BucketBar({ label, count, percentage, bucket }) {
       <div className="csv-nps-bucket-bar-track">
         <div
           className={`csv-nps-bucket-bar-fill csv-nps-bucket-bar-fill-${bucket}`}
-          style={{ width: `${percentage}%` }}
+          style={{
+            width: `${percentage}%`,
+          }}
         />
       </div>
     </div>
@@ -979,12 +1370,16 @@ function QuestionScoreBar({
   responses,
   isNpsQuestion,
 }) {
-  const score = normaliseNpsScore(averageScore);
+  const score =
+    normaliseNpsScore(averageScore);
 
   const percentage =
     score === null
       ? 0
-      : Math.max(0, Math.min(100, score * 10));
+      : Math.max(
+          0,
+          Math.min(100, score * 10)
+        );
 
   return (
     <div className="csv-nps-question-score-row">
@@ -1000,7 +1395,11 @@ function QuestionScoreBar({
 
             {isNpsQuestion && (
               <>
-                <span aria-hidden="true"> · </span>
+                <span aria-hidden="true">
+                  {" "}
+                  ·{" "}
+                </span>
+
                 <span className="csv-nps-question-score-badge">
                   NPS question
                 </span>
@@ -1010,7 +1409,10 @@ function QuestionScoreBar({
         </div>
 
         <div className="csv-nps-question-score-value">
-          {score === null ? "—" : score.toFixed(1)}
+          {score === null
+            ? "—"
+            : score.toFixed(1)}
+
           <span>/10</span>
         </div>
       </div>
@@ -1019,15 +1421,21 @@ function QuestionScoreBar({
         className="csv-nps-question-score-track"
         role="progressbar"
         aria-label={`${question}: ${
-          score === null ? "no score" : `${score} out of 10`
+          score === null
+            ? "no score"
+            : `${score} out of 10`
         }`}
         aria-valuemin="0"
         aria-valuemax="10"
-        aria-valuenow={score ?? undefined}
+        aria-valuenow={
+          score ?? undefined
+        }
       >
         <div
           className="csv-nps-question-score-fill"
-          style={{ width: `${percentage}%` }}
+          style={{
+            width: `${percentage}%`,
+          }}
         />
       </div>
     </div>
@@ -1035,41 +1443,75 @@ function QuestionScoreBar({
 }
 
 function getScoreClass(score) {
-  if (score >= 9) return "csv-nps-score-fill-promoter";
-  if (score >= 7) return "csv-nps-score-fill-passive";
+  if (score >= 9) {
+    return "csv-nps-score-fill-promoter";
+  }
+
+  if (score >= 7) {
+    return "csv-nps-score-fill-passive";
+  }
+
   return "csv-nps-score-fill-detractor";
 }
 
-function rowMatchesPeriod(isoDate, period) {
-  if (!period || period === "all") return true;
+function rowMatchesPeriod(
+  isoDate,
+  period
+) {
+  if (
+    !period ||
+    period === "all"
+  ) {
+    return true;
+  }
 
-  const submittedAt = new Date(isoDate || "");
-  if (Number.isNaN(submittedAt.getTime())) return false;
+  const submittedAt = new Date(
+    isoDate || ""
+  );
+
+  if (
+    Number.isNaN(
+      submittedAt.getTime()
+    )
+  ) {
+    return false;
+  }
 
   const now = new Date();
 
   if (period === "7d") {
     const threshold = new Date(now);
-    threshold.setDate(threshold.getDate() - 7);
+    threshold.setDate(
+      threshold.getDate() - 7
+    );
+
     return submittedAt >= threshold;
   }
 
   if (period === "30d") {
     const threshold = new Date(now);
-    threshold.setDate(threshold.getDate() - 30);
+    threshold.setDate(
+      threshold.getDate() - 30
+    );
+
     return submittedAt >= threshold;
   }
 
   if (period === "90d") {
     const threshold = new Date(now);
-    threshold.setDate(threshold.getDate() - 90);
+    threshold.setDate(
+      threshold.getDate() - 90
+    );
+
     return submittedAt >= threshold;
   }
 
   if (period === "this_month") {
     return (
-      submittedAt.getFullYear() === now.getFullYear() &&
-      submittedAt.getMonth() === now.getMonth()
+      submittedAt.getFullYear() ===
+        now.getFullYear() &&
+      submittedAt.getMonth() ===
+        now.getMonth()
     );
   }
 
@@ -1077,17 +1519,27 @@ function rowMatchesPeriod(isoDate, period) {
 }
 
 function summariseRows(rows) {
-  const validRows = (Array.isArray(rows) ? rows : [])
+  const validRows = (
+    Array.isArray(rows)
+      ? rows
+      : []
+  )
     .map((row) => ({
       ...row,
-      normalisedScore: normaliseNpsScore(row?.score),
+
+      normalisedScore:
+        normaliseNpsScore(row?.score),
     }))
-    .filter((row) => row.normalisedScore !== null);
+    .filter(
+      (row) =>
+        row.normalisedScore !== null
+    );
 
   const total = validRows.length;
 
   const promoters = validRows.filter(
-    (row) => row.normalisedScore >= 9
+    (row) =>
+      row.normalisedScore >= 9
   ).length;
 
   const passives = validRows.filter(
@@ -1097,14 +1549,17 @@ function summariseRows(rows) {
   ).length;
 
   const detractors = validRows.filter(
-    (row) => row.normalisedScore <= 6
+    (row) =>
+      row.normalisedScore <= 6
   ).length;
 
   const averageScore =
     total > 0
       ? Math.round(
           (validRows.reduce(
-            (sum, row) => sum + row.normalisedScore,
+            (sum, row) =>
+              sum +
+              row.normalisedScore,
             0
           ) /
             total) *
@@ -1115,7 +1570,10 @@ function summariseRows(rows) {
   const nps =
     total > 0
       ? Math.round(
-          ((promoters - detractors) / total) * 100
+          ((promoters -
+            detractors) /
+            total) *
+            100
         )
       : null;
 
@@ -1130,43 +1588,67 @@ function summariseRows(rows) {
 }
 
 function summariseCloseLoop(rows) {
-  const safeRows = Array.isArray(rows) ? rows : [];
+  const safeRows = Array.isArray(rows)
+    ? rows
+    : [];
 
-  const withLatestAction = safeRows.map((row) => {
-    const latestAction = getLatestCloseLoopAction(
-      row.close_loop_actions || row.closeLoopActions || row.loopActions
+  const withLatestAction =
+    safeRows.map((row) => {
+      const latestAction =
+        getLatestCloseLoopAction(
+          row.close_loop_actions ||
+            row.closeLoopActions ||
+            row.loopActions
+        );
+
+      return {
+        ...row,
+        latestAction,
+
+        currentStatus:
+          latestAction?.status || null,
+      };
+    });
+
+  const withAnyFollowUp =
+    withLatestAction.filter(
+      (row) => row.latestAction
     );
 
-    return {
-      ...row,
-      latestAction,
-      currentStatus: latestAction?.status || null,
-    };
-  });
-
-  const withAnyFollowUp = withLatestAction.filter((row) => row.latestAction);
-
   const open = withAnyFollowUp.filter(
-    (row) => row.currentStatus === "open"
+    (row) =>
+      row.currentStatus === "open"
   ).length;
 
-  const inProgress = withAnyFollowUp.filter(
-    (row) => row.currentStatus === "in_progress"
-  ).length;
+  const inProgress =
+    withAnyFollowUp.filter(
+      (row) =>
+        row.currentStatus ===
+        "in_progress"
+    ).length;
 
-  const closed = withAnyFollowUp.filter(
-    (row) => row.currentStatus === "closed"
-  ).length;
+  const closed =
+    withAnyFollowUp.filter(
+      (row) =>
+        row.currentStatus === "closed"
+    ).length;
 
-  const active = withAnyFollowUp.filter(
-    (row) => row.currentStatus !== "closed"
-  ).length;
+  const active =
+    withAnyFollowUp.filter(
+      (row) =>
+        row.currentStatus !== "closed"
+    ).length;
 
-  const activeDetractors = withAnyFollowUp.filter(
-    (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
-  ).length;
+  const activeDetractors =
+    withAnyFollowUp.filter(
+      (row) =>
+        row.bucket === "detractor" &&
+        row.currentStatus !== "closed"
+    ).length;
 
-  const untouched = safeRows.length - withAnyFollowUp.length;
+  const untouched =
+    safeRows.length -
+    withAnyFollowUp.length;
 
   return {
     open,
@@ -1176,27 +1658,41 @@ function summariseCloseLoop(rows) {
     activeDetractors,
     untouched,
 
-    // aliases for older UI references
-    openDetractors: activeDetractors,
+    // Alias retained for older UI references.
+    openDetractors:
+      activeDetractors,
   };
 }
 
-function getLatestCloseLoopAction(actions = []) {
-  if (!Array.isArray(actions) || actions.length === 0) {
+function getLatestCloseLoopAction(
+  actions = []
+) {
+  if (
+    !Array.isArray(actions) ||
+    actions.length === 0
+  ) {
     return null;
   }
 
-  return [...actions].sort((a, b) => {
-    const aDate = new Date(
-      a.updated_at || a.created_at || a.updatedAt || 0
-    ).getTime();
+  return [...actions].sort(
+    (a, b) => {
+      const aDate = new Date(
+        a.updated_at ||
+          a.created_at ||
+          a.updatedAt ||
+          0
+      ).getTime();
 
-    const bDate = new Date(
-      b.updated_at || b.created_at || b.updatedAt || 0
-    ).getTime();
+      const bDate = new Date(
+        b.updated_at ||
+          b.created_at ||
+          b.updatedAt ||
+          0
+      ).getTime();
 
-    return bDate - aDate;
-  })[0];
+      return bDate - aDate;
+    }
+  )[0];
 }
 
 function buildManagementSummary({
@@ -1205,8 +1701,13 @@ function buildManagementSummary({
   periodFilter,
   bucketFilter,
 }) {
-  const windowLabel = formatPeriodLabel(periodFilter);
-  const bucketLabel = bucketFilter === "all" ? "all responses" : bucketFilter;
+  const windowLabel =
+    formatPeriodLabel(periodFilter);
+
+  const bucketLabel =
+    bucketFilter === "all"
+      ? "all responses"
+      : bucketFilter;
 
   if (!summary?.total) {
     return `No usable responses are available for ${bucketLabel} in ${windowLabel}.`;
@@ -1214,15 +1715,25 @@ function buildManagementSummary({
 
   const detractorPart =
     summary.detractors > 0
-      ? `${summary.detractors} detractor${summary.detractors === 1 ? "" : "s"}`
+      ? `${summary.detractors} detractor${
+          summary.detractors === 1
+            ? ""
+            : "s"
+        }`
       : "no detractors";
 
   const activeFollowUpPart =
-    closeLoopSummary.activeDetractors > 0
-      ? `${closeLoopSummary.activeDetractors} active detractor follow-up${closeLoopSummary.activeDetractors === 1 ? "" : "s"}`
+    closeLoopSummary.activeDetractors >
+    0
+      ? `${closeLoopSummary.activeDetractors} active detractor follow-up${
+          closeLoopSummary.activeDetractors ===
+          1
+            ? ""
+            : "s"
+        }`
       : "no active detractor follow-ups";
 
-    return `For ${bucketLabel} in ${windowLabel}, NPS is ${
+  return `For ${bucketLabel} in ${windowLabel}, NPS is ${
     summary.nps ?? "—"
   } from ${summary.total} response${
     summary.total === 1 ? "" : "s"
@@ -1234,9 +1745,21 @@ function buildManagementSummary({
 }
 
 function formatPeriodLabel(period) {
-  if (period === "7d") return "the last 7 days";
-  if (period === "30d") return "the last 30 days";
-  if (period === "90d") return "the last 90 days";
-  if (period === "this_month") return "this month";
+  if (period === "7d") {
+    return "the last 7 days";
+  }
+
+  if (period === "30d") {
+    return "the last 30 days";
+  }
+
+  if (period === "90d") {
+    return "the last 90 days";
+  }
+
+  if (period === "this_month") {
+    return "this month";
+  }
+
   return "all time";
 }

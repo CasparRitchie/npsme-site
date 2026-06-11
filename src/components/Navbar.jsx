@@ -269,7 +269,7 @@ export default function NavBar() {
           >
             <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
             <span className="text-lg tracking-tight font-semibold text-white">
-              NPS <span className="text-[#7C3AED]">Me</span>
+              NPS <span className="text-[#22C55E]">Me</span>
             </span>
           </Link>
 

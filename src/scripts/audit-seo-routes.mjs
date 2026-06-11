@@ -1,7 +1,8 @@
 // scripts/audit-seo-routes.mjs
 import { ROUTES_MANIFEST } from "../routesManifest.js";
 
-const BASE_URL = "http://localhost:3000";
+// const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://www.npsme.com";
 
 const REQUEST_HEADERS = {
   Host: "www.npsme.com",

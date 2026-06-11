@@ -29,6 +29,10 @@ import { createNpsDataRouter } from "./npsData.routes.js";
 import { createWorkspaceRouter } from "./workspace.routes.js";
 import { createWorkspaceIntercomRouter } from "./workspaceIntercom.routes.js";
 import { ROUTES_MANIFEST } from "./src/routesManifest.js";
+import {
+  getSeoUrls,
+  normaliseSeoPath,
+} from "./src/seoRoutes.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -2885,6 +2889,27 @@ function isRouteIndexable(pathname) {
   return route?.enabled === true && route?.indexable === true;
 }
 
+const ROBOTS_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bname=["']robots["'])[^>]*>/i;
+
+const CANONICAL_TAG_PATTERN =
+  /<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/i;
+
+const OG_URL_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bproperty=["']og:url["'])[^>]*>/i;
+
+const OG_TITLE_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bproperty=["']og:title["'])[^>]*>/i;
+
+const OG_DESCRIPTION_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bproperty=["']og:description["'])[^>]*>/i;
+
+const TWITTER_TITLE_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bname=["']twitter:title["'])[^>]*>/i;
+
+const TWITTER_DESCRIPTION_TAG_PATTERN =
+  /<meta\b(?=[^>]*\bname=["']twitter:description["'])[^>]*>/i;
+
 /* -----------------------------
    SPA HTML: inject canonical + og:url + per-route meta + hreflang
 ------------------------------ */
@@ -2898,16 +2923,35 @@ app.get("*", (req, res, next) => {
 
   res.set("Cache-Control", "no-store, must-revalidate");
 
-  const pathOnly = req.originalUrl.split("?")[0] || "/";
-  const fullUrl = `https://${CANONICAL_HOST}${pathOnly}`;
+  const requestedPath =
+    req.originalUrl.split("?")[0] || "/";
 
-  const manifestRoute = getManifestRoute(pathOnly);
-  const isIndexable = manifestRoute?.enabled === true && manifestRoute?.indexable === true;
+  const pathOnly =
+    normaliseSeoPath(requestedPath);
 
-  // --- Language detection (simple) ---
-  const isFr = pathOnly === "/fr" || pathOnly.startsWith("/fr/");
-  const htmlLang = isFr ? "fr" : "en";
-  const inLang = isFr ? "fr-FR" : "en-GB";
+  const {
+    enUrl,
+    frUrl,
+    xDefaultUrl,
+    canonicalUrl,
+    isFrench,
+  } = getSeoUrls(pathOnly);
+
+  const fullUrl = canonicalUrl;
+
+  const manifestRoute =
+    getManifestRoute(pathOnly);
+
+  const isIndexable =
+    manifestRoute?.enabled === true &&
+    manifestRoute?.indexable === true;
+
+  // Language is derived from the canonical URL path.
+  const htmlLang =
+    isFrench ? "fr" : "en";
+
+  const inLang =
+    isFrench ? "fr-FR" : "en-GB";
 
   // --- Per-route meta (expand this map over time) ---
   const DEFAULT_META = {
@@ -2976,15 +3020,27 @@ const ROUTE_META = {
     ? ROUTE_META[pathOnly] || DEFAULT_META
     : PRIVATE_META;
   // --- Hreflang ---
-  // You can add more languages later; keep this simple for now.
-  const enPath = isFr ? pathOnly.replace(/^\/fr/, "") || "/" : pathOnly;
-  const frPath = isFr ? pathOnly : `/fr${pathOnly === "/" ? "" : pathOnly}`;
-
+  // Uses the same shared resolver as the React <Seo /> component.
   const hreflang = isIndexable
     ? `
-    <link rel="alternate" href="https://${CANONICAL_HOST}${enPath}" hreflang="en-GB" />
-    <link rel="alternate" href="https://${CANONICAL_HOST}${frPath}" hreflang="fr-FR" />
-    <link rel="alternate" href="https://${CANONICAL_HOST}/" hreflang="x-default" />
+    <link
+      data-rh="true"
+      rel="alternate"
+      href="${enUrl}"
+      hreflang="en-GB"
+    />
+    <link
+      data-rh="true"
+      rel="alternate"
+      href="${frUrl}"
+      hreflang="fr-FR"
+    />
+    <link
+      data-rh="true"
+      rel="alternate"
+      href="${xDefaultUrl}"
+      hreflang="x-default"
+    />
     `.trim()
     : "";
 
@@ -2997,62 +3053,67 @@ const ROUTE_META = {
   html = html.replace(/__INLANG__/g, inLang);
   html = html.replace(/__HREFLANG__/g, hreflang);
 
-  const robotsContent = isIndexable ? "index, follow" : "noindex, nofollow";
+    const robotsContent = isIndexable
+    ? "index, follow"
+    : "noindex, nofollow";
 
-  if (html.match(/<meta\s+name=["']robots["'][^>]*>/i)) {
+  if (ROBOTS_TAG_PATTERN.test(html)) {
     html = html.replace(
-      /<meta\s+name=["']robots["'][^>]*>/i,
-      `<meta name="robots" content="${robotsContent}" />`
+      ROBOTS_TAG_PATTERN,
+      `<meta data-rh="true" name="robots" content="${robotsContent}" />`
     );
   } else {
     html = html.replace(
       /<\/head>/i,
-      `  <meta name="robots" content="${robotsContent}" />\n</head>`
+      `  <meta data-rh="true" name="robots" content="${robotsContent}" />\n</head>`
     );
   }
 
-  // 2) Canonical
-  if (html.match(/<link\s+rel=["']canonical["'][^>]*>/i)) {
+    // 2) Canonical
+  if (CANONICAL_TAG_PATTERN.test(html)) {
     html = html.replace(
-      /<link\s+rel=["']canonical["'][^>]*>/i,
-      `<link rel="canonical" href="${fullUrl}" />`
+      CANONICAL_TAG_PATTERN,
+      `<link data-rh="true" rel="canonical" href="${fullUrl}" />`
     );
   } else {
     html = html.replace(
       /<\/head>/i,
-      `  <link rel="canonical" href="${fullUrl}" />\n</head>`
+      `  <link data-rh="true" rel="canonical" href="${fullUrl}" />\n</head>`
     );
   }
 
-  // 3) og:url
-  if (html.match(/<meta\s+property=["']og:url["'][^>]*>/i)) {
+    // 3) og:url
+  if (OG_URL_TAG_PATTERN.test(html)) {
     html = html.replace(
-      /<meta\s+property=["']og:url["'][^>]*>/i,
-      `<meta property="og:url" content="${fullUrl}" />`
+      OG_URL_TAG_PATTERN,
+      `<meta data-rh="true" property="og:url" content="${fullUrl}" />`
     );
   } else {
     html = html.replace(
       /<\/head>/i,
-      `  <meta property="og:url" content="${fullUrl}" />\n</head>`
+      `  <meta data-rh="true" property="og:url" content="${fullUrl}" />\n</head>`
     );
   }
 
-  // 4) Keep OG/Twitter title/description aligned with <title>/<meta name="description">
+    // 4) Keep OG/Twitter title/description aligned
   html = html.replace(
-    /<meta\s+property=["']og:title["'][^>]*>/i,
-    `<meta property="og:title" content="${meta.title}" />`
+    OG_TITLE_TAG_PATTERN,
+    `<meta data-rh="true" property="og:title" content="${meta.title}" />`
   );
+
   html = html.replace(
-    /<meta\s+property=["']og:description["'][^>]*>/i,
-    `<meta property="og:description" content="${meta.description}" />`
+    OG_DESCRIPTION_TAG_PATTERN,
+    `<meta data-rh="true" property="og:description" content="${meta.description}" />`
   );
+
   html = html.replace(
-    /<meta\s+name=["']twitter:title["'][^>]*>/i,
-    `<meta name="twitter:title" content="${meta.title}" />`
+    TWITTER_TITLE_TAG_PATTERN,
+    `<meta data-rh="true" name="twitter:title" content="${meta.title}" />`
   );
+
   html = html.replace(
-    /<meta\s+name=["']twitter:description["'][^>]*>/i,
-    `<meta name="twitter:description" content="${meta.description}" />`
+    TWITTER_DESCRIPTION_TAG_PATTERN,
+    `<meta data-rh="true" name="twitter:description" content="${meta.description}" />`
   );
 
   res.type("html").send(html);

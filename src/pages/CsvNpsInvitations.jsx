@@ -30,9 +30,10 @@ function prettyDate(iso) {
 }
 
 function statusLabel(status) {
-  if (status === "responded") return "Responded";
+  if (status === "responded") return "Valid response";
+  if (status === "completed_without_score") return "Completed without score";
   if (status === "delivered") return "Delivered";
-  if (status === "opened") return "Opened";
+  if (status === "opened") return "Started / opened";
   if (status === "bounced") return "Bounced";
   if (status === "failed") return "Failed";
   if (status === "sent") return "Sent";
@@ -42,6 +43,10 @@ function statusLabel(status) {
 function statusPillClass(status) {
   if (status === "responded") {
     return "border-emerald-400/30 bg-emerald-500/10 text-emerald-200";
+  }
+
+  if (status === "completed_without_score") {
+    return "border-amber-400/30 bg-amber-500/10 text-amber-200";
   }
 
   if (status === "delivered") {
@@ -190,25 +195,72 @@ export default function CsvNpsInvitations() {
       : PAGE_COPY.sessionSubtitle;
 
   const opportunitySummary = useMemo(() => {
-    if (invites.loading) return "Loading invitation opportunity summary...";
+    if (invites.loading) {
+      return "Loading invitation opportunity summary...";
+    }
 
-    if (!summary.sent) {
+    const sent = Number(summary.sent || 0);
+
+    if (!sent) {
       return "No invitations were found for the selected period.";
     }
 
-    const notResponded = Math.max(
-      0,
-      Number(summary.sent || 0) - Number(summary.responded || 0)
+    const validResponses = Number(
+      summary.valid_nps_responses ?? summary.responded ?? 0
     );
 
-    if (notResponded === 0) {
-      return "All detected invitations in this period have a matched response. This is a strong result; keep monitoring future invitation batches.";
+    const completedWithoutScore = Number(
+      summary.completed_without_valid_score || 0
+    );
+
+    const startedButNotCompleted = Number(
+      summary.started_but_not_completed || 0
+    );
+
+    const noActivity = Number(
+      summary.no_response_activity || 0
+    );
+
+    if (
+      completedWithoutScore === 0 &&
+      startedButNotCompleted === 0 &&
+      noActivity === 0
+    ) {
+      return `All ${sent} invitations produced a valid scored NPS response.`;
     }
 
-    return `${notResponded} invitation${notResponded === 1 ? "" : "s"} in this period ${
-      notResponded === 1 ? "has" : "have"
-    } not yet produced a response. These are useful quick-win follow-up opportunities, especially for contacts who have opened Intercom but not completed the survey.`;
-  }, [invites.loading, summary.sent, summary.responded]);
+    const parts = [];
+
+    if (startedButNotCompleted > 0) {
+      parts.push(
+        `${startedButNotCompleted} started but not completed`
+      );
+    }
+
+    if (completedWithoutScore > 0) {
+      parts.push(
+        `${completedWithoutScore} completed without a valid NPS score`
+      );
+    }
+
+    if (noActivity > 0) {
+      parts.push(
+        `${noActivity} with no response activity`
+      );
+    }
+
+    return `${validResponses} of ${sent} invitations produced a valid scored NPS response. The remaining invitations include ${parts.join(
+      ", "
+    )}. Started surveys are the clearest follow-up opportunity, while completed surveys without a score should be reviewed in Intercom.`;
+  }, [
+    invites.loading,
+    summary.sent,
+    summary.responded,
+    summary.valid_nps_responses,
+    summary.completed_without_valid_score,
+    summary.started_but_not_completed,
+    summary.no_response_activity,
+  ]);
 
   if (loadingDataset) {
     return (
@@ -280,10 +332,11 @@ export default function CsvNpsInvitations() {
               <option value="all">All</option>
               <option value="sent">Sent</option>
               <option value="delivered">Delivered</option>
-              <option value="opened">Opened</option>
-              <option value="responded">Responded</option>
+              <option value="opened">Started / opened</option>
+              <option value="responded">Valid NPS response</option>
               <option value="bounced">Bounced</option>
               <option value="failed">Failed</option>
+              <option value="completed_without_score">Completed without score</option>
             </select>
           </label>
 
@@ -337,28 +390,56 @@ export default function CsvNpsInvitations() {
           />
 
           <MetricCard
-            label="Delivered"
-            value={invites.loading ? "…" : summary.delivered ?? "—"}
-          />
-
-          <MetricCard
-            label="Opened"
+            label="Opened / started"
             value={invites.loading ? "…" : summary.opened ?? "—"}
           />
 
           <MetricCard
-            label="Responded"
-            value={invites.loading ? "…" : summary.responded ?? "—"}
+            label="Valid NPS responses"
+            value={
+              invites.loading
+                ? "…"
+                : summary.valid_nps_responses ?? summary.responded ?? "—"
+            }
           />
 
           <MetricCard
-            label="Response rate"
+            label="NPS response rate"
             value={
               invites.loading
                 ? "…"
                 : summary.response_rate_pct == null
                   ? "—"
                   : `${summary.response_rate_pct}%`
+            }
+          />
+
+          <MetricCard
+            label="Intercom completions"
+            value={
+              invites.loading
+                ? "…"
+                : summary.intercom_completed ?? summary.completed ?? "—"
+            }
+          />
+
+          <MetricCard
+            label="Completion rate"
+            value={
+              invites.loading
+                ? "…"
+                : summary.intercom_completion_rate_pct == null
+                  ? "—"
+                  : `${summary.intercom_completion_rate_pct}%`
+            }
+          />
+
+          <MetricCard
+            label="Completed without score"
+            value={
+              invites.loading
+                ? "…"
+                : summary.completed_without_valid_score ?? "—"
             }
           />
 
@@ -482,7 +563,11 @@ export default function CsvNpsInvitations() {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Prompt in Intercom
+                            {row.status === "completed_without_score"
+                            ? "Review in Intercom"
+                            : row.status === "opened"
+                              ? "Prompt in Intercom"
+                              : "Open in Intercom"}
                           </a>
                         ) : (
                           "—"

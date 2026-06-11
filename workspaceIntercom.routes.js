@@ -677,7 +677,7 @@ async function syncWorkspaceIntercomRows({ dataset, rows }) {
       source: "workspace_intercom",
       row_number: index + 1,
       submitted_at: row.submitted_at || null,
-      score: Number.isFinite(Number(row.score)) ? Number(row.score) : null,
+      score: normaliseNpsScore(row.score),
       bucket: row.bucket || "unknown",
 
       // Keep PII minimised in the workspace dataset.
@@ -943,12 +943,9 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
        * Intercom may mark a survey as completed even when the exported
        * response does not contain a valid NPS score.
        */
-      const completedAt =
-        row.first_completion ||
-        matchedResponse?.submitted_at ||
-        null;
+      const intercomCompletedAt = row.first_completion || null;
 
-      const isIntercomCompleted = Boolean(completedAt);
+      const isIntercomCompleted = Boolean(intercomCompletedAt);
 
       /*
        * first_answer indicates that someone started answering the survey,
@@ -961,7 +958,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
         null;
 
       const respondedAt = hasValidNpsResponse
-        ? matchedResponse?.submitted_at || completedAt
+        ? matchedResponse?.submitted_at || intercomCompletedAt
         : null;
 
       let status = "unknown";
@@ -1016,7 +1013,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
          * starting, completing and submitting a valid scored response.
          */
         started_at: startedAt,
-        completed_at: completedAt,
+        completed_at: intercomCompletedAt,
         intercom_completed: isIntercomCompleted,
         has_valid_nps_response: hasValidNpsResponse,
         completed_without_valid_score:
@@ -1234,6 +1231,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     content_id: contentId,
     days,
     status: statusFilter,
+    refresh: refreshInfo,
     summary,
     rows,
     ...(diagnostics ? { diagnostics } : {}),
@@ -1406,14 +1404,29 @@ function toWorkspaceIntercomSourceSummary(row) {
 
 function summariseWorkspaceIntercomRows(rows) {
   const safeRows = Array.isArray(rows) ? rows : [];
-  const total = safeRows.length;
-  const promoters = safeRows.filter((row) => row.bucket === "promoter").length;
-  const passives = safeRows.filter((row) => row.bucket === "passive").length;
-  const detractors = safeRows.filter((row) => row.bucket === "detractor").length;
 
-  const scores = safeRows
-    .map((row) => Number(row.score))
-    .filter((score) => Number.isFinite(score));
+  const scoredRows = safeRows.filter(
+    (row) => normaliseNpsScore(row?.score) !== null
+  );
+
+  const total = safeRows.length;
+  const validResponses = scoredRows.length;
+
+  const promoters = scoredRows.filter(
+    (row) => scoreBucket(normaliseNpsScore(row.score)) === "promoter"
+  ).length;
+
+  const passives = scoredRows.filter(
+    (row) => scoreBucket(normaliseNpsScore(row.score)) === "passive"
+  ).length;
+
+  const detractors = scoredRows.filter(
+    (row) => scoreBucket(normaliseNpsScore(row.score)) === "detractor"
+  ).length;
+
+  const scores = scoredRows.map((row) =>
+    normaliseNpsScore(row.score)
+  );
 
   const averageScore = scores.length
     ? Math.round(
@@ -1422,10 +1435,15 @@ function summariseWorkspaceIntercomRows(rows) {
     : null;
 
   const nps =
-    total > 0 ? Math.round(((promoters - detractors) / total) * 100) : null;
+    validResponses > 0
+      ? Math.round(
+          ((promoters - detractors) / validResponses) * 100
+        )
+      : null;
 
   return {
     total,
+    validResponses,
     promoters,
     passives,
     detractors,

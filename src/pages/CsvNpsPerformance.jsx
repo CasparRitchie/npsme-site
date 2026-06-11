@@ -45,9 +45,15 @@ export default function CsvNpsPerformance() {
         const sourceType = String(datasetMeta?.dataset?.source_type || "").trim();
 
         if (sourceType === "workspace_intercom") {
-          const intercomRes = await fetch(`/api/workspace-intercom/responses`, {
-            credentials: "include",
-          });
+          const params = new URLSearchParams();
+          params.set("limit", "5000");
+
+          const intercomRes = await fetch(
+            `/api/workspace-intercom/responses?${params.toString()}`,
+            {
+              credentials: "include",
+            }
+          );
 
           const intercomData = await intercomRes.json();
 
@@ -94,9 +100,15 @@ export default function CsvNpsPerformance() {
 
     async function loadActiveIntercomDataset() {
       try {
-        const res = await fetch(`/api/workspace-intercom/responses`, {
-          credentials: "include",
-        });
+        const params = new URLSearchParams();
+        params.set("limit", "5000");
+
+        const res = await fetch(
+          `/api/workspace-intercom/responses?${params.toString()}`,
+          {
+            credentials: "include",
+          }
+        );
 
         const data = await res.json();
 
@@ -170,25 +182,7 @@ export default function CsvNpsPerformance() {
     }
   }, [datasetId]);
 
-  const bucketPercentages = useMemo(() => {
-    if (!dataset?.summary?.total) {
-      return {
-        promoters: 0,
-        passives: 0,
-        detractors: 0,
-      };
-    }
-
-    const total = dataset.summary.total;
-
-    return {
-      promoters: Math.round((dataset.summary.promoters / total) * 100),
-      passives: Math.round((dataset.summary.passives / total) * 100),
-      detractors: Math.round((dataset.summary.detractors / total) * 100),
-    };
-  }, [dataset]);
-
-  const scoreDistribution = useMemo(() => {
+    const scoreDistribution = useMemo(() => {
     const counts = Array.isArray(dataset?.scoreDistribution)
       ? dataset.scoreDistribution
       : Array.from({ length: 11 }, (_, score) => ({
@@ -196,11 +190,16 @@ export default function CsvNpsPerformance() {
           count: 0,
         }));
 
-    const maxCount = Math.max(...counts.map((item) => item.count || 0), 1);
+    const maxCount = Math.max(
+      ...counts.map((item) => Number(item.count || 0)),
+      1
+    );
 
     return counts.map((item) => ({
       ...item,
-      percentageOfMax: Math.round(((item.count || 0) / maxCount) * 100),
+      percentageOfMax: Math.round(
+        (Number(item.count || 0) / maxCount) * 100
+      ),
     }));
   }, [dataset]);
 
@@ -215,26 +214,63 @@ export default function CsvNpsPerformance() {
       const matchesBucket =
         bucketFilter === "all" || row.bucket === bucketFilter;
 
-      const matchesPeriod = rowMatchesPeriod(row.submitted_at, periodFilter);
+      const matchesPeriod = rowMatchesPeriod(
+        row.submitted_at,
+        periodFilter
+      );
 
       return matchesBucket && matchesPeriod;
     });
   }, [dataset, bucketFilter, periodFilter]);
 
   const filteredSummary = useMemo(() => {
-    if (!performanceRows.length) {
-      return dataset?.summary || {
-        total: 0,
-        promoters: 0,
-        passives: 0,
-        detractors: 0,
-        nps: null,
-        averageScore: null,
-      };
+    const filtersActive =
+      periodFilter !== "all" || bucketFilter !== "all";
+
+    if (!filtersActive) {
+      return (
+        dataset?.summary || {
+          total: 0,
+          promoters: 0,
+          passives: 0,
+          detractors: 0,
+          nps: null,
+          averageScore: null,
+        }
+      );
     }
 
     return summariseRows(performanceRows);
-  }, [performanceRows, dataset]);
+  }, [
+    performanceRows,
+    dataset,
+    periodFilter,
+    bucketFilter,
+  ]);
+
+  const bucketPercentages = useMemo(() => {
+    const total = Number(filteredSummary?.total || 0);
+
+    if (!total) {
+      return {
+        promoters: 0,
+        passives: 0,
+        detractors: 0,
+      };
+    }
+
+    return {
+      promoters: Math.round(
+        (Number(filteredSummary.promoters || 0) / total) * 100
+      ),
+      passives: Math.round(
+        (Number(filteredSummary.passives || 0) / total) * 100
+      ),
+      detractors: Math.round(
+        (Number(filteredSummary.detractors || 0) / total) * 100
+      ),
+    };
+  }, [filteredSummary]);
 
   const closeLoopSummary = useMemo(() => {
     return summariseCloseLoop(performanceRows);
@@ -591,8 +627,9 @@ function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
   }));
 
   rows.forEach((row) => {
-    const score = Number(row.score);
-    if (Number.isInteger(score) && score >= 0 && score <= 10) {
+    const score = normaliseNpsScore(row.score);
+
+    if (Number.isInteger(score)) {
       counts[score].count += 1;
     }
   });
@@ -666,8 +703,9 @@ function normaliseSessionDataset(sessionDataset) {
   }));
 
   rows.forEach((row) => {
-    const score = Number(row.score);
-    if (Number.isInteger(score) && score >= 0 && score <= 10) {
+    const score = normaliseNpsScore(row.score);
+
+    if (Number.isInteger(score)) {
       scoreDistribution[score].count += 1;
     }
   });
@@ -706,26 +744,71 @@ function normaliseSummary(summaryJson, rows) {
   };
 }
 
+function normaliseNpsScore(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const score = Number(value);
+
+  if (!Number.isFinite(score)) {
+    return null;
+  }
+
+  if (score < 0 || score > 10) {
+    return null;
+  }
+
+  return score;
+}
+
 function calculateNps(rows) {
-  const total = rows.length;
-  if (!total) return null;
+  const validRows = (Array.isArray(rows) ? rows : [])
+    .map((row) => ({
+      ...row,
+      normalisedScore: normaliseNpsScore(row?.score),
+    }))
+    .filter((row) => row.normalisedScore !== null);
 
-  const promoters = rows.filter((row) => row.bucket === "promoter").length;
-  const detractors = rows.filter((row) => row.bucket === "detractor").length;
+  const total = validRows.length;
 
-  return Math.round(((promoters - detractors) / total) * 100);
+  if (!total) {
+    return null;
+  }
+
+  const promoters = validRows.filter(
+    (row) => row.normalisedScore >= 9
+  ).length;
+
+  const detractors = validRows.filter(
+    (row) => row.normalisedScore <= 6
+  ).length;
+
+  return Math.round(
+    ((promoters - detractors) / total) * 100
+  );
 }
 
 function calculateAverageScore(rows) {
-  const scores = rows
-    .map((row) => Number(row.score))
-    .filter((score) => Number.isFinite(score));
+  const scores = (Array.isArray(rows) ? rows : [])
+    .map((row) => normaliseNpsScore(row?.score))
+    .filter((score) => score !== null);
 
-  if (!scores.length) return null;
+  if (!scores.length) {
+    return null;
+  }
 
-  return Math.round(
-    (scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10
-  ) / 10;
+  return (
+    Math.round(
+      (scores.reduce((sum, score) => sum + score, 0) /
+        scores.length) *
+        10
+    ) / 10
+  );
 }
 
 function MetricCard({ label, value }) {
@@ -800,25 +883,47 @@ function rowMatchesPeriod(isoDate, period) {
 }
 
 function summariseRows(rows) {
-  const safeRows = Array.isArray(rows) ? rows : [];
-  const total = safeRows.length;
+  const validRows = (Array.isArray(rows) ? rows : [])
+    .map((row) => ({
+      ...row,
+      normalisedScore: normaliseNpsScore(row?.score),
+    }))
+    .filter((row) => row.normalisedScore !== null);
 
-  const promoters = safeRows.filter((row) => row.bucket === "promoter").length;
-  const passives = safeRows.filter((row) => row.bucket === "passive").length;
-  const detractors = safeRows.filter((row) => row.bucket === "detractor").length;
+  const total = validRows.length;
 
-  const scores = safeRows
-    .map((row) => Number(row.score))
-    .filter((score) => Number.isFinite(score));
+  const promoters = validRows.filter(
+    (row) => row.normalisedScore >= 9
+  ).length;
 
-  const averageScore = scores.length
-    ? Math.round(
-        (scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10
-      ) / 10
-    : null;
+  const passives = validRows.filter(
+    (row) =>
+      row.normalisedScore >= 7 &&
+      row.normalisedScore <= 8
+  ).length;
+
+  const detractors = validRows.filter(
+    (row) => row.normalisedScore <= 6
+  ).length;
+
+  const averageScore =
+    total > 0
+      ? Math.round(
+          (validRows.reduce(
+            (sum, row) => sum + row.normalisedScore,
+            0
+          ) /
+            total) *
+            10
+        ) / 10
+      : null;
 
   const nps =
-    total > 0 ? Math.round(((promoters - detractors) / total) * 100) : null;
+    total > 0
+      ? Math.round(
+          ((promoters - detractors) / total) * 100
+        )
+      : null;
 
   return {
     total,
@@ -923,7 +1028,16 @@ function buildManagementSummary({
       ? `${closeLoopSummary.activeDetractors} active detractor follow-up${closeLoopSummary.activeDetractors === 1 ? "" : "s"}`
       : "no active detractor follow-ups";
 
-  return `For ${bucketLabel} in ${windowLabel}, NPS is ${summary.nps ?? "—"} from ${summary.total} response${summary.total === 1 ? "" : "s"}, with ${summary.promoters} promoter${summary.promoters === 1 ? "" : "s"}, ${summary.passives} passive${summary.passives === 1 ? "" : "s"} and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to progress active follow-ups, close any unresolved detractor cases and look for repeated issues in the latest comments.`;}
+    return `For ${bucketLabel} in ${windowLabel}, NPS is ${
+    summary.nps ?? "—"
+  } from ${summary.total} response${
+    summary.total === 1 ? "" : "s"
+  }, with ${summary.promoters} promoter${
+    summary.promoters === 1 ? "" : "s"
+  }, ${summary.passives} passive${
+    summary.passives === 1 ? "" : "s"
+  } and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to progress active follow-ups, close any unresolved detractor cases and look for repeated issues in the latest comments.`;
+}
 
 function formatPeriodLabel(period) {
   if (period === "7d") return "the last 7 days";

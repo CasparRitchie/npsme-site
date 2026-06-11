@@ -1092,6 +1092,12 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     (row) => row.completed_without_valid_score
   ).length;
 
+  const validResponsesWithoutCompletionEvent = allRows.filter(
+    (row) =>
+      row.has_valid_nps_response &&
+      !row.intercom_completed
+  ).length;
+
   const startedButNotCompleted = allRows.filter(
     (row) =>
       Boolean(row.started_at) &&
@@ -1124,6 +1130,8 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     completed,
     intercom_completed: completed,
     completed_without_valid_score: completedWithoutValidScore,
+    valid_responses_without_completion_event:
+      validResponsesWithoutCompletionEvent,
     started_but_not_completed: startedButNotCompleted,
     no_response_activity: noResponseActivity,
 
@@ -1206,6 +1214,9 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
 
           completed_without_valid_score_rows:
             completedWithoutValidScore,
+
+          valid_responses_without_completion_event_rows:
+            validResponsesWithoutCompletionEvent,
 
           started_but_not_completed_rows:
             startedButNotCompleted,

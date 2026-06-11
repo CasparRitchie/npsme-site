@@ -187,6 +187,55 @@ export default function CsvNpsInvitations() {
   const rows = Array.isArray(invites.data?.rows) ? invites.data.rows : [];
   const source = invites.data?.source || null;
   const refresh = invites.data?.refresh || null;
+  const lifecycleMetrics = useMemo(() => {
+    const sent = Number(summary.sent || 0);
+
+    const validResponses = Number(
+      summary.valid_nps_responses ?? summary.responded ?? 0
+    );
+
+    const explicitCompletions = Number(
+      summary.intercom_completed ?? summary.completed ?? 0
+    );
+
+    const completedWithoutScore = Number(
+      summary.completed_without_valid_score || 0
+    );
+
+    /*
+    * Prefer the exact backend figure. The fallback reconciles the totals:
+    *
+    * valid responses without completion event
+    * = valid responses
+    * - all explicit completion events
+    * + completion events that did not produce a valid score
+    */
+    const validWithoutCompletionEvent = Number(
+      summary.valid_responses_without_completion_event ??
+        Math.max(
+          0,
+          validResponses -
+            explicitCompletions +
+            completedWithoutScore
+        )
+    );
+
+    return {
+      sent,
+      validResponses,
+      explicitCompletions,
+      completedWithoutScore,
+      validWithoutCompletionEvent,
+    };
+  }, [
+    summary.sent,
+    summary.responded,
+    summary.valid_nps_responses,
+    summary.completed,
+    summary.intercom_completed,
+    summary.completed_without_valid_score,
+    summary.valid_responses_without_completion_event,
+  ]);
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -199,19 +248,17 @@ export default function CsvNpsInvitations() {
       return "Loading invitation opportunity summary...";
     }
 
-    const sent = Number(summary.sent || 0);
+    const {
+      sent,
+      validResponses,
+      explicitCompletions,
+      completedWithoutScore,
+      validWithoutCompletionEvent,
+    } = lifecycleMetrics;
 
     if (!sent) {
       return "No invitations were found for the selected period.";
     }
-
-    const validResponses = Number(
-      summary.valid_nps_responses ?? summary.responded ?? 0
-    );
-
-    const completedWithoutScore = Number(
-      summary.completed_without_valid_score || 0
-    );
 
     const startedButNotCompleted = Number(
       summary.started_but_not_completed || 0
@@ -221,43 +268,55 @@ export default function CsvNpsInvitations() {
       summary.no_response_activity || 0
     );
 
-    if (
-      completedWithoutScore === 0 &&
-      startedButNotCompleted === 0 &&
-      noActivity === 0
-    ) {
-      return `All ${sent} invitations produced a valid scored NPS response.`;
-    }
+    const resultParts = [
+      `${validResponses} of ${sent} invitations produced a valid scored NPS response`,
+      `${explicitCompletions} have an explicit completion event in the Intercom invitation statistics`,
+    ];
 
-    const parts = [];
-
-    if (startedButNotCompleted > 0) {
-      parts.push(
-        `${startedButNotCompleted} started but not completed`
+    if (validWithoutCompletionEvent > 0) {
+      resultParts.push(
+        `${validWithoutCompletionEvent} valid response${
+          validWithoutCompletionEvent === 1 ? "" : "s"
+        } ${
+          validWithoutCompletionEvent === 1 ? "does" : "do"
+        } not have a matching Intercom completion event`
       );
     }
 
     if (completedWithoutScore > 0) {
-      parts.push(
-        `${completedWithoutScore} completed without a valid NPS score`
+      resultParts.push(
+        `${completedWithoutScore} explicit completion${
+          completedWithoutScore === 1 ? "" : "s"
+        } did not produce a valid NPS score`
+      );
+    }
+
+    const followUpParts = [];
+
+    if (startedButNotCompleted > 0) {
+      followUpParts.push(
+        `${startedButNotCompleted} started but not completed`
       );
     }
 
     if (noActivity > 0) {
-      parts.push(
-        `${noActivity} with no response activity`
+      followUpParts.push(
+        `${noActivity} with no detected response activity`
       );
     }
 
-    return `${validResponses} of ${sent} invitations produced a valid scored NPS response. The remaining invitations include ${parts.join(
-      ", "
-    )}. Started surveys are the clearest follow-up opportunity, while completed surveys without a score should be reviewed in Intercom.`;
+    const reconciliationText = `${resultParts.join(". ")}.`;
+
+    if (followUpParts.length === 0) {
+      return `${reconciliationText} There are no currently detected incomplete or untouched invitations requiring survey follow-up.`;
+    }
+
+    return `${reconciliationText} The clearest follow-up opportunities are ${followUpParts.join(
+      " and "
+    )}. Valid NPS responses remain the authoritative response measure; Intercom completion events are shown separately as a technical lifecycle measure.`;
   }, [
     invites.loading,
-    summary.sent,
-    summary.responded,
-    summary.valid_nps_responses,
-    summary.completed_without_valid_score,
+    lifecycleMetrics,
     summary.started_but_not_completed,
     summary.no_response_activity,
   ]);
@@ -386,12 +445,14 @@ export default function CsvNpsInvitations() {
           <MetricCard
             label="Invitations sent"
             value={invites.loading ? "…" : summary.sent ?? "—"}
-            sub={`${days}d`}
+            sub={`${days}-day window`}
+            description="All survey invitations detected in the selected period."
           />
 
           <MetricCard
-            label="Opened / started"
+            label="Opened or started"
             value={invites.loading ? "…" : summary.opened ?? "—"}
+            description="Invitations with detected opening, answering or completion activity."
           />
 
           <MetricCard
@@ -399,8 +460,9 @@ export default function CsvNpsInvitations() {
             value={
               invites.loading
                 ? "…"
-                : summary.valid_nps_responses ?? summary.responded ?? "—"
+                : lifecycleMetrics.validResponses
             }
+            description="Canonical responses containing a usable score from 0 to 10."
           />
 
           <MetricCard
@@ -412,19 +474,21 @@ export default function CsvNpsInvitations() {
                   ? "—"
                   : `${summary.response_rate_pct}%`
             }
+            description="Valid scored NPS responses divided by invitations sent."
           />
 
           <MetricCard
-            label="Intercom completions"
+            label="Recorded completion events"
             value={
               invites.loading
                 ? "…"
-                : summary.intercom_completed ?? summary.completed ?? "—"
+                : lifecycleMetrics.explicitCompletions
             }
+            description="Invitations for which Intercom exported an explicit completion timestamp."
           />
 
           <MetricCard
-            label="Completion rate"
+            label="Completion event rate"
             value={
               invites.loading
                 ? "…"
@@ -432,22 +496,106 @@ export default function CsvNpsInvitations() {
                   ? "—"
                   : `${summary.intercom_completion_rate_pct}%`
             }
+            description="Explicit Intercom completion events divided by invitations sent."
           />
 
           <MetricCard
-            label="Completed without score"
+            label="Valid responses without completion event"
             value={
               invites.loading
                 ? "…"
-                : summary.completed_without_valid_score ?? "—"
+                : lifecycleMetrics.validWithoutCompletionEvent
             }
+            description="Usable NPS responses where the invitation statistics did not include a matching completion event."
+          />
+
+          <MetricCard
+            label="Completed without valid score"
+            value={
+              invites.loading
+                ? "…"
+                : lifecycleMetrics.completedWithoutScore
+            }
+            description="Explicit Intercom completions that did not produce a usable 0–10 score."
+          />
+
+          <MetricCard
+            label="Started but not completed"
+            value={
+              invites.loading
+                ? "…"
+                : summary.started_but_not_completed ?? "—"
+            }
+            description="Invitations with response activity but no completion or valid NPS response."
+          />
+
+          <MetricCard
+            label="No response activity"
+            value={
+              invites.loading
+                ? "…"
+                : summary.no_response_activity ?? "—"
+            }
+            description="Invitations with no detected opening, answer, completion or response."
           />
 
           <MetricCard
             label="Last invitation"
-            value={invites.loading ? "…" : prettyDate(summary.last_sent_at)}
+            value={
+              invites.loading
+                ? "…"
+                : prettyDate(summary.last_sent_at)
+            }
+            description="Most recent invitation detected in the selected period."
           />
         </div>
+
+        <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+          <div className="csv-nps-responses-header">
+            <div>
+              <h3>How these figures reconcile</h3>
+              <p>
+                Valid NPS responses and Intercom completion events measure different
+                parts of the survey lifecycle.
+              </p>
+            </div>
+          </div>
+
+          <div className="csv-nps-management-summary">
+            <p>
+              <strong>
+                {lifecycleMetrics.validResponses} valid NPS responses
+              </strong>{" "}
+              were found in the canonical response data. Intercom separately recorded{" "}
+              <strong>
+                {lifecycleMetrics.explicitCompletions} explicit completion events
+              </strong>
+              .
+            </p>
+
+            <p>
+              Of these results,{" "}
+              <strong>
+                {lifecycleMetrics.validWithoutCompletionEvent}
+              </strong>{" "}
+              valid response
+              {lifecycleMetrics.validWithoutCompletionEvent === 1 ? "" : "s"}{" "}
+              {lifecycleMetrics.validWithoutCompletionEvent === 1 ? "has" : "have"} no
+              matching completion event, while{" "}
+              <strong>
+                {lifecycleMetrics.completedWithoutScore}
+              </strong>{" "}
+              recorded completion
+              {lifecycleMetrics.completedWithoutScore === 1 ? "" : "s"} did not produce
+              a valid score.
+            </p>
+
+            <p className="csv-nps-muted-cell">
+              The valid NPS response total is used for NPS reporting. Completion events
+              are retained as a separate Intercom delivery and lifecycle diagnostic.
+            </p>
+          </div>
+        </section>
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
@@ -600,12 +748,26 @@ function normaliseDatasetMeta(dataset) {
   };
 }
 
-function MetricCard({ label, value, sub }) {
+function MetricCard({ label, value, sub, description }) {
   return (
     <div className="csv-nps-metric-card">
       <div className="csv-nps-metric-label">{label}</div>
-      <div className="csv-nps-metric-value">{value ?? "—"}</div>
-      {sub ? <div className="csv-nps-muted-cell">{sub}</div> : null}
+
+      <div className="csv-nps-metric-value">
+        {value ?? "—"}
+      </div>
+
+      {sub ? (
+        <div className="csv-nps-muted-cell">
+          {sub}
+        </div>
+      ) : null}
+
+      {description ? (
+        <p className="mt-2 text-xs leading-relaxed text-slate-400">
+          {description}
+        </p>
+      ) : null}
     </div>
   );
 }

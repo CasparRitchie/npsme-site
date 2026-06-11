@@ -2921,6 +2921,23 @@ app.get("*", (req, res, next) => {
   // Never serve SPA HTML for file-ish paths (/.env, /.git/config, /favicon.ico, etc)
   if (req.path.includes(".")) return next();
 
+    // Correct malformed duplicated French prefixes such as:
+  // /fr/fr/blog -> /fr/blog
+  if (req.path === "/fr/fr" || req.path.startsWith("/fr/fr/")) {
+    const correctedPath = req.path.replace(/^\/fr\/fr/, "/fr");
+
+    const queryIndex = req.originalUrl.indexOf("?");
+    const queryString =
+      queryIndex >= 0
+        ? req.originalUrl.slice(queryIndex)
+        : "";
+
+    return res.redirect(
+      301,
+      `${correctedPath}${queryString}`
+    );
+  }
+
   res.set("Cache-Control", "no-store, must-revalidate");
 
   const requestedPath =
@@ -2942,9 +2959,17 @@ app.get("*", (req, res, next) => {
   const manifestRoute =
     getManifestRoute(pathOnly);
 
+  // Do not return the React app for unknown or disabled URLs.
+  // This prevents soft-404 pages and accidental crawlable duplicates.
+  if (!manifestRoute || manifestRoute.enabled !== true) {
+    return res
+      .status(404)
+      .type("text/plain")
+      .send("Not found");
+  }
+
   const isIndexable =
-    manifestRoute?.enabled === true &&
-    manifestRoute?.indexable === true;
+    manifestRoute.indexable === true;
 
   // Language is derived from the canonical URL path.
   const htmlLang =

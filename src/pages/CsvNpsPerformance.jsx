@@ -45,32 +45,55 @@ export default function CsvNpsPerformance() {
         const sourceType = String(datasetMeta?.dataset?.source_type || "").trim();
 
         if (sourceType === "workspace_intercom") {
-          const params = new URLSearchParams();
-          params.set("limit", "5000");
+          const performanceParams = new URLSearchParams();
+          performanceParams.set("days", "365");
 
-          const intercomRes = await fetch(
-            `/api/workspace-intercom/responses?${params.toString()}`,
-            {
-              credentials: "include",
-            }
-          );
+          const responseParams = new URLSearchParams();
+          responseParams.set("limit", "5000");
 
-          const intercomData = await intercomRes.json();
+          const [performanceRes, responsesRes] = await Promise.all([
+            fetch(
+              `/api/workspace-intercom/performance?${performanceParams.toString()}`,
+              {
+                credentials: "include",
+              }
+            ),
+            fetch(
+              `/api/workspace-intercom/responses?${responseParams.toString()}`,
+              {
+                credentials: "include",
+              }
+            ),
+          ]);
 
-          if (!intercomRes.ok || !intercomData.ok) {
+          const [performanceData, responsesData] = await Promise.all([
+            performanceRes.json(),
+            responsesRes.json(),
+          ]);
+
+          if (!performanceRes.ok || !performanceData.ok) {
             throw new Error(
-              intercomData.error || "Failed to load workspace Intercom responses"
+              performanceData.error ||
+                "Failed to load workspace Intercom performance"
+            );
+          }
+
+          if (!responsesRes.ok || !responsesData.ok) {
+            throw new Error(
+              responsesData.error ||
+                "Failed to load workspace Intercom responses"
             );
           }
 
           setDataset(
             normaliseWorkspaceIntercomPerformanceDataset({
               dataset: datasetMeta.dataset,
-              source: intercomData.source,
-              summary: intercomData.summary,
-              rows: intercomData.rows,
+              source: performanceData.source,
+              performance: performanceData,
+              rows: responsesData.rows,
             })
           );
+
           setMode("intercom");
           return;
         }
@@ -100,42 +123,83 @@ export default function CsvNpsPerformance() {
 
     async function loadActiveIntercomDataset() {
       try {
-        const params = new URLSearchParams();
-        params.set("limit", "5000");
+        const performanceParams = new URLSearchParams();
+        performanceParams.set("days", "365");
 
-        const res = await fetch(
-          `/api/workspace-intercom/responses?${params.toString()}`,
-          {
-            credentials: "include",
-          }
-        );
+        const responseParams = new URLSearchParams();
+        responseParams.set("limit", "5000");
 
-        const data = await res.json();
+        const [performanceRes, responsesRes] = await Promise.all([
+          fetch(
+            `/api/workspace-intercom/performance?${performanceParams.toString()}`,
+            {
+              credentials: "include",
+            }
+          ),
+          fetch(
+            `/api/workspace-intercom/responses?${responseParams.toString()}`,
+            {
+              credentials: "include",
+            }
+          ),
+        ]);
 
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load active Intercom responses");
+        const [performanceData, responsesData] = await Promise.all([
+          performanceRes.json(),
+          responsesRes.json(),
+        ]);
+
+        if (!performanceRes.ok || !performanceData.ok) {
+          throw new Error(
+            performanceData.error ||
+              "Failed to load active Intercom performance"
+          );
+        }
+
+        if (!responsesRes.ok || !responsesData.ok) {
+          throw new Error(
+            responsesData.error ||
+              "Failed to load active Intercom responses"
+          );
         }
 
         setDataset(
           normaliseWorkspaceIntercomPerformanceDataset({
-            dataset: data.dataset || {
+            dataset: responsesData.dataset || {
               id: null,
-              dataset_name: data?.source?.source_name || "Active Intercom source",
+              dataset_name:
+                performanceData?.source?.source_name ||
+                "Active Intercom source",
               source_type: "workspace_intercom",
-              content_id: data?.content_id || data?.source?.survey_content_id || null,
-              raw_row_count: data?.summary?.total || data?.rows?.length || 0,
-              valid_row_count: data?.summary?.total || data?.rows?.length || 0,
+              content_id:
+                performanceData?.content_id ||
+                performanceData?.source?.survey_content_id ||
+                null,
+              raw_row_count:
+                performanceData?.summary?.total ||
+                responsesData?.rows?.length ||
+                0,
+              valid_row_count:
+                performanceData?.summary?.validResponses ||
+                responsesData?.rows?.length ||
+                0,
               skipped_row_count: 0,
-              summary_json: data?.summary || {},
+              summary_json: performanceData?.summary || {},
             },
-            source: data.source,
-            summary: data.summary,
-            rows: data.rows,
+            source: performanceData.source,
+            performance: performanceData,
+            rows: responsesData.rows,
           })
         );
+
         setMode("intercom");
         return true;
-      } catch (_err) {
+      } catch (err) {
+        console.error(
+          "Failed to load active Intercom performance:",
+          err
+        );
+
         return false;
       }
     }
@@ -503,6 +567,33 @@ export default function CsvNpsPerformance() {
           </section>
         </div>
 
+        {questionScores.length > 0 && (
+          <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+            <div className="csv-nps-responses-header">
+              <div>
+                <h3>Average score by question</h3>
+                <p>
+                  Average rating out of 10 for each survey question.
+                  The recommendation question is also used to calculate the
+                  headline NPS result.
+                </p>
+              </div>
+            </div>
+
+            <div className="csv-nps-question-score-list">
+              {questionScores.map((item) => (
+                <QuestionScoreBar
+                  key={item.questionId || item.question}
+                  question={item.question}
+                  averageScore={item.averageScore}
+                  responses={item.responses}
+                  isNpsQuestion={item.isNpsQuestion}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <h3>Timeline</h3>
           <p>
@@ -581,83 +672,125 @@ function normaliseWorkspacePerformanceDataset(apiResponse) {
 
 function normaliseWorkspaceIntercomPerformanceDataset(apiResponse) {
   const dataset = apiResponse.dataset || {};
+  const performance = apiResponse.performance || {};
+  const source = apiResponse.source || performance.source || {};
+
   const rows = Array.isArray(apiResponse.rows)
     ? apiResponse.rows.map((row) => ({
         ...row,
-        closeLoopActions: row.closeLoopActions || row.close_loop_actions || [],
+        closeLoopActions:
+          row.closeLoopActions ||
+          row.close_loop_actions ||
+          [],
       }))
     : [];
-  const summary = apiResponse.summary || {};
-  const source = apiResponse.source || {};
 
-  const byDate = new Map();
+  const summary = performance.summary || {};
 
-  rows.forEach((row) => {
-    if (!row.submitted_at) return;
+  const timeline = Array.isArray(performance.timeseries)
+    ? performance.timeseries.map((point) => ({
+        date: point.date,
+        total: point.responses ?? 0,
+        responses: point.responses ?? 0,
+        promoters: point.promoters ?? 0,
+        passives: point.passives ?? 0,
+        detractors: point.detractors ?? 0,
+        nps: point.nps ?? null,
+        averageScore: point.average_score ?? null,
+      }))
+    : [];
 
-    const dateKey = String(row.submitted_at).slice(0, 10);
-    if (!dateKey) return;
+  const scoreDistribution = Array.isArray(
+    performance.score_distribution
+  )
+    ? performance.score_distribution.map((item) => ({
+        score: item.score,
+        count: item.count ?? 0,
+        percentage: item.percentage ?? 0,
+        bucket: item.bucket || null,
+      }))
+    : [];
 
-    if (!byDate.has(dateKey)) {
-      byDate.set(dateKey, {
-        date: dateKey,
-        total: 0,
-        promoters: 0,
-        passives: 0,
-        detractors: 0,
-        nps: null,
-      });
-    }
+  const questionScores = Array.isArray(
+    performance.question_scores
+  )
+    ? performance.question_scores.map((item) => ({
+        questionId: item.question_id || null,
+        question: item.question || "Survey question",
+        responses: item.responses ?? 0,
+        averageScore: item.average_score ?? null,
+        isNpsQuestion:
+          String(item.question_id || "") === "612560",
+      }))
+    : [];
 
-    const bucket = byDate.get(dateKey);
-    bucket.total += 1;
+  const benefits = Array.isArray(performance.benefits)
+    ? performance.benefits
+    : [];
 
-    if (row.bucket === "promoter") bucket.promoters += 1;
-    if (row.bucket === "passive") bucket.passives += 1;
-    if (row.bucket === "detractor") bucket.detractors += 1;
-
-    bucket.nps = Math.round(
-      ((bucket.promoters - bucket.detractors) / bucket.total) * 100
-    );
-  });
-
-  const counts = Array.from({ length: 11 }, (_, score) => ({
-    score,
-    count: 0,
-  }));
-
-  rows.forEach((row) => {
-    const score = normaliseNpsScore(row.score);
-
-    if (Number.isInteger(score)) {
-      counts[score].count += 1;
-    }
-  });
+  const recentDetractors = Array.isArray(
+    performance.recent_detractors
+  )
+    ? performance.recent_detractors
+    : [];
 
   return {
-    id: dataset.id,
+    id: dataset.id || null,
+
     datasetName:
       dataset.dataset_name ||
       source.source_name ||
       "Workspace Intercom dataset",
-    sourceType: dataset.source_type || "workspace_intercom",
-    content_id: dataset.content_id || source.survey_content_id || null,
-    rawRowCount: rows.length,
-    validRowCount: summary.total ?? rows.length,
-    skippedRowCount: 0,
+
+    sourceType:
+      dataset.source_type ||
+      "workspace_intercom",
+
+    content_id:
+      performance.content_id ||
+      dataset.content_id ||
+      source.survey_content_id ||
+      null,
+
+    rawRowCount:
+      performance?.data_quality?.canonical_rows_in_period ??
+      summary.total ??
+      rows.length,
+
+    validRowCount:
+      summary.validResponses ??
+      summary.total ??
+      rows.length,
+
+    skippedRowCount:
+      performance?.data_quality?.responses_without_valid_score ??
+      0,
+
     rows,
+
     summary: {
-      total: summary.total ?? rows.length,
-      promoters: summary.promoters ?? rows.filter((row) => row.bucket === "promoter").length,
-      passives: summary.passives ?? rows.filter((row) => row.bucket === "passive").length,
-      detractors: summary.detractors ?? rows.filter((row) => row.bucket === "detractor").length,
-      nps: summary.nps ?? calculateNps(rows),
-      averageScore: summary.averageScore ?? calculateAverageScore(rows),
+      total: summary.total ?? 0,
+      validResponses:
+        summary.validResponses ??
+        summary.total ??
+        0,
+      promoters: summary.promoters ?? 0,
+      passives: summary.passives ?? 0,
+      detractors: summary.detractors ?? 0,
+      nps: summary.nps ?? null,
+      averageScore: summary.averageScore ?? null,
+      latestSubmittedAt:
+        summary.latestSubmittedAt ?? null,
     },
-    timeline: Array.from(byDate.values()).sort((a, b) =>
-      a.date > b.date ? 1 : -1
-    ),
-    scoreDistribution: counts,
+
+    period: performance.period || null,
+    comparison: performance.comparison || null,
+    timeline,
+    scoreDistribution,
+    questionScores,
+    benefits,
+    recentDetractors,
+    dataQuality: performance.data_quality || null,
   };
 }
 
@@ -833,6 +966,67 @@ function BucketBar({ label, count, percentage, bucket }) {
       <div className="csv-nps-bucket-bar-track">
         <div
           className={`csv-nps-bucket-bar-fill csv-nps-bucket-bar-fill-${bucket}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function QuestionScoreBar({
+  question,
+  averageScore,
+  responses,
+  isNpsQuestion,
+}) {
+  const score = normaliseNpsScore(averageScore);
+
+  const percentage =
+    score === null
+      ? 0
+      : Math.max(0, Math.min(100, score * 10));
+
+  return (
+    <div className="csv-nps-question-score-row">
+      <div className="csv-nps-question-score-header">
+        <div>
+          <div className="csv-nps-question-score-title">
+            {question}
+          </div>
+
+          <div className="csv-nps-question-score-meta">
+            {responses} response
+            {responses === 1 ? "" : "s"}
+
+            {isNpsQuestion && (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span className="csv-nps-question-score-badge">
+                  NPS question
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="csv-nps-question-score-value">
+          {score === null ? "—" : score.toFixed(1)}
+          <span>/10</span>
+        </div>
+      </div>
+
+      <div
+        className="csv-nps-question-score-track"
+        role="progressbar"
+        aria-label={`${question}: ${
+          score === null ? "no score" : `${score} out of 10`
+        }`}
+        aria-valuemin="0"
+        aria-valuemax="10"
+        aria-valuenow={score ?? undefined}
+      >
+        <div
+          className="csv-nps-question-score-fill"
           style={{ width: `${percentage}%` }}
         />
       </div>

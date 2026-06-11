@@ -1463,3 +1463,73 @@
 .csv-nps-loop-card-selected {
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.55);
 }
+
+
+.csv-nps-question-score-list {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.csv-nps-question-score-row {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.csv-nps-question-score-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.csv-nps-question-score-title {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.csv-nps-question-score-meta {
+  margin-top: 0.25rem;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.csv-nps-question-score-badge {
+  color: #c4b5fd;
+  font-weight: 600;
+}
+
+.csv-nps-question-score-value {
+  flex: 0 0 auto;
+  color: #f8fafc;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.csv-nps-question-score-value span {
+  margin-left: 0.2rem;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.csv-nps-question-score-track {
+  height: 0.65rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+}
+
+.csv-nps-question-score-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a78bfa
+  );
+  transition: width 180ms ease;
+}

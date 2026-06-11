@@ -1762,7 +1762,7 @@ function splitSelectedOptions(value) {
     .split(/[;,|]/)
     .map((item) => item.trim())
     .filter(Boolean);
-}node --check workspaceIntercom.routes.js
+}
 
 async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   const contentId = String(source?.survey_content_id || query?.content_id || "").trim();

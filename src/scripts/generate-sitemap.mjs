@@ -18,8 +18,9 @@ const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 // --- Base pages from manifest (enabled, inSitemap !== false, absolute path, not hash, not dynamic ":") ---
 const basePages = ROUTES_MANIFEST.filter(
   (r) =>
-    r.enabled &&
-    r.indexable !== false &&
+    r.enabled === true &&
+    r.indexable === true &&
+    r.inSitemap !== false &&
     r.path.startsWith("/") &&
     !r.isHash &&
     !r.path.includes(":")

@@ -915,26 +915,62 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     }
   }
 
-  let rows = statsContentRows
+  const allRows = statsContentRows
     .map((row) => {
       const sentAtRaw = row.received_at || "";
       const sentAtMs = sentAtRaw ? new Date(sentAtRaw).getTime() : 0;
 
-      const receiptId = String(row.receipt_id || "").trim();
+      const receiptId = normaliseReceiptId(row?.receipt_id);
+
       const matchedResponse = receiptId
         ? responsesByReceiptId.get(receiptId)
         : null;
 
-      const respondedAt =
-        matchedResponse?.submitted_at ||
+      const score = normaliseNpsScore(
+        matchedResponse?.score_0_10
+      );
+
+      /*
+       * A valid NPS response must:
+       * 1. exist in the canonical responses data; and
+       * 2. contain a valid score from 0 to 10.
+       */
+      const hasValidNpsResponse = Boolean(
+        matchedResponse && score !== null
+      );
+
+      /*
+       * Intercom may mark a survey as completed even when the exported
+       * response does not contain a valid NPS score.
+       */
+      const completedAt =
         row.first_completion ||
+        matchedResponse?.submitted_at ||
         null;
+
+      const isIntercomCompleted = Boolean(completedAt);
+
+      /*
+       * first_answer indicates that someone started answering the survey,
+       * even if they did not subsequently complete it.
+       */
+      const startedAt =
+        row.first_answer ||
+        row.first_open ||
+        row.first_click ||
+        null;
+
+      const respondedAt = hasValidNpsResponse
+        ? matchedResponse?.submitted_at || completedAt
+        : null;
 
       let status = "unknown";
 
-      if (respondedAt) {
+      if (hasValidNpsResponse) {
         status = "responded";
-      } else if (row.first_open || row.first_click) {
+      } else if (isIntercomCompleted) {
+        status = "completed_without_score";
+      } else if (startedAt) {
         status = "opened";
       } else if (row.first_delivery || row.delivered_at) {
         status = "delivered";
@@ -958,20 +994,36 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
         customer_id: contactId || null,
         survey_id: String(row.content_id || "").trim() || null,
         type_of_device: row.device || "",
+
         sent_at: sentAtRaw || null,
         sent_at_ms: sentAtMs,
+
         status,
+
+        /*
+         * Do not create a synthetic response_id for an Intercom completion
+         * that does not have a canonical NPS response.
+         */
         response_id:
           matchedResponse?.response_id ||
-          (respondedAt && row.content_id && row.receipt_id
-            ? `${row.content_id}:${row.receipt_id}`
-            : ""),
-        score_0_10:
-          typeof matchedResponse?.score_0_10 === "number"
-            ? matchedResponse.score_0_10
-            : null,
+          "",
+
+        score_0_10: score,
         responded_at: respondedAt,
+
+        /*
+         * Additional lifecycle fields let the frontend distinguish between
+         * starting, completing and submitting a valid scored response.
+         */
+        started_at: startedAt,
+        completed_at: completedAt,
+        intercom_completed: isIntercomCompleted,
+        has_valid_nps_response: hasValidNpsResponse,
+        completed_without_valid_score:
+          isIntercomCompleted && !hasValidNpsResponse,
+
         contact_label: formatRedactedContactLabel(contactId),
+
         intercom_contact_url:
           source?.intercom_app_id && contactId
             ? `https://app.intercom.com/a/apps/${source.intercom_app_id}/users/${contactId}`
@@ -979,43 +1031,139 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
       };
     })
     .filter((row) => {
-      if (!row.sent_at_ms || Number.isNaN(row.sent_at_ms)) return false;
-      if (row.sent_at_ms < cutoffMs) return false;
-      if (statusFilter !== "all" && row.status !== statusFilter) return false;
+      if (!row.sent_at_ms || Number.isNaN(row.sent_at_ms)) {
+        return false;
+      }
+
+      if (row.sent_at_ms < cutoffMs) {
+        return false;
+      }
+
       return true;
     })
     .sort((a, b) => {
-      const ar = a.responded_at ? Date.parse(a.responded_at) || 0 : 0;
-      const br = b.responded_at ? Date.parse(b.responded_at) || 0 : 0;
+      const aLatestActivity = Math.max(
+        Date.parse(a.responded_at || "") || 0,
+        Date.parse(a.completed_at || "") || 0,
+        Date.parse(a.started_at || "") || 0,
+        a.sent_at_ms || 0
+      );
 
-      return Math.max(br, b.sent_at_ms || 0) - Math.max(ar, a.sent_at_ms || 0);
+      const bLatestActivity = Math.max(
+        Date.parse(b.responded_at || "") || 0,
+        Date.parse(b.completed_at || "") || 0,
+        Date.parse(b.started_at || "") || 0,
+        b.sent_at_ms || 0
+      );
+
+      return bLatestActivity - aLatestActivity;
     });
 
-  const sent = rows.length;
-  const delivered = rows.filter((row) =>
-    ["sent", "delivered", "opened", "responded"].includes(row.status)
+  /*
+   * Build summary figures from the complete date-filtered set, before the
+   * optional status filter is applied.
+   */
+  const sent = allRows.length;
+
+  const delivered = allRows.filter((row) =>
+    [
+      "sent",
+      "delivered",
+      "opened",
+      "responded",
+      "completed_without_score",
+    ].includes(row.status)
   ).length;
-  const opened = rows.filter((row) =>
-    ["opened", "responded"].includes(row.status)
+
+  const opened = allRows.filter((row) =>
+    [
+      "opened",
+      "responded",
+      "completed_without_score",
+    ].includes(row.status)
   ).length;
-  const responded = rows.filter((row) => row.status === "responded").length;
+
+  const completed = allRows.filter(
+    (row) => row.intercom_completed
+  ).length;
+
+  const responded = allRows.filter(
+    (row) => row.has_valid_nps_response
+  ).length;
+
+  const completedWithoutValidScore = allRows.filter(
+    (row) => row.completed_without_valid_score
+  ).length;
+
+  const startedButNotCompleted = allRows.filter(
+    (row) =>
+      Boolean(row.started_at) &&
+      !row.intercom_completed &&
+      !row.has_valid_nps_response
+  ).length;
+
+  const noResponseActivity = allRows.filter(
+    (row) =>
+      !row.started_at &&
+      !row.intercom_completed &&
+      !row.has_valid_nps_response
+  ).length;
 
   const summary = {
     sent,
     delivered,
     opened,
+
+    /*
+     * `responded` is now the NPS Me business metric:
+     * a canonical response containing a valid 0–10 score.
+     */
     responded,
-    bounced: rows.filter((row) => row.status === "bounced").length,
-    failed: rows.filter((row) => row.status === "failed").length,
+    valid_nps_responses: responded,
+
+    /*
+     * Keep the Intercom lifecycle metric separately.
+     */
+    completed,
+    intercom_completed: completed,
+    completed_without_valid_score: completedWithoutValidScore,
+    started_but_not_completed: startedButNotCompleted,
+    no_response_activity: noResponseActivity,
+
+    bounced: allRows.filter(
+      (row) => row.status === "bounced"
+    ).length,
+
+    failed: allRows.filter(
+      (row) => row.status === "failed"
+    ).length,
+
     response_rate_pct:
-      sent > 0 ? Math.round((responded / sent) * 1000) / 10 : null,
+      sent > 0
+        ? Math.round((responded / sent) * 1000) / 10
+        : null,
+
+    intercom_completion_rate_pct:
+      sent > 0
+        ? Math.round((completed / sent) * 1000) / 10
+        : null,
+
     last_sent_at:
-      rows
+      allRows
         .map((row) => row.sent_at)
         .filter(Boolean)
         .sort()
         .slice(-1)[0] || null,
   };
+
+  /*
+   * Apply the status filter only to the returned table rows.
+   * The headline summary remains based on all invitations in the period.
+   */
+  const rows =
+    statusFilter === "all"
+      ? allRows
+      : allRows.filter((row) => row.status === statusFilter);
 
   const statsReceiptIds = new Set(
     statsContentRows
@@ -1035,20 +1183,48 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   const statsReceiptsMissingFromResponses = Array.from(statsReceiptIds)
     .filter((receiptId) => !responseReceiptIds.has(receiptId));
 
-  const diagnostics =
+    const diagnostics =
     String(query?.debug || "") === "1"
       ? {
-          canonical_response_rows_for_content: canonicalContentRows.length,
-          stats_rows_for_content: statsContentRows.length,
-          response_receipt_ids: responseReceiptIds.size,
-          stats_receipt_ids: statsReceiptIds.size,
-          responded_rows_from_invitation_payload: responded,
+          canonical_response_rows_for_content:
+            canonicalContentRows.length,
+
+          stats_rows_for_content:
+            statsContentRows.length,
+
+          response_receipt_ids:
+            responseReceiptIds.size,
+
+          stats_receipt_ids:
+            statsReceiptIds.size,
+
+          responded_rows_from_invitation_payload:
+            responded,
+
+          valid_nps_response_rows_from_invitation_payload:
+            responded,
+
+          intercom_completed_rows_from_invitation_payload:
+            completed,
+
+          completed_without_valid_score_rows:
+            completedWithoutValidScore,
+
+          started_but_not_completed_rows:
+            startedButNotCompleted,
+
+          no_response_activity_rows:
+            noResponseActivity,
+
           response_receipts_missing_from_stats_count:
             responseReceiptsMissingFromStats.length,
+
           response_receipts_missing_from_stats:
             responseReceiptsMissingFromStats.slice(0, 20),
+
           stats_receipts_missing_from_responses_count:
             statsReceiptsMissingFromResponses.length,
+
           stats_receipts_missing_from_responses:
             statsReceiptsMissingFromResponses.slice(0, 20),
         }
@@ -1080,10 +1256,7 @@ function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], s
     ...allAnswersByQuestionId(answers, 612570),
   ]);
 
-  const numericScore =
-    typeof row?.score_0_10 === "number" ? row.score_0_10 : Number(row?.score_0_10);
-
-  const score = Number.isFinite(numericScore) ? numericScore : null;
+  const score = normaliseNpsScore(row?.score_0_10);
   const bucket = scoreBucket(score);
 
   return {
@@ -1263,6 +1436,24 @@ function summariseWorkspaceIntercomRows(rows) {
 
 function normaliseReceiptId(value) {
   return String(value || "").trim();
+}
+
+function normaliseNpsScore(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const score = Number(value);
+
+  if (!Number.isFinite(score)) {
+    return null;
+  }
+
+  if (score < 0 || score > 10) {
+    return null;
+  }
+
+  return score;
 }
 
 function receiptIdFromResponse(row) {

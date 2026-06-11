@@ -22,7 +22,7 @@ function FooterGroup({ title, links }) {
 
   return (
     <div>
-      <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
         {title}
       </h2>
 
@@ -192,11 +192,11 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             © {new Date().getFullYear()} NPS Me. All rights reserved.
           </p>
 
-          <p className="max-w-3xl text-[11px] leading-snug text-slate-500">
+          <p className="max-w-3xl text-[11px] leading-snug text-slate-400">
             NPS® and Net Promoter Score® are registered service marks of Bain
             &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc.
             References are descriptive only. NPS Me is independent and is not

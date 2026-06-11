@@ -29,7 +29,7 @@ function ProofStrip() {
   return (
     <section className="mx-auto max-w-7xl px-6 pb-12">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <div className="text-xs uppercase tracking-widest text-slate-500">
+        <div className="text-xs uppercase tracking-widest text-slate-400">
           {label}
         </div>
 
@@ -122,7 +122,7 @@ function DemoSummaryStrip() {
           <div className="mt-1 text-2xl font-semibold text-white">
             {stats.nps ?? "-"}
           </div>
-          <p className="mt-1 text-[11px] text-slate-500">
+          <p className="mt-1 text-[11px] text-slate-400">
             {tr("landing.demo.basedOn").replace("{count}", String(stats.total))}
           </p>
         </div>
@@ -211,7 +211,7 @@ export default function NpsMeLanding() {
 
             <div className="mt-6 space-y-4 text-xs">
               <div>
-                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-500">
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-400">
                   {lang === "fr" ? "Comment j’aide" : "How I help"}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ export default function NpsMeLanding() {
               </div>
 
               <div>
-                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-500">
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-slate-400">
                   {lang === "fr" ? "Compatible avec" : "Works with"}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -243,7 +243,7 @@ export default function NpsMeLanding() {
               </div>
             </div>
 
-            <p className="mt-3 max-w-xl text-[11px] text-slate-500">
+            <p className="mt-3 max-w-xl text-[11px] text-slate-400">
               {tr("landing.hero.chipsNote")}
             </p>
           </div>

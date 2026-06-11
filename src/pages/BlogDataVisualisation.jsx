@@ -21,9 +21,10 @@ export default function BlogCxDataVisualisation() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/blog/cx-data-visualisation"
-        title={`${title} | NPS Me`}
-        description={description}
+        path={location.pathname}
+        lang={lang}
+        title={translations(lang, "blogCxDataViz.seo.title")}
+        description={translations(lang, "blogCxDataViz.seo.description")}
       />
 
       {/* BlogPosting JSON-LD */}

@@ -33,6 +33,7 @@ import {
   getSeoUrls,
   normaliseSeoPath,
 } from "./src/seoRoutes.js";
+import { translations } from "./src/i18n/translations.js";
 
 // Rate limit: tune as you like
 const socialSummaryLimiter = rateLimit({
@@ -2884,10 +2885,10 @@ function getManifestRoute(pathname) {
   });
 }
 
-function isRouteIndexable(pathname) {
-  const route = getManifestRoute(pathname);
-  return route?.enabled === true && route?.indexable === true;
-}
+// function isRouteIndexable(pathname) {
+//   const route = getManifestRoute(pathname);
+//   return route?.enabled === true && route?.indexable === true;
+// }
 
 const ROBOTS_TAG_PATTERN =
   /<meta\b(?=[^>]*\bname=["']robots["'])[^>]*>/i;
@@ -2909,6 +2910,161 @@ const TWITTER_TITLE_TAG_PATTERN =
 
 const TWITTER_DESCRIPTION_TAG_PATTERN =
   /<meta\b(?=[^>]*\bname=["']twitter:description["'])[^>]*>/i;
+
+const ROUTE_SEO_KEYS = {
+  "/": "landing",
+  "/fr": "landing",
+
+  "/products": "products",
+  "/fr/products": "products",
+
+  "/training": "training",
+  "/fr/training": "training",
+
+  "/speaking": "speaking",
+  "/fr/speaking": "speaking",
+
+  "/impact": "impact",
+  "/fr/impact": "impact",
+
+  "/about": "about",
+  "/fr/about": "about",
+
+  "/why-nps-me": "whyNpsMe",
+  "/fr/why-nps-me": "whyNpsMe",
+
+  "/milestone-nps": "milestonePage",
+  "/fr/milestone-nps": "milestonePage",
+
+  "/nps-survey-programme": "surveyProgramme",
+  "/fr/nps-survey-programme": "surveyProgramme",
+
+  "/what-is-nps": "whatIsNps",
+  "/fr/what-is-nps": "whatIsNps",
+
+  "/nps-intelligence-layer": "npsIntelligenceLayer",
+  "/fr/nps-intelligence-layer": "npsIntelligenceLayer",
+
+  "/intercom-nps-analytics": "intercomNps",
+  "/fr/analyse-nps-intercom": "intercomNps",
+
+  "/customer-feedback-workspace": "customerFeedbackWorkspace",
+  "/fr/customer-feedback-workspace": "customerFeedbackWorkspace",
+
+  "/data-automation": "dataAutomation",
+  "/fr/data-automation": "dataAutomation",
+
+  "/book": "book",
+  "/fr/book": "book",
+
+  "/social-listening": "socialListening",
+  "/fr/social-listening": "socialListening",
+
+  "/social-listening-index": "socialListeningIndex",
+  "/fr/social-listening-index": "socialListeningIndex",
+
+  "/cx-cockpit": "cxCockpit",
+  "/fr/cx-cockpit": "cxCockpit",
+
+  "/blog": "blog",
+  "/fr/blog": "blog",
+
+  "/blog/ethical-surveys": "blogEthicalSurveys",
+  "/fr/blog/ethical-surveys": "blogEthicalSurveys",
+
+  "/blog/ethics-of-contact-selection": "blogEthicsOfContactSelection",
+  "/fr/blog/ethics-of-contact-selection": "blogEthicsOfContactSelection",
+
+  "/blog/closing-the-loop": "blogClosingLoop",
+  "/fr/blog/closing-the-loop": "blogClosingLoop",
+
+  "/blog/intercom-nps-beyond-the-score": "blogIntercomNps",
+  "/fr/blog/intercom-nps-beyond-the-score": "blogIntercomNps",
+
+  "/blog/what-to-do-with-nps-scores": "blogWhatToDoWithNpsScores",
+  "/fr/blog/what-to-do-with-nps-scores": "blogWhatToDoWithNpsScores",
+
+  "/blog/sending-nps-before-christmas": "blogSendingNpsBeforeChristmas",
+  "/fr/blog/sending-nps-before-christmas": "blogSendingNpsBeforeChristmas",
+
+  "/blog/why-nps-isnt-improving": "blogWhyNpsIsntImproving",
+  "/fr/blog/why-nps-isnt-improving": "blogWhyNpsIsntImproving",
+
+  "/blog/data-visualisation-cx-insights": "blogCxDataViz",
+  "/fr/blog/data-visualisation-cx-insights": "blogCxDataViz",
+
+  "/privacy": "privacy",
+  "/fr/privacy": "privacy",
+
+  "/terms": "terms",
+  "/fr/terms": "terms",
+};
+
+const DEFAULT_META_BY_LANGUAGE = {
+  en: {
+    title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
+    description:
+      "Practical NPS consulting, customer feedback systems and CX insight for startups and SMEs.",
+  },
+
+  fr: {
+    title: "Conseil CX et amélioration du NPS | NPS Me",
+    description:
+      "Conseil NPS, systèmes de feedback client et analyses CX pratiques pour startups et PME.",
+  },
+};
+
+function getTranslationString(lang, paths) {
+  for (const translationPath of paths) {
+    const value = translations(lang, translationPath, "");
+
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function getServerRouteMeta(pathname, language) {
+  const lang = language === "fr" ? "fr" : "en";
+  const seoKey = ROUTE_SEO_KEYS[pathname];
+  const fallback = DEFAULT_META_BY_LANGUAGE[lang];
+
+  if (!seoKey) {
+    return fallback;
+  }
+
+  const title = getTranslationString(lang, [
+    `${seoKey}.seo.title`,
+    `${seoKey}.seoTitle`,
+  ]);
+
+  const description = getTranslationString(lang, [
+    `${seoKey}.seo.description`,
+    `${seoKey}.seoDescription`,
+  ]);
+
+  if (!title || !description) {
+    console.warn(
+      `[seo] Missing translated SEO metadata for ${pathname} ` +
+      `(namespace: ${seoKey}, language: ${lang})`
+    );
+  }
+
+  return {
+    title: title || fallback.title,
+    description: description || fallback.description,
+  };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 /* -----------------------------
    SPA HTML: inject canonical + og:url + per-route meta + hreflang
@@ -2978,62 +3134,8 @@ app.get("*", (req, res, next) => {
   const inLang =
     isFrench ? "fr-FR" : "en-GB";
 
-  // --- Per-route meta (expand this map over time) ---
-  const DEFAULT_META = {
-    title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
-    description:
-      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue-diagnose friction, prioritise fixes, ship measurable gains.",
-  };
-
-const ROUTE_META = {
-  "/": {
-    title: "Customer Experience (CX) Consulting & NPS Improvement | NPS Me",
-    description:
-      "NPS Me is a CX consulting firm helping teams improve Net Promoter Score (NPS)®, retention, and revenue-diagnose friction, prioritise fixes, ship measurable gains.",
-  },
-
-  "/fr": {
-    title: "Conseil CX & Amélioration du NPS | NPS Me",
-    description:
-      "NPS Me aide les équipes à améliorer le NPS®, la rétention et la croissance - diagnostiquer les frictions, prioriser, déployer et mesurer.",
-  },
-
-  "/book": {
-    title: "Book CX & NPS Consulting | NPS Me",
-    description:
-      "Book a call with NPS Me to diagnose customer friction, prioritise improvements, and increase NPS®, retention, and revenue.",
-  },
-
-  "/fr/book": {
-    title: "Réserver un appel Conseil CX & NPS | NPS Me",
-    description:
-      "Réservez un échange avec NPS Me pour diagnostiquer les frictions clients, prioriser les actions et améliorer le NPS®, la rétention et la croissance.",
-  },
-
-  "/what-is-nps": {
-    title: "What Is Net Promoter Score (NPS)? | NPS Me",
-    description:
-      "Learn what Net Promoter Score (NPS)® is, how it works, and how to use it to improve customer experience and retention.",
-  },
-
-  "/fr/what-is-nps": {
-    title: "Qu’est-ce que le Net Promoter Score (NPS) ? | NPS Me",
-    description:
-      "Découvrez ce qu’est le Net Promoter Score (NPS)®, comment il fonctionne et comment l’utiliser pour améliorer l’expérience client.",
-  },
-
-  "/milestone-nps": {
-    title: "Milestone NPS: Measuring CX at Key Moments | NPS Me",
-    description:
-      "Understand Milestone NPS and how measuring customer sentiment at key moments improves insight beyond overall NPS.",
-  },
-
-  "/fr/milestone-nps": {
-    title: "NPS par étape : mesurer l’expérience aux moments clés | NPS Me",
-    description:
-      "Comprenez le NPS par étape et comment mesurer la satisfaction aux moments clés améliore l’analyse de l’expérience client.",
-  },
-};
+  const PUBLIC_META =
+    getServerRouteMeta(pathOnly, htmlLang);
 
   const PRIVATE_META = {
     title: "NPS Me Workspace",
@@ -3041,9 +3143,22 @@ const ROUTE_META = {
       "Secure NPS Me workspace for managing customer feedback, NPS responses, and close-the-loop workflows.",
   };
 
-  const meta = isIndexable
-    ? ROUTE_META[pathOnly] || DEFAULT_META
-    : PRIVATE_META;
+    if (isIndexable && !ROUTE_SEO_KEYS[pathOnly]) {
+    console.warn(
+      `[seo] No SEO translation key configured for indexable route: ${pathOnly}`
+    );
+  }
+
+  const meta =
+    isIndexable
+      ? PUBLIC_META
+      : PRIVATE_META;
+
+    const escapedMeta = {
+    title: escapeHtml(meta.title),
+    description: escapeHtml(meta.description),
+  };
+
   // --- Hreflang ---
   // Uses the same shared resolver as the React <Seo /> component.
   const hreflang = isIndexable
@@ -3072,8 +3187,8 @@ const ROUTE_META = {
   let html = baseIndexHtml;
 
   // 1) Replace placeholders introduced in index.html
-  html = html.replace(/__TITLE__/g, meta.title);
-  html = html.replace(/__DESCRIPTION__/g, meta.description);
+  html = html.replace(/__TITLE__/g, escapedMeta.title);
+  html = html.replace(/__DESCRIPTION__/g, escapedMeta.description);
   html = html.replace(/__LANG__/g, htmlLang);
   html = html.replace(/__INLANG__/g, inLang);
   html = html.replace(/__HREFLANG__/g, hreflang);
@@ -3120,25 +3235,25 @@ const ROUTE_META = {
     );
   }
 
-    // 4) Keep OG/Twitter title/description aligned
+  // 4) Keep OG/Twitter title/description aligned
   html = html.replace(
     OG_TITLE_TAG_PATTERN,
-    `<meta data-rh="true" property="og:title" content="${meta.title}" />`
+    `<meta data-rh="true" property="og:title" content="${escapedMeta.title}" />`
   );
 
   html = html.replace(
     OG_DESCRIPTION_TAG_PATTERN,
-    `<meta data-rh="true" property="og:description" content="${meta.description}" />`
+    `<meta data-rh="true" property="og:description" content="${escapedMeta.description}" />`
   );
 
   html = html.replace(
     TWITTER_TITLE_TAG_PATTERN,
-    `<meta data-rh="true" name="twitter:title" content="${meta.title}" />`
+    `<meta data-rh="true" name="twitter:title" content="${escapedMeta.title}" />`
   );
 
   html = html.replace(
     TWITTER_DESCRIPTION_TAG_PATTERN,
-    `<meta data-rh="true" name="twitter:description" content="${meta.description}" />`
+    `<meta data-rh="true" name="twitter:description" content="${escapedMeta.description}" />`
   );
 
   res.type("html").send(html);

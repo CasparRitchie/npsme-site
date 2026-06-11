@@ -17,11 +17,12 @@ export default function BlogClosingTheLoop() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0B0F19] via-[#0C1224] to-[#0B0F19] text-slate-200">
       <Seo
-        path="/blog/closing-the-loop"
+        path={location.pathname}
+        lang={lang}
         title={translations(lang, "blogClosingLoop.seo.title")}
         description={translations(lang, "blogClosingLoop.seo.description")}
       />
-      
+
       {/* BlogPosting JSON-LD */}
       <script
         type="application/ld+json"

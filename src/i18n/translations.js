@@ -144,6 +144,26 @@ export const TRANSLATIONS = {
         secondary: "Email hello@npsme.com",
       },
     },
+    impact: {
+      seoTitle:
+        "CX Impact Calculator: Estimate NPS, Churn and Support Savings | NPS Me",
+      seoDescription:
+        "Estimate the potential commercial impact of better customer experience through repeat purchases, reduced churn and lower support costs.",
+    },
+    privacy: {
+      seo: {
+        title: "Privacy Policy | NPS Me",
+        description:
+          "How NPS Me handles workspace data, imported feedback datasets, cookies, AI analysis and third-party services.",
+      },
+    },
+    terms: {
+      seo: {
+        title: "Terms of Service | NPS Me",
+        description:
+          "NPS Me terms of service, scope of services, limitations and contact details.",
+      },
+    },
     cxCockpit: {
       seoTitle: "CX Cockpit (Demo) | NPS Me",
       seoDescription:
@@ -341,6 +361,7 @@ export const TRANSLATIONS = {
       seo: {
         baseTitle:
           "How to Use Data Visualisation to Drill Into CX Data and Uncover Insights That Teams Can Act On",
+        title: "How to Use Data Visualisation to Drill Into CX Data and Uncover Insights That Teams Can Act On | NPS Me",
         description:
           "Most companies have more CX dashboards than time. Learn how to use data visualisation to spot patterns, find friction, and turn NPS data into clear next actions.",
       },
@@ -4118,6 +4139,26 @@ export const TRANSLATIONS = {
         secondary: "Écrire à hello@npsme.com",
       },
     },
+    impact: {
+      seoTitle:
+        "Calculateur d’impact CX : estimez les gains liés au NPS et à la rétention | NPS Me",
+      seoDescription:
+        "Estimez l’impact potentiel d’une meilleure expérience client grâce aux achats répétés, à la réduction du churn et à la baisse des coûts de support.",
+    },
+    privacy: {
+      seo: {
+        title: "Politique de confidentialité | NPS Me",
+        description:
+          "Comment NPS Me traite les données des espaces clients, les feedbacks importés, les cookies, les analyses par IA et les services tiers.",
+      },
+    },
+    terms: {
+      seo: {
+        title: "Conditions d’utilisation | NPS Me",
+        description:
+          "Conditions d’utilisation de NPS Me, périmètre des services, limitations et coordonnées de contact.",
+      },
+    },
     blog: {
       seo: {
         title: "Blog | NPS Me – Analyses CX & NPS pragmatiques",
@@ -4262,6 +4303,8 @@ export const TRANSLATIONS = {
       seo: {
         baseTitle:
           "Comment utiliser la datavisualisation pour explorer vos données CX et révéler des insights vraiment actionnables",
+        title:
+          "Comment utiliser la datavisualisation pour explorer vos données CX et révéler des insights vraiment actionnables | NPS Me",
         description:
           "La plupart des entreprises ont plus de dashboards CX que de temps. Découvrez comment utiliser la datavisualisation pour repérer les tendances, trouver les frictions et transformer les signaux NPS en prochaines actions claires.",
       },

@@ -207,6 +207,51 @@ export function createWorkspaceIntercomRouter() {
     }
   });
 
+  // --------------------------------------------------
+  // GET /api/workspace-intercom/performance
+  //
+  // Query options:
+  // - days=365
+  // - from=2026-01-01&to=2026-06-11
+  // - granularity=day|week|month
+  // --------------------------------------------------
+  router.get("/performance", async (req, res) => {
+    try {
+      ensureSupabase();
+
+      const workspaceId = getRequestWorkspaceId(req);
+      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+
+      if (!source) {
+        return res.status(404).json({
+          ok: false,
+          error: "No active Intercom source configured for this workspace",
+        });
+      }
+
+      const payload = await buildWorkspaceIntercomPerformancePayload({
+        source,
+        query: req.query,
+      });
+
+      return res.json({
+        ok: true,
+        workspaceId,
+        source: toWorkspaceIntercomSourceSummary(source),
+        ...payload,
+      });
+    } catch (err) {
+      console.error("[workspace-intercom] GET /performance error", err);
+
+      return res.status(500).json({
+        ok: false,
+        error:
+          err.message ||
+          "Failed to load workspace Intercom performance",
+      });
+    }
+  });
+
 
   // --------------------------------------------------
   // GET /api/workspace-intercom/invitations
@@ -395,6 +440,552 @@ router.get("/invitations/reconcile", async (req, res) => {
           ok: false,
           error: "No active Intercom source configured for this workspace",
         });
+      }
+
+      async function buildWorkspaceIntercomPerformancePayload({
+        source,
+        query,
+      }) {
+        const contentId = String(source?.survey_content_id || "").trim();
+
+        if (!contentId) {
+          throw new Error("Active source is missing survey_content_id");
+        }
+
+        const window = parsePerformanceWindow(query);
+
+        const requestedGranularity = String(
+          query?.granularity || ""
+        )
+          .trim()
+          .toLowerCase();
+
+        const granularity = ["day", "week", "month"].includes(
+          requestedGranularity
+        )
+          ? requestedGranularity
+          : choosePerformanceGranularity(window);
+
+        const canonicalRows = await getCanonicalResponses();
+
+        /*
+        * Filter once here.
+        *
+        * Every chart and headline figure below must use this exact same
+        * response population so that the numbers remain internally consistent.
+        */
+        const rows = (canonicalRows || [])
+          .filter(
+            (row) =>
+              String(row?.content_id || "").trim() === contentId
+          )
+          .map((row) => ({
+            ...row,
+            _submitted_ms: Date.parse(row?.submitted_at || ""),
+            _score: normaliseNpsScore(row?.score_0_10),
+          }))
+          .filter((row) => Number.isFinite(row._submitted_ms))
+          .filter(
+            (row) =>
+              row._submitted_ms >= window.fromMs &&
+              row._submitted_ms <= window.toMs
+          )
+          .sort((a, b) => b._submitted_ms - a._submitted_ms);
+
+        const summary = buildPerformanceSummary(rows);
+
+        const previousRows = (canonicalRows || [])
+          .filter(
+            (row) =>
+              String(row?.content_id || "").trim() === contentId
+          )
+          .map((row) => ({
+            ...row,
+            _submitted_ms: Date.parse(row?.submitted_at || ""),
+            _score: normaliseNpsScore(row?.score_0_10),
+          }))
+          .filter((row) => Number.isFinite(row._submitted_ms))
+          .filter(
+            (row) =>
+              row._submitted_ms >= window.previousFromMs &&
+              row._submitted_ms <= window.previousToMs
+          );
+
+        const previousSummary = buildPerformanceSummary(previousRows);
+
+        return {
+          content_id: contentId,
+
+          period: {
+            mode: window.mode,
+            days: window.days,
+            from: toYmdUtc(window.fromMs),
+            to: toYmdUtc(window.toMs),
+            granularity,
+
+            previous_from: toYmdUtc(window.previousFromMs),
+            previous_to: toYmdUtc(window.previousToMs),
+          },
+
+          summary,
+
+          comparison: buildPerformanceComparison({
+            current: summary,
+            previous: previousSummary,
+          }),
+
+          timeseries: buildPerformanceTimeseries(
+            rows,
+            granularity,
+            window
+          ),
+
+          score_distribution: buildPerformanceScoreDistribution(rows),
+
+          question_scores: buildPerformanceQuestionScores(rows),
+
+          benefits: buildPerformanceBenefits(rows),
+
+          recent_detractors: buildRecentDetractors(rows, source, 8),
+
+          data_quality: {
+            canonical_rows_in_period: rows.length,
+            valid_scored_responses: summary.validResponses,
+            responses_without_valid_score:
+              rows.length - summary.validResponses,
+            responses_with_comments: rows.filter(
+              (row) => getBestResponseComment(row)
+            ).length,
+            responses_with_benefits: rows.filter(
+              (row) => getResponseBenefits(row).length > 0
+            ).length,
+          },
+        };
+      }
+
+      function parsePerformanceWindow(query = {}) {
+        const fromRaw = String(query?.from || "").trim();
+        const toRaw = String(query?.to || "").trim();
+
+        if (fromRaw || toRaw) {
+          if (!fromRaw || !toRaw) {
+            throw new Error(
+              "Both from and to are required when using a custom date range"
+            );
+          }
+
+          const fromMs = Date.parse(`${fromRaw}T00:00:00.000Z`);
+          const toMs = Date.parse(`${toRaw}T23:59:59.999Z`);
+
+          if (
+            !Number.isFinite(fromMs) ||
+            !Number.isFinite(toMs)
+          ) {
+            throw new Error(
+              "Invalid date range. Use YYYY-MM-DD for from and to"
+            );
+          }
+
+          if (fromMs > toMs) {
+            throw new Error(
+              "The from date must be before or equal to the to date"
+            );
+          }
+
+          const durationMs = toMs - fromMs + 1;
+
+          return {
+            mode: "range",
+            days: Math.max(
+              1,
+              Math.ceil(durationMs / (24 * 60 * 60 * 1000))
+            ),
+            fromMs,
+            toMs,
+            previousFromMs: fromMs - durationMs,
+            previousToMs: fromMs - 1,
+          };
+        }
+
+        const days = clampInt(query?.days, 365, 1, 3650);
+        const toMs = Date.now();
+
+        /*
+        * Use days - 1 because the current calendar day is included.
+        */
+        const fromMs =
+          startOfUtcDay(toMs) -
+          (days - 1) * 24 * 60 * 60 * 1000;
+
+        const durationMs = toMs - fromMs + 1;
+
+        return {
+          mode: "rolling",
+          days,
+          fromMs,
+          toMs,
+          previousFromMs: fromMs - durationMs,
+          previousToMs: fromMs - 1,
+        };
+      }
+
+      function choosePerformanceGranularity(window) {
+        if (window.days <= 45) return "day";
+        if (window.days <= 550) return "week";
+        return "month";
+      }
+
+      function startOfUtcDay(ms) {
+        const date = new Date(ms);
+
+        return Date.UTC(
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate()
+        );
+      }
+
+      function toYmdUtc(ms) {
+        const date = new Date(ms);
+
+        const pad = (value) =>
+          String(value).padStart(2, "0");
+
+        return [
+          date.getUTCFullYear(),
+          pad(date.getUTCMonth() + 1),
+          pad(date.getUTCDate()),
+        ].join("-");
+      }
+
+      function buildPerformanceScoreDistribution(rows) {
+        const counts = Array.from(
+          { length: 11 },
+          (_, score) => ({
+            score,
+            count: 0,
+            percentage: 0,
+            bucket: scoreBucket(score),
+          })
+        );
+
+        let validResponses = 0;
+
+        for (const row of rows || []) {
+          const score = normaliseNpsScore(row?._score);
+
+          if (score === null) continue;
+
+          /*
+          * Intercom NPS scores should be whole numbers.
+          * Ignore non-integer values rather than silently moving them.
+          */
+          if (!Number.isInteger(score)) continue;
+
+          counts[score].count += 1;
+          validResponses += 1;
+        }
+
+        return counts.map((item) => ({
+          ...item,
+          percentage:
+            validResponses > 0
+              ? roundOneDecimal(
+                  (item.count / validResponses) * 100
+                )
+              : 0,
+        }));
+      }
+
+      function buildPerformanceQuestionScores(rows) {
+        const byQuestion = new Map();
+
+        for (const row of rows || []) {
+          const answers = Array.isArray(row?.answers)
+            ? row.answers
+            : [];
+
+          const seenInResponse = new Set();
+
+          for (const answer of answers) {
+            const score = normaliseNpsScore(answer?.response);
+
+            if (score === null) continue;
+
+            const questionId =
+              answer?.question_id !== null &&
+              answer?.question_id !== undefined
+                ? String(answer.question_id)
+                : "";
+
+            const questionText = String(
+              answer?.question_text || ""
+            ).trim();
+
+            if (!questionId && !questionText) continue;
+
+            const key = questionId
+              ? `id:${questionId}`
+              : `text:${questionText}`;
+
+            /*
+            * Avoid counting the same question twice for one response.
+            */
+            if (seenInResponse.has(key)) continue;
+            seenInResponse.add(key);
+
+            const current =
+              byQuestion.get(key) || {
+                question_id: questionId || null,
+                question:
+                  questionText ||
+                  `Question ${questionId}`,
+                responses: 0,
+                score_total: 0,
+                promoters: 0,
+                passives: 0,
+                detractors: 0,
+              };
+
+            current.responses += 1;
+            current.score_total += score;
+
+            const bucket = scoreBucket(score);
+
+            if (bucket === "promoter") current.promoters += 1;
+            if (bucket === "passive") current.passives += 1;
+            if (bucket === "detractor") current.detractors += 1;
+
+            if (
+              (!current.question ||
+                current.question.startsWith("Question ")) &&
+              questionText
+            ) {
+              current.question = questionText;
+            }
+
+            byQuestion.set(key, current);
+          }
+        }
+
+        return Array.from(byQuestion.values())
+          .map((item) => ({
+            question_id: item.question_id,
+            question: item.question,
+            responses: item.responses,
+
+            average_score:
+              item.responses > 0
+                ? roundOneDecimal(
+                    item.score_total / item.responses
+                  )
+                : null,
+
+            promoters: item.promoters,
+            passives: item.passives,
+            detractors: item.detractors,
+          }))
+          .sort((a, b) => {
+            if (b.responses !== a.responses) {
+              return b.responses - a.responses;
+            }
+
+            return String(a.question).localeCompare(
+              String(b.question)
+            );
+          });
+      }
+
+      function buildPerformanceBenefits(rows) {
+        const byBenefit = new Map();
+        let responsesWithBenefits = 0;
+
+        for (const row of rows || []) {
+          const benefits = getResponseBenefits(row);
+
+          if (benefits.length === 0) continue;
+
+          responsesWithBenefits += 1;
+
+          /*
+          * Count a selected option only once per response.
+          */
+          for (const benefit of new Set(benefits)) {
+            const current =
+              byBenefit.get(benefit) || {
+                benefit,
+                mentions: 0,
+                score_total: 0,
+                scored_mentions: 0,
+                promoter_mentions: 0,
+                passive_mentions: 0,
+                detractor_mentions: 0,
+              };
+
+            current.mentions += 1;
+
+            const score = normaliseNpsScore(row?._score);
+
+            if (score !== null) {
+              current.score_total += score;
+              current.scored_mentions += 1;
+
+              const bucket = scoreBucket(score);
+
+              if (bucket === "promoter") {
+                current.promoter_mentions += 1;
+              }
+
+              if (bucket === "passive") {
+                current.passive_mentions += 1;
+              }
+
+              if (bucket === "detractor") {
+                current.detractor_mentions += 1;
+              }
+            }
+
+            byBenefit.set(benefit, current);
+          }
+        }
+
+        return Array.from(byBenefit.values())
+          .map((item) => ({
+            benefit: item.benefit,
+            mentions: item.mentions,
+
+            percentage_of_responses_with_benefits:
+              responsesWithBenefits > 0
+                ? roundOneDecimal(
+                    (item.mentions /
+                      responsesWithBenefits) *
+                      100
+                  )
+                : null,
+
+            average_score:
+              item.scored_mentions > 0
+                ? roundOneDecimal(
+                    item.score_total /
+                      item.scored_mentions
+                  )
+                : null,
+
+            promoter_mentions: item.promoter_mentions,
+            passive_mentions: item.passive_mentions,
+            detractor_mentions:
+              item.detractor_mentions,
+          }))
+          .sort((a, b) => {
+            if (b.mentions !== a.mentions) {
+              return b.mentions - a.mentions;
+            }
+
+            return String(a.benefit).localeCompare(
+              String(b.benefit)
+            );
+          });
+      }
+
+      function buildRecentDetractors(
+        rows,
+        source,
+        limit = 8
+      ) {
+        const appId = String(
+          source?.intercom_app_id || ""
+        ).trim();
+
+        return (rows || [])
+          .filter((row) => {
+            const score = normaliseNpsScore(row?._score);
+            return score !== null && score <= 6;
+          })
+          .sort(
+            (a, b) =>
+              Number(b?._submitted_ms || 0) -
+              Number(a?._submitted_ms || 0)
+          )
+          .slice(0, limit)
+          .map((row) => {
+            const contactId = String(
+              row?.contact_id || ""
+            ).trim();
+
+            return {
+              response_id: row?.response_id || null,
+              submitted_at: row?.submitted_at || null,
+              score: normaliseNpsScore(row?._score),
+              bucket: "detractor",
+
+              contact_label:
+                formatRedactedContactLabel(contactId),
+
+              comment: redactFreeText(
+                getBestResponseComment(row),
+                400
+              ),
+
+              intercom_contact_url:
+                appId && contactId
+                  ? `https://app.intercom.com/a/apps/${appId}/users/${contactId}`
+                  : null,
+            };
+          });
+      }
+
+      function getBestResponseComment(row) {
+        const verbatims = Array.isArray(row?.verbatims)
+          ? row.verbatims
+          : [];
+
+        const verbatimTexts = verbatims
+          .map((item) =>
+            String(item?.text || "").trim()
+          )
+          .filter(Boolean)
+          .sort((a, b) => b.length - a.length);
+
+        if (verbatimTexts.length > 0) {
+          return verbatimTexts[0];
+        }
+
+        return String(row?.comment || "").trim();
+      }
+
+      function getResponseBenefits(row) {
+        const answers = Array.isArray(row?.answers)
+          ? row.answers
+          : [];
+
+        const answerBenefits = allAnswersByQuestionId(
+          answers,
+          612570
+        ).flatMap(splitSelectedOptions);
+
+        const storedBenefits = Array.isArray(
+          row?.selected_options
+        )
+          ? row.selected_options.flatMap(splitSelectedOptions)
+          : [];
+
+        return uniqueStrings([
+          ...storedBenefits,
+          ...answerBenefits,
+        ])
+          .map((value) => value.trim())
+          .filter(Boolean);
+      }
+
+      function splitSelectedOptions(value) {
+        if (Array.isArray(value)) {
+          return value.flatMap(splitSelectedOptions);
+        }
+
+        return String(value || "")
+          .split(/[;,|]/)
+          .map((item) => item.trim())
+          .filter(Boolean);
       }
 
       const payload = await buildWorkspaceIntercomResponsesPayload({

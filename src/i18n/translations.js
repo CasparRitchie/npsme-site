@@ -2014,14 +2014,14 @@ export const TRANSLATIONS = {
 
       hero: {
         h1: {
-          lead: "NPS and customer feedback,",
+          lead: "NPS and customer feedback",
           nps: "set up with confidence",
           tail: "for startups and SMEs.",
           accent:
-            "Put clear surveys, useful reporting and customer follow-up workflows in place — without overcomplicating CX.",
+            "Clear surveys. Useful reporting. Follow-up workflows your team can actually use.",
         },
         body:
-          "NPS Me helps growing businesses turn customer feedback into a practical operating rhythm: clear surveys, useful reporting, customer insight and close-the-loop actions that teams can actually use.",
+          "NPS Me helps growing businesses put a practical feedback process in place — turning customer insight into action without adding a heavyweight CX platform.",
         ctaPrimary: "Book a free CX setup review",
         ctaMethod: "See how it works",
         ctaDemo: "View example insights",
@@ -6072,14 +6072,14 @@ export const TRANSLATIONS = {
 
       hero: {
         h1: {
-          lead: "NPS et feedback client,",
+          lead: "NPS et feedback client",
           nps: "mis en place avec confiance",
           tail: "pour startups et PME.",
           accent:
-            "Mettez en place des enquêtes claires, un reporting utile et des workflows de suivi client — sans complexifier la CX.",
+            "Des enquêtes claires. Un reporting utile. Un suivi client que votre équipe peut vraiment utiliser.",
         },
         body:
-          "NPS Me aide les entreprises en croissance à transformer le feedback client en un rythme opérationnel concret : enquêtes claires, reporting utile, analyse des retours et actions de close-the-loop que les équipes peuvent vraiment utiliser.",
+          "NPS Me aide les entreprises en croissance à mettre en place un processus de feedback concret — pour transformer les retours clients en actions, sans ajouter une plateforme CX lourde.",
         ctaPrimary: "Réserver une revue CX gratuite",
         ctaMethod: "Voir comment cela fonctionne",
         ctaDemo: "Voir un exemple d’insights",

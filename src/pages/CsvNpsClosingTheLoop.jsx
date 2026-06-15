@@ -1410,44 +1410,11 @@ function SelectedResponsePanel({
       <div className="csv-nps-selected-response-grid">
         <div className="csv-nps-selected-response-card">
           <h3>Full survey response</h3>
+          <p className="csv-nps-muted-cell">
+            Question-level scores and comments from the survey, combined into one view.
+          </p>
 
           <SurveyQuestionScoreTable row={row} />
-
-          <div className="csv-nps-selected-response-section">
-            <h4>Comments and text answers</h4>
-
-            <ResponseDetail label="Main comment" value={row.comment} />
-            <ResponseDetail
-              label="Recommend comment"
-              value={row.q_recommend_comment}
-            />
-            <ResponseDetail
-              label="Install comment"
-              value={row.q_install_comment}
-            />
-            <ResponseDetail label="Benefits" value={row.q_benefits} />
-            <ResponseDetail
-              label="Parent relation comment"
-              value={row.q_parent_relation_comment}
-            />
-            <ResponseDetail
-              label="Support comment"
-              value={row.q_support_comment}
-            />
-            <ResponseDetail
-              label="Final comment"
-              value={row.q_final_comment}
-            />
-
-            {Array.isArray(row.selected_options) &&
-              row.selected_options.length > 0 && (
-                <div className="csv-nps-loop-options">
-                  {row.selected_options.map((option) => (
-                    <span key={option}>{option}</span>
-                  ))}
-                </div>
-              )}
-          </div>
         </div>
 
         <div className="csv-nps-selected-response-card">
@@ -1587,12 +1554,33 @@ function SelectedResponsePanel({
 }
 
 function SurveyQuestionScoreTable({ row }) {
+  const selectedBenefits = uniqueStrings([
+    row.q_benefits,
+    ...(Array.isArray(row.selected_options) ? row.selected_options : []),
+    ...(Array.isArray(row.selected_options_json) ? row.selected_options_json : []),
+  ]).join(", ");
+
+  const existingComments = [
+    row.q_recommend_comment,
+    row.q_install_comment,
+    row.q_parent_relation_comment,
+    row.q_support_comment,
+    row.q_final_comment,
+    selectedBenefits,
+  ]
+    .filter(Boolean)
+    .map((value) => String(value).trim());
+
+  const mainComment = String(row.comment || "").trim();
+  const shouldShowMainComment =
+    mainComment && !existingComments.includes(mainComment);
+
   const questions = [
     {
       label: "Recommendation",
+      helper: "NPS question",
       score: row.q_recommend_score ?? row.score,
       comment: row.q_recommend_comment,
-      isNpsQuestion: true,
     },
     {
       label: "Installation and getting started",
@@ -1605,6 +1593,11 @@ function SurveyQuestionScoreTable({ row }) {
       comment: null,
     },
     {
+      label: "Benefits selected",
+      score: null,
+      comment: selectedBenefits,
+    },
+    {
       label: "Parent relationship impact",
       score: row.q_parent_relation_score,
       comment: row.q_parent_relation_comment,
@@ -1614,19 +1607,42 @@ function SurveyQuestionScoreTable({ row }) {
       score: row.q_support_score,
       comment: row.q_support_comment,
     },
-  ].filter((item) => item.score !== null && item.score !== undefined && item.score !== "");
+    {
+      label: "Final comment",
+      score: null,
+      comment: row.q_final_comment,
+    },
+    ...(shouldShowMainComment
+      ? [
+          {
+            label: "Additional comment",
+            score: null,
+            comment: mainComment,
+          },
+        ]
+      : []),
+  ].filter((item) => {
+    const hasScore =
+      item.score !== null &&
+      item.score !== undefined &&
+      item.score !== "";
+
+    const hasComment = Boolean(String(item.comment || "").trim());
+
+    return hasScore || hasComment;
+  });
 
   if (questions.length === 0) {
     return (
       <p className="csv-nps-muted-cell">
-        No question-level scores were found for this response.
+        No question-level scores or comments were found for this response.
       </p>
     );
   }
 
   return (
     <div className="csv-nps-table-wrap">
-      <table className="csv-nps-table">
+      <table className="csv-nps-table csv-nps-survey-response-table">
         <thead>
           <tr>
             <th>Question</th>
@@ -1640,12 +1656,18 @@ function SurveyQuestionScoreTable({ row }) {
             <tr key={item.label}>
               <td>
                 <strong>{item.label}</strong>
-                {item.isNpsQuestion && (
-                  <div className="csv-nps-muted-cell">NPS question</div>
+                {item.helper && (
+                  <div className="csv-nps-muted-cell">{item.helper}</div>
                 )}
               </td>
               <td>
-                <strong>{item.score}/10</strong>
+                {item.score !== null &&
+                item.score !== undefined &&
+                item.score !== "" ? (
+                  <strong>{item.score}/10</strong>
+                ) : (
+                  <span className="csv-nps-muted-cell">—</span>
+                )}
               </td>
               <td>{item.comment || "—"}</td>
             </tr>

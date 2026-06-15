@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
@@ -36,6 +36,8 @@ export default function CsvNpsClosingTheLoop() {
   const [replyDraftLoading, setReplyDraftLoading] = useState(false);
   const [replyDraftError, setReplyDraftError] = useState("");
   const [replyDraftCopied, setReplyDraftCopied] = useState(false);
+
+  const selectedResponsePanelRef = useRef(null);
 
 
   useEffect(() => {
@@ -454,27 +456,42 @@ export default function CsvNpsClosingTheLoop() {
   }, [periodRows, bucketFilter, statusFilter]);
 
   const selectedRow = useMemo(() => {
-  if (!selectedResponseRef) return null;
+    if (!selectedResponseRef) return null;
 
-  return enrichedRows.find((row) => {
-    const refs = [
-      row.db_row_id,
-      row.dataset_row_id,
-      row.response_id,
-      getActionKey(row),
-    ]
-      .filter(Boolean)
-      .map((value) => String(value));
+    return enrichedRows.find((row) => {
+      const refs = [
+        row.db_row_id,
+        row.dataset_row_id,
+        row.response_id,
+        getActionKey(row),
+      ]
+        .filter(Boolean)
+        .map((value) => String(value));
 
-    return refs.includes(String(selectedResponseRef));
-  });
-}, [enrichedRows, selectedResponseRef]);
+      return refs.includes(String(selectedResponseRef));
+    });
+  }, [enrichedRows, selectedResponseRef]);
 
-useEffect(() => {
-  setReplyDraft(null);
-  setReplyDraftError("");
-  setReplyDraftCopied(false);
-}, [selectedResponseRef]);
+  function scrollToSelectedResponsePanel() {
+    window.setTimeout(() => {
+      selectedResponsePanelRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 80);
+  }
+
+  useEffect(() => {
+    if (!selectedRow) return;
+
+    scrollToSelectedResponsePanel();
+  }, [selectedRow]);
+
+  useEffect(() => {
+    setReplyDraft(null);
+    setReplyDraftError("");
+    setReplyDraftCopied(false);
+  }, [selectedResponseRef]);
 
   const counts = useMemo(() => {
     const total = periodRows.length;
@@ -595,6 +612,8 @@ function selectRow(row) {
   setSearchParams({
     response: String(responseRef),
   });
+
+  scrollToSelectedResponsePanel();
 }
 
   if (loadingDataset) {
@@ -687,29 +706,34 @@ function selectRow(row) {
         </div>
         <CloseLoopStatusChart counts={counts} />
 
-        <UrgentDetractorsPanel rows={urgentDetractors} />
         {selectedRow && (
-          <SelectedResponsePanel
-            row={selectedRow}
-            replyDraft={replyDraft}
-            replyDraftLoading={replyDraftLoading}
-            replyDraftError={replyDraftError}
-            replyDraftCopied={replyDraftCopied}
-            onGenerateDraft={() => generateReplyDraft(selectedRow)}
-            onCopyDraft={copyReplyDraft}
-            onDraftChange={(body) =>
-              setReplyDraft((current) => ({
-                ...(current || {}),
-                body,
-              }))
-            }
-            action={selectedRow.draftAction}
-            savedActions={selectedRow.loopActions || []}
-            currentStatus={selectedRow.currentStatus}
-            onActionChange={(patch) => saveAction(getActionKey(selectedRow), patch)}
-            onSaveAction={() => persistAction(selectedRow)}
-          />
+          <div ref={selectedResponsePanelRef} id="selected-response-detail">
+            <SelectedResponsePanel
+              row={selectedRow}
+              replyDraft={replyDraft}
+              replyDraftLoading={replyDraftLoading}
+              replyDraftError={replyDraftError}
+              replyDraftCopied={replyDraftCopied}
+              onGenerateDraft={() => generateReplyDraft(selectedRow)}
+              onCopyDraft={copyReplyDraft}
+              onDraftChange={(body) =>
+                setReplyDraft((current) => ({
+                  ...(current || {}),
+                  body,
+                }))
+              }
+              action={selectedRow.draftAction}
+              savedActions={selectedRow.loopActions || []}
+              currentStatus={selectedRow.currentStatus}
+              onActionChange={(patch) =>
+                saveAction(getActionKey(selectedRow), patch)
+              }
+              onSaveAction={() => persistAction(selectedRow)}
+            />
+          </div>
         )}
+
+        <UrgentDetractorsPanel rows={urgentDetractors} />
 
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
@@ -1387,24 +1411,43 @@ function SelectedResponsePanel({
         <div className="csv-nps-selected-response-card">
           <h3>Full survey response</h3>
 
-          <ResponseDetail label="Main comment" value={row.comment} />
-          <ResponseDetail label="Recommend comment" value={row.q_recommend_comment} />
-          <ResponseDetail label="Install comment" value={row.q_install_comment} />
-          <ResponseDetail label="Benefits" value={row.q_benefits} />
-          <ResponseDetail
-            label="Parent relation comment"
-            value={row.q_parent_relation_comment}
-          />
-          <ResponseDetail label="Support comment" value={row.q_support_comment} />
-          <ResponseDetail label="Final comment" value={row.q_final_comment} />
+          <SurveyQuestionScoreTable row={row} />
 
-          {Array.isArray(row.selected_options) && row.selected_options.length > 0 && (
-            <div className="csv-nps-loop-options">
-              {row.selected_options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          )}
+          <div className="csv-nps-selected-response-section">
+            <h4>Comments and text answers</h4>
+
+            <ResponseDetail label="Main comment" value={row.comment} />
+            <ResponseDetail
+              label="Recommend comment"
+              value={row.q_recommend_comment}
+            />
+            <ResponseDetail
+              label="Install comment"
+              value={row.q_install_comment}
+            />
+            <ResponseDetail label="Benefits" value={row.q_benefits} />
+            <ResponseDetail
+              label="Parent relation comment"
+              value={row.q_parent_relation_comment}
+            />
+            <ResponseDetail
+              label="Support comment"
+              value={row.q_support_comment}
+            />
+            <ResponseDetail
+              label="Final comment"
+              value={row.q_final_comment}
+            />
+
+            {Array.isArray(row.selected_options) &&
+              row.selected_options.length > 0 && (
+                <div className="csv-nps-loop-options">
+                  {row.selected_options.map((option) => (
+                    <span key={option}>{option}</span>
+                  ))}
+                </div>
+              )}
+          </div>
         </div>
 
         <div className="csv-nps-selected-response-card">
@@ -1540,6 +1583,76 @@ function SelectedResponsePanel({
         </div>
       </div>
     </section>
+  );
+}
+
+function SurveyQuestionScoreTable({ row }) {
+  const questions = [
+    {
+      label: "Recommendation",
+      score: row.q_recommend_score ?? row.score,
+      comment: row.q_recommend_comment,
+      isNpsQuestion: true,
+    },
+    {
+      label: "Installation and getting started",
+      score: row.q_install_score,
+      comment: row.q_install_comment,
+    },
+    {
+      label: "Daily use",
+      score: row.q_daily_use_score,
+      comment: null,
+    },
+    {
+      label: "Parent relationship impact",
+      score: row.q_parent_relation_score,
+      comment: row.q_parent_relation_comment,
+    },
+    {
+      label: "Envola support",
+      score: row.q_support_score,
+      comment: row.q_support_comment,
+    },
+  ].filter((item) => item.score !== null && item.score !== undefined && item.score !== "");
+
+  if (questions.length === 0) {
+    return (
+      <p className="csv-nps-muted-cell">
+        No question-level scores were found for this response.
+      </p>
+    );
+  }
+
+  return (
+    <div className="csv-nps-table-wrap">
+      <table className="csv-nps-table">
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Score</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {questions.map((item) => (
+            <tr key={item.label}>
+              <td>
+                <strong>{item.label}</strong>
+                {item.isNpsQuestion && (
+                  <div className="csv-nps-muted-cell">NPS question</div>
+                )}
+              </td>
+              <td>
+                <strong>{item.score}/10</strong>
+              </td>
+              <td>{item.comment || "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

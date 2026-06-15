@@ -1407,7 +1407,10 @@ function SelectedResponsePanel({
         )}
       </div>
 
-      <div className="csv-nps-selected-response-grid">
+      <div
+        className="csv-nps-selected-response-grid"
+        style={{ gridTemplateColumns: "minmax(0, 1fr)" }}
+      >
         <div className="csv-nps-selected-response-card">
           <h3>Full survey response</h3>
           <p className="csv-nps-muted-cell">

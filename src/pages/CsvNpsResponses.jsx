@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
@@ -114,6 +114,9 @@ function CellText({ children, className = "" }) {
 
 export default function CsvNpsResponses() {
   const { datasetId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedResponseParam = searchParams.get("response") || "";
+  const selectedDetailRef = useRef(null);
 
   const [dataset, setDataset] = useState(null);
   const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
@@ -124,6 +127,7 @@ export default function CsvNpsResponses() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("submitted_at");
   const [dir, setDir] = useState("desc");
+  const [selectedResponseRef, setSelectedResponseRef] = useState(selectedResponseParam);
 
   useEffect(() => {
 
@@ -296,17 +300,52 @@ export default function CsvNpsResponses() {
   }
 
   function getClosingLoopUrl(row) {
-    const responseRef =
-      row.db_row_id ||
-      row.dataset_row_id ||
-      row.id ||
-      row.response_id;
+    const responseRef = getResponseRef(row);
 
     if (!responseRef) {
       return "/workspace/closing-the-loop";
     }
 
     return `/workspace/closing-the-loop?response=${encodeURIComponent(responseRef)}`;
+  }
+
+  function getResponseRef(row) {
+    return (
+      row?.db_row_id ||
+      row?.dataset_row_id ||
+      row?.id ||
+      row?.response_id ||
+      ""
+    );
+  }
+
+  function selectResponse(row, { scroll = true } = {}) {
+    const responseRef = getResponseRef(row);
+
+    if (!responseRef) return;
+
+    setSelectedResponseRef(String(responseRef));
+
+    const next = new URLSearchParams(searchParams);
+    next.set("response", String(responseRef));
+    setSearchParams(next, { replace: true });
+
+    if (scroll) {
+      window.setTimeout(() => {
+        selectedDetailRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 80);
+    }
+  }
+
+  function clearSelectedResponse() {
+    setSelectedResponseRef("");
+
+    const next = new URLSearchParams(searchParams);
+    next.delete("response");
+    setSearchParams(next, { replace: true });
   }
 
   function handleRowClick(row, event) {
@@ -316,7 +355,7 @@ export default function CsvNpsResponses() {
 
     if (interactiveTarget) return;
 
-    window.location.href = getClosingLoopUrl(row);
+    selectResponse(row);
   }
 
   const filteredRows = useMemo(() => {
@@ -365,6 +404,43 @@ export default function CsvNpsResponses() {
       return compareValues(a?.submitted_at, b?.submitted_at, "desc");
     });
   }, [dataset, bucketFilter, searchTerm, sort, dir]);
+
+  const selectedRow = useMemo(() => {
+    const ref = String(selectedResponseRef || selectedResponseParam || "").trim();
+
+    if (!ref) return null;
+
+    const rows = Array.isArray(dataset?.rows) ? dataset.rows : [];
+
+    return rows.find((row) => responseMatchesRef(row, ref)) || null;
+  }, [dataset, selectedResponseRef, selectedResponseParam]);
+
+  useEffect(() => {
+    if (!selectedResponseParam || !dataset?.rows?.length) return;
+
+    const matched = dataset.rows.find((row) =>
+      responseMatchesRef(row, selectedResponseParam)
+    );
+
+    if (matched) {
+      setSelectedResponseRef(String(getResponseRef(matched)));
+    }
+  }, [dataset, selectedResponseParam]);
+
+  useEffect(() => {
+    if (!selectedRow) return;
+
+    const shouldScroll = Boolean(selectedResponseParam);
+
+    if (!shouldScroll) return;
+
+    window.setTimeout(() => {
+      selectedDetailRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 160);
+  }, [selectedRow, selectedResponseParam]);
 
   const subtitle = datasetId
     ? PAGE_COPY.savedSubtitle
@@ -484,6 +560,19 @@ export default function CsvNpsResponses() {
           </label>
         </div>
 
+        {selectedRow && (
+          <section
+            ref={selectedDetailRef}
+            className="csv-nps-chart-card csv-nps-chart-card-wide"
+          >
+            <ResponseDetailPanel
+              row={selectedRow}
+              onClose={clearSelectedResponse}
+              closingLoopUrl={getClosingLoopUrl(selectedRow)}
+            />
+          </section>
+        )}
+
         {isIntercomMode ? (
           <div className="csv-nps-table-wrap">
             <table className="min-w-[2450px] table-fixed border-collapse text-xs csv-nps-table">
@@ -549,18 +638,26 @@ export default function CsvNpsResponses() {
                       <tr
                         key={row.response_id || `${row.contact_name}-${row.submitted_at}-${i}`}
                         onClick={(event) => handleRowClick(row, event)}
-                        title="Click to manage this response in Closing the Loop"
+                        title="Click to view response details"
                         className={`cursor-pointer border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
                       >
                         <td className={`sticky left-0 z-20 w-[150px] min-w-[150px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
                           <CellText>{row.contact_name}</CellText>
 
                           <div className="mt-3 flex flex-col gap-2">
+                            <button
+                              type="button"
+                              onClick={() => selectResponse(row)}
+                              className="inline-flex items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-[11px] font-medium text-sky-200 hover:bg-sky-500/20"
+                            >
+                              View details
+                            </button>
+
                             <a
                               href={getClosingLoopUrl(row)}
                               className="inline-flex items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/20"
                             >
-                              Manage
+                              Manage follow-up
                             </a>
 
                             {row.intercom_contact_url ? (
@@ -685,7 +782,7 @@ export default function CsvNpsResponses() {
                     <tr
                       key={row.response_id || row.id}
                       onClick={(event) => handleRowClick(row, event)}
-                      title="Click to manage this response in Closing the Loop"
+                      title="Click to view response details"
                       className="cursor-pointer"
                     >
                       <td>{row.submitted_at?.slice(0, 10) || "—"}</td>
@@ -737,6 +834,190 @@ export default function CsvNpsResponses() {
         )}
       </section>
     </main>
+  );
+}
+
+
+function responseMatchesRef(row, ref) {
+  const target = String(ref || "").trim();
+
+  if (!target) return false;
+
+  return [
+    row?.db_row_id,
+    row?.dataset_row_id,
+    row?.id,
+    row?.response_id,
+  ]
+    .filter(Boolean)
+    .some((value) => String(value) === target);
+}
+
+function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
+  const surveyRows = buildSurveyQuestionRows(row);
+
+  return (
+    <div className="space-y-6">
+      <div className="csv-nps-responses-header">
+        <div>
+          <h3>Selected response</h3>
+          <p>
+            {row.contact_name || row.contact_label || "Contact"} · Score {row.score ?? "—"} · {row.bucket || "unknown"} · {shortDate(row.submitted_at)}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {row.intercom_contact_url && (
+            <a
+              href={row.intercom_contact_url}
+              target="_blank"
+              rel="noreferrer"
+              className="csv-nps-secondary-link"
+            >
+              Open in Intercom
+            </a>
+          )}
+
+          <a className="csv-nps-button" href={closingLoopUrl}>
+            Manage follow-up
+          </a>
+
+          <button
+            type="button"
+            className="csv-nps-button csv-nps-button-secondary"
+            onClick={onClose}
+          >
+            Close details
+          </button>
+        </div>
+      </div>
+
+      <div className="csv-nps-table-wrap">
+        <table className="csv-nps-table">
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Score</th>
+              <th>Comment / answer</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {surveyRows.map((item) => (
+              <tr key={item.key}>
+                <td>
+                  <strong>{item.question}</strong>
+                  {item.description && (
+                    <div className="csv-nps-muted-cell">{item.description}</div>
+                  )}
+                </td>
+                <td>
+                  <span className={scoreTextClass(Number(item.score))}>
+                    {item.score == null || item.score === "" ? "—" : `${item.score}/10`}
+                  </span>
+                </td>
+                <td>{item.comment || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {Array.isArray(row.previous_response_dates) && row.previous_response_dates.length > 0 && (
+        <div className="csv-nps-empty-state csv-nps-empty-state-compact">
+          Previous responses from this contact: {row.previous_response_dates.map(shortDate).join(", ")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function buildSurveyQuestionRows(row) {
+  const benefits = uniqueStrings([
+    row?.q_benefits,
+    ...(Array.isArray(row?.selected_options) ? row.selected_options : []),
+  ]);
+
+  const rows = [
+    {
+      key: "recommend",
+      question: "Recommendation",
+      description: "NPS question",
+      score: row?.q_recommend_score ?? row?.score ?? null,
+      comment: row?.q_recommend_comment || row?.comment || "",
+    },
+    {
+      key: "install",
+      question: "Installation and getting started",
+      score: row?.q_install_score ?? null,
+      comment: row?.q_install_comment || "",
+    },
+    {
+      key: "daily_use",
+      question: "Daily use",
+      score: row?.q_daily_use_score ?? null,
+      comment: "",
+    },
+    {
+      key: "benefits",
+      question: "Benefits selected",
+      score: null,
+      comment: benefits.join(", "),
+    },
+    {
+      key: "parent_relationship",
+      question: "Parent relationship impact",
+      score: row?.q_parent_relation_score ?? null,
+      comment: row?.q_parent_relation_comment || "",
+    },
+    {
+      key: "support",
+      question: "Envola support",
+      score: row?.q_support_score ?? null,
+      comment: row?.q_support_comment || "",
+    },
+    {
+      key: "final",
+      question: "Final comment",
+      score: null,
+      comment: row?.q_final_comment || "",
+    },
+  ];
+
+  const knownComments = uniqueStrings(
+    rows.map((item) => item.comment).filter(Boolean)
+  );
+
+  if (
+    row?.comment &&
+    !knownComments.some((comment) => String(comment).trim() === String(row.comment).trim())
+  ) {
+    rows.push({
+      key: "main_comment",
+      question: "Additional comment",
+      score: null,
+      comment: row.comment,
+    });
+  }
+
+  return rows.filter((item) => {
+    const hasScore = item.score !== null && item.score !== undefined && item.score !== "";
+    const hasComment = String(item.comment || "").trim();
+    return hasScore || hasComment || item.key === "benefits";
+  });
+}
+
+function uniqueStrings(values) {
+  return Array.from(
+    new Set(
+      (values || [])
+        .flatMap((value) => {
+          if (Array.isArray(value)) return value;
+          return String(value || "").split(/[;,|]/);
+        })
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+    )
   );
 }
 

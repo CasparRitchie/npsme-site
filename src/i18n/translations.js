@@ -2014,14 +2014,14 @@ export const TRANSLATIONS = {
 
       hero: {
         h1: {
-          lead: "Practical NPS and customer feedback setup",
-          nps: "for startups and SMEs",
-          tail: "that want CX properly covered.",
+          lead: "NPS and customer feedback,",
+          nps: "set up with confidence",
+          tail: "for startups and SMEs.",
           accent:
-            "Put a credible feedback process in place, turn insight into action, and build better customer habits as your business grows.",
+            "Put clear surveys, useful reporting and customer follow-up workflows in place — without overcomplicating CX.",
         },
         body:
-          "NPS Me helps growing businesses set up a practical customer feedback programme: surveys, reporting, customer insight and close-the-loop workflows that teams actually use. The goal is not another dashboard. It is a clear, credible process for listening to customers, acting on feedback and improving retention over time.",
+          "NPS Me helps growing businesses turn customer feedback into a practical operating rhythm: clear surveys, useful reporting, customer insight and close-the-loop actions that teams can actually use.",
         ctaPrimary: "Book a free CX setup review",
         ctaMethod: "See how it works",
         ctaDemo: "View example insights",
@@ -6072,14 +6072,14 @@ export const TRANSLATIONS = {
 
       hero: {
         h1: {
-          lead: "Une mise en place pratique du NPS et du feedback client",
-          nps: "pour les startups et les PME",
-          tail: "qui veulent vraiment structurer leur CX.",
+          lead: "NPS et feedback client,",
+          nps: "mis en place avec confiance",
+          tail: "pour startups et PME.",
           accent:
-            "Mettez en place un processus de feedback crédible, transformez les retours en actions et installez de meilleures habitudes CX à mesure que votre activité grandit.",
+            "Mettez en place des enquêtes claires, un reporting utile et des workflows de suivi client — sans complexifier la CX.",
         },
         body:
-          "NPS Me aide les entreprises en croissance à mettre en place un programme de feedback client concret : enquêtes, reporting, analyse des retours et workflows de close-the-loop que les équipes utilisent réellement. L’objectif n’est pas d’ajouter un tableau de bord de plus, mais de créer un processus clair et crédible pour écouter les clients, agir sur leurs retours et améliorer la fidélisation dans le temps.",
+          "NPS Me aide les entreprises en croissance à transformer le feedback client en un rythme opérationnel concret : enquêtes claires, reporting utile, analyse des retours et actions de close-the-loop que les équipes peuvent vraiment utiliser.",
         ctaPrimary: "Réserver une revue CX gratuite",
         ctaMethod: "Voir comment cela fonctionne",
         ctaDemo: "Voir un exemple d’insights",

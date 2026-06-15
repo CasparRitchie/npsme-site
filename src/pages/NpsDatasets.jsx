@@ -1,5 +1,5 @@
 // src/pages/NpsDatasets.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import { workspaceFetch } from "../../utils/workspaceApi";
@@ -17,6 +17,25 @@ export default function NpsDatasets() {
 
   const userCanDeleteDatasets = canDeleteDatasets(workspaceRole);
 
+  /*
+   * workspace_intercom rows are persisted implementation records used by
+   * response-level actions, close-the-loop state and reply drafts.
+   *
+   * They should not appear as separate user-facing saved datasets because
+   * the active Intercom source already has its own Live source card above.
+   */
+  const visibleSavedDatasets = useMemo(() => {
+    return (Array.isArray(datasets) ? datasets : []).filter(
+      (dataset) => dataset.source_type !== "workspace_intercom"
+    );
+  }, [datasets]);
+
+  const hiddenIntercomMirrorCount = useMemo(() => {
+    return (Array.isArray(datasets) ? datasets : []).filter(
+      (dataset) => dataset.source_type === "workspace_intercom"
+    ).length;
+  }, [datasets]);
+
   async function loadDatasets() {
     setLoading(true);
     setError("");
@@ -27,10 +46,13 @@ export default function NpsDatasets() {
         workspaceFetch("/api/nps-data/datasets"),
         workspaceFetch("/api/workspace-intercom/sources/active").catch((err) => {
           if (
-            String(err?.message || "").toLowerCase().includes("no active intercom source")
+            String(err?.message || "")
+              .toLowerCase()
+              .includes("no active intercom source")
           ) {
             return { ok: false, source: null };
           }
+
           throw err;
         }),
       ]);
@@ -105,8 +127,8 @@ export default function NpsDatasets() {
             <p>
               {loading
                 ? "Loading saved datasets and connected sources..."
-                : `${datasets.length} saved dataset${
-                    datasets.length === 1 ? "" : "s"
+                : `${visibleSavedDatasets.length} saved dataset${
+                    visibleSavedDatasets.length === 1 ? "" : "s"
                   }${
                     activeIntercomSource ? " and 1 live Intercom source" : ""
                   } available.`}
@@ -117,6 +139,14 @@ export default function NpsDatasets() {
                 Signed in as {formatWorkspaceRole(workspaceRole)}.
                 {!userCanDeleteDatasets &&
                   " Dataset deletion is restricted to workspace owners and admins."}
+              </p>
+            )}
+
+            {!loading && hiddenIntercomMirrorCount > 0 && (
+              <p className="csv-nps-muted-note">
+                {hiddenIntercomMirrorCount} Intercom backing dataset
+                {hiddenIntercomMirrorCount === 1 ? " is" : "s are"} hidden
+                from this list because the live Intercom source is shown above.
               </p>
             )}
           </div>
@@ -162,15 +192,16 @@ export default function NpsDatasets() {
             </p>
           </div>
 
-          {!loading && datasets.length === 0 && !error && (
+          {!loading && visibleSavedDatasets.length === 0 && !error && (
             <div className="csv-nps-empty-state">
-              No saved datasets yet. Import feedback data first, then save it here.
+              No saved imported datasets yet. The live Intercom source is
+              available above.
             </div>
           )}
 
-          {datasets.length > 0 && (
+          {visibleSavedDatasets.length > 0 && (
             <div className="csv-nps-dataset-grid">
-              {datasets.map((dataset) => (
+              {visibleSavedDatasets.map((dataset) => (
                 <DatasetCard
                   key={dataset.id}
                   dataset={dataset}

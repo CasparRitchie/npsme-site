@@ -1678,6 +1678,18 @@ function SurveyQuestionScoreTable({ row }) {
   );
 }
 
+
+function uniqueStrings(values) {
+  return Array.from(
+    new Set(
+      (values || [])
+        .flatMap((value) => (Array.isArray(value) ? value : [value]))
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+    )
+  );
+}
+
 function ResponseDetail({ label, value }) {
   if (!value) return null;
 

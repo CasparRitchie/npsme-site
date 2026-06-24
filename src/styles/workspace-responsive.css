@@ -127,3 +127,9 @@
     flex-direction: column;
   }
 }
+
+@media (max-width: 900px) {
+  .csv-nps-filters-four {
+    grid-template-columns: 1fr;
+  }
+}

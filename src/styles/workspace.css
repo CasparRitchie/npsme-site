@@ -1533,3 +1533,23 @@
   );
   transition: width 180ms ease;
 }
+
+
+
+.csv-nps-chart-canvas {
+  width: 100%;
+  min-width: 0;
+  height: 18rem;
+  margin-top: 1.5rem;
+}
+
+.csv-nps-metric-grid-compact {
+  margin-top: 1.5rem;
+}
+
+
+.csv-nps-filters-four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+

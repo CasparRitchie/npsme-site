@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import DatasetAiInsights from "../components/DatasetAiInsights";
+import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
+import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -25,6 +27,8 @@ export default function CsvNpsPerformance() {
 
   const [periodFilter, setPeriodFilter] = useState("all");
   const [bucketFilter, setBucketFilter] = useState("all");
+  const [chartGranularity, setChartGranularity] = useState("week");
+  const [selectedChartPoint, setSelectedChartPoint] = useState(null);
 
   useEffect(() => {
     async function loadSavedDataset() {
@@ -323,6 +327,76 @@ export default function CsvNpsPerformance() {
     });
   }, [dataset, bucketFilter, periodFilter]);
 
+  const chartPoints = useMemo(() => {
+    if (Array.isArray(performanceRows) && performanceRows.length > 0) {
+      return buildTimeseriesFromRows(performanceRows, chartGranularity);
+    }
+
+    return Array.isArray(timeline)
+      ? timeline.map((point) => ({
+          date: point.date,
+          responses: point.responses ?? point.total ?? 0,
+          promoters: point.promoters ?? 0,
+          passives: point.passives ?? 0,
+          detractors: point.detractors ?? 0,
+          nps: point.nps ?? null,
+          average_score:
+            point.average_score ??
+            point.averageScore ??
+            null,
+        }))
+      : [];
+  }, [performanceRows, timeline, chartGranularity]);
+
+  const chartTotals = useMemo(() => {
+    if (!chartPoints.length) {
+      return {
+        totalResponses: 0,
+        latestNps: null,
+        latestDate: null,
+        points: 0,
+      };
+    }
+
+    const totalResponses = chartPoints.reduce(
+      (sum, point) => sum + Number(point.responses || 0),
+      0
+    );
+
+    const nonEmptyPoints = chartPoints.filter(
+      (point) => Number(point.responses || 0) > 0
+    );
+
+    const latestPoint = nonEmptyPoints[nonEmptyPoints.length - 1] || null;
+
+    return {
+      totalResponses,
+      latestNps: latestPoint?.nps ?? null,
+      latestDate: latestPoint?.date ?? null,
+      points: chartPoints.length,
+    };
+  }, [chartPoints]);
+
+  const selectedChartResponses = useMemo(() => {
+    if (!selectedChartPoint?.date) {
+      return [];
+    }
+
+    return performanceRows
+      .filter((row) =>
+        rowMatchesChartPoint(
+          row.submitted_at,
+          selectedChartPoint.date,
+          chartGranularity
+        )
+      )
+      .sort((a, b) =>
+        String(b?.submitted_at || "").localeCompare(
+          String(a?.submitted_at || "")
+        )
+      );
+  }, [performanceRows, selectedChartPoint, chartGranularity]);
+
   const filteredSummary = useMemo(() => {
     const filtersActive =
       periodFilter !== "all" ||
@@ -508,7 +582,7 @@ export default function CsvNpsPerformance() {
       )}
 
       <section className="csv-nps-results">
-        <div className="csv-nps-filters csv-nps-filters-three">
+        <div className="csv-nps-filters csv-nps-filters-four">
           <label className="csv-nps-filter-field">
             <span>Period</span>
 
@@ -567,6 +641,22 @@ export default function CsvNpsPerformance() {
             </select>
           </label>
 
+          <label className="csv-nps-filter-field">
+            <span>Chart granularity</span>
+
+            <select
+              value={chartGranularity}
+              onChange={(event) => {
+                setChartGranularity(event.target.value);
+                setSelectedChartPoint(null);
+              }}
+            >
+              <option value="day">Day</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+            </select>
+          </label>
+
           <div className="csv-nps-filter-field">
             <span>Workspace actions</span>
 
@@ -578,9 +668,7 @@ export default function CsvNpsPerformance() {
                 Review responses
               </a>
 
-              <span className="text-slate-500">
-                ·
-              </span>
+              <span className="text-slate-500">·</span>
 
               <a
                 className="text-link"
@@ -651,35 +739,156 @@ export default function CsvNpsPerformance() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
-              <h3>Management summary</h3>
+              <h3>NPS over time</h3>
 
               <p>
-                Founder-level readout combining NPS
-                performance and close-loop progress.
+                Overall NPS trend and response volume using the selected period,
+                bucket and chart granularity filters.
               </p>
             </div>
           </div>
 
-          <div className="csv-nps-management-summary">
-            <p>{managementSummary}</p>
-
-            <div className="csv-nps-management-actions">
-              <a
-                className="csv-nps-button"
-                href="/workspace/closing-the-loop"
-              >
-                View open follow-ups
-              </a>
-
-              <a
-                className="csv-nps-button csv-nps-button-secondary"
-                href="/workspace/responses"
-              >
-                Review responses
-              </a>
+          {chartPoints.length === 0 ? (
+            <div className="csv-nps-empty-state">
+              No usable response dates were detected for this filter set.
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="csv-nps-chart-canvas">
+                <NpsTimeseriesChart
+                  points={chartPoints}
+                  granularity={chartGranularity}
+                  onPointClick={(point) => setSelectedChartPoint(point)}
+                />
+              </div>
+
+              <div className="csv-nps-metric-grid csv-nps-metric-grid-compact">
+                <MetricCard
+                  label="Responses in chart"
+                  value={chartTotals.totalResponses}
+                />
+
+                <MetricCard
+                  label="Latest NPS point"
+                  value={chartTotals.latestNps}
+                />
+
+                <MetricCard
+                  label="Latest period"
+                  value={chartTotals.latestDate || "—"}
+                />
+
+                <MetricCard
+                  label="Data points"
+                  value={chartTotals.points}
+                />
+              </div>
+            </>
+          )}
         </section>
+
+        {selectedChartPoint && (
+          <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+            <div className="csv-nps-responses-header">
+              <div>
+                <h3>Responses for {selectedChartPoint.date}</h3>
+
+                <p>
+                  {selectedChartResponses.length} response
+                  {selectedChartResponses.length === 1 ? "" : "s"} in this selected
+                  chart period.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="csv-nps-button csv-nps-button-secondary"
+                onClick={() => setSelectedChartPoint(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            {selectedChartResponses.length === 0 ? (
+              <div className="csv-nps-empty-state">
+                No responses found for this chart point.
+              </div>
+            ) : (
+              <div className="csv-nps-table-wrap">
+                <table className="csv-nps-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Score</th>
+                      <th>Bucket</th>
+                      <th>Contact</th>
+                      <th>Comment</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {selectedChartResponses.slice(0, 30).map((row) => (
+                      <tr key={row.response_id || row.id}>
+                        <td>{formatCompactDate(row.submitted_at)}</td>
+                        <td>{row.score ?? "—"}</td>
+                        <td>{formatBucketLabel(row.bucket)}</td>
+                        <td>{row.contact_label || row.contact_name || "Contact"}</td>
+                        <td>
+                          {truncateText(
+                            row.q_recommend_comment ||
+                              row.q_final_comment ||
+                              row.comment ||
+                              "",
+                            120
+                          )}
+                        </td>
+                        <td>
+                          <div className="flex flex-wrap gap-2">
+                            <a
+                              className="text-link"
+                              href={`/workspace/responses?response=${encodeURIComponent(
+                                row.response_id || row.id || ""
+                              )}`}
+                            >
+                              View details
+                            </a>
+
+                            <a
+                              className="text-link"
+                              href={`/workspace/closing-the-loop?response=${encodeURIComponent(
+                                row.db_row_id ||
+                                  row.dataset_row_id ||
+                                  row.response_id ||
+                                  row.id ||
+                                  ""
+                              )}`}
+                            >
+                              Manage follow-up
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
+        {chartPoints.length > 0 && (
+          <section className="csv-nps-chart-card csv-nps-chart-card-wide">
+            <NpsBucketStackedColumns
+              points={chartPoints}
+              granularity={chartGranularity}
+              height={220}
+              maxBars={36}
+              title="Score split over time"
+              subtitle="Promoters, passives and detractors across the same selected filters."
+            />
+          </section>
+        )}
 
         <div className="csv-nps-performance-grid">
           <section className="csv-nps-chart-card">
@@ -1762,4 +1971,151 @@ function formatPeriodLabel(period) {
   }
 
   return "all time";
+}
+
+function buildTimeseriesFromRows(rows, granularity = "week") {
+  const byPeriod = new Map();
+
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const submittedMs = Date.parse(row?.submitted_at || "");
+
+    if (!Number.isFinite(submittedMs)) {
+      continue;
+    }
+
+    const score = normaliseNpsScore(row?.score);
+
+    if (score === null) {
+      continue;
+    }
+
+    const date = getChartPeriodKey(submittedMs, granularity);
+
+    const current =
+      byPeriod.get(date) || {
+        date,
+        responses: 0,
+        promoters: 0,
+        passives: 0,
+        detractors: 0,
+        scoreTotal: 0,
+        nps: null,
+        average_score: null,
+      };
+
+    current.responses += 1;
+    current.scoreTotal += score;
+
+    if (score >= 9) {
+      current.promoters += 1;
+    } else if (score >= 7) {
+      current.passives += 1;
+    } else {
+      current.detractors += 1;
+    }
+
+    byPeriod.set(date, current);
+  }
+
+  return Array.from(byPeriod.values())
+    .map((point) => ({
+      date: point.date,
+      responses: point.responses,
+      promoters: point.promoters,
+      passives: point.passives,
+      detractors: point.detractors,
+      nps:
+        point.responses > 0
+          ? Math.round(
+              ((point.promoters - point.detractors) / point.responses) * 100
+            )
+          : null,
+      average_score:
+        point.responses > 0
+          ? Math.round((point.scoreTotal / point.responses) * 10) / 10
+          : null,
+    }))
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+}
+
+function rowMatchesChartPoint(isoDate, chartDate, granularity = "week") {
+  const submittedMs = Date.parse(isoDate || "");
+
+  if (!Number.isFinite(submittedMs)) {
+    return false;
+  }
+
+  return getChartPeriodKey(submittedMs, granularity) === chartDate;
+}
+
+function getChartPeriodKey(ms, granularity = "week") {
+  const date = new Date(ms);
+
+  if (granularity === "month") {
+    return `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1
+    ).padStart(2, "0")}-01`;
+  }
+
+  if (granularity === "week") {
+    const day = date.getUTCDay();
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+
+    const monday = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate() + diffToMonday
+      )
+    );
+
+    return ymdUtc(monday.getTime());
+  }
+
+  return ymdUtc(ms);
+}
+
+function ymdUtc(ms) {
+  const date = new Date(ms);
+
+  return [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function formatCompactDate(isoDate) {
+  if (!isoDate) return "—";
+
+  const date = new Date(isoDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
+
+function formatBucketLabel(bucket) {
+  if (bucket === "promoter") return "Promoter";
+  if (bucket === "passive") return "Passive";
+  if (bucket === "detractor") return "Detractor";
+  return "Unknown";
+}
+
+function truncateText(value, maxLength = 120) {
+  const text = String(value || "").trim();
+
+  if (!text) return "—";
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, maxLength - 1).trimEnd()}…`;
 }

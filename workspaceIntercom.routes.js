@@ -1776,10 +1776,13 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     throw new Error("Active source is missing survey_content_id");
   }
 
+  const refreshHours = query?.ingest_hours
+  ? clampInt(query.ingest_hours, 72, 1, 9000)
+  : Math.min(days * 24, 9000);
+
   const refreshInfo = await refreshIntercomSurveyStatsIfStale({
-    hours: clampInt(query?.ingest_hours, 72, 1, 720),
-    minIntervalMs:
-      clampInt(query?.min_refresh_minutes, 10, 1, 120) * 60 * 1000,
+    hours: refreshHours,
+    minIntervalMs: clampInt(query?.min_refresh_minutes, 10, 1, 120) * 60 * 1000,
     force: String(query?.refresh || "").trim() === "1",
   }).catch((err) => {
     console.error("[workspace-intercom] invitation stats refresh failed", err);

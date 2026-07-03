@@ -1776,23 +1776,33 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     throw new Error("Active source is missing survey_content_id");
   }
 
-  const refreshHours = query?.ingest_hours
-  ? clampInt(query.ingest_hours, 72, 1, 9000)
-  : Math.min(days * 24, 9000);
+    /*
+    * Intercom export jobs cannot cover more than 90 days in one request.
+    *
+    * The selected reporting window can be 365 days, but the automatic refresh
+    * should only refresh the most recent exportable period. Older invitation
+    * stats remain available from the database once they have been backfilled.
+    */
+    const maxIntercomExportHours = 90 * 24;
 
-  const refreshInfo = await refreshIntercomSurveyStatsIfStale({
-    hours: refreshHours,
-    minIntervalMs: clampInt(query?.min_refresh_minutes, 10, 1, 120) * 60 * 1000,
-    force: String(query?.refresh || "").trim() === "1",
-  }).catch((err) => {
-    console.error("[workspace-intercom] invitation stats refresh failed", err);
+    const requestedRefreshHours = query?.ingest_hours
+      ? clampInt(query.ingest_hours, 72, 1, maxIntercomExportHours)
+      : Math.min(days * 24, maxIntercomExportHours);
 
-    return {
-      ok: false,
-      ran: false,
-      error: err.message || "Invitation stats refresh failed",
-    };
-  });
+    const refreshInfo = await refreshIntercomSurveyStatsIfStale({
+      hours: requestedRefreshHours,
+      minIntervalMs:
+        clampInt(query?.min_refresh_minutes, 10, 1, 120) * 60 * 1000,
+      force: String(query?.refresh || "").trim() === "1",
+    }).catch((err) => {
+      console.error("[workspace-intercom] invitation stats refresh failed", err);
+
+      return {
+        ok: false,
+        ran: false,
+        error: err.message || "Invitation stats refresh failed",
+      };
+    });
 
   const statsRows = await getSurveyStatsRows();
   const canonicalRows = await getCanonicalResponses();
@@ -2101,11 +2111,20 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
 
     failed: allRows.filter((row) => row.status === "failed").length,
 
+    /*
+    * Use matched responses for the invitation response rate, because the
+    * denominator is the Intercom invitation/stat feed. Canonical responses can
+    * include valid responses whose invitation/stat row is missing, so using
+    * canonical responses here can produce rates above 100%.
+    */
     response_rate_pct:
-      sent > 0 ? Math.round((responded / sent) * 1000) / 10 : null,
+      sent > 0 ? Math.round((matchedResponded / sent) * 1000) / 10 : null,
 
     matched_response_rate_pct:
       sent > 0 ? Math.round((matchedResponded / sent) * 1000) / 10 : null,
+
+    canonical_response_coverage_pct:
+      sent > 0 ? Math.round((responded / sent) * 1000) / 10 : null,
 
     intercom_completion_rate_pct:
       sent > 0 ? Math.round((completed / sent) * 1000) / 10 : null,
@@ -2397,7 +2416,7 @@ function summariseWorkspaceIntercomRows(rows) {
 }
 
 function normaliseReceiptId(value) {
-  return String(value || "").trim();
+  return String(value || "").trim().toLowerCase();
 }
 
 function normaliseNpsScore(value) {

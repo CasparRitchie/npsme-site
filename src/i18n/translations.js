@@ -3893,7 +3893,7 @@ export const TRANSLATIONS = {
         tag: "NPS Me / Why NPS Me",
         title: "Practical NPS and customer feedback support that teams can actually use",
         intro:
-          "NPS Me exists to fill a common gap. Many businesses collect customer feedback, but far fewer turn it into a simple, credible process for listening, learning and acting. We help startups and SMEs put that process in place without turning it into a slow, expensive CX project.",
+          "NPS Me exists to fill a common gap. Many businesses collect customer feedback, but far fewer turn it into a simple, straightforward process for listening, learning and acting. We help startups and SMEs put that process in place without turning it into a slow, expensive CX project.",
         ctaBook: "Book a discovery call",
         ctaDemo: "See example outputs",
       },
@@ -7968,7 +7968,7 @@ export const TRANSLATIONS = {
         tag: "NPS Me / Pourquoi NPS Me",
         title: "Un accompagnement NPS et feedback client concret que les équipes peuvent vraiment utiliser",
         intro:
-          "NPS Me existe pour combler un manque fréquent. Beaucoup d’entreprises collectent du feedback client, mais bien moins le transforment en un processus simple et crédible pour écouter, comprendre et agir. Nous aidons les startups et PME à mettre ce processus en place sans en faire un projet CX lent et coûteux.",
+          "NPS Me existe pour combler un manque fréquent. Beaucoup d’entreprises collectent du feedback client, mais bien moins le transforment en un processus simple pour écouter, comprendre et agir. Nous aidons les startups et PME à mettre ce processus en place sans en faire un projet CX lent et coûteux.",
         ctaBook: "Prendre un appel découverte",
         ctaDemo: "Voir des exemples de livrables",
       },

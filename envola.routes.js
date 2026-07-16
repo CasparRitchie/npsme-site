@@ -989,16 +989,40 @@ export function createEnvolaRouter() {
           const receiptId = String(row.receipt_id || "").trim();
           const matchedResponse = receiptId ? responsesByReceiptId.get(receiptId) : null;
 
-          const respondedAt =
-            matchedResponse?.submitted_at ||
-            row.first_completion ||
+          const score =
+            typeof matchedResponse?.score_0_10 === "number"
+              ? matchedResponse.score_0_10
+              : null;
+
+          const hasValidNpsResponse =
+            matchedResponse && typeof score === "number" && score >= 0 && score <= 10;
+
+          const intercomCompletedAt = row.first_completion || null;
+          const isIntercomCompleted = Boolean(intercomCompletedAt);
+
+          const startedAt =
+            row.first_answer ||
+            row.first_open ||
+            row.first_click ||
             null;
 
+          const respondedAt = hasValidNpsResponse
+            ? matchedResponse?.submitted_at || intercomCompletedAt
+            : null;
+
           let status = "unknown";
-          if (respondedAt) status = "responded";
-          else if (row.first_open || row.first_click) status = "opened";
-          else if (row.first_hard_bounce || row.first_soft_bounce) status = "bounced";
-          else if (row.received_at) status = "sent";
+
+          if (hasValidNpsResponse) {
+            status = "responded";
+          } else if (isIntercomCompleted) {
+            status = "completed_without_score";
+          } else if (startedAt) {
+            status = "opened";
+          } else if (row.first_hard_bounce || row.first_soft_bounce) {
+            status = "bounced";
+          } else if (row.received_at) {
+            status = "sent";
+          }
 
           const contactId = String(row.user_id || matchedResponse?.contact_id || "").trim();
 
@@ -1011,16 +1035,15 @@ export function createEnvolaRouter() {
             sent_at_ms: sentAtMs,
             resent_count: 0,
             status,
-            response_id:
-              matchedResponse?.response_id ||
-              (respondedAt && row.content_id && row.receipt_id
-                ? `${row.content_id}:${row.receipt_id}`
-                : ""),
-            score_0_10:
-              typeof matchedResponse?.score_0_10 === "number"
-                ? matchedResponse.score_0_10
-                : null,
+            response_id: matchedResponse?.response_id || "",
+            score_0_10: score,
             responded_at: respondedAt,
+            started_at: startedAt,
+            completed_at: intercomCompletedAt,
+            intercom_completed: isIntercomCompleted,
+            has_valid_nps_response: hasValidNpsResponse,
+            completed_without_valid_score:
+              isIntercomCompleted && !hasValidNpsResponse,
             contact_label: formatRedactedContactLabel(contactId),
             intercom_contact_url: contactId ? intercomContactUrl(contactId) : null,
           };
@@ -1038,23 +1061,29 @@ export function createEnvolaRouter() {
           return Math.max(br, b.sent_at_ms || 0) - Math.max(ar, a.sent_at_ms || 0);
         });
 
+      const responded = rows.filter((r) => r.has_valid_nps_response).length;
+      const completedWithoutValidScore = rows.filter(
+        (r) => r.completed_without_valid_score
+      ).length;
+
       const summary = {
         sent: rows.length,
         delivered: rows.filter((r) =>
-          ["sent", "opened", "responded"].includes(r.status)
+          ["sent", "opened", "responded", "completed_without_score"].includes(
+            r.status
+          )
         ).length,
-        responded: rows.filter((r) => r.status === "responded").length,
+        responded,
+        valid_nps_responses: responded,
+        completed_without_valid_score: completedWithoutValidScore,
         response_rate_pct:
-          rows.length > 0
-            ? Math.round(
-                (rows.filter((r) => r.status === "responded").length / rows.length) * 1000
-              ) / 10
-            : null,
-        last_sent_at: rows
-          .map((r) => r.sent_at)
-          .filter(Boolean)
-          .sort()
-          .slice(-1)[0] || null,
+          rows.length > 0 ? Math.round((responded / rows.length) * 1000) / 10 : null,
+        last_sent_at:
+          rows
+            .map((r) => r.sent_at)
+            .filter(Boolean)
+            .sort()
+            .slice(-1)[0] || null,
       };
 
       return res.json({

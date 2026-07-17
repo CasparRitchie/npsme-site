@@ -4,6 +4,18 @@ import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
+const CANONICAL_PAGE_LIMIT = 200;
+
+const EMPTY_CANONICAL_SUMMARY = {
+  totalMatchingResponses: 0,
+  noCase: 0,
+  open: 0,
+  inProgress: 0,
+  closed: 0,
+  openDetractors: 0,
+  highPriorityActive: 0,
+  unassignedActive: 0,
+};
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -20,6 +32,9 @@ export default function CsvNpsClosingTheLoop() {
   const { datasetId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseRef = searchParams.get("response");
+  const isWorkspaceRoute = /^\/(?:fr\/)?workspace(?:\/|$)/.test(
+    window.location.pathname
+  );
 
   const [dataset, setDataset] = useState(null);
   const [actions, setActions] = useState({});
@@ -27,6 +42,16 @@ export default function CsvNpsClosingTheLoop() {
   const [datasetError, setDatasetError] = useState("");
   const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
   const [actionScope, setActionScope] = useState(datasetId || "session");
+  const [permissions, setPermissions] = useState({
+    canRead: false,
+    canMutate: false,
+    role: null,
+  });
+  const [assignableOwners, setAssignableOwners] = useState([]);
+  const [canonicalSummary, setCanonicalSummary] = useState(
+    EMPTY_CANONICAL_SUMMARY
+  );
+  const [canonicalPagination, setCanonicalPagination] = useState(null);
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -41,6 +66,63 @@ export default function CsvNpsClosingTheLoop() {
 
 
   useEffect(() => {
+    async function loadCanonicalWorkspaceQueue() {
+      setLoadingDataset(true);
+      setDatasetError("");
+
+      try {
+        const params = new URLSearchParams();
+        params.set("limit", String(CANONICAL_PAGE_LIMIT));
+        if (datasetId) params.set("datasetId", datasetId);
+
+        const response = await fetch(
+          `/api/workspace/closing-loop?${params.toString()}`,
+          { credentials: "include" }
+        );
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          if (response.status === 401) {
+            throw new Error("Your Workspace session has expired. Please sign in again.");
+          }
+
+          if (response.status === 403) {
+            throw new Error("Your Workspace access is no longer active.");
+          }
+
+          throw new Error(
+            data?.error?.message || "Failed to load the Closing the Loop queue"
+          );
+        }
+
+        const owners = Array.isArray(data.assignableOwners)
+          ? data.assignableOwners
+          : [];
+
+        setDataset(normaliseCanonicalClosingLoop(data, datasetId));
+        setPermissions({
+          canRead: data.permissions?.canRead === true,
+          canMutate: data.permissions?.canMutate === true,
+          role: data.permissions?.role || null,
+        });
+        setAssignableOwners(owners);
+        setCanonicalSummary({
+          ...EMPTY_CANONICAL_SUMMARY,
+          ...(data.summary || {}),
+        });
+        setCanonicalPagination(data.pagination || null);
+        setActions({});
+        setMode("canonical");
+      } catch (err) {
+        console.error("Failed to load canonical Closing the Loop queue:", err);
+        setDatasetError(
+          err.message || "Failed to load the Closing the Loop queue"
+        );
+      } finally {
+        setLoadingDataset(false);
+      }
+    }
+
     async function loadSavedDataset() {
       setLoadingDataset(true);
       setDatasetError("");
@@ -189,12 +271,14 @@ export default function CsvNpsClosingTheLoop() {
       }
     }
 
-    if (datasetId) {
+    if (isWorkspaceRoute) {
+      loadCanonicalWorkspaceQueue();
+    } else if (datasetId) {
       loadSavedDataset();
     } else {
       loadWithoutDatasetId();
     }
-  }, [datasetId]);
+  }, [datasetId, isWorkspaceRoute]);
 
   function saveAction(actionKey, patch) {
     setActions((current) => {
@@ -239,154 +323,62 @@ export default function CsvNpsClosingTheLoop() {
       return;
     }
 
-    if (mode === "intercom" && !row.db_row_id) {
+    if (mode !== "session") {
       setActions((current) => ({
         ...current,
         [actionKey]: {
           ...(current[actionKey] || action),
           isSaving: false,
-          saveError:
-            "This Intercom response is not linked to a saved workspace row yet, so the follow-up cannot be shared.",
+          saveError: "Case updates are read-only in this release.",
         },
       }));
       return;
     }
 
-    if (mode === "session" || !row.db_row_id) {
-      const localSavedAction = {
-        id: `local-${Date.now()}`,
-        status: action.status || "open",
-        owner: action.owner || "",
-        actionTaken: action.actionTaken || "",
-        updatedAt: new Date().toISOString(),
-        isDirty: false,
-        isSaving: false,
-        saveError: "",
+    const localSavedAction = {
+      id: `local-${Date.now()}`,
+      status: action.status || "open",
+      owner: action.owner || "",
+      actionTaken: action.actionTaken || "",
+      updatedAt: new Date().toISOString(),
+      isDirty: false,
+      isSaving: false,
+      saveError: "",
+    };
+
+    setDataset((currentDataset) => {
+      if (!currentDataset) return currentDataset;
+
+      return {
+        ...currentDataset,
+        rows: currentDataset.rows.map((datasetRow) =>
+          getActionKey(datasetRow) === actionKey
+            ? {
+                ...datasetRow,
+                loopActions: [...(datasetRow.loopActions || []), localSavedAction],
+              }
+            : datasetRow
+        ),
       };
+    });
 
-      setDataset((currentDataset) => {
-        if (!currentDataset) return currentDataset;
-
-        return {
-          ...currentDataset,
-          rows: currentDataset.rows.map((datasetRow) => {
-            if (getActionKey(datasetRow) !== actionKey) {
-              return datasetRow;
-            }
-
-            return {
-              ...datasetRow,
-              loopActions: [...(datasetRow.loopActions || []), localSavedAction],
-            };
-          }),
-        };
-      });
-
-      setActions((current) => {
-        const updated = {
-          ...current,
-          [actionKey]: {
-            status: action.status || "open",
-            owner: action.owner || "",
-            actionTaken: "",
-            updatedAt: null,
-            isDirty: false,
-            isSaving: false,
-            saveError: "",
-          },
-        };
-
-        if (mode === "session") {
-          writeLocalActions(actionScope, updated);
-        }
-
-        return updated;
-      });
-
-      return;
-    }
-
-    setActions((current) => ({
-      ...current,
-      [actionKey]: {
-        ...(current[actionKey] || action),
-        isSaving: true,
-        saveError: "",
-      },
-    }));
-
-    try {
-      const res = await fetch(`/api/nps-data/rows/${row.db_row_id}/actions`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+    setActions((current) => {
+      const updated = {
+        ...current,
+        [actionKey]: {
           status: action.status || "open",
           owner: action.owner || "",
-          actionTaken: action.actionTaken || "",
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to save follow-up action");
-      }
-
-      const savedAction = normaliseSavedAction(data.action);
-
-      setDataset((currentDataset) => {
-        if (!currentDataset) return currentDataset;
-
-        return {
-          ...currentDataset,
-          rows: currentDataset.rows.map((datasetRow) => {
-            if (getActionKey(datasetRow) !== actionKey) {
-              return datasetRow;
-            }
-
-            return {
-              ...datasetRow,
-              loopActions: [...(datasetRow.loopActions || []), savedAction],
-            };
-          }),
-        };
-      });
-
-      setActions((current) => {
-        const updated = {
-          ...current,
-          [actionKey]: {
-            status: action.status || "open",
-            owner: action.owner || "",
-            actionTaken: "",
-            updatedAt: null,
-            isDirty: false,
-            isSaving: false,
-            saveError: "",
-          },
-        };
-
-        if (mode === "session") {
-          writeLocalActions(actionScope, updated);
-        }
-
-        return updated;
-      });
-    } catch (err) {
-      console.error("Failed to persist close-loop action:", err);
-
-      setActions((current) => ({
-        ...current,
-        [actionKey]: {
-          ...(current[actionKey] || action),
+          actionTaken: "",
+          updatedAt: null,
+          isDirty: false,
           isSaving: false,
-          saveError: err.message || "Failed to save follow-up action",
+          saveError: "",
         },
-      }));
-    }
+      };
+
+      writeLocalActions(actionScope, updated);
+      return updated;
+    });
   }
 
   function getLatestAction(savedActions = [], draftAction = null) {
@@ -408,6 +400,24 @@ export default function CsvNpsClosingTheLoop() {
     const sourceRows = dataset?.rows || [];
 
     return sourceRows.map((row) => {
+      if (mode === "canonical") {
+        return {
+          ...row,
+          draftAction: {
+            status: row.case?.status || "no_case",
+            owner: row.caseOwnerLabel || "",
+            actionTaken: "",
+            updatedAt: null,
+            isDirty: false,
+            isSaving: false,
+            saveError: "",
+          },
+          loopActions: row.loopActions || [],
+          latestSavedAction: row.latestLegacyAction || null,
+          currentStatus: row.case?.status || "no_case",
+        };
+      }
+
       const actionKey = getActionKey(row);
       const draftAction = actions[actionKey] || {
         status: "open",
@@ -433,15 +443,21 @@ export default function CsvNpsClosingTheLoop() {
         currentStatus,
       };
     });
-  }, [dataset, actions]);
+  }, [dataset, actions, mode]);
 
   const periodRows = useMemo(() => {
+    if (mode === "canonical") return enrichedRows;
+
     return enrichedRows.filter((row) =>
       matchesPeriod(row.submitted_at, periodFilter)
     );
-  }, [enrichedRows, periodFilter]);
+  }, [enrichedRows, mode, periodFilter]);
 
   const rows = useMemo(() => {
+    if (mode === "canonical") {
+      return [...periodRows].sort(sortClosingLoopRows);
+    }
+
     return periodRows
       .filter((row) => {
         const matchesBucket =
@@ -453,7 +469,7 @@ export default function CsvNpsClosingTheLoop() {
         return matchesBucket && matchesStatus;
       })
       .sort(sortClosingLoopRows);
-  }, [periodRows, bucketFilter, statusFilter]);
+  }, [periodRows, bucketFilter, statusFilter, mode]);
 
   const selectedRow = useMemo(() => {
     if (!selectedResponseRef) return null;
@@ -494,6 +510,19 @@ export default function CsvNpsClosingTheLoop() {
   }, [selectedResponseRef]);
 
   const counts = useMemo(() => {
+    if (mode === "canonical") {
+      return {
+        total: canonicalSummary.totalMatchingResponses,
+        noCase: canonicalSummary.noCase,
+        open: canonicalSummary.open,
+        inProgress: canonicalSummary.inProgress,
+        closed: canonicalSummary.closed,
+        openDetractors: canonicalSummary.openDetractors,
+        highPriorityActive: canonicalSummary.highPriorityActive,
+        unassignedActive: canonicalSummary.unassignedActive,
+      };
+    }
+
     const total = periodRows.length;
     const open = periodRows.filter((row) => row.currentStatus === "open").length;
     const inProgress = periodRows.filter(
@@ -508,18 +537,21 @@ export default function CsvNpsClosingTheLoop() {
 
     return {
       total,
+      noCase: 0,
       open,
       inProgress,
       closed,
       detractors,
       openDetractors,
+      highPriorityActive: 0,
+      unassignedActive: 0,
     };
-  }, [periodRows]);
+  }, [canonicalSummary, mode, periodRows]);
 
   const urgentDetractors = useMemo(() => {
     return periodRows
       .filter(
-        (row) => row.bucket === "detractor" && row.currentStatus !== "closed"
+        (row) => row.bucket === "detractor" && row.currentStatus === "open"
       )
       .sort((a, b) => {
         const scoreDiff = Number(a.score ?? 999) - Number(b.score ?? 999);
@@ -532,7 +564,9 @@ export default function CsvNpsClosingTheLoop() {
       .slice(0, 5);
   }, [periodRows]);
 
-  const subtitle = datasetId
+  const subtitle = mode === "canonical"
+    ? PAGE_COPY.savedSubtitle
+    : datasetId
     ? PAGE_COPY.savedSubtitle
     : mode === "intercom"
       ? PAGE_COPY.intercomSubtitle
@@ -691,20 +725,61 @@ function selectRow(row) {
           <div>
             <h2>Follow-up queue</h2>
             <p>
-              Showing {rows.length} of {dataset.rows.length} response
-              {dataset.rows.length === 1 ? "" : "s"}.
+              Showing {rows.length} of{" "}
+              {mode === "canonical"
+                ? canonicalPagination?.totalMatching ?? counts.total
+                : dataset.rows.length}{" "}
+              response
+              {(mode === "canonical"
+                ? canonicalPagination?.totalMatching ?? counts.total
+                : dataset.rows.length) === 1
+                ? ""
+                : "s"}.
             </p>
           </div>
         </div>
 
+        {mode === "canonical" && (
+          <div className="csv-nps-panel">
+            <strong>
+              {permissions.role === "viewer"
+                ? "Read-only Workspace access"
+                : "Case workflow is temporarily read-only"}
+            </strong>
+            <p>
+              {permissions.role === "viewer"
+                ? "Your current Workspace role can review cases and history but cannot change them."
+                : "Canonical cases and history are now shown here. Case updates will be connected in the next workflow release."}
+            </p>
+            <p className="csv-nps-muted-cell">
+              Effective role: {permissions.role || "unknown"} · Assignable owners: {assignableOwners.length}
+            </p>
+          </div>
+        )}
+
         <div className="csv-nps-metric-grid">
           <MetricCard label="Total" value={counts.total} />
+          {mode === "canonical" && (
+            <MetricCard label="No case" value={counts.noCase} />
+          )}
           <MetricCard label="Open" value={counts.open} />
           <MetricCard label="In progress" value={counts.inProgress} />
           <MetricCard label="Closed" value={counts.closed} />
           <MetricCard label="Open detractors" value={counts.openDetractors} />
+          {mode === "canonical" && (
+            <>
+              <MetricCard
+                label="High-priority active"
+                value={counts.highPriorityActive}
+              />
+              <MetricCard
+                label="Unassigned active"
+                value={counts.unassignedActive}
+              />
+            </>
+          )}
         </div>
-        <CloseLoopStatusChart counts={counts} />
+        <CloseLoopStatusChart counts={counts} showNoCase={mode === "canonical"} />
 
         {selectedRow && (
           <div ref={selectedResponsePanelRef} id="selected-response-detail">
@@ -729,12 +804,19 @@ function selectRow(row) {
                 saveAction(getActionKey(selectedRow), patch)
               }
               onSaveAction={() => persistAction(selectedRow)}
+              readOnly={mode === "canonical"}
             />
           </div>
         )}
 
         <UrgentDetractorsPanel rows={urgentDetractors} />
 
+        {mode === "canonical" ? (
+          <p className="csv-nps-muted-cell">
+            Workspace-wide filters and load-more controls will be connected to
+            the server-side read contract in a later frontend update.
+          </p>
+        ) : (
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
             <span>Period</span>
@@ -775,6 +857,7 @@ function selectRow(row) {
             </select>
           </label>
         </div>
+        )}
 
         <div className="csv-nps-loop-list">
           {rows.length === 0 ? (
@@ -795,6 +878,7 @@ function selectRow(row) {
                 onSelect={() => selectRow(row)}
                 onChange={(patch) => saveAction(getActionKey(row), patch)}
                 onSave={() => persistAction(row)}
+                readOnly={mode === "canonical"}
               />
             ))
           )}
@@ -802,6 +886,70 @@ function selectRow(row) {
       </section>
     </main>
   );
+}
+
+function normaliseCanonicalClosingLoop(apiResponse, requestedDatasetId) {
+  const apiRows = Array.isArray(apiResponse.rows) ? apiResponse.rows : [];
+  const ownersByMembershipId = new Map(
+    (apiResponse.assignableOwners || []).map((owner) => [
+      owner.membershipId,
+      owner,
+    ])
+  );
+  const firstDataset = apiRows[0]?.datasets || {};
+
+  const rows = apiRows.map((row) => {
+    const closingCase = row.case || null;
+    const caseOwner = closingCase?.owner_membership_id
+      ? ownersByMembershipId.get(closingCase.owner_membership_id)
+      : null;
+    const latestLegacyAction = row.latest_legacy_action
+      ? {
+          ...normaliseSavedAction(row.latest_legacy_action),
+          isLegacy: true,
+        }
+      : null;
+
+    return {
+      ...row,
+      db_row_id: row.id,
+      dataset_row_id: row.id,
+      response_id: row.response_id || row.id,
+      submitted_at: row.submitted_at || null,
+      score: row.score ?? null,
+      bucket: row.bucket || null,
+      comment: row.comment || "",
+      company: row.company || null,
+      stage: row.stage || null,
+      contact_label:
+        row.company || row.stage || row.response_id || "Contact",
+      intercom_contact_url: row.intercom_contact_url || null,
+      selected_options: Array.isArray(row.selected_options_json)
+        ? row.selected_options_json
+        : [],
+      datasetContext: row.datasets || null,
+      case: closingCase,
+      caseOwnerLabel: caseOwner?.fullName || caseOwner?.email || "",
+      latestLegacyAction,
+      latestLegacyStatus: row.latest_legacy_status || null,
+      loopActions: latestLegacyAction ? [latestLegacyAction] : [],
+      currentStatus: closingCase?.status || "no_case",
+    };
+  });
+
+  return {
+    id: firstDataset.id || requestedDatasetId || null,
+    datasetName:
+      firstDataset.dataset_name ||
+      (requestedDatasetId ? "Workspace dataset" : "Workspace feedback"),
+    sourceType: firstDataset.source_type || "workspace",
+    content_id: null,
+    rawRowCount: apiResponse.summary?.totalMatchingResponses ?? rows.length,
+    validRowCount: apiResponse.summary?.totalMatchingResponses ?? rows.length,
+    skippedRowCount: 0,
+    summary: apiResponse.summary || EMPTY_CANONICAL_SUMMARY,
+    rows,
+  };
 }
 
 function normaliseSavedDataset(apiResponse) {
@@ -1009,7 +1157,7 @@ function getActionKey(row) {
   );
 }
 
-function CloseLoopStatusChart({ counts }) {
+function CloseLoopStatusChart({ counts, showNoCase = false }) {
   const max = Math.max(counts.open, counts.inProgress, counts.closed, 1);
 
   const items = [
@@ -1047,6 +1195,13 @@ function CloseLoopStatusChart({ counts }) {
             );
           })}
         </div>
+
+        {showNoCase && (
+          <p className="csv-nps-muted-cell">
+            No case: <strong>{counts.noCase}</strong>. These responses are kept
+            separate from open cases.
+          </p>
+        )}
       </section>
     </div>
   );
@@ -1121,9 +1276,10 @@ function UrgentDetractorsPanel({ rows }) {
 
 function sortClosingLoopRows(a, b) {
   const statusPriority = {
-    open: 0,
-    in_progress: 1,
-    closed: 2,
+    no_case: 0,
+    open: 1,
+    in_progress: 2,
+    closed: 3,
   };
 
   const bucketPriority = {
@@ -1208,6 +1364,7 @@ function ClosingLoopCard({
   onSelect,
   onChange,
   onSave,
+  readOnly = false,
 }) {
   const hasSavedActions = savedActions.length > 0;
 
@@ -1265,7 +1422,9 @@ function ClosingLoopCard({
         {savedActions.length > 0 && (
           <div className="csv-nps-loop-saved-actions">
             <span className="csv-nps-loop-saved-actions-title">
-              Follow-up log
+              {savedActions.some((savedAction) => savedAction.isLegacy)
+                ? "Earlier legacy follow-up"
+                : "Follow-up log"}
             </span>
 
             {savedActions.map((savedAction) => (
@@ -1276,7 +1435,12 @@ function ClosingLoopCard({
                 <div className="csv-nps-loop-saved-action-meta">
                   <strong>{formatStatus(savedAction.status)}</strong>
 
-                  {savedAction.owner && <span>{savedAction.owner}</span>}
+                  {savedAction.owner && (
+                    <span>
+                      {savedAction.isLegacy ? "Legacy owner: " : ""}
+                      {savedAction.owner}
+                    </span>
+                  )}
 
                   {savedAction.updatedAt && (
                     <span>
@@ -1313,7 +1477,9 @@ function ClosingLoopCard({
           <select
             value={action.status || "open"}
             onChange={(e) => onChange({ status: e.target.value })}
+            disabled={readOnly}
           >
+            <option value="no_case">No case</option>
             <option value="open">Open</option>
             <option value="in_progress">In progress</option>
             <option value="closed">Closed</option>
@@ -1327,6 +1493,7 @@ function ClosingLoopCard({
             value={action.owner || ""}
             onChange={(e) => onChange({ owner: e.target.value })}
             placeholder="Who is following up?"
+            disabled={readOnly}
           />
         </label>
 
@@ -1337,6 +1504,7 @@ function ClosingLoopCard({
             onChange={(e) => onChange({ actionTaken: e.target.value })}
             placeholder="Example: Called customer, apologised, offered a fix, or escalated the issue..."
             rows={4}
+            disabled={readOnly}
           />
         </label>
 
@@ -1344,10 +1512,16 @@ function ClosingLoopCard({
           type="button"
           className="csv-nps-button"
           onClick={onSave}
-          disabled={action.isSaving}
+          disabled={readOnly || action.isSaving}
         >
-          {buttonLabel}
+          {readOnly ? "Updates coming next" : buttonLabel}
         </button>
+
+        {readOnly && (
+          <p className="csv-nps-muted-cell">
+            Priority: {row.case?.priority || "Not set"}. Owner: {row.caseOwnerLabel || "Unassigned"}.
+          </p>
+        )}
 
         {action.saveError && (
           <div className="csv-nps-error csv-nps-error-compact">
@@ -1373,6 +1547,7 @@ function SelectedResponsePanel({
   currentStatus,
   onActionChange,
   onSaveAction,
+  readOnly = false,
 }) {
   const buttonLabel = action?.isSaving
     ? "Saving..."
@@ -1482,7 +1657,9 @@ function SelectedResponsePanel({
             <select
               value={action?.status || "open"}
               onChange={(e) => onActionChange({ status: e.target.value })}
+              disabled={readOnly}
             >
+              <option value="no_case">No case</option>
               <option value="open">Open</option>
               <option value="in_progress">In progress</option>
               <option value="closed">Closed</option>
@@ -1496,6 +1673,7 @@ function SelectedResponsePanel({
               value={action?.owner || ""}
               onChange={(e) => onActionChange({ owner: e.target.value })}
               placeholder="Who is following up?"
+              disabled={readOnly}
             />
           </label>
 
@@ -1506,6 +1684,7 @@ function SelectedResponsePanel({
               onChange={(e) => onActionChange({ actionTaken: e.target.value })}
               placeholder="Example: Called customer, apologised, offered a fix, or escalated the issue..."
               rows={4}
+              disabled={readOnly}
             />
           </label>
 
@@ -1513,10 +1692,16 @@ function SelectedResponsePanel({
             type="button"
             className="csv-nps-button"
             onClick={onSaveAction}
-            disabled={action?.isSaving}
+            disabled={readOnly || action?.isSaving}
           >
-            {buttonLabel}
+            {readOnly ? "Updates coming next" : buttonLabel}
           </button>
+
+          {readOnly && (
+            <p className="csv-nps-muted-cell">
+              Priority: {row.case?.priority || "Not set"}. Owner: {row.caseOwnerLabel || "Unassigned"}.
+            </p>
+          )}
 
           {action?.saveError && (
             <div className="csv-nps-error csv-nps-error-compact">
@@ -1527,7 +1712,9 @@ function SelectedResponsePanel({
           {savedActions.length > 0 && (
             <div className="csv-nps-loop-saved-actions">
               <span className="csv-nps-loop-saved-actions-title">
-                Follow-up log
+                {savedActions.some((savedAction) => savedAction.isLegacy)
+                  ? "Earlier legacy follow-up"
+                  : "Follow-up log"}
               </span>
 
               {savedActions.map((savedAction) => (
@@ -1538,7 +1725,12 @@ function SelectedResponsePanel({
                   <div className="csv-nps-loop-saved-action-meta">
                     <strong>{formatStatus(savedAction.status)}</strong>
 
-                    {savedAction.owner && <span>{savedAction.owner}</span>}
+                    {savedAction.owner && (
+                      <span>
+                        {savedAction.isLegacy ? "Legacy owner: " : ""}
+                        {savedAction.owner}
+                      </span>
+                    )}
 
                     {savedAction.updatedAt && (
                       <span>{new Date(savedAction.updatedAt).toLocaleString()}</span>
@@ -1705,6 +1897,7 @@ function ResponseDetail({ label, value }) {
 }
 
 function formatStatus(status) {
+  if (status === "no_case") return "No case";
   if (status === "in_progress") return "In progress";
   if (status === "closed") return "Closed";
   return "Open";

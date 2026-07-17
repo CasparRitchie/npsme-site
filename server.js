@@ -28,6 +28,7 @@ import { createCsvNpsRouter } from "./csvNps.routes.js";
 import { createNpsDataRouter } from "./npsData.routes.js";
 import { createWorkspaceRouter } from "./workspace.routes.js";
 import { createWorkspaceIntercomRouter } from "./workspaceIntercom.routes.js";
+import { createWorkspaceClosingLoopRouter } from "./workspaceClosingLoop.routes.js";
 import { ROUTES_MANIFEST } from "./src/routesManifest.js";
 import {
   getSeoUrls,
@@ -450,6 +451,10 @@ app.use("/api/nps-data",
 
 
 
+
+app.use("/api/workspace/closing-loop",
+  createWorkspaceClosingLoopRouter()
+);
 
 app.use("/api/workspace",
   createWorkspaceRouter()

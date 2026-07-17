@@ -61,6 +61,7 @@ export default function CsvNpsClosingTheLoop() {
   const [replyDraftLoading, setReplyDraftLoading] = useState(false);
   const [replyDraftError, setReplyDraftError] = useState("");
   const [replyDraftCopied, setReplyDraftCopied] = useState(false);
+  const [managementOverviewOpen, setManagementOverviewOpen] = useState(true);
 
   const selectedResponsePanelRef = useRef(null);
 
@@ -721,26 +722,8 @@ function selectRow(row) {
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
-        <div className="csv-nps-responses-header">
-          <div>
-            <h2>Follow-up queue</h2>
-            <p>
-              Showing {rows.length} of{" "}
-              {mode === "canonical"
-                ? canonicalPagination?.totalMatching ?? counts.total
-                : dataset.rows.length}{" "}
-              response
-              {(mode === "canonical"
-                ? canonicalPagination?.totalMatching ?? counts.total
-                : dataset.rows.length) === 1
-                ? ""
-                : "s"}.
-            </p>
-          </div>
-        </div>
-
         {mode === "canonical" && (
-          <div className="csv-nps-panel">
+          <div className="csv-nps-loop-readonly-notice">
             <strong>
               {permissions.role === "viewer"
                 ? "Read-only Workspace access"
@@ -757,7 +740,7 @@ function selectRow(row) {
           </div>
         )}
 
-        <div className="csv-nps-metric-grid">
+        <div className="csv-nps-metric-grid csv-nps-loop-summary-strip">
           <MetricCard label="Total" value={counts.total} />
           {mode === "canonical" && (
             <MetricCard label="No case" value={counts.noCase} />
@@ -779,7 +762,40 @@ function selectRow(row) {
             </>
           )}
         </div>
-        <CloseLoopStatusChart counts={counts} showNoCase={mode === "canonical"} />
+
+        <section className="csv-nps-loop-overview">
+          <div className="csv-nps-loop-overview-toggle-row">
+            <div>
+              <h2>Management overview</h2>
+              <p>Status coverage and the detractors that need attention first.</p>
+            </div>
+            <button
+              type="button"
+              className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+              aria-expanded={managementOverviewOpen}
+              aria-controls="closing-loop-management-overview"
+              onClick={() => setManagementOverviewOpen((current) => !current)}
+            >
+              {managementOverviewOpen ? "Hide overview" : "Show overview"}
+            </button>
+          </div>
+
+          {managementOverviewOpen && (
+            <div
+              id="closing-loop-management-overview"
+              className="csv-nps-loop-management-grid"
+            >
+              <CloseLoopStatusChart
+                counts={counts}
+                showNoCase={mode === "canonical"}
+              />
+              <UrgentDetractorsPanel
+                rows={urgentDetractors}
+                onSelect={selectRow}
+              />
+            </div>
+          )}
+        </section>
 
         {selectedRow && (
           <div ref={selectedResponsePanelRef} id="selected-response-detail">
@@ -809,7 +825,24 @@ function selectRow(row) {
           </div>
         )}
 
-        <UrgentDetractorsPanel rows={urgentDetractors} />
+        <div className="csv-nps-loop-queue-header">
+          <div>
+            <p className="eyebrow">Operations queue</p>
+            <h2>Responses requiring review</h2>
+            <p>
+              Showing {rows.length} of{" "}
+              {mode === "canonical"
+                ? canonicalPagination?.totalMatching ?? counts.total
+                : dataset.rows.length}{" "}
+              response
+              {(mode === "canonical"
+                ? canonicalPagination?.totalMatching ?? counts.total
+                : dataset.rows.length) === 1
+                ? ""
+                : "s"}.
+            </p>
+          </div>
+        </div>
 
         {mode === "canonical" ? (
           <p className="csv-nps-muted-cell">
@@ -859,28 +892,36 @@ function selectRow(row) {
         </div>
         )}
 
-        <div className="csv-nps-loop-list">
+        <div className={mode === "canonical" ? "csv-nps-loop-queue" : "csv-nps-loop-list"}>
           {rows.length === 0 ? (
             <div className="csv-nps-empty-state">
               No responses match the current filters.
             </div>
           ) : (
-            rows.map((row) => (
-              <ClosingLoopCard
-                key={getActionKey(row)}
-                row={row}
-                action={row.draftAction}
-                savedActions={row.loopActions || []}
-                currentStatus={row.currentStatus}
-                isSelected={
-                  selectedRow && getActionKey(selectedRow) === getActionKey(row)
-                }
-                onSelect={() => selectRow(row)}
-                onChange={(patch) => saveAction(getActionKey(row), patch)}
-                onSave={() => persistAction(row)}
-                readOnly={mode === "canonical"}
+            mode === "canonical" ? (
+              <ClosingLoopQueue
+                rows={rows}
+                selectedRow={selectedRow}
+                onSelect={selectRow}
               />
-            ))
+            ) : (
+              rows.map((row) => (
+                <ClosingLoopCard
+                  key={getActionKey(row)}
+                  row={row}
+                  action={row.draftAction}
+                  savedActions={row.loopActions || []}
+                  currentStatus={row.currentStatus}
+                  isSelected={
+                    selectedRow && getActionKey(selectedRow) === getActionKey(row)
+                  }
+                  onSelect={() => selectRow(row)}
+                  onChange={(patch) => saveAction(getActionKey(row), patch)}
+                  onSave={() => persistAction(row)}
+                  readOnly={false}
+                />
+              ))
+            )
           )}
         </div>
       </section>
@@ -1167,47 +1208,45 @@ function CloseLoopStatusChart({ counts, showNoCase = false }) {
   ];
 
   return (
-    <div className="csv-nps-loop-management-grid">
-      <section className="csv-nps-loop-management-card">
-        <div className="csv-nps-loop-management-header">
-          <div>
-            <h3>Follow-up status</h3>
-            <p>Shared close-the-loop progress for the selected period.</p>
-          </div>
+    <section className="csv-nps-loop-management-card">
+      <div className="csv-nps-loop-management-header">
+        <div>
+          <h3>Follow-up status</h3>
+          <p>Shared close-the-loop progress for the selected period.</p>
         </div>
+      </div>
 
-        <div className="csv-nps-loop-status-chart">
-          {items.map((item) => {
-            const height = Math.max(8, Math.round((item.value / max) * 100));
+      <div className="csv-nps-loop-status-chart">
+        {items.map((item) => {
+          const height = Math.max(8, Math.round((item.value / max) * 100));
 
-            return (
-              <div className="csv-nps-loop-status-column" key={item.key}>
-                <div className="csv-nps-loop-status-column-plot">
-                  <div
-                    className={`csv-nps-loop-status-column-fill csv-nps-loop-status-column-fill-${item.key}`}
-                    style={{ height: `${height}%` }}
-                  />
-                </div>
-
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
+          return (
+            <div className="csv-nps-loop-status-column" key={item.key}>
+              <div className="csv-nps-loop-status-column-plot">
+                <div
+                  className={`csv-nps-loop-status-column-fill csv-nps-loop-status-column-fill-${item.key}`}
+                  style={{ height: `${height}%` }}
+                />
               </div>
-            );
-          })}
-        </div>
 
-        {showNoCase && (
-          <p className="csv-nps-muted-cell">
-            No case: <strong>{counts.noCase}</strong>. These responses are kept
-            separate from open cases.
-          </p>
-        )}
-      </section>
-    </div>
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {showNoCase && (
+        <p className="csv-nps-muted-cell">
+          No case: <strong>{counts.noCase}</strong>. These responses are kept
+          separate from open cases.
+        </p>
+      )}
+    </section>
   );
 }
 
-function UrgentDetractorsPanel({ rows }) {
+function UrgentDetractorsPanel({ rows, onSelect }) {
   return (
     <section className="csv-nps-loop-urgent-panel">
       <div className="csv-nps-loop-management-header">
@@ -1256,16 +1295,25 @@ function UrgentDetractorsPanel({ rows }) {
                 </p>
               </div>
 
-              {row.intercom_contact_url && (
-                <a
-                  href={row.intercom_contact_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-link"
+              <div className="csv-nps-loop-urgent-actions">
+                <button
+                  type="button"
+                  className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+                  onClick={() => onSelect(row)}
                 >
-                  Open in Intercom
-                </a>
-              )}
+                  View response
+                </button>
+                {row.intercom_contact_url && (
+                  <a
+                    href={row.intercom_contact_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-link"
+                  >
+                    Open in Intercom
+                  </a>
+                )}
+              </div>
             </article>
           ))}
         </div>
@@ -1352,6 +1400,138 @@ function MetricCard({ label, value }) {
       <div className="csv-nps-metric-label">{label}</div>
       <div className="csv-nps-metric-value">{value ?? "—"}</div>
     </div>
+  );
+}
+
+function ClosingLoopQueue({ rows, selectedRow, onSelect }) {
+  return (
+    <div className="csv-nps-loop-queue-table" role="table" aria-label="Closing the Loop operations queue">
+      <div className="csv-nps-loop-queue-columns" role="row">
+        <span role="columnheader">Priority</span>
+        <span role="columnheader">Score</span>
+        <span role="columnheader">Response</span>
+        <span role="columnheader">Context</span>
+        <span role="columnheader">Owner</span>
+        <span role="columnheader">Case state</span>
+        <span role="columnheader">Activity</span>
+        <span role="columnheader">Actions</span>
+      </div>
+
+      <div role="rowgroup">
+        {rows.map((row) => (
+          <ClosingLoopQueueRow
+            key={getActionKey(row)}
+            row={row}
+            isSelected={
+              Boolean(selectedRow) &&
+              getActionKey(selectedRow) === getActionKey(row)
+            }
+            onSelect={() => onSelect(row)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
+  const priority = row.case?.priority || "not_set";
+  const workflowHelpId = `closing-loop-workflow-help-${row.dataset_row_id}`;
+  const lastActivity =
+    row.case?.updated_at ||
+    row.latestLegacyAction?.updatedAt ||
+    row.created_at ||
+    row.submitted_at;
+  const workflowLabel = row.case ? "Continue case" : "Start case";
+
+  function handleRowClick(event) {
+    if (event.target.closest("button, a")) return;
+    onSelect();
+  }
+
+  return (
+    <article
+      className={`csv-nps-loop-queue-row csv-nps-loop-queue-row-${row.bucket} ${
+        isSelected ? "csv-nps-loop-queue-row-selected" : ""
+      }`}
+      role="row"
+      aria-current={isSelected ? "true" : undefined}
+      onClick={handleRowClick}
+    >
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-priority" role="cell" data-label="Priority">
+        <span className={`csv-nps-loop-priority csv-nps-loop-priority-${priority}`}>
+          {formatPriority(priority)}
+        </span>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-score" role="cell" data-label="Score">
+        <strong>{row.score ?? "—"}</strong>
+        <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
+          {row.bucket || "Unknown"}
+        </span>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-response" role="cell" data-label="Response">
+        <button type="button" className="csv-nps-loop-response-button" onClick={onSelect}>
+          <strong>{row.contact_label || "Response"}</strong>
+          <span>{truncateText(row.comment || "No comment provided.", 160)}</span>
+        </button>
+        {row.latestLegacyAction && (
+          <span className="csv-nps-loop-legacy-indicator">Earlier legacy follow-up</span>
+        )}
+      </div>
+
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-context" role="cell" data-label="Context">
+        <strong>{row.company || row.stage || "—"}</strong>
+        {row.company && row.stage && <span>{row.stage}</span>}
+        <span>{formatCompactDate(row.submitted_at)}</span>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Owner">
+        <strong>{row.caseOwnerLabel || "Unassigned"}</strong>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Case state">
+        <span className={`csv-nps-loop-status csv-nps-loop-status-${row.currentStatus}`}>
+          {formatStatus(row.currentStatus)}
+        </span>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Activity">
+        <span>{formatCompactDate(lastActivity)}</span>
+      </div>
+
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-actions" role="cell" data-label="Actions">
+        <button
+          type="button"
+          className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+          onClick={onSelect}
+        >
+          View response
+        </button>
+        {row.intercom_contact_url && (
+          <a
+            href={row.intercom_contact_url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-link"
+          >
+            Intercom
+          </a>
+        )}
+        <button
+          type="button"
+          className="csv-nps-button csv-nps-button-compact"
+          disabled
+          aria-describedby={workflowHelpId}
+        >
+          {workflowLabel}
+        </button>
+        <span id={workflowHelpId} className="csv-nps-loop-workflow-help">
+          Available in the next workflow step.
+        </span>
+      </div>
+    </article>
   );
 }
 
@@ -1901,4 +2081,22 @@ function formatStatus(status) {
   if (status === "in_progress") return "In progress";
   if (status === "closed") return "Closed";
   return "Open";
+}
+
+function formatPriority(priority) {
+  if (priority === "high") return "High";
+  if (priority === "low") return "Low";
+  if (priority === "normal") return "Normal";
+  return "Not set";
+}
+
+function formatCompactDate(value) {
+  const date = new Date(value || "");
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
 }

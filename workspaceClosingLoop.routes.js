@@ -7,7 +7,10 @@ const READ_ROLES = new Set(["owner", "admin", "member", "viewer"]);
 const MUTATION_ROLES = new Set(["owner", "admin", "member"]);
 const STATUSES = new Set(["open", "in_progress", "closed"]);
 const PRIORITIES = new Set(["high", "normal", "low"]);
-const LEGACY_ACTION_LIMIT = 5000;
+const CASE_STATES = new Set(["all", "no_case", ...STATUSES]);
+const BUCKETS = new Set(["all", "detractor", "passive", "promoter"]);
+const PERIODS = new Set(["all", "7d", "30d", "this_month"]);
+const MAX_SEARCH_LENGTH = 120;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -20,140 +23,106 @@ export function createWorkspaceClosingLoopRouter() {
     try {
       ensureSupabase();
 
-      const datasetId = optionalString(req.query.datasetId);
-      const limit = clampInt(req.query.limit, 200, 1, 500);
-
-      if (datasetId && !isUuid(datasetId)) {
-        return sendError(res, 400, "INVALID_DATASET_ID", "Valid datasetId is required");
+      const parsed = parseListRequest(req.query);
+      if (!parsed.ok) {
+        return sendError(res, 400, parsed.code, parsed.message);
       }
 
-      // Status, priority and owner filters must be added with database-side
-      // pagination during the frontend/reporting implementation.
-      let rowsQuery = supabaseAdmin
-        .from("dataset_rows")
-        .select(`
-          id,
-          dataset_id,
-          response_id,
-          source,
-          submitted_at,
-          score,
-          bucket,
-          company,
-          stage,
-          comment,
-          contact_id,
-          intercom_contact_url,
-          created_at,
-          datasets!inner (
-            id,
-            workspace_id,
-            dataset_name,
-            source_type
-          )
-        `)
-        .eq("datasets.workspace_id", req.auth.workspaceId)
+      const { filters, limit, cursor } = parsed;
+      const ownersResult = await loadAssignableOwners(req.auth.workspaceId);
+
+      if (ownersResult.error) {
+        console.error("[workspace-closing-loop] Failed to load assignable owners", ownersResult.error);
+        return sendError(res, 500, "OWNERS_FAILED", "Failed to load assignable owners");
+      }
+
+      const assignableOwners = ownersResult.owners;
+      if (
+        isUuid(filters.owner) &&
+        !assignableOwners.some((owner) => owner.membershipId === filters.owner)
+      ) {
+        return sendError(
+          res,
+          400,
+          "INVALID_OWNER_FILTER",
+          "Owner filter must be an active assignable Workspace member"
+        );
+      }
+
+      const baseSpec = buildBaseQuerySpec(filters);
+      const rowsQuery = applyCursor(
+        createFilteredRowsQuery({
+          workspaceId: req.auth.workspaceId,
+          filters,
+          spec: baseSpec,
+          select: buildListSelect(baseSpec),
+        }),
+        cursor
+      )
         .order("submitted_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false })
         .order("id", { ascending: false })
-        .limit(limit);
+        .order("updated_at", {
+          referencedTable: "close_loop_actions",
+          ascending: false,
+          nullsFirst: false,
+        })
+        .order("created_at", {
+          referencedTable: "close_loop_actions",
+          ascending: false,
+          nullsFirst: false,
+        })
+        .order("id", {
+          referencedTable: "close_loop_actions",
+          ascending: false,
+        })
+        .limit(1, { referencedTable: "close_loop_actions" })
+        .limit(limit + 1);
 
-      if (datasetId) rowsQuery = rowsQuery.eq("dataset_id", datasetId);
-
-      const { data: datasetRows, error: rowsError } = await rowsQuery;
+      const summaryPromise = loadFilteredSummary({
+        workspaceId: req.auth.workspaceId,
+        filters,
+      });
+      const [{ data, error: rowsError }, summaryResult] = await Promise.all([
+        rowsQuery,
+        summaryPromise,
+      ]);
 
       if (rowsError) {
         console.error("[workspace-closing-loop] Failed to list dataset rows", rowsError);
         return sendError(res, 500, "LIST_FAILED", "Failed to load Closing the Loop cases");
       }
 
-      const rowIds = (datasetRows || []).map((row) => row.id);
-      let cases = [];
-      let legacyActions = [];
-
-      if (rowIds.length > 0) {
-        const [casesResult, legacyActionsResult] = await Promise.all([
-          supabaseAdmin
-            .from("closing_loop_cases")
-            .select("*")
-            .eq("workspace_id", req.auth.workspaceId)
-            .in("dataset_row_id", rowIds),
-          supabaseAdmin
-            .from("close_loop_actions")
-            .select(`
-              id,
-              dataset_row_id,
-              status,
-              owner,
-              action_taken,
-              updated_at,
-              created_at,
-              dataset_rows!inner (
-                id,
-                datasets!inner (
-                  workspace_id
-                )
-              )
-            `)
-            .in("dataset_row_id", rowIds)
-            .eq("dataset_rows.datasets.workspace_id", req.auth.workspaceId)
-            .order("updated_at", { ascending: false, nullsFirst: false })
-            .order("created_at", { ascending: false, nullsFirst: false })
-            .order("id", { ascending: false })
-            .limit(LEGACY_ACTION_LIMIT),
-        ]);
-
-        if (casesResult.error) {
-          console.error("[workspace-closing-loop] Failed to load cases", casesResult.error);
-          return sendError(res, 500, "LIST_FAILED", "Failed to load Closing the Loop cases");
-        }
-
-        if (legacyActionsResult.error) {
-          console.error(
-            "[workspace-closing-loop] Failed to load legacy actions",
-            legacyActionsResult.error
-          );
-          return sendError(res, 500, "LIST_FAILED", "Failed to load Closing the Loop cases");
-        }
-
-        cases = casesResult.data || [];
-        legacyActions = legacyActionsResult.data || [];
+      if (summaryResult.error) {
+        console.error("[workspace-closing-loop] Failed to load summary", summaryResult.error);
+        return sendError(res, 500, "SUMMARY_FAILED", "Failed to load Closing the Loop summary");
       }
 
-      const casesByRowId = new Map(cases.map((closingCase) => [closingCase.dataset_row_id, closingCase]));
-      const legacyActionsByRowId = new Map();
-
-      legacyActions.forEach((action) => {
-        const safeAction = {
-          id: action.id,
-          dataset_row_id: action.dataset_row_id,
-          status: action.status,
-          owner: action.owner || null,
-          action_taken: action.action_taken || null,
-          updated_at: action.updated_at || null,
-          created_at: action.created_at || null,
-        };
-        const existing = legacyActionsByRowId.get(action.dataset_row_id) || [];
-        existing.push(safeAction);
-        legacyActionsByRowId.set(action.dataset_row_id, existing);
-      });
-
-      const rows = (datasetRows || []).map((row) => {
-        const rowLegacyActions = legacyActionsByRowId.get(row.id) || [];
-
-        return {
-          ...row,
-          case: casesByRowId.get(row.id) || null,
-          legacy_actions: rowLegacyActions,
-          latest_legacy_status: rowLegacyActions[0]?.status || null,
-        };
-      });
+      const resultRows = data || [];
+      const hasMore = resultRows.length > limit;
+      const pageRows = resultRows.slice(0, limit);
+      const rows = pageRows.map(toClosingLoopListRow);
+      const nextCursor = hasMore && pageRows.length
+        ? encodeCursor(pageRows[pageRows.length - 1])
+        : null;
 
       return res.json({
         ok: true,
-        limit,
-        returned: rows.length,
-        legacy_actions_truncated: legacyActions.length === LEGACY_ACTION_LIMIT,
+        permissions: {
+          canRead: true,
+          canMutate: MUTATION_ROLES.has(req.workspaceMembership.role),
+          role: req.workspaceMembership.role,
+        },
+        assignableOwners,
+        filters,
+        summary: summaryResult.summary,
+        pagination: {
+          limit,
+          returned: rows.length,
+          totalMatching: summaryResult.summary.totalMatchingResponses,
+          hasMore,
+          nextCursor,
+        },
         rows,
       });
     } catch (err) {
@@ -404,6 +373,440 @@ export function createWorkspaceClosingLoopRouter() {
   });
 
   return router;
+}
+
+function parseListRequest(query) {
+  const datasetId = optionalString(query.datasetId);
+  const caseState = optionalString(query.caseState) || "all";
+  const priority = optionalString(query.priority) || "all";
+  const owner = optionalString(query.owner) || "all";
+  const bucket = optionalString(query.bucket) || "all";
+  const period = optionalString(query.period) || "all";
+  const rawSearch = optionalString(query.search);
+  const limit = clampInt(query.limit, 100, 1, 500);
+
+  if (datasetId && !isUuid(datasetId)) {
+    return invalidListRequest("INVALID_DATASET_ID", "Valid datasetId is required");
+  }
+
+  if (!CASE_STATES.has(caseState)) {
+    return invalidListRequest("INVALID_CASE_STATE", "Invalid caseState filter");
+  }
+
+  if (priority !== "all" && !PRIORITIES.has(priority)) {
+    return invalidListRequest("INVALID_PRIORITY", "Invalid priority filter");
+  }
+
+  if (owner !== "all" && owner !== "unassigned" && !isUuid(owner)) {
+    return invalidListRequest("INVALID_OWNER_FILTER", "Invalid owner filter");
+  }
+
+  if (!BUCKETS.has(bucket)) {
+    return invalidListRequest("INVALID_BUCKET", "Invalid bucket filter");
+  }
+
+  if (!PERIODS.has(period)) {
+    return invalidListRequest("INVALID_PERIOD", "Invalid period filter");
+  }
+
+  if (rawSearch.length > MAX_SEARCH_LENGTH) {
+    return invalidListRequest(
+      "SEARCH_TOO_LONG",
+      `Search must be ${MAX_SEARCH_LENGTH} characters or fewer`
+    );
+  }
+
+  if (caseState === "no_case" && (priority !== "all" || owner !== "all")) {
+    return invalidListRequest(
+      "INVALID_FILTER_COMBINATION",
+      "Priority and owner filters require a Closing the Loop case"
+    );
+  }
+
+  const decodedCursor = query.cursor ? decodeCursor(optionalString(query.cursor)) : null;
+  if (query.cursor && !decodedCursor) {
+    return invalidListRequest("INVALID_CURSOR", "Invalid pagination cursor");
+  }
+
+  return {
+    ok: true,
+    limit,
+    cursor: decodedCursor,
+    filters: {
+      datasetId: datasetId || null,
+      caseState,
+      priority,
+      owner,
+      bucket,
+      period,
+      search: normaliseSearchTerm(rawSearch),
+    },
+  };
+}
+
+function invalidListRequest(code, message) {
+  return { ok: false, code, message };
+}
+
+function normaliseSearchTerm(value) {
+  return value
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}\s@._'-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function loadAssignableOwners(workspaceId) {
+  const { data, error } = await supabaseAdmin
+    .from("workspace_members")
+    .select(`
+      id,
+      user_id,
+      role,
+      app_users!inner (
+        id,
+        full_name,
+        email,
+        is_active
+      )
+    `)
+    .eq("workspace_id", workspaceId)
+    .in("role", [...MUTATION_ROLES])
+    .eq("app_users.is_active", true);
+
+  if (error) return { owners: [], error };
+
+  const owners = (data || [])
+    .map((membership) => {
+      const user = Array.isArray(membership.app_users)
+        ? membership.app_users[0]
+        : membership.app_users;
+
+      return {
+        membershipId: membership.id,
+        userId: membership.user_id,
+        fullName: user?.full_name || "",
+        email: user?.email || "",
+        role: membership.role,
+      };
+    })
+    .sort((left, right) => {
+      const nameOrder = left.fullName.localeCompare(right.fullName, undefined, {
+        sensitivity: "base",
+      });
+      if (nameOrder !== 0) return nameOrder;
+      const emailOrder = left.email.localeCompare(right.email, undefined, {
+        sensitivity: "base",
+      });
+      if (emailOrder !== 0) return emailOrder;
+      return left.membershipId.localeCompare(right.membershipId);
+    });
+
+  return { owners, error: null };
+}
+
+function buildBaseQuerySpec(filters) {
+  return {
+    noCase: filters.caseState === "no_case",
+    statuses: STATUSES.has(filters.caseState) ? [filters.caseState] : null,
+    priority: filters.priority,
+    owner: filters.owner,
+    bucket: filters.bucket,
+  };
+}
+
+function buildListSelect(spec) {
+  return `
+    id,
+    dataset_id,
+    response_id,
+    source,
+    submitted_at,
+    score,
+    bucket,
+    company,
+    stage,
+    comment,
+    contact_id,
+    intercom_contact_url,
+    created_at,
+    datasets!inner (
+      id,
+      workspace_id,
+      dataset_name,
+      source_type
+    ),
+    ${buildCaseSelect(spec, "*")},
+    close_loop_actions (
+      id,
+      dataset_row_id,
+      status,
+      owner,
+      action_taken,
+      updated_at,
+      created_at
+    )
+  `;
+}
+
+function buildCountSelect(spec) {
+  return `
+    id,
+    datasets!inner (id, workspace_id),
+    ${buildCaseSelect(spec, "id,status,priority,owner_membership_id")}
+  `;
+}
+
+function buildCaseSelect(spec, columns) {
+  return `closing_loop_cases!${caseJoinType(spec)} (${columns})`;
+}
+
+function caseJoinType(spec) {
+  const caseFilterRequired =
+    !spec.noCase &&
+    (Boolean(spec.statuses?.length) || spec.priority !== "all" || spec.owner !== "all");
+  return caseFilterRequired ? "inner" : "left";
+}
+
+function createFilteredRowsQuery({ workspaceId, filters, spec, select, count, head = false }) {
+  let query = supabaseAdmin
+    .from("dataset_rows")
+    .select(select, { count, head })
+    .eq("datasets.workspace_id", workspaceId);
+
+  if (filters.datasetId) query = query.eq("dataset_id", filters.datasetId);
+  if (spec.bucket !== "all") query = query.eq("bucket", spec.bucket);
+
+  const periodStart = getPeriodStart(filters.period);
+  if (periodStart) query = query.gte("submitted_at", periodStart);
+
+  if (filters.search) {
+    const pattern = `%${filters.search}%`;
+    query = query.or(
+      ["comment", "company", "stage", "response_id", "contact_id"]
+        .map((field) => `${field}.ilike.${pattern}`)
+        .join(",")
+    );
+  }
+
+  if (spec.noCase) {
+    query = query.is("closing_loop_cases", null);
+  } else {
+    if (spec.statuses?.length === 1) {
+      query = query.eq("closing_loop_cases.status", spec.statuses[0]);
+    } else if (spec.statuses?.length > 1) {
+      query = query.in("closing_loop_cases.status", spec.statuses);
+    }
+
+    if (spec.priority !== "all") {
+      query = query.eq("closing_loop_cases.priority", spec.priority);
+    }
+
+    if (spec.owner === "unassigned") {
+      query = query.is("closing_loop_cases.owner_membership_id", null);
+    } else if (isUuid(spec.owner)) {
+      query = query.eq("closing_loop_cases.owner_membership_id", spec.owner);
+    }
+  }
+
+  return query;
+}
+
+function getPeriodStart(period) {
+  if (period === "all") return null;
+
+  const now = new Date();
+  if (period === "this_month") {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  }
+
+  const days = period === "7d" ? 7 : 30;
+  return new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
+}
+
+function applyCursor(query, cursor) {
+  if (!cursor) return query;
+
+  const createdPredicate = [
+    `created_at.lt.${cursor.createdAt}`,
+    `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
+  ].join(",");
+
+  if (cursor.submittedAt === null) {
+    return query.is("submitted_at", null).or(createdPredicate);
+  }
+
+  return query.or(
+    [
+      `submitted_at.lt.${cursor.submittedAt}`,
+      `and(submitted_at.eq.${cursor.submittedAt},created_at.lt.${cursor.createdAt})`,
+      `and(submitted_at.eq.${cursor.submittedAt},created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`,
+      "submitted_at.is.null",
+    ].join(",")
+  );
+}
+
+function encodeCursor(row) {
+  return Buffer.from(
+    JSON.stringify({
+      v: 1,
+      submittedAt: row.submitted_at || null,
+      createdAt: row.created_at,
+      id: row.id,
+    })
+  ).toString("base64url");
+}
+
+function decodeCursor(value) {
+  try {
+    const parsed = JSON.parse(Buffer.from(value, "base64url").toString("utf8"));
+    if (
+      parsed?.v !== 1 ||
+      (parsed.submittedAt !== null && !isIsoDate(parsed.submittedAt)) ||
+      !isIsoDate(parsed.createdAt) ||
+      !isUuid(parsed.id)
+    ) {
+      return null;
+    }
+
+    return {
+      submittedAt: parsed.submittedAt === null
+        ? null
+        : new Date(parsed.submittedAt).toISOString(),
+      createdAt: new Date(parsed.createdAt).toISOString(),
+      id: parsed.id,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function isIsoDate(value) {
+  return typeof value === "string" && value.length <= 40 && !Number.isNaN(Date.parse(value));
+}
+
+async function loadFilteredSummary({ workspaceId, filters }) {
+  const baseSpec = buildBaseQuerySpec(filters);
+  const definitions = [
+    ["totalMatchingResponses", baseSpec],
+    ["noCase", buildNoCaseSummarySpec(baseSpec)],
+    ["open", buildCaseSummarySpec(baseSpec, { statuses: ["open"] })],
+    ["inProgress", buildCaseSummarySpec(baseSpec, { statuses: ["in_progress"] })],
+    ["closed", buildCaseSummarySpec(baseSpec, { statuses: ["closed"] })],
+    [
+      "openDetractors",
+      buildCaseSummarySpec(baseSpec, { statuses: ["open"], bucket: "detractor" }),
+    ],
+    [
+      "highPriorityActive",
+      buildCaseSummarySpec(baseSpec, {
+        statuses: ["open", "in_progress"],
+        priority: "high",
+      }),
+    ],
+    [
+      "unassignedActive",
+      buildCaseSummarySpec(baseSpec, {
+        statuses: ["open", "in_progress"],
+        owner: "unassigned",
+      }),
+    ],
+  ];
+
+  const results = await Promise.all(
+    definitions.map(async ([key, spec]) => {
+      if (!spec) return { key, count: 0, error: null };
+
+      const { count, error } = await createFilteredRowsQuery({
+        workspaceId,
+        filters,
+        spec,
+        select: buildCountSelect(spec),
+        count: "exact",
+        head: true,
+      });
+      return { key, count: count || 0, error };
+    })
+  );
+
+  const failed = results.find((result) => result.error);
+  if (failed) return { summary: null, error: failed.error };
+
+  return {
+    summary: Object.fromEntries(results.map((result) => [result.key, result.count])),
+    error: null,
+  };
+}
+
+function buildNoCaseSummarySpec(baseSpec) {
+  if (baseSpec.priority !== "all" || baseSpec.owner !== "all") return null;
+  if (baseSpec.statuses?.length) return null;
+
+  return {
+    ...baseSpec,
+    noCase: true,
+    statuses: null,
+  };
+}
+
+function buildCaseSummarySpec(baseSpec, requested) {
+  if (baseSpec.noCase) return null;
+
+  const statuses = intersectStatuses(baseSpec.statuses, requested.statuses);
+  if (!statuses.length) return null;
+
+  const priority = intersectSingleValue(baseSpec.priority, requested.priority || "all");
+  if (!priority) return null;
+
+  const owner = intersectSingleValue(baseSpec.owner, requested.owner || "all");
+  if (!owner) return null;
+
+  const bucket = intersectSingleValue(baseSpec.bucket, requested.bucket || "all");
+  if (!bucket) return null;
+
+  return {
+    noCase: false,
+    statuses,
+    priority,
+    owner,
+    bucket,
+  };
+}
+
+function intersectStatuses(current, requested) {
+  if (!current?.length) return requested;
+  return current.filter((status) => requested.includes(status));
+}
+
+function intersectSingleValue(current, requested) {
+  if (current === "all") return requested;
+  if (requested === "all" || requested === current) return current;
+  return null;
+}
+
+function toClosingLoopListRow(row) {
+  const { closing_loop_cases: closingCases, close_loop_actions: legacyActions, ...response } = row;
+  const closingCase = Array.isArray(closingCases) ? closingCases[0] : closingCases;
+  const latestLegacy = Array.isArray(legacyActions) ? legacyActions[0] : null;
+  const safeLegacyAction = latestLegacy
+    ? {
+        id: latestLegacy.id,
+        dataset_row_id: latestLegacy.dataset_row_id,
+        status: latestLegacy.status,
+        owner: latestLegacy.owner || null,
+        action_taken: latestLegacy.action_taken || null,
+        updated_at: latestLegacy.updated_at || null,
+        created_at: latestLegacy.created_at || null,
+      }
+    : null;
+
+  return {
+    ...response,
+    case: closingCase || null,
+    legacy_actions: safeLegacyAction ? [safeLegacyAction] : [],
+    latest_legacy_action: safeLegacyAction,
+    latest_legacy_status: safeLegacyAction?.status || null,
+  };
 }
 
 async function authenticateCurrentWorkspaceMember(req, res, next) {

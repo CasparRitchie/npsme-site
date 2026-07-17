@@ -1138,18 +1138,33 @@
 }
 
 .csv-nps-loop-queue-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
+  display: grid;
+  align-items: start;
+  gap: 9px;
 }
 
-.csv-nps-loop-queue-actions .text-link {
-  font-size: 0.75rem;
+.csv-nps-loop-queue-action-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.csv-nps-loop-queue-action-links .csv-nps-button,
+.csv-nps-loop-queue-workflow-action .csv-nps-button {
+  width: 100%;
+  min-height: 38px;
+  padding-inline: 9px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+}
+
+.csv-nps-loop-queue-workflow-action {
+  display: grid;
+  gap: 5px;
 }
 
 .csv-nps-loop-workflow-help {
-  width: 100%;
   color: var(--muted, rgba(245, 247, 251, 0.58));
   font-size: 0.67rem;
   line-height: 1.25;
@@ -1859,4 +1874,3 @@
 .csv-nps-filters-four {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-

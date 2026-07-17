@@ -477,7 +477,7 @@ export function createWorkspaceRouter() {
         });
       }
 
-      const { data: row, error: rowError } = await supabaseAdmin
+      let rowQuery = supabaseAdmin
         .from("dataset_rows")
         .select(`
           id,
@@ -495,6 +495,7 @@ export function createWorkspaceRouter() {
           intercom_contact_url,
           selected_options_json,
           extra_scores_json,
+          raw_json,
           created_at,
           close_loop_actions (
             id,
@@ -505,9 +506,13 @@ export function createWorkspaceRouter() {
             created_at
           )
         `)
-        .eq("dataset_id", datasetId)
-        .eq("response_id", responseId)
-        .single();
+        .eq("dataset_id", datasetId);
+
+      rowQuery = isUuid(responseId)
+        ? rowQuery.or(`response_id.eq.${responseId},id.eq.${responseId}`)
+        : rowQuery.eq("response_id", responseId);
+
+      const { data: row, error: rowError } = await rowQuery.single();
 
       if (rowError || !row) {
         return res.status(404).json({
@@ -729,6 +734,8 @@ function toSafeWorkspaceResponseListRow(row) {
 }
 
 function toSafeWorkspaceResponseDetail(row) {
+  const structuredSurvey = buildSafeStructuredSurveyDetail(row);
+
   return {
     id: row.id,
     dataset_id: row.dataset_id,
@@ -743,9 +750,6 @@ function toSafeWorkspaceResponseDetail(row) {
     stage: row.stage || null,
     comment: redactFreeText(row.comment, 1200),
 
-    customer_name: null,
-    customer_email: null,
-
     contact_label: buildOperationalReferenceLabel(row),
     intercom_contact_url: row.intercom_contact_url || null,
 
@@ -754,8 +758,39 @@ function toSafeWorkspaceResponseDetail(row) {
       : [],
 
     extra_scores_json: row.extra_scores_json || {},
+    ...structuredSurvey,
     close_loop_actions: toSafeCloseLoopActions(row.close_loop_actions),
     created_at: row.created_at || null,
+  };
+}
+
+function buildSafeStructuredSurveyDetail(row) {
+  const raw = row.raw_json || {};
+  const extra = row.extra_scores_json || {};
+  const value = (snakeKey, camelKey) =>
+    raw[snakeKey] ?? raw[camelKey] ?? extra[snakeKey] ?? extra[camelKey] ?? null;
+  const score = (snakeKey, camelKey) => {
+    const parsed = Number(value(snakeKey, camelKey));
+    return Number.isFinite(parsed) && parsed >= 0 && parsed <= 10 ? parsed : null;
+  };
+  const comment = (snakeKey, camelKey) =>
+    redactFreeText(value(snakeKey, camelKey), 1200) || null;
+
+  return {
+    q_recommend_score: score("q_recommend_score", "qRecommendScore"),
+    q_recommend_comment: comment("q_recommend_comment", "qRecommendComment"),
+    q_install_score: score("q_install_score", "qInstallScore"),
+    q_install_comment: comment("q_install_comment", "qInstallComment"),
+    q_daily_use_score: score("q_daily_use_score", "qDailyUseScore"),
+    q_daily_use_comment: comment("q_daily_use_comment", "qDailyUseComment"),
+    q_parent_relation_score: score("q_parent_relation_score", "qParentRelationScore"),
+    q_parent_relation_comment: comment(
+      "q_parent_relation_comment",
+      "qParentRelationComment"
+    ),
+    q_support_score: score("q_support_score", "qSupportScore"),
+    q_support_comment: comment("q_support_comment", "qSupportComment"),
+    q_final_comment: comment("q_final_comment", "qFinalComment"),
   };
 }
 

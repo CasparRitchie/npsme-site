@@ -62,6 +62,9 @@ export default function CsvNpsClosingTheLoop() {
   const [replyDraftError, setReplyDraftError] = useState("");
   const [replyDraftCopied, setReplyDraftCopied] = useState(false);
   const [managementOverviewOpen, setManagementOverviewOpen] = useState(true);
+  const [selectedResponseDetail, setSelectedResponseDetail] = useState(null);
+  const [selectedResponseDetailLoading, setSelectedResponseDetailLoading] = useState(false);
+  const [selectedResponseDetailError, setSelectedResponseDetailError] = useState("");
 
   const selectedResponsePanelRef = useRef(null);
 
@@ -280,6 +283,56 @@ export default function CsvNpsClosingTheLoop() {
       loadWithoutDatasetId();
     }
   }, [datasetId, isWorkspaceRoute]);
+
+  useEffect(() => {
+    const selectedRow = dataset?.rows?.find(
+      (row) => String(getActionKey(row)) === String(selectedResponseRef)
+    );
+
+    setSelectedResponseDetail(null);
+    setSelectedResponseDetailError("");
+
+    if (
+      mode !== "canonical" ||
+      !selectedRow?.dataset_row_id ||
+      !selectedRow?.dataset_id ||
+      !selectedRow?.response_id
+    ) {
+      setSelectedResponseDetailLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+
+    async function loadSelectedResponseDetail() {
+      setSelectedResponseDetailLoading(true);
+
+      try {
+        const response = await fetch(
+          `/api/workspace/datasets/${encodeURIComponent(selectedRow.dataset_id)}/responses/${encodeURIComponent(selectedRow.response_id)}`,
+          { credentials: "include", signal: controller.signal }
+        );
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load the complete survey response");
+        }
+
+        setSelectedResponseDetail(normaliseSelectedResponseDetail(selectedRow, data.response));
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setSelectedResponseDetailError(
+            err.message || "Failed to load the complete survey response"
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) setSelectedResponseDetailLoading(false);
+      }
+    }
+
+    loadSelectedResponseDetail();
+    return () => controller.abort();
+  }, [dataset, mode, selectedResponseRef]);
 
   function saveAction(actionKey, patch) {
     setActions((current) => {
@@ -800,7 +853,9 @@ function selectRow(row) {
         {selectedRow && (
           <div ref={selectedResponsePanelRef} id="selected-response-detail">
             <SelectedResponsePanel
-              row={selectedRow}
+              row={selectedResponseDetail || selectedRow}
+              detailLoading={selectedResponseDetailLoading}
+              detailError={selectedResponseDetailError}
               replyDraft={replyDraft}
               replyDraftLoading={replyDraftLoading}
               replyDraftError={replyDraftError}
@@ -990,6 +1045,24 @@ function normaliseCanonicalClosingLoop(apiResponse, requestedDatasetId) {
     skippedRowCount: 0,
     summary: apiResponse.summary || EMPTY_CANONICAL_SUMMARY,
     rows,
+  };
+}
+
+function normaliseSelectedResponseDetail(baseRow, detail = {}) {
+  return {
+    ...baseRow,
+    ...detail,
+    db_row_id: baseRow.db_row_id,
+    dataset_row_id: baseRow.dataset_row_id,
+    response_id: baseRow.response_id,
+    selected_options: Array.isArray(detail.selected_options_json)
+      ? detail.selected_options_json
+      : baseRow.selected_options,
+    extra_scores: detail.extra_scores_json || {},
+    case: baseRow.case,
+    caseOwnerLabel: baseRow.caseOwnerLabel,
+    loopActions: baseRow.loopActions,
+    currentStatus: baseRow.currentStatus,
   };
 }
 
@@ -1502,34 +1575,38 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
       </div>
 
       <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-actions" role="cell" data-label="Actions">
-        <button
-          type="button"
-          className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
-          onClick={onSelect}
-        >
-          View response
-        </button>
-        {row.intercom_contact_url && (
-          <a
-            href={row.intercom_contact_url}
-            target="_blank"
-            rel="noreferrer"
-            className="text-link"
+        <div className="csv-nps-loop-queue-action-links">
+          <button
+            type="button"
+            className="csv-nps-button csv-nps-button-compact"
+            onClick={onSelect}
           >
-            Intercom
-          </a>
-        )}
-        <button
-          type="button"
-          className="csv-nps-button csv-nps-button-compact"
-          disabled
-          aria-describedby={workflowHelpId}
-        >
-          {workflowLabel}
-        </button>
-        <span id={workflowHelpId} className="csv-nps-loop-workflow-help">
-          Available in the next workflow step.
-        </span>
+            View response
+          </button>
+          {row.intercom_contact_url && (
+            <a
+              href={row.intercom_contact_url}
+              target="_blank"
+              rel="noreferrer"
+              className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+            >
+              Open in Intercom
+            </a>
+          )}
+        </div>
+        <div className="csv-nps-loop-queue-workflow-action">
+          <button
+            type="button"
+            className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+            disabled
+            aria-describedby={workflowHelpId}
+          >
+            {workflowLabel}
+          </button>
+          <span id={workflowHelpId} className="csv-nps-loop-workflow-help">
+            Available in the next workflow step.
+          </span>
+        </div>
       </div>
     </article>
   );
@@ -1715,6 +1792,8 @@ function ClosingLoopCard({
 
 function SelectedResponsePanel({
   row,
+  detailLoading,
+  detailError,
   replyDraft,
   replyDraftLoading,
   replyDraftError,
@@ -1748,6 +1827,11 @@ function SelectedResponsePanel({
             {row.submitted_at?.slice(0, 10) || "No date"} ·{" "}
             {formatStatus(currentStatus)}
           </p>
+          {(row.company || row.stage) && (
+            <p>
+              {[row.company, row.stage].filter(Boolean).join(" · ")}
+            </p>
+          )}
         </div>
 
         {row.intercom_contact_url && (
@@ -1772,6 +1856,12 @@ function SelectedResponsePanel({
             Question-level scores and comments from the survey, combined into one view.
           </p>
 
+          {detailLoading && (
+            <p className="csv-nps-muted-cell">Loading complete response…</p>
+          )}
+          {detailError && (
+            <div className="csv-nps-error csv-nps-error-compact">{detailError}</div>
+          )}
           <SurveyQuestionScoreTable row={row} />
         </div>
 
@@ -1935,6 +2025,7 @@ function SurveyQuestionScoreTable({ row }) {
     ...(Array.isArray(row.selected_options_json) ? row.selected_options_json : []),
   ]).join(", ");
 
+  const extraQuestions = buildExtraSurveyQuestionRows(row.extra_scores || row.extra_scores_json);
   const existingComments = [
     row.q_recommend_comment,
     row.q_install_comment,
@@ -1942,6 +2033,7 @@ function SurveyQuestionScoreTable({ row }) {
     row.q_support_comment,
     row.q_final_comment,
     selectedBenefits,
+    ...extraQuestions.map((item) => item.comment),
   ]
     .filter(Boolean)
     .map((value) => String(value).trim());
@@ -1953,8 +2045,7 @@ function SurveyQuestionScoreTable({ row }) {
   const questions = [
     {
       label: "Recommendation",
-      helper: "NPS question",
-      score: row.q_recommend_score ?? row.score,
+      score: row.q_recommend_score,
       comment: row.q_recommend_comment,
     },
     {
@@ -1965,7 +2056,7 @@ function SurveyQuestionScoreTable({ row }) {
     {
       label: "Daily use",
       score: row.q_daily_use_score,
-      comment: null,
+      comment: row.q_daily_use_comment,
     },
     {
       label: "Benefits selected",
@@ -1987,7 +2078,14 @@ function SurveyQuestionScoreTable({ row }) {
       score: null,
       comment: row.q_final_comment,
     },
-    ...(shouldShowMainComment
+    ...extraQuestions,
+    {
+      label: "Overall NPS",
+      helper: "Headline score",
+      score: row.score,
+      comment: mainComment,
+    },
+    ...(shouldShowMainComment && row.score == null
       ? [
           {
             label: "Additional comment",
@@ -2051,6 +2149,86 @@ function SurveyQuestionScoreTable({ row }) {
       </table>
     </div>
   );
+}
+
+function buildExtraSurveyQuestionRows(extraScores) {
+  if (!extraScores || Array.isArray(extraScores) || typeof extraScores !== "object") {
+    return [];
+  }
+
+  const knownKeys = new Set([
+    "q_recommend_score", "qRecommendScore", "q_recommend_comment", "qRecommendComment",
+    "q_install_score", "qInstallScore", "q_install_comment", "qInstallComment",
+    "q_daily_use_score", "qDailyUseScore", "q_daily_use_comment", "qDailyUseComment",
+    "q_parent_relation_score", "qParentRelationScore", "q_parent_relation_comment", "qParentRelationComment",
+    "q_support_score", "qSupportScore", "q_support_comment", "qSupportComment",
+    "q_final_comment", "qFinalComment",
+    "comment", "response_comment", "nps_comment", "feedback", "feedback_text",
+    "customer_comment",
+  ]);
+  const entries = Object.entries(extraScores).filter(
+    ([key, value]) => !knownKeys.has(key) && hasSurveyValue(value)
+  );
+  const handled = new Set();
+
+  return entries.flatMap(([key, value]) => {
+    if (handled.has(key)) return [];
+
+    const scoreMatch = key.match(/^(.*?)(?:_score|Score)$/);
+    if (scoreMatch) {
+      const base = scoreMatch[1];
+      const commentEntry = entries.find(([candidate]) =>
+        candidate === `${base}_comment` || candidate === `${base}Comment`
+      );
+      if (commentEntry) handled.add(commentEntry[0]);
+      handled.add(key);
+      return [{
+        label: formatSurveyFieldLabel(base),
+        score: normaliseSurveyScore(value),
+        comment: formatSurveyAnswer(commentEntry?.[1]),
+      }];
+    }
+
+    if (key.match(/(?:_comment|Comment)$/)) {
+      handled.add(key);
+      return [{
+        label: formatSurveyFieldLabel(key.replace(/(?:_comment|Comment)$/, "")),
+        score: null,
+        comment: formatSurveyAnswer(value),
+      }];
+    }
+
+    handled.add(key);
+    const numericScore = normaliseSurveyScore(value);
+    return [{
+      label: formatSurveyFieldLabel(key),
+      score: numericScore,
+      comment: numericScore == null ? formatSurveyAnswer(value) : "",
+    }];
+  }).filter((item) => item.score != null || item.comment);
+}
+
+function hasSurveyValue(value) {
+  return value !== null && value !== undefined && String(value).trim() !== "";
+}
+
+function normaliseSurveyScore(value) {
+  const score = Number(value);
+  return Number.isFinite(score) && score >= 0 && score <= 10 ? score : null;
+}
+
+function formatSurveyAnswer(value) {
+  if (Array.isArray(value)) return uniqueStrings(value).join(", ");
+  if (value && typeof value === "object") return "";
+  return String(value ?? "").trim();
+}
+
+function formatSurveyFieldLabel(value) {
+  return String(value || "Question")
+    .replace(/^q[_-]?/i, "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 

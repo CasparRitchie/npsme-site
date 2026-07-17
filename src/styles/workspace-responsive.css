@@ -201,14 +201,11 @@
   }
 
   .csv-nps-loop-queue-actions {
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .csv-nps-loop-queue-actions .csv-nps-button,
-  .csv-nps-loop-queue-actions .text-link {
-    flex: 1 1 auto;
-    justify-content: center;
-    text-align: center;
+  .csv-nps-loop-queue-action-links {
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
   }
 
   .csv-nps-loop-urgent-actions {

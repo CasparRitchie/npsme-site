@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
 const CANONICAL_PAGE_LIMIT = 200;
@@ -30,6 +32,8 @@ const PAGE_COPY = {
 
 export default function CsvNpsClosingTheLoop() {
   const { datasetId } = useParams();
+  const { lang } = useLanguage();
+  const copy = translations[lang].workspaceClosingLoop;
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseRef = searchParams.get("response");
   const isWorkspaceRoute = /^\/(?:fr\/)?workspace(?:\/|$)/.test(
@@ -65,6 +69,12 @@ export default function CsvNpsClosingTheLoop() {
   const [selectedResponseDetail, setSelectedResponseDetail] = useState(null);
   const [selectedResponseDetailLoading, setSelectedResponseDetailLoading] = useState(false);
   const [selectedResponseDetailError, setSelectedResponseDetailError] = useState("");
+  const [caseEvents, setCaseEvents] = useState([]);
+  const [caseEventsLoading, setCaseEventsLoading] = useState(false);
+  const [caseEventsError, setCaseEventsError] = useState("");
+  const [caseMutation, setCaseMutation] = useState({ loading: false, error: "" });
+  const [noteDraft, setNoteDraft] = useState("");
+  const [eventsVersion, setEventsVersion] = useState(0);
 
   const selectedResponsePanelRef = useRef(null);
 
@@ -333,6 +343,120 @@ export default function CsvNpsClosingTheLoop() {
     loadSelectedResponseDetail();
     return () => controller.abort();
   }, [dataset, mode, selectedResponseRef]);
+
+  useEffect(() => {
+    const caseId = selectedRow?.case?.id;
+    setCaseEvents([]);
+    setCaseEventsError("");
+    setNoteDraft("");
+    if (mode !== "canonical" || !caseId) return undefined;
+
+    const controller = new AbortController();
+    setCaseEventsLoading(true);
+    fetch(`/api/workspace/closing-loop/cases/${encodeURIComponent(caseId)}/events`, {
+      credentials: "include",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data?.error?.message || copy.errors.events);
+        setCaseEvents(Array.isArray(data.events) ? data.events : []);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") setCaseEventsError(error.message || copy.errors.events);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCaseEventsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [selectedResponseRef, dataset, mode, eventsVersion, copy.errors.events]);
+
+  function applyCanonicalCase(datasetRowId, closingCase) {
+    const nextCase = Array.isArray(closingCase) ? closingCase[0] : closingCase;
+    const previousStatus = dataset?.rows.find(
+      (row) => row.dataset_row_id === datasetRowId
+    )?.currentStatus || "no_case";
+    if (nextCase && previousStatus !== nextCase.status) {
+      const summaryKeys = { no_case: "noCase", open: "open", in_progress: "inProgress", closed: "closed" };
+      setCanonicalSummary((summary) => ({
+        ...summary,
+        [summaryKeys[previousStatus]]: Math.max(0, (summary[summaryKeys[previousStatus]] || 0) - 1),
+        [summaryKeys[nextCase.status]]: (summary[summaryKeys[nextCase.status]] || 0) + 1,
+      }));
+    }
+    setDataset((current) => {
+      if (!current || !nextCase) return current;
+      return {
+      ...current,
+      rows: current.rows.map((row) => row.dataset_row_id === datasetRowId ? {
+        ...row,
+        case: nextCase,
+        currentStatus: nextCase.status || "no_case",
+        caseOwnerLabel: assignableOwners.find(
+          (owner) => owner.membershipId === nextCase.owner_membership_id
+        )?.fullName || assignableOwners.find(
+          (owner) => owner.membershipId === nextCase.owner_membership_id
+        )?.email || "",
+      } : row),
+      };
+    });
+    setEventsVersion((value) => value + 1);
+  }
+
+  async function runCaseMutation(request, fallbackMessage, onSuccess) {
+    setCaseMutation({ loading: true, error: "" });
+    try {
+      const response = await fetch(request.url, {
+        method: request.method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request.body),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data?.error?.message || data?.error || fallbackMessage);
+      onSuccess(data);
+    } catch (error) {
+      setCaseMutation({ loading: false, error: error.message || fallbackMessage });
+      return;
+    }
+    setCaseMutation({ loading: false, error: "" });
+  }
+
+  function startFollowUp(row) {
+    runCaseMutation({
+      url: "/api/workspace/closing-loop/cases",
+      method: "POST",
+      body: { datasetRowId: row.dataset_row_id, ownerMembershipId: null, priority: "normal" },
+    }, copy.errors.create, (data) => applyCanonicalCase(row.dataset_row_id, data.case));
+  }
+
+  function updateFollowUp(row, patch) {
+    runCaseMutation({
+      url: `/api/workspace/closing-loop/cases/${encodeURIComponent(row.case.id)}`,
+      method: "PATCH",
+      body: patch,
+    }, copy.errors.update, (data) => {
+      applyCanonicalCase(row.dataset_row_id, data.case);
+      if (patch.note) setNoteDraft("");
+    });
+  }
+
+  function addFollowUpNote(row) {
+    const note = noteDraft.trim();
+    if (!note) {
+      setCaseMutation({ loading: false, error: copy.errors.noteRequired });
+      return;
+    }
+    runCaseMutation({
+      url: `/api/workspace/closing-loop/cases/${encodeURIComponent(row.case.id)}/notes`,
+      method: "POST",
+      body: { note },
+    }, copy.errors.note, () => {
+      setNoteDraft("");
+      setEventsVersion((value) => value + 1);
+    });
+  }
 
   function saveAction(actionKey, patch) {
     setActions((current) => {
@@ -708,9 +832,9 @@ function selectRow(row) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
-          <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>Loading follow-up queue...</p>
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h1>{copy.title}</h1>
+          <p>{copy.loading}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -765,9 +889,9 @@ function selectRow(row) {
   return (
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
-        <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-        <h1>{PAGE_COPY.title}</h1>
-        <p>{subtitle}</p>
+        <p className="eyebrow">{copy.eyebrow}</p>
+        <h1>{copy.title}</h1>
+        <p>{mode === "canonical" ? copy.subtitle : subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -775,41 +899,23 @@ function selectRow(row) {
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
       <section className="csv-nps-results">
-        {mode === "canonical" && (
-          <div className="csv-nps-loop-readonly-notice">
-            <strong>
-              {permissions.role === "viewer"
-                ? "Read-only Workspace access"
-                : "Case workflow is temporarily read-only"}
-            </strong>
-            <p>
-              {permissions.role === "viewer"
-                ? "Your current Workspace role can review cases and history but cannot change them."
-                : "Canonical cases and history are now shown here. Case updates will be connected in the next workflow release."}
-            </p>
-            <p className="csv-nps-muted-cell">
-              Effective role: {permissions.role || "unknown"} · Assignable owners: {assignableOwners.length}
-            </p>
-          </div>
-        )}
-
         <div className="csv-nps-metric-grid csv-nps-loop-summary-strip">
-          <MetricCard label="Total" value={counts.total} />
+          <MetricCard label={copy.summary.total} value={counts.total} />
           {mode === "canonical" && (
-            <MetricCard label="No case" value={counts.noCase} />
+            <MetricCard label={copy.summary.noCase} value={counts.noCase} />
           )}
-          <MetricCard label="Open" value={counts.open} />
-          <MetricCard label="In progress" value={counts.inProgress} />
-          <MetricCard label="Closed" value={counts.closed} />
-          <MetricCard label="Open detractors" value={counts.openDetractors} />
+          <MetricCard label={copy.summary.open} value={counts.open} />
+          <MetricCard label={copy.summary.inProgress} value={counts.inProgress} />
+          <MetricCard label={copy.summary.closed} value={counts.closed} />
+          <MetricCard label={copy.summary.openDetractors} value={counts.openDetractors} />
           {mode === "canonical" && (
             <>
               <MetricCard
-                label="High-priority active"
+                label={copy.summary.highPriority}
                 value={counts.highPriorityActive}
               />
               <MetricCard
-                label="Unassigned active"
+                label={copy.summary.unassigned}
                 value={counts.unassignedActive}
               />
             </>
@@ -819,8 +925,8 @@ function selectRow(row) {
         <section className="csv-nps-loop-overview">
           <div className="csv-nps-loop-overview-toggle-row">
             <div>
-              <h2>Management overview</h2>
-              <p>Status coverage and the detractors that need attention first.</p>
+              <h2>{copy.overview.title}</h2>
+              <p>{copy.overview.subtitle}</p>
             </div>
             <button
               type="button"
@@ -829,7 +935,7 @@ function selectRow(row) {
               aria-controls="closing-loop-management-overview"
               onClick={() => setManagementOverviewOpen((current) => !current)}
             >
-              {managementOverviewOpen ? "Hide overview" : "Show overview"}
+              {managementOverviewOpen ? copy.overview.hide : copy.overview.show}
             </button>
           </div>
 
@@ -841,10 +947,12 @@ function selectRow(row) {
               <CloseLoopStatusChart
                 counts={counts}
                 showNoCase={mode === "canonical"}
+                copy={copy}
               />
               <UrgentDetractorsPanel
                 rows={urgentDetractors}
                 onSelect={selectRow}
+                copy={copy}
               />
             </div>
           )}
@@ -875,35 +983,39 @@ function selectRow(row) {
                 saveAction(getActionKey(selectedRow), patch)
               }
               onSaveAction={() => persistAction(selectedRow)}
-              readOnly={mode === "canonical"}
+              readOnly={mode === "canonical" && !permissions.canMutate}
+              copy={copy}
+              assignableOwners={assignableOwners}
+              caseEvents={caseEvents}
+              caseEventsLoading={caseEventsLoading}
+              caseEventsError={caseEventsError}
+              caseMutation={caseMutation}
+              noteDraft={noteDraft}
+              onNoteChange={setNoteDraft}
+              onStartFollowUp={() => startFollowUp(selectedRow)}
+              onUpdateFollowUp={(patch) => updateFollowUp(selectedRow, patch)}
+              onAddNote={() => addFollowUpNote(selectedRow)}
             />
           </div>
         )}
 
         <div className="csv-nps-loop-queue-header">
           <div>
-            <p className="eyebrow">Operations queue</p>
-            <h2>Responses requiring review</h2>
+            <p className="eyebrow">{copy.queue.eyebrow}</p>
+            <h2>{copy.queue.title}</h2>
             <p>
-              Showing {rows.length} of{" "}
+              {copy.queue.showing} {rows.length} {copy.queue.of}{" "}
               {mode === "canonical"
                 ? canonicalPagination?.totalMatching ?? counts.total
                 : dataset.rows.length}{" "}
-              response
-              {(mode === "canonical"
-                ? canonicalPagination?.totalMatching ?? counts.total
-                : dataset.rows.length) === 1
-                ? ""
-                : "s"}.
+              {" "}{(mode === "canonical" ? canonicalPagination?.totalMatching ?? counts.total : dataset.rows.length) === 1 ? copy.queue.response : copy.queue.responses}
+              .
             </p>
           </div>
         </div>
 
         {mode === "canonical" ? (
-          <p className="csv-nps-muted-cell">
-            Workspace-wide filters and load-more controls will be connected to
-            the server-side read contract in a later frontend update.
-          </p>
+        <></>
         ) : (
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
@@ -950,7 +1062,7 @@ function selectRow(row) {
         <div className={mode === "canonical" ? "csv-nps-loop-queue" : "csv-nps-loop-list"}>
           {rows.length === 0 ? (
             <div className="csv-nps-empty-state">
-              No responses match the current filters.
+              {copy.queue.empty}
             </div>
           ) : (
             mode === "canonical" ? (
@@ -958,6 +1070,9 @@ function selectRow(row) {
                 rows={rows}
                 selectedRow={selectedRow}
                 onSelect={selectRow}
+                onStartFollowUp={startFollowUp}
+                canMutate={permissions.canMutate}
+                copy={copy}
               />
             ) : (
               rows.map((row) => (
@@ -1271,21 +1386,21 @@ function getActionKey(row) {
   );
 }
 
-function CloseLoopStatusChart({ counts, showNoCase = false }) {
+function CloseLoopStatusChart({ counts, showNoCase = false, copy }) {
   const max = Math.max(counts.open, counts.inProgress, counts.closed, 1);
 
   const items = [
-    { key: "open", label: "Open", value: counts.open },
-    { key: "in_progress", label: "In progress", value: counts.inProgress },
-    { key: "closed", label: "Closed", value: counts.closed },
+    { key: "open", label: copy.statuses.open, value: counts.open },
+    { key: "in_progress", label: copy.statuses.in_progress, value: counts.inProgress },
+    { key: "closed", label: copy.statuses.closed, value: counts.closed },
   ];
 
   return (
     <section className="csv-nps-loop-management-card">
       <div className="csv-nps-loop-management-header">
         <div>
-          <h3>Follow-up status</h3>
-          <p>Shared close-the-loop progress for the selected period.</p>
+          <h3>{copy.overview.statusTitle}</h3>
+          <p>{copy.overview.statusSubtitle}</p>
         </div>
       </div>
 
@@ -1311,30 +1426,26 @@ function CloseLoopStatusChart({ counts, showNoCase = false }) {
 
       {showNoCase && (
         <p className="csv-nps-muted-cell">
-          No case: <strong>{counts.noCase}</strong>. These responses are kept
-          separate from open cases.
+          <strong>{counts.noCase}</strong> {copy.overview.noCaseHint}
         </p>
       )}
     </section>
   );
 }
 
-function UrgentDetractorsPanel({ rows, onSelect }) {
+function UrgentDetractorsPanel({ rows, onSelect, copy }) {
   return (
     <section className="csv-nps-loop-urgent-panel">
       <div className="csv-nps-loop-management-header">
         <div>
-          <h3>Needs attention first</h3>
-          <p>
-            Lowest-scoring open detractors, prioritised for same-day follow-up
-            where possible.
-          </p>
+          <h3>{copy.overview.urgentTitle}</h3>
+          <p>{copy.overview.urgentSubtitle}</p>
         </div>
       </div>
 
       {rows.length === 0 ? (
         <div className="csv-nps-empty-state csv-nps-empty-state-compact">
-          No open detractors in the selected period.
+          {copy.overview.noneUrgent}
         </div>
       ) : (
         <div className="csv-nps-loop-urgent-list">
@@ -1346,23 +1457,23 @@ function UrgentDetractorsPanel({ rows, onSelect }) {
               <div>
                 <div className="csv-nps-loop-urgent-topline">
                   <span className="csv-nps-bucket csv-nps-bucket-detractor">
-                    Detractor
+                    {copy.buckets.detractor}
                   </span>
                   <span className="csv-nps-loop-score">
-                    Score {row.score ?? "—"}
+                    {copy.detail.score} {row.score ?? "—"}
                   </span>
                   <span
                     className={`csv-nps-loop-status csv-nps-loop-status-${row.currentStatus}`}
                   >
-                    {formatStatus(row.currentStatus)}
+                    {formatStatus(row.currentStatus, copy)}
                   </span>
                 </div>
 
-                <h4>{row.contact_label || "Contact"}</h4>
+                <h4>{row.contact_label || copy.queue.customerResponse}</h4>
 
                 <p>
                   {truncateText(
-                    row.comment || "No comment provided.",
+                    row.comment || copy.queue.noComment,
                     180
                   )}
                 </p>
@@ -1374,7 +1485,7 @@ function UrgentDetractorsPanel({ rows, onSelect }) {
                   className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
                   onClick={() => onSelect(row)}
                 >
-                  View response
+                  {copy.overview.view}
                 </button>
                 {row.intercom_contact_url && (
                   <a
@@ -1476,18 +1587,18 @@ function MetricCard({ label, value }) {
   );
 }
 
-function ClosingLoopQueue({ rows, selectedRow, onSelect }) {
+function ClosingLoopQueue({ rows, selectedRow, onSelect, onStartFollowUp, canMutate, copy }) {
   return (
-    <div className="csv-nps-loop-queue-table" role="table" aria-label="Closing the Loop operations queue">
+    <div className="csv-nps-loop-queue-table" role="table" aria-label={copy.queue.title}>
       <div className="csv-nps-loop-queue-columns" role="row">
-        <span role="columnheader">Priority</span>
-        <span role="columnheader">Score</span>
-        <span role="columnheader">Response</span>
-        <span role="columnheader">Context</span>
-        <span role="columnheader">Owner</span>
-        <span role="columnheader">Case state</span>
-        <span role="columnheader">Activity</span>
-        <span role="columnheader">Actions</span>
+        <span role="columnheader">{copy.queue.priority}</span>
+        <span role="columnheader">{copy.queue.score}</span>
+        <span role="columnheader">{copy.queue.customerResponse}</span>
+        <span role="columnheader">{copy.queue.context}</span>
+        <span role="columnheader">{copy.queue.owner}</span>
+        <span role="columnheader">{copy.queue.progress}</span>
+        <span role="columnheader">{copy.queue.activity}</span>
+        <span role="columnheader">{copy.queue.actions}</span>
       </div>
 
       <div role="rowgroup">
@@ -1500,6 +1611,12 @@ function ClosingLoopQueue({ rows, selectedRow, onSelect }) {
               getActionKey(selectedRow) === getActionKey(row)
             }
             onSelect={() => onSelect(row)}
+            onStartFollowUp={() => {
+              onSelect(row);
+              onStartFollowUp(row);
+            }}
+            canMutate={canMutate}
+            copy={copy}
           />
         ))}
       </div>
@@ -1507,15 +1624,14 @@ function ClosingLoopQueue({ rows, selectedRow, onSelect }) {
   );
 }
 
-function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
+function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMutate, copy }) {
   const priority = row.case?.priority || "not_set";
-  const workflowHelpId = `closing-loop-workflow-help-${row.dataset_row_id}`;
   const lastActivity =
     row.case?.updated_at ||
     row.latestLegacyAction?.updatedAt ||
     row.created_at ||
     row.submitted_at;
-  const workflowLabel = row.case ? "Continue case" : "Start case";
+  const workflowLabel = row.case ? copy.queue.continue : copy.queue.start;
 
   function handleRowClick(event) {
     if (event.target.closest("button, a")) return;
@@ -1531,57 +1647,58 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
       aria-current={isSelected ? "true" : undefined}
       onClick={handleRowClick}
     >
-      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-priority" role="cell" data-label="Priority">
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-priority" role="cell" data-label={copy.queue.priority}>
         <span className={`csv-nps-loop-priority csv-nps-loop-priority-${priority}`}>
-          {formatPriority(priority)}
+          {formatPriority(priority, copy)}
         </span>
       </div>
 
-      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-score" role="cell" data-label="Score">
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-score" role="cell" data-label={copy.queue.score}>
         <strong>{row.score ?? "—"}</strong>
         <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
-          {row.bucket || "Unknown"}
+          {copy.buckets[row.bucket] || copy.buckets.unknown}
         </span>
       </div>
 
-      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-response" role="cell" data-label="Response">
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-response" role="cell" data-label={copy.queue.customerResponse}>
         <button type="button" className="csv-nps-loop-response-button" onClick={onSelect}>
-          <strong>{row.contact_label || "Response"}</strong>
-          <span>{truncateText(row.comment || "No comment provided.", 160)}</span>
+          <strong>{row.contact_label || copy.queue.customerResponse}</strong>
+          <span>{truncateText(row.comment || copy.queue.noComment, 160)}</span>
         </button>
         {row.latestLegacyAction && (
-          <span className="csv-nps-loop-legacy-indicator">Earlier legacy follow-up</span>
+          <span className="csv-nps-loop-legacy-indicator">{copy.queue.earlierHistory}</span>
         )}
       </div>
 
-      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-context" role="cell" data-label="Context">
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-context" role="cell" data-label={copy.queue.context}>
         <strong>{row.company || row.stage || "—"}</strong>
         {row.company && row.stage && <span>{row.stage}</span>}
         <span>{formatCompactDate(row.submitted_at)}</span>
       </div>
 
-      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Owner">
-        <strong>{row.caseOwnerLabel || "Unassigned"}</strong>
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label={copy.queue.owner}>
+        <strong>{row.caseOwnerLabel || copy.queue.unassigned}</strong>
       </div>
 
-      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Case state">
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label={copy.queue.progress}>
         <span className={`csv-nps-loop-status csv-nps-loop-status-${row.currentStatus}`}>
-          {formatStatus(row.currentStatus)}
+          {formatStatus(row.currentStatus, copy)}
         </span>
       </div>
 
-      <div className="csv-nps-loop-queue-cell" role="cell" data-label="Activity">
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label={copy.queue.activity}>
         <span>{formatCompactDate(lastActivity)}</span>
       </div>
 
-      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-actions" role="cell" data-label="Actions">
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-actions" role="cell" data-label={copy.queue.actions}>
         <div className="csv-nps-loop-queue-action-links">
           <button
             type="button"
             className="csv-nps-button csv-nps-button-compact"
-            onClick={onSelect}
+            onClick={row.case ? onSelect : onStartFollowUp}
+            disabled={!row.case && !canMutate}
           >
-            View response
+            {copy.queue.view}
           </button>
           {row.intercom_contact_url && (
             <a
@@ -1590,7 +1707,7 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
               rel="noreferrer"
               className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
             >
-              Open in Intercom
+              {copy.queue.intercom}
             </a>
           )}
         </div>
@@ -1598,14 +1715,10 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect }) {
           <button
             type="button"
             className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
-            disabled
-            aria-describedby={workflowHelpId}
+            onClick={onSelect}
           >
             {workflowLabel}
           </button>
-          <span id={workflowHelpId} className="csv-nps-loop-workflow-help">
-            Available in the next workflow step.
-          </span>
         </div>
       </div>
     </article>
@@ -1807,25 +1920,38 @@ function SelectedResponsePanel({
   onActionChange,
   onSaveAction,
   readOnly = false,
+  copy,
+  assignableOwners = [],
+  caseEvents = [],
+  caseEventsLoading,
+  caseEventsError,
+  caseMutation,
+  noteDraft,
+  onNoteChange,
+  onStartFollowUp,
+  onUpdateFollowUp,
+  onAddNote,
 }) {
-  const buttonLabel = action?.isSaving
-    ? "Saving..."
-    : action?.isDirty
-      ? "Save follow-up"
-      : savedActions.length
-        ? "Add another follow-up"
-        : "Save follow-up";
+  const hasCase = Boolean(row.case);
+  const status = row.case?.status || "no_case";
+  const nextStatusAction = status === "open"
+    ? { label: copy.detail.moveFollowing, status: "in_progress" }
+    : status === "in_progress"
+      ? { label: copy.detail.resolve, status: "closed" }
+      : status === "closed"
+        ? { label: copy.detail.reopen, status: "in_progress" }
+        : null;
 
   return (
     <section className="csv-nps-panel csv-nps-selected-response-panel">
       <div className="csv-nps-responses-header">
         <div>
-          <p className="eyebrow">Selected response</p>
+          <p className="eyebrow">{copy.detail.eyebrow}</p>
           <h2>{row.contact_label || "Contact"}</h2>
           <p>
-            Score {row.score ?? "—"} · {row.bucket || "unknown"} ·{" "}
-            {row.submitted_at?.slice(0, 10) || "No date"} ·{" "}
-            {formatStatus(currentStatus)}
+            {copy.detail.score} {row.score ?? "—"} · {copy.buckets[row.bucket] || copy.buckets.unknown} ·{" "}
+            {row.submitted_at?.slice(0, 10) || copy.detail.noDate} ·{" "}
+            {formatStatus(currentStatus, copy)}
           </p>
           {(row.company || row.stage) && (
             <p>
@@ -1841,184 +1967,133 @@ function SelectedResponsePanel({
             rel="noreferrer"
             className="text-link"
           >
-            Open in Intercom
+            {copy.detail.intercom}
           </a>
         )}
       </div>
 
-      <div
-        className="csv-nps-selected-response-grid"
-        style={{ gridTemplateColumns: "minmax(0, 1fr)" }}
-      >
-        <div className="csv-nps-selected-response-card">
-          <h3>Full survey response</h3>
-          <p className="csv-nps-muted-cell">
-            Question-level scores and comments from the survey, combined into one view.
-          </p>
+      <div className="csv-nps-customer-workspace-grid">
+        <div className="csv-nps-selected-response-card csv-nps-customer-feedback-card">
+          <h3>{copy.detail.feedback}</h3>
+          <p className="csv-nps-muted-cell">{copy.detail.feedbackHelp}</p>
 
           {detailLoading && (
-            <p className="csv-nps-muted-cell">Loading complete response…</p>
+            <p className="csv-nps-muted-cell">{copy.detail.loading}</p>
           )}
           {detailError && (
             <div className="csv-nps-error csv-nps-error-compact">{detailError}</div>
           )}
-          <SurveyQuestionScoreTable row={row} />
+          <SurveyQuestionScoreTable row={row} copy={copy} />
         </div>
 
-        <div className="csv-nps-selected-response-card">
-          <div className="csv-nps-selected-response-card-header">
-            <div>
-              <h3>Suggested reply draft</h3>
-              <p>Generate a French Intercom draft and review it before sending.</p>
-            </div>
-
-            <button
-              type="button"
-              className="csv-nps-button"
-              onClick={onGenerateDraft}
-              disabled={replyDraftLoading}
-            >
-              {replyDraftLoading ? "Generating..." : "Generate draft"}
-            </button>
-          </div>
-
-          {replyDraftError && (
-            <div className="csv-nps-error csv-nps-error-compact">
-              {replyDraftError}
-            </div>
-          )}
-
-          {replyDraft?.body ? (
-            <>
-              <textarea
-                value={replyDraft.body}
-                onChange={(e) => onDraftChange(e.target.value)}
-                rows={7}
-                className="csv-nps-reply-draft-textarea"
-              />
-
-              <button
-                type="button"
-                className="csv-nps-button csv-nps-button-secondary"
-                onClick={onCopyDraft}
-              >
-                {replyDraftCopied ? "Copied" : "Copy draft"}
+        <div className="csv-nps-selected-response-card csv-nps-next-action-card">
+          <h3>{copy.detail.nextAction}</h3>
+          {!hasCase ? (
+            <div className="csv-nps-no-follow-up-state">
+              <strong>{copy.detail.noFollowUp}</strong>
+              <p>{copy.detail.noFollowUpHelp}</p>
+              <button type="button" className="csv-nps-button" onClick={onStartFollowUp} disabled={readOnly || caseMutation.loading}>
+                {caseMutation.loading ? copy.detail.saving : copy.detail.start}
               </button>
-            </>
+            </div>
           ) : (
-            !replyDraftLoading &&
-            !replyDraftError && (
-              <p className="csv-nps-muted-cell">
-                No draft generated yet.
-              </p>
-            )
+            <>
+              {row.intercom_contact_url && (
+                <a href={row.intercom_contact_url} target="_blank" rel="noreferrer" className="csv-nps-button csv-nps-button-secondary">
+                  {copy.detail.contact}
+                </a>
+              )}
+              {nextStatusAction && (
+                <button type="button" className="csv-nps-button" onClick={() => onUpdateFollowUp({ status: nextStatusAction.status, ...(nextStatusAction.status === "closed" ? { note: noteDraft.trim() } : {}) })} disabled={readOnly || caseMutation.loading || (nextStatusAction.status === "closed" && !noteDraft.trim())}>
+                  {nextStatusAction.label}
+                </button>
+              )}
+              <label className="csv-nps-filter-field">
+                <span>{copy.detail.owner}</span>
+                <select value={row.case.owner_membership_id || ""} onChange={(event) => onUpdateFollowUp({ ownerMembershipId: event.target.value || null })} disabled={readOnly || caseMutation.loading}>
+                  <option value="">{copy.queue.unassigned}</option>
+                  {assignableOwners.map((owner) => <option key={owner.membershipId} value={owner.membershipId}>{owner.fullName || owner.email}</option>)}
+                </select>
+              </label>
+              <label className="csv-nps-filter-field">
+                <span>{copy.detail.priority}</span>
+                <select value={row.case.priority || "normal"} onChange={(event) => onUpdateFollowUp({ priority: event.target.value })} disabled={readOnly || caseMutation.loading}>
+                  {["high", "normal", "low"].map((priority) => <option key={priority} value={priority}>{copy.priorities[priority]}</option>)}
+                </select>
+              </label>
+            </>
           )}
-
-          <p className="csv-nps-muted-cell">
-            Human-in-the-loop: this is a suggested draft only.
-          </p>
+          {caseMutation.error && <div className="csv-nps-error csv-nps-error-compact">{caseMutation.error}</div>}
         </div>
 
-        <div className="csv-nps-selected-response-card">
-          <h3>Manage follow-up</h3>
+        <div className="csv-nps-selected-response-card csv-nps-timeline-card">
+          <h3>{copy.detail.timeline}</h3>
+          <p className="csv-nps-muted-cell">{copy.detail.timelineHelp}</p>
+          {caseEventsLoading && <p className="csv-nps-muted-cell">{copy.detail.loading}</p>}
+          {caseEventsError && <div className="csv-nps-error csv-nps-error-compact">{caseEventsError}</div>}
+          {!caseEventsLoading && caseEvents.length === 0 ? <p className="csv-nps-muted-cell">{copy.detail.timelineEmpty}</p> : (
+            <div className="csv-nps-case-timeline">{caseEvents.map((event) => <CaseTimelineEvent key={event.id} event={event} copy={copy} />)}</div>
+          )}
+        </div>
 
-          <label className="csv-nps-filter-field">
-            <span>Status</span>
-            <select
-              value={action?.status || "open"}
-              onChange={(e) => onActionChange({ status: e.target.value })}
-              disabled={readOnly}
-            >
-              <option value="no_case">No case</option>
-              <option value="open">Open</option>
-              <option value="in_progress">In progress</option>
-              <option value="closed">Closed</option>
-            </select>
-          </label>
-
-          <label className="csv-nps-filter-field">
-            <span>Owner</span>
-            <input
-              type="text"
-              value={action?.owner || ""}
-              onChange={(e) => onActionChange({ owner: e.target.value })}
-              placeholder="Who is following up?"
-              disabled={readOnly}
-            />
-          </label>
-
-          <label className="csv-nps-filter-field csv-nps-loop-action-field">
-            <span>Action taken or next step</span>
-            <textarea
-              value={action?.actionTaken || ""}
-              onChange={(e) => onActionChange({ actionTaken: e.target.value })}
-              placeholder="Example: Called customer, apologised, offered a fix, or escalated the issue..."
-              rows={4}
-              disabled={readOnly}
-            />
-          </label>
-
-          <button
-            type="button"
-            className="csv-nps-button"
-            onClick={onSaveAction}
-            disabled={readOnly || action?.isSaving}
-          >
-            {readOnly ? "Updates coming next" : buttonLabel}
+        <div className="csv-nps-selected-response-card csv-nps-notes-card">
+          <h3>{copy.detail.notes}</h3>
+          <textarea value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
+          <button type="button" className="csv-nps-button" onClick={onAddNote} disabled={!hasCase || readOnly || caseMutation.loading}>
+            {caseMutation.loading ? copy.detail.saving : copy.detail.saveNote}
           </button>
-
-          {readOnly && (
-            <p className="csv-nps-muted-cell">
-              Priority: {row.case?.priority || "Not set"}. Owner: {row.caseOwnerLabel || "Unassigned"}.
-            </p>
-          )}
-
-          {action?.saveError && (
-            <div className="csv-nps-error csv-nps-error-compact">
-              {action.saveError}
-            </div>
-          )}
-
-          {savedActions.length > 0 && (
-            <div className="csv-nps-loop-saved-actions">
-              <span className="csv-nps-loop-saved-actions-title">
-                {savedActions.some((savedAction) => savedAction.isLegacy)
-                  ? "Earlier legacy follow-up"
-                  : "Follow-up log"}
-              </span>
-
-              {savedActions.map((savedAction) => (
-                <div
-                  key={savedAction.id || savedAction.updatedAt}
-                  className="csv-nps-loop-saved-action"
-                >
-                  <div className="csv-nps-loop-saved-action-meta">
-                    <strong>{formatStatus(savedAction.status)}</strong>
-
-                    {savedAction.owner && (
-                      <span>
-                        {savedAction.isLegacy ? "Legacy owner: " : ""}
-                        {savedAction.owner}
-                      </span>
-                    )}
-
-                    {savedAction.updatedAt && (
-                      <span>{new Date(savedAction.updatedAt).toLocaleString()}</span>
-                    )}
-                  </div>
-
-                  {savedAction.actionTaken && <p>{savedAction.actionTaken}</p>}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="csv-nps-reminder-placeholder">
+            <strong>{copy.detail.reminder}</strong>
+            <span>{copy.detail.reminderHelp}</span>
+            <button type="button" className="csv-nps-button csv-nps-button-secondary" disabled>{copy.detail.reminderUnavailable}</button>
+            {/* TODO: Persist reminders once the canonical backend exposes a reminder contract. */}
+          </div>
         </div>
+
+        <details className="csv-nps-selected-response-card csv-nps-collapsible-card">
+          <summary><span>{copy.detail.legacy}</span><small>{copy.detail.legacyHelp}</small></summary>
+          {savedActions.length ? savedActions.map((savedAction) => <div key={savedAction.id || savedAction.updatedAt} className="csv-nps-loop-saved-action"><div className="csv-nps-loop-saved-action-meta"><strong>{formatStatus(savedAction.status, copy)}</strong>{savedAction.updatedAt && <span>{new Date(savedAction.updatedAt).toLocaleString()}</span>}</div>{savedAction.actionTaken && <p>{savedAction.actionTaken}</p>}</div>) : <p className="csv-nps-muted-cell">{copy.detail.noLegacy}</p>}
+        </details>
+
+        <details className="csv-nps-selected-response-card csv-nps-collapsible-card">
+          <summary><span>{copy.detail.replyTools}</span><small>{copy.detail.replyHelp}</small></summary>
+          <button type="button" className="csv-nps-button" onClick={onGenerateDraft} disabled={replyDraftLoading}>{replyDraftLoading ? copy.detail.generating : copy.detail.generate}</button>
+          {replyDraftError && <div className="csv-nps-error csv-nps-error-compact">{replyDraftError}</div>}
+          {replyDraft?.body ? <><textarea value={replyDraft.body} onChange={(event) => onDraftChange(event.target.value)} rows={7} className="csv-nps-reply-draft-textarea" /><button type="button" className="csv-nps-button csv-nps-button-secondary" onClick={onCopyDraft}>{replyDraftCopied ? copy.detail.copied : copy.detail.copy}</button></> : !replyDraftLoading && !replyDraftError && <p className="csv-nps-muted-cell">{copy.detail.noDraft}</p>}
+          <p className="csv-nps-muted-cell">{copy.detail.draftNotice}</p>
+        </details>
       </div>
     </section>
   );
 }
 
-function SurveyQuestionScoreTable({ row }) {
+function CaseTimelineEvent({ event, copy }) {
+  const labels = {
+    case_created: copy.detail.caseOpened,
+    note_added: copy.detail.noteAdded,
+    status_changed: copy.detail.statusChanged,
+    owner_changed: copy.detail.ownerChanged,
+    priority_changed: copy.detail.priorityChanged,
+  };
+  const detail = event.event_type === "status_changed"
+    ? formatStatus(event.new_status, copy)
+    : event.event_type === "priority_changed"
+      ? copy.priorities[event.new_priority]
+      : event.note || "";
+
+  return (
+    <article className="csv-nps-case-timeline-event">
+      <span className="csv-nps-case-timeline-marker" aria-hidden="true" />
+      <div>
+        <strong>{labels[event.event_type] || copy.detail.event}</strong>
+        {detail && <p>{detail}</p>}
+        <time dateTime={event.created_at}>{formatCompactDateTime(event.created_at)}</time>
+      </div>
+    </article>
+  );
+}
+
+function SurveyQuestionScoreTable({ row, copy }) {
   const selectedBenefits = uniqueStrings([
     row.q_benefits,
     ...(Array.isArray(row.selected_options) ? row.selected_options : []),
@@ -2044,51 +2119,51 @@ function SurveyQuestionScoreTable({ row }) {
 
   const questions = [
     {
-      label: "Recommendation",
+      label: copy.detail.recommendation,
       score: row.q_recommend_score,
       comment: row.q_recommend_comment,
     },
     {
-      label: "Installation and getting started",
+      label: copy.detail.installation,
       score: row.q_install_score,
       comment: row.q_install_comment,
     },
     {
-      label: "Daily use",
+      label: copy.detail.dailyUse,
       score: row.q_daily_use_score,
       comment: row.q_daily_use_comment,
     },
     {
-      label: "Benefits selected",
+      label: copy.detail.benefits,
       score: null,
       comment: selectedBenefits,
     },
     {
-      label: "Parent relationship impact",
+      label: copy.detail.parentRelation,
       score: row.q_parent_relation_score,
       comment: row.q_parent_relation_comment,
     },
     {
-      label: "Envola support",
+      label: copy.detail.support,
       score: row.q_support_score,
       comment: row.q_support_comment,
     },
     {
-      label: "Final comment",
+      label: copy.detail.finalComment,
       score: null,
       comment: row.q_final_comment,
     },
     ...extraQuestions,
     {
-      label: "Overall NPS",
-      helper: "Headline score",
+      label: copy.detail.overallNps,
+      helper: copy.detail.headlineScore,
       score: row.score,
       comment: mainComment,
     },
     ...(shouldShowMainComment && row.score == null
       ? [
           {
-            label: "Additional comment",
+            label: copy.detail.additionalComment,
             score: null,
             comment: mainComment,
           },
@@ -2108,7 +2183,7 @@ function SurveyQuestionScoreTable({ row }) {
   if (questions.length === 0) {
     return (
       <p className="csv-nps-muted-cell">
-        No question-level scores or comments were found for this response.
+        {copy.detail.noQuestions}
       </p>
     );
   }
@@ -2118,9 +2193,9 @@ function SurveyQuestionScoreTable({ row }) {
       <table className="csv-nps-table csv-nps-survey-response-table">
         <thead>
           <tr>
-            <th>Question</th>
-            <th>Score</th>
-            <th>Comment</th>
+            <th>{copy.detail.question}</th>
+            <th>{copy.detail.score}</th>
+            <th>{copy.detail.comment}</th>
           </tr>
         </thead>
 
@@ -2254,18 +2329,26 @@ function ResponseDetail({ label, value }) {
   );
 }
 
-function formatStatus(status) {
+function formatStatus(status, copy) {
+  if (copy?.statuses?.[status]) return copy.statuses[status];
   if (status === "no_case") return "No case";
   if (status === "in_progress") return "In progress";
   if (status === "closed") return "Closed";
   return "Open";
 }
 
-function formatPriority(priority) {
+function formatPriority(priority, copy) {
+  if (copy?.priorities?.[priority]) return copy.priorities[priority];
   if (priority === "high") return "High";
   if (priority === "low") return "Low";
   if (priority === "normal") return "Normal";
   return "Not set";
+}
+
+function formatCompactDateTime(value) {
+  const date = new Date(value || "");
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
 function formatCompactDate(value) {

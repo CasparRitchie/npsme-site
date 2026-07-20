@@ -1,4 +1,17 @@
 @media (max-width: 900px) {
+  .csv-nps-customer-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .csv-nps-customer-feedback-card,
+  .csv-nps-timeline-card,
+  .csv-nps-next-action-card,
+  .csv-nps-notes-card,
+  .csv-nps-collapsible-card {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
   .csv-nps-performance-grid {
     grid-template-columns: 1fr;
   }

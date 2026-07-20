@@ -436,6 +436,13 @@ export default function CsvNpsClosingTheLoop() {
   }
 
   function updateFollowUp(row, patch) {
+    if (patch.status === "closed" && !String(patch.note || "").trim()) {
+      setCaseMutation({ loading: false, error: copy.errors.closureNoteRequired });
+      window.requestAnimationFrame(() => {
+        document.getElementById("closing-loop-note")?.focus();
+      });
+      return;
+    }
     runCaseMutation({
       url: `/api/workspace/closing-loop/cases/${encodeURIComponent(row.case.id)}`,
       method: "PATCH",
@@ -2008,7 +2015,7 @@ function SelectedResponsePanel({
                 </a>
               )}
               {nextStatusAction && (
-                <button type="button" className="csv-nps-button" onClick={() => onUpdateFollowUp({ status: nextStatusAction.status, ...(nextStatusAction.status === "closed" ? { note: noteDraft.trim() } : {}) })} disabled={readOnly || caseMutation.loading || (nextStatusAction.status === "closed" && !noteDraft.trim())}>
+                <button type="button" className="csv-nps-button" onClick={() => onUpdateFollowUp({ status: nextStatusAction.status, ...(nextStatusAction.status === "closed" ? { note: noteDraft.trim() } : {}) })} disabled={readOnly || caseMutation.loading}>
                   {nextStatusAction.label}
                 </button>
               )}
@@ -2042,7 +2049,7 @@ function SelectedResponsePanel({
 
         <div className="csv-nps-selected-response-card csv-nps-notes-card">
           <h3>{copy.detail.notes}</h3>
-          <textarea value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
+          <textarea id="closing-loop-note" value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
           <button type="button" className="csv-nps-button" onClick={onAddNote} disabled={!hasCase || readOnly || caseMutation.loading}>
             {caseMutation.loading ? copy.detail.saving : copy.detail.saveNote}
           </button>

@@ -33,7 +33,11 @@ const PAGE_COPY = {
 export default function CsvNpsClosingTheLoop() {
   const { datasetId } = useParams();
   const { lang } = useLanguage();
-  const copy = translations[lang].workspaceClosingLoop;
+  const copy = translations(
+    lang || "en",
+    "workspaceClosingLoop",
+    translations("en", "workspaceClosingLoop", {})
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseRef = searchParams.get("response");
   const isWorkspaceRoute = /^\/(?:fr\/)?workspace(?:\/|$)/.test(

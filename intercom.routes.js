@@ -20,6 +20,10 @@ import {
   rebuildEnvolaResponsesFile,
   getCanonicalResponses,
   } from "./envola.routes.js";
+import {
+  CLOSING_LOOP_THEME_RULES,
+  detectClosingLoopThemes,
+} from "./shared/closingLoopThemes.js";
 
 
 // --- Private auth (shared password cookie) ---
@@ -132,22 +136,7 @@ let lastNpsIngestAt = 0;
 let lastExportIngestAt = 0;
 let ingestLock = null;
 
-const THEME_RULES = [
-  { key: "onboarding", en: "Onboarding", fr: "Onboarding", patterns: [/onboard/i, /mise en (route|place)/i, /d[eé]marr/i, /installation/i] },
-  { key: "wifi", en: "Connectivity / WiFi", fr: "Connexion / WiFi", patterns: [/wifi/i, /connexion/i, /internet/i, /r[eé]seau/i] },
-  { key: "support", en: "Support speed", fr: "Support", patterns: [/support/i, /réponse/i, /lenteur/i, /ticket/i] },
-  { key: "billing", en: "Billing", fr: "Facturation", patterns: [/factur/i, /paiement/i, /prix/i, /tarif/i] },
-  { key: "reliability", en: "Reliability", fr: "Fiabilité", patterns: [/bug/i, /plante/i, /crash/i, /marche pas/i, /fiab/i] },
-  { key: "attendance_sheet", en: "Attendance sheet", fr: "Fiche de présence", patterns: [/fiche de pr[eé]sence/i, /feuilles? de pr[eé]sence/i] },
-  { key: "time_tracking", en: "Hours & tracking", fr: "Heures & pointage", patterns: [/horaires?/i, /heures?/i, /pointage/i, /\bpointer\b/i, /heures suppl[eé]mentaires/i] },
-  { key: "lateness", en: "Lateness / punctuality", fr: "Retards / ponctualité", patterns: [/retards?/i, /[aà]\s*l['’]?heure/i, /ponctual/i] },
-  { key: "parents", en: "Parents relationship", fr: "Relation parents", patterns: [/parents?/i, /employeurs?/i, /rapport(s)? avec les parents/i] },
-  { key: "setup", en: "Setup & onboarding", fr: "Installation & prise en main", patterns: [/installation/i, /prise en main/i, /d[eé]marr/i, /onboard/i] },
-  { key: "reliability", en: "Reliability / bugs", fr: "Fiabilité / bugs", patterns: [/ne fonctionne pas/i, /fonctionne pas/i, /marche pas/i, /bug/i, /fait parfois des siennes/i] },
-  { key: "feature_requests", en: "Feature requests", fr: "Demandes d’ajouts", patterns: [/ajouter/i, /ce serait bien/i, /am[eé]lior/i, /repas/i, /sieste/i, /changes?/i, /carnet de liaison/i, /brochures?/i] },
-  { key: "support_speed", en: "Support responsiveness", fr: "Réactivité support", patterns: [/r[eé]actif/i, /support/i, /disponibil/i, /[eé]coute/i] },
-
-];
+const THEME_RULES = CLOSING_LOOP_THEME_RULES;
 
 const ENVOLA_BENEFIT_OPTIONS = [
   "Gain de temps",
@@ -168,13 +157,7 @@ function isBenefitsMultiSelectAnswer(answer) {
 }
 
 function detectThemes(comment = "") {
-  const text = String(comment || "").trim();
-  if (!text) return [];
-  const hits = [];
-  for (const rule of THEME_RULES) {
-    if (rule.patterns.some((re) => re.test(text))) hits.push(rule.key);
-  }
-  return hits;
+  return detectClosingLoopThemes(comment, { unique: false });
 }
 
 function redactText(input) {

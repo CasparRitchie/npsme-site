@@ -4,6 +4,10 @@ import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
+import {
+  detectClosingLoopThemes,
+  formatClosingLoopTheme,
+} from "../../shared/closingLoopThemes.js";
 
 const ACTIONS_STORAGE_KEY = "csvNpsClosingLoopActions";
 const CANONICAL_PAGE_LIMIT = 200;
@@ -2584,22 +2588,6 @@ function getRecommendedPriority(score) {
   return "low";
 }
 
-const CLOSING_LOOP_THEME_RULES = [
-  { key: "onboarding", patterns: [/onboard/i, /mise en (route|place)/i, /d[eé]marr/i, /installation/i] },
-  { key: "wifi", patterns: [/wifi/i, /connexion/i, /internet/i, /r[eé]seau/i] },
-  { key: "support", patterns: [/support/i, /réponse/i, /lenteur/i, /ticket/i] },
-  { key: "billing", patterns: [/factur/i, /paiement/i, /prix/i, /tarif/i] },
-  { key: "reliability", patterns: [/bug/i, /plante/i, /crash/i, /marche pas/i, /fiab/i] },
-  { key: "attendance_sheet", patterns: [/fiche de pr[eé]sence/i, /feuilles? de pr[eé]sence/i] },
-  { key: "time_tracking", patterns: [/horaires?/i, /heures?/i, /pointage/i, /\bpointer\b/i, /heures suppl[eé]mentaires/i] },
-  { key: "lateness", patterns: [/retards?/i, /[aà]\s*l['’]?heure/i, /ponctual/i] },
-  { key: "parents", patterns: [/parents?/i, /employeurs?/i, /rapport(s)? avec les parents/i] },
-  { key: "setup", patterns: [/installation/i, /prise en main/i, /d[eé]marr/i, /onboard/i] },
-  { key: "reliability", patterns: [/ne fonctionne pas/i, /fonctionne pas/i, /marche pas/i, /bug/i, /fait parfois des siennes/i] },
-  { key: "feature_requests", patterns: [/ajouter/i, /ce serait bien/i, /am[eé]lior/i, /repas/i, /sieste/i, /changes?/i, /carnet de liaison/i, /brochures?/i] },
-  { key: "support_speed", patterns: [/r[eé]actif/i, /support/i, /disponibil/i, /[eé]coute/i] },
-];
-
 function getClosingLoopThemes(row, includeDetail = false) {
   const values = [row?.comment];
   if (includeDetail) {
@@ -2613,15 +2601,11 @@ function getClosingLoopThemes(row, includeDetail = false) {
     );
   }
   const text = values.filter(Boolean).join(" ");
-  return Array.from(new Set(
-    CLOSING_LOOP_THEME_RULES
-      .filter((rule) => rule.patterns.some((pattern) => pattern.test(text)))
-      .map((rule) => rule.key)
-  ));
+  return detectClosingLoopThemes(text);
 }
 
 function formatTheme(theme, copy) {
-  return theme ? copy.themes?.[theme] || theme.replaceAll("_", " ") : "";
+  return formatClosingLoopTheme(theme, copy.themes);
 }
 
 function getClosingLoopRiskScore(row) {

@@ -112,3 +112,25 @@ Before deletion, extract behavior without changing route contracts:
 
 No schema, migration, service extraction, route deletion, redirect, production
 data operation, or production integration call is part of iteration 1.
+
+## Iteration 2 progress: neutral theme boundary
+
+The first dependency-separation slice moves the shared rule vocabulary and
+detection behavior to `shared/closingLoopThemes.js`:
+
+- Workspace consumes the canonical unique-key result and continues to obtain
+  translated labels from the Workspace translation catalog.
+- `intercom.routes.js` consumes the same neutral detector through a thin local
+  compatibility function. Its duplicate-hit behavior is deliberately retained
+  while legacy theme aggregation remains live, avoiding an unplanned API
+  contract change in this extraction.
+- Dependency-free fixture tests cover bilingual detection, unique Workspace
+  results, duplicate legacy compatibility, empty feedback, key validation, and
+  translated-label formatting.
+
+This slice has no external I/O and does not move authentication, tenant
+selection, response projection, Dropbox persistence, ingestion, webhook, or
+route responsibilities. The next extraction slice is the canonical response
+repository currently exported by `envola.routes.js`; it should begin with
+injected local file adapters so Workspace can be moved without production
+Dropbox calls.

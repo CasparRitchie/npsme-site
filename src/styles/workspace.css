@@ -972,9 +972,10 @@
 .csv-nps-loop-queue-row {
   display: grid;
   grid-template-columns:
-    minmax(74px, 0.55fr)
+    minmax(82px, 0.58fr)
     minmax(76px, 0.55fr)
-    minmax(220px, 1.8fr)
+    minmax(190px, 1.55fr)
+    minmax(145px, 1.05fr)
     minmax(110px, 0.9fr)
     minmax(100px, 0.8fr)
     minmax(100px, 0.8fr)
@@ -1111,6 +1112,54 @@
 .csv-nps-loop-queue-score .csv-nps-bucket {
   padding: 3px 6px;
   font-size: 0.67rem;
+}
+
+.csv-nps-loop-risk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.csv-nps-loop-risk.is-critical {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(248, 113, 113, 0.16);
+  color: #fecaca;
+}
+
+.csv-nps-loop-risk.is-high {
+  border-color: rgba(251, 146, 60, 0.42);
+  background: rgba(251, 146, 60, 0.14);
+  color: #fed7aa;
+}
+
+.csv-nps-loop-risk.is-medium {
+  border-color: rgba(250, 204, 21, 0.38);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fef08a;
+}
+
+.csv-nps-loop-risk.is-low {
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.11);
+  color: #bbf7d0;
+}
+
+.csv-nps-loop-queue-recommendation strong {
+  white-space: normal;
+}
+
+.csv-nps-loop-urgent-recommendation {
+  display: block;
+  margin-top: 7px;
+  color: var(--text, #f5f7fb);
+  font-size: 0.78rem;
 }
 
 .csv-nps-loop-response-button {

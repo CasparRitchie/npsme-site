@@ -141,7 +141,7 @@
   }
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1180px) {
   .csv-nps-loop-queue-columns {
     display: none;
   }

@@ -438,7 +438,7 @@ export default function CsvNpsClosingTheLoop() {
     runCaseMutation({
       url: "/api/workspace/closing-loop/cases",
       method: "POST",
-      body: { datasetRowId: row.dataset_row_id, ownerMembershipId: null, priority: "normal" },
+      body: { datasetRowId: row.dataset_row_id, ownerMembershipId: null },
     }, copy.errors.create, (data) => applyCanonicalCase(row.dataset_row_id, data.case));
   }
 
@@ -748,12 +748,10 @@ export default function CsvNpsClosingTheLoop() {
 
   const urgentDetractors = useMemo(() => {
     return periodRows
-      .filter(
-        (row) => row.bucket === "detractor" && row.currentStatus === "open"
-      )
+      .filter((row) => row.currentStatus !== "closed")
       .sort((a, b) => {
-        const scoreDiff = Number(a.score ?? 999) - Number(b.score ?? 999);
-        if (scoreDiff !== 0) return scoreDiff;
+        const riskDiff = getClosingLoopRiskScore(b) - getClosingLoopRiskScore(a);
+        if (riskDiff !== 0) return riskDiff;
 
         return String(b?.submitted_at || "").localeCompare(
           String(a?.submitted_at || "")
@@ -1485,8 +1483,8 @@ function UrgentDetractorsPanel({ rows, onSelect, copy }) {
             >
               <div>
                 <div className="csv-nps-loop-urgent-topline">
-                  <span className="csv-nps-bucket csv-nps-bucket-detractor">
-                    {copy.buckets.detractor}
+                  <span className={`csv-nps-loop-risk ${getRiskBand(getClosingLoopRiskScore(row))}`}>
+                    {getClosingLoopRiskScore(row)} / 100
                   </span>
                   <span className="csv-nps-loop-score">
                     {copy.detail.score} {row.score ?? "—"}
@@ -1506,6 +1504,9 @@ function UrgentDetractorsPanel({ rows, onSelect, copy }) {
                     180
                   )}
                 </p>
+                <strong className="csv-nps-loop-urgent-recommendation">
+                  {getClosingLoopRecommendation(row, copy)}
+                </strong>
               </div>
 
               <div className="csv-nps-loop-urgent-actions">
@@ -1570,15 +1571,12 @@ function sortClosingLoopRows(a, b) {
 function sortCanonicalQueueRows(left, right, sort) {
   const direction = sort.direction === "desc" ? -1 : 1;
   const statusOrder = { in_progress: 0, open: 1, no_case: 2, closed: 3 };
-  const priorityOrder = { high: 0, normal: 1, low: 2 };
   const activity = (row) =>
     row.case?.updated_at || row.latestLegacyAction?.updatedAt || row.created_at || row.submitted_at || "";
   let comparison = 0;
 
   if (sort.key === "priority") {
-    comparison =
-      (priorityOrder[left.case?.priority || getRecommendedPriority(left.score)] ?? 99) -
-      (priorityOrder[right.case?.priority || getRecommendedPriority(right.score)] ?? 99);
+    comparison = getClosingLoopRiskScore(left) - getClosingLoopRiskScore(right);
   } else if (sort.key === "score") {
     comparison = Number(left.score ?? 999) - Number(right.score ?? 999);
   } else if (sort.key === "response") {
@@ -1605,6 +1603,11 @@ function sortCanonicalQueueRows(left, right, sort) {
     comparison =
       (statusOrder[left.currentStatus] ?? 99) -
       (statusOrder[right.currentStatus] ?? 99);
+
+    // The default operational order is Following up first, then highest risk.
+    if (comparison === 0) {
+      comparison = getClosingLoopRiskScore(right) - getClosingLoopRiskScore(left);
+    }
   }
 
   if (comparison !== 0) return comparison * direction;
@@ -1692,6 +1695,7 @@ function ClosingLoopQueue({
           </QueueHeaderFilter>
         </QueueSortHeader>
         <QueueSortHeader label={copy.queue.customerResponse} sortKey="response" sort={sort} onSort={onSort} copy={copy} />
+        <span role="columnheader">{copy.queue.recommendation}</span>
         <QueueSortHeader label={copy.queue.context} sortKey="context" sort={sort} onSort={onSort} copy={copy} />
         <QueueSortHeader label={copy.queue.owner} sortKey="owner" sort={sort} onSort={onSort} copy={copy}>
           <QueueHeaderFilter value={ownerFilter} onChange={onOwnerFilter} label={copy.queue.ownerFilter}>
@@ -1742,7 +1746,9 @@ function ClosingLoopQueue({
 
 function QueueSortHeader({ label, sortKey, sort, onSort, copy, children }) {
   const isActive = sort.key === sortKey;
-  const nextDirection = isActive && sort.direction === "asc" ? "desc" : "asc";
+  const nextDirection = isActive
+    ? sort.direction === "asc" ? "desc" : "asc"
+    : sortKey === "priority" ? "desc" : "asc";
   const directionLabel = nextDirection === "asc" ? copy.queue.sortAscending : copy.queue.sortDescending;
 
   return (
@@ -1779,7 +1785,7 @@ function QueueHeaderFilter({ value, onChange, label, children }) {
 }
 
 function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMutate, copy }) {
-  const priority = row.case?.priority || getRecommendedPriority(row.score);
+  const riskScore = getClosingLoopRiskScore(row);
   const lastActivity =
     row.case?.updated_at ||
     row.latestLegacyAction?.updatedAt ||
@@ -1802,8 +1808,8 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMu
       onClick={handleRowClick}
     >
       <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-priority" role="cell" data-label={copy.queue.priority}>
-        <span className={`csv-nps-loop-priority csv-nps-loop-priority-${priority}`}>
-          {formatPriority(priority, copy)}
+        <span className={`csv-nps-loop-risk ${getRiskBand(riskScore)}`}>
+          {riskScore} / 100
         </span>
       </div>
 
@@ -1822,6 +1828,10 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMu
         {row.latestLegacyAction && (
           <span className="csv-nps-loop-legacy-indicator">{copy.queue.earlierHistory}</span>
         )}
+      </div>
+
+      <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-recommendation" role="cell" data-label={copy.queue.recommendation}>
+        <strong>{getClosingLoopRecommendation(row, copy)}</strong>
       </div>
 
       <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-context" role="cell" data-label={copy.queue.context}>
@@ -2169,12 +2179,15 @@ function SelectedResponsePanel({
                   {assignableOwners.map((owner) => <option key={owner.membershipId} value={owner.membershipId}>{owner.fullName || owner.email}</option>)}
                 </select>
               </label>
-              <label className="csv-nps-filter-field">
+              <div className="csv-nps-filter-field">
                 <span>{copy.detail.priority}</span>
-                <select value={row.case.priority || "normal"} onChange={(event) => onUpdateFollowUp({ priority: event.target.value })} disabled={readOnly || caseMutation.loading}>
-                  {["high", "normal", "low"].map((priority) => <option key={priority} value={priority}>{copy.priorities[priority]}</option>)}
-                </select>
-              </label>
+                <span className={`csv-nps-loop-risk ${getRiskBand(getClosingLoopRiskScore(row))}`}>
+                  {getClosingLoopRiskScore(row)} / 100
+                </span>
+                <small className="csv-nps-muted-cell">
+                  {getClosingLoopRecommendation(row, copy)}
+                </small>
+              </div>
             </>
           )}
           {caseMutation.error && <div className="csv-nps-error csv-nps-error-compact">{caseMutation.error}</div>}
@@ -2504,6 +2517,63 @@ function getRecommendedPriority(score) {
   if (numericScore <= 6) return "high";
   if (numericScore <= 8) return "normal";
   return "low";
+}
+
+const CLOSING_LOOP_THEME_RULES = [
+  { key: "onboarding", patterns: [/onboard/i, /mise en (route|place)/i, /d[eé]marr/i, /installation/i] },
+  { key: "wifi", patterns: [/wifi/i, /connexion/i, /internet/i, /r[eé]seau/i] },
+  { key: "support", patterns: [/support/i, /réponse/i, /lenteur/i, /ticket/i] },
+  { key: "billing", patterns: [/factur/i, /paiement/i, /prix/i, /tarif/i] },
+  { key: "reliability", patterns: [/bug/i, /plante/i, /crash/i, /marche pas/i, /fiab/i] },
+  { key: "attendance_sheet", patterns: [/fiche de pr[eé]sence/i, /feuilles? de pr[eé]sence/i] },
+  { key: "time_tracking", patterns: [/horaires?/i, /heures?/i, /pointage/i, /\bpointer\b/i, /heures suppl[eé]mentaires/i] },
+  { key: "lateness", patterns: [/retards?/i, /[aà]\s*l['’]?heure/i, /ponctual/i] },
+  { key: "parents", patterns: [/parents?/i, /employeurs?/i, /rapport(s)? avec les parents/i] },
+  { key: "setup", patterns: [/installation/i, /prise en main/i, /d[eé]marr/i, /onboard/i] },
+  { key: "reliability", patterns: [/ne fonctionne pas/i, /fonctionne pas/i, /marche pas/i, /bug/i, /fait parfois des siennes/i] },
+  { key: "feature_requests", patterns: [/ajouter/i, /ce serait bien/i, /am[eé]lior/i, /repas/i, /sieste/i, /changes?/i, /carnet de liaison/i, /brochures?/i] },
+  { key: "support_speed", patterns: [/r[eé]actif/i, /support/i, /disponibil/i, /[eé]coute/i] },
+];
+
+function getClosingLoopRiskScore(row) {
+  const hasScore = row?.score !== null && row?.score !== undefined && row?.score !== "";
+  const score = hasScore ? Number(row.score) : NaN;
+  const bucket = row?.bucket;
+  const comment = String(row?.comment || "").trim();
+  let risk = bucket === "detractor" ? 60 : bucket === "passive" ? 25 : bucket === "promoter" ? 5 : 0;
+
+  if (Number.isFinite(score)) {
+    risk += Math.max(0, 10 - score) * 2;
+  }
+
+  const themeCount = new Set(
+    CLOSING_LOOP_THEME_RULES
+      .filter((rule) => rule.patterns.some((pattern) => pattern.test(comment)))
+      .map((rule) => rule.key)
+  ).size;
+  risk += Math.min(20, themeCount * 4);
+
+  if (comment.split(/\s+/).filter(Boolean).length >= 8) risk += 8;
+
+  return Math.max(0, Math.min(100, Math.round(risk)));
+}
+
+function getRiskBand(riskScore) {
+  if (riskScore >= 80) return "is-critical";
+  if (riskScore >= 50) return "is-high";
+  if (riskScore >= 25) return "is-medium";
+  return "is-low";
+}
+
+function getClosingLoopRecommendation(row, copy) {
+  if (row?.bucket === "detractor") {
+    return getClosingLoopRiskScore(row) >= 80
+      ? copy.recommendations.callToday
+      : copy.recommendations.messageToday;
+  }
+  if (row?.bucket === "passive") return copy.recommendations.followUp;
+  if (row?.bucket === "promoter") return copy.recommendations.thank;
+  return copy.recommendations.review;
 }
 
 function formatCompactDateTime(value) {

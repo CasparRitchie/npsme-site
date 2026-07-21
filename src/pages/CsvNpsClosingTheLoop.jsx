@@ -686,6 +686,25 @@ export default function CsvNpsClosingTheLoop() {
     });
   }, [enrichedRows, selectedResponseRef]);
 
+  useEffect(() => {
+    if (
+      mode === "canonical" &&
+      !loadingDataset &&
+      dataset &&
+      selectedResponseRef &&
+      !selectedRow
+    ) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [dataset, loadingDataset, mode, selectedResponseRef, selectedRow, setSearchParams]);
+
+  function clearCanonicalFilters() {
+    setCanonicalCaseState("all");
+    setCanonicalBucket("all");
+    setCanonicalOwner("all");
+    setSearchParams({}, { replace: true });
+  }
+
   function scrollToSelectedResponsePanel() {
     window.setTimeout(() => {
       selectedResponsePanelRef.current?.scrollIntoView({
@@ -1078,31 +1097,31 @@ function selectRow(row) {
         )}
 
         <div className={mode === "canonical" ? "csv-nps-loop-queue" : "csv-nps-loop-list"}>
-          {rows.length === 0 ? (
+          {mode === "canonical" ? (
+            <ClosingLoopQueue
+              rows={rows}
+              selectedRow={selectedRow}
+              onSelect={selectRow}
+              onStartFollowUp={startFollowUp}
+              canMutate={permissions.canMutate}
+              copy={copy}
+              sort={queueSort}
+              onSort={setQueueSort}
+              caseStateFilter={canonicalCaseState}
+              onCaseStateFilter={setCanonicalCaseState}
+              bucketFilter={canonicalBucket}
+              onBucketFilter={setCanonicalBucket}
+              ownerFilter={canonicalOwner}
+              onOwnerFilter={setCanonicalOwner}
+              assignableOwners={assignableOwners}
+              onClearFilters={clearCanonicalFilters}
+            />
+          ) : rows.length === 0 ? (
             <div className="csv-nps-empty-state">
               {copy.queue.empty}
             </div>
           ) : (
-            mode === "canonical" ? (
-              <ClosingLoopQueue
-                rows={rows}
-                selectedRow={selectedRow}
-                onSelect={selectRow}
-                onStartFollowUp={startFollowUp}
-                canMutate={permissions.canMutate}
-                copy={copy}
-                sort={queueSort}
-                onSort={setQueueSort}
-                caseStateFilter={canonicalCaseState}
-                onCaseStateFilter={setCanonicalCaseState}
-                bucketFilter={canonicalBucket}
-                onBucketFilter={setCanonicalBucket}
-                ownerFilter={canonicalOwner}
-                onOwnerFilter={setCanonicalOwner}
-                assignableOwners={assignableOwners}
-              />
-            ) : (
-              rows.map((row) => (
+            rows.map((row) => (
                 <ClosingLoopCard
                   key={getActionKey(row)}
                   row={row}
@@ -1118,7 +1137,6 @@ function selectRow(row) {
                   readOnly={false}
                 />
               ))
-            )
           )}
         </div>
       </section>
@@ -1681,6 +1699,7 @@ function ClosingLoopQueue({
   ownerFilter,
   onOwnerFilter,
   assignableOwners,
+  onClearFilters,
 }) {
   return (
     <div className="csv-nps-loop-queue-table" role="table" aria-label={copy.queue.title}>
@@ -1695,6 +1714,7 @@ function ClosingLoopQueue({
           </QueueHeaderFilter>
         </QueueSortHeader>
         <QueueSortHeader label={copy.queue.customerResponse} sortKey="response" sort={sort} onSort={onSort} copy={copy} />
+        <span role="columnheader">{copy.queue.theme}</span>
         <span role="columnheader">{copy.queue.recommendation}</span>
         <QueueSortHeader label={copy.queue.context} sortKey="context" sort={sort} onSort={onSort} copy={copy} />
         <QueueSortHeader label={copy.queue.owner} sortKey="owner" sort={sort} onSort={onSort} copy={copy}>
@@ -1722,7 +1742,20 @@ function ClosingLoopQueue({
       </div>
 
       <div role="rowgroup">
-        {rows.map((row) => (
+        {rows.length === 0 ? (
+          <div className="csv-nps-loop-queue-empty" role="row">
+            <div role="cell">
+              <strong>{copy.queue.empty}</strong>
+              <button
+                type="button"
+                className="csv-nps-button csv-nps-button-secondary csv-nps-button-compact"
+                onClick={onClearFilters}
+              >
+                {copy.queue.clearFilters}
+              </button>
+            </div>
+          </div>
+        ) : rows.map((row) => (
           <ClosingLoopQueueRow
             key={getActionKey(row)}
             row={row}
@@ -1828,6 +1861,10 @@ function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMu
         {row.latestLegacyAction && (
           <span className="csv-nps-loop-legacy-indicator">{copy.queue.earlierHistory}</span>
         )}
+      </div>
+
+      <div className="csv-nps-loop-queue-cell" role="cell" data-label={copy.queue.theme}>
+        <strong>{formatTheme(getClosingLoopThemes(row)[0], copy) || copy.queue.noTheme}</strong>
       </div>
 
       <div className="csv-nps-loop-queue-cell csv-nps-loop-queue-recommendation" role="cell" data-label={copy.queue.recommendation}>
@@ -2148,6 +2185,22 @@ function SelectedResponsePanel({
             <div className="csv-nps-error csv-nps-error-compact">{detailError}</div>
           )}
           <SurveyQuestionScoreTable row={row} copy={copy} />
+          <div className="csv-nps-response-themes">
+            <h4>{copy.themeSection.title}</h4>
+            {getClosingLoopThemes(row, true).length > 0 ? (
+              <div className="csv-nps-loop-theme-list">
+                {getClosingLoopThemes(row, true).map((theme) => (
+                  <span key={theme} className="csv-nps-loop-theme-chip">
+                    {formatTheme(theme, copy)}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="csv-nps-muted-cell">
+                {copy.themeSection.empty}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="csv-nps-selected-response-card csv-nps-next-action-card">
@@ -2547,6 +2600,30 @@ const CLOSING_LOOP_THEME_RULES = [
   { key: "support_speed", patterns: [/r[eé]actif/i, /support/i, /disponibil/i, /[eé]coute/i] },
 ];
 
+function getClosingLoopThemes(row, includeDetail = false) {
+  const values = [row?.comment];
+  if (includeDetail) {
+    values.push(
+      row?.q_recommend_comment,
+      row?.q_install_comment,
+      row?.q_daily_use_comment,
+      row?.q_parent_relation_comment,
+      row?.q_support_comment,
+      row?.q_final_comment
+    );
+  }
+  const text = values.filter(Boolean).join(" ");
+  return Array.from(new Set(
+    CLOSING_LOOP_THEME_RULES
+      .filter((rule) => rule.patterns.some((pattern) => pattern.test(text)))
+      .map((rule) => rule.key)
+  ));
+}
+
+function formatTheme(theme, copy) {
+  return theme ? copy.themes?.[theme] || theme.replaceAll("_", " ") : "";
+}
+
 function getClosingLoopRiskScore(row) {
   const hasScore = row?.score !== null && row?.score !== undefined && row?.score !== "";
   const score = hasScore ? Number(row.score) : NaN;
@@ -2558,11 +2635,7 @@ function getClosingLoopRiskScore(row) {
     risk += Math.max(0, 10 - score) * 2;
   }
 
-  const themeCount = new Set(
-    CLOSING_LOOP_THEME_RULES
-      .filter((rule) => rule.patterns.some((pattern) => pattern.test(comment)))
-      .map((rule) => rule.key)
-  ).size;
+  const themeCount = getClosingLoopThemes({ comment }).length;
   risk += Math.min(20, themeCount * 4);
 
   if (comment.split(/\s+/).filter(Boolean).length >= 8) risk += 8;

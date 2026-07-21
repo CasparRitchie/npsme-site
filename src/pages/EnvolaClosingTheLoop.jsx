@@ -984,6 +984,25 @@ export default function EnvolaClosingTheLoop() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-6 pt-6">
+        <div className="flex flex-col gap-4 rounded-2xl border border-violet-300/25 bg-violet-400/10 p-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="font-semibold text-white">
+              {tr("envola.closingTheLoop.migration.title", "Closing the Loop is moving to Workspace")}
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-300">
+              {tr("envola.closingTheLoop.migration.body", "Use the Workspace version for the current customer follow-up experience. This Envola page remains available during migration.")}
+            </p>
+          </div>
+          <a
+            href={lang === "fr" ? "/fr/workspace/closing-the-loop" : "/workspace/closing-the-loop"}
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-violet-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-400"
+          >
+            {tr("envola.closingTheLoop.migration.action", "Open Workspace Closing the Loop")}
+          </a>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 pb-6 pt-6">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5 md:p-6">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-12">

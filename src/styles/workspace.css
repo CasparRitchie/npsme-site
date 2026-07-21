@@ -972,11 +972,12 @@
 .csv-nps-loop-queue-columns,
 .csv-nps-loop-queue-row {
   display: grid;
-  min-width: 1050px;
+  min-width: 1160px;
   grid-template-columns:
     minmax(82px, 0.58fr)
     minmax(76px, 0.55fr)
     minmax(190px, 1.55fr)
+    minmax(120px, 0.9fr)
     minmax(145px, 1.05fr)
     minmax(110px, 0.9fr)
     minmax(100px, 0.8fr)
@@ -985,6 +986,41 @@
     minmax(150px, 1fr);
   gap: 10px;
   align-items: center;
+}
+
+.csv-nps-loop-queue-empty {
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.csv-nps-loop-queue-empty > div {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.csv-nps-response-themes {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.csv-nps-loop-theme-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.csv-nps-loop-theme-chip {
+  display: inline-flex;
+  padding: 5px 9px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.12);
+  color: #ddd6fe;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .csv-nps-loop-queue-columns {

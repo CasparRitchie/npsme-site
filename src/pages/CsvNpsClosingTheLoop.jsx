@@ -905,7 +905,7 @@ function selectRow(row) {
   }
 
   return (
-    <main className="csv-nps-page">
+    <main className="csv-nps-page csv-nps-closing-loop-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">{copy.eyebrow}</p>
         <h1>{copy.title}</h1>

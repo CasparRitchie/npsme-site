@@ -140,7 +140,7 @@
   }
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 900px) {
   .csv-nps-loop-queue-columns {
     display: none;
   }
@@ -156,10 +156,10 @@
   .csv-nps-loop-queue-row {
     min-width: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px 14px;
-    padding: 14px;
+    gap: 7px 10px;
+    padding: 9px;
     border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
-    border-radius: 16px;
+    border-radius: 11px;
     background: rgba(15, 17, 21, 0.42);
   }
 

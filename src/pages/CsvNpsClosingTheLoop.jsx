@@ -1636,7 +1636,7 @@ function ClosingLoopQueue({ rows, selectedRow, onSelect, onStartFollowUp, canMut
 }
 
 function ClosingLoopQueueRow({ row, isSelected, onSelect, onStartFollowUp, canMutate, copy }) {
-  const priority = row.case?.priority || "not_set";
+  const priority = row.case?.priority || getRecommendedPriority(row.score);
   const lastActivity =
     row.case?.updated_at ||
     row.latestLegacyAction?.updatedAt ||
@@ -2047,18 +2047,13 @@ function SelectedResponsePanel({
           )}
         </div>
 
-        <div className="csv-nps-selected-response-card csv-nps-notes-card">
+        <div className="csv-nps-selected-response-card csv-nps-notes-card csv-nps-loop-action-field">
           <h3>{copy.detail.notes}</h3>
-          <textarea id="closing-loop-note" value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
+          <textarea id="closing-loop-note" aria-label={copy.detail.notes} value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
           <button type="button" className="csv-nps-button" onClick={onAddNote} disabled={!hasCase || readOnly || caseMutation.loading}>
             {caseMutation.loading ? copy.detail.saving : copy.detail.saveNote}
           </button>
-          <div className="csv-nps-reminder-placeholder">
-            <strong>{copy.detail.reminder}</strong>
-            <span>{copy.detail.reminderHelp}</span>
-            <button type="button" className="csv-nps-button csv-nps-button-secondary" disabled>{copy.detail.reminderUnavailable}</button>
-            {/* TODO: Persist reminders once the canonical backend exposes a reminder contract. */}
-          </div>
+          {/* TODO: Restore reminder controls when the canonical backend exposes reminder persistence. */}
         </div>
 
         <details className="csv-nps-selected-response-card csv-nps-collapsible-card">
@@ -2354,6 +2349,18 @@ function formatPriority(priority, copy) {
   if (priority === "low") return "Low";
   if (priority === "normal") return "Normal";
   return "Not set";
+}
+
+function getRecommendedPriority(score) {
+  const numericScore = Number(score);
+
+  if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 10) {
+    return "normal";
+  }
+
+  if (numericScore <= 6) return "high";
+  if (numericScore <= 8) return "normal";
+  return "low";
 }
 
 function formatCompactDateTime(value) {

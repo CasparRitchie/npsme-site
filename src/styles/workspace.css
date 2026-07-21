@@ -962,7 +962,8 @@
 }
 
 .csv-nps-loop-queue-table {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
   border-radius: 16px;
   background: rgba(15, 17, 21, 0.3);
@@ -971,6 +972,7 @@
 .csv-nps-loop-queue-columns,
 .csv-nps-loop-queue-row {
   display: grid;
+  min-width: 1050px;
   grid-template-columns:
     minmax(82px, 0.58fr)
     minmax(76px, 0.55fr)
@@ -1798,6 +1800,8 @@
 
 
 .csv-nps-selected-response-panel {
+  min-width: 0;
+  max-width: 100%;
   margin-bottom: 1.5rem;
 }
 
@@ -1809,6 +1813,9 @@
 }
 
 .csv-nps-selected-response-card {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1.25rem;
   background: rgba(15, 23, 42, 0.55);
@@ -1841,6 +1848,8 @@
 
 .csv-nps-customer-workspace-grid {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
   gap: 1rem;
   margin-top: 1rem;
@@ -1851,8 +1860,7 @@
   grid-column: 1;
 }
 
-.csv-nps-next-action-card,
-.csv-nps-notes-card {
+.csv-nps-next-action-card {
   grid-column: 2;
 }
 
@@ -1860,12 +1868,7 @@
   grid-row: 1;
 }
 
-.csv-nps-notes-card {
-  grid-row: 2;
-}
-
 .csv-nps-next-action-card,
-.csv-nps-notes-card,
 .csv-nps-no-follow-up-state,
 .csv-nps-reminder-placeholder {
   display: grid;
@@ -1887,10 +1890,51 @@
   line-height: 1.5;
 }
 
-.csv-nps-notes-card textarea,
+.csv-nps-next-action-notes textarea,
 .csv-nps-collapsible-card textarea {
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+}
+
+.csv-nps-next-action-notes {
+  display: grid;
+  min-width: 0;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.csv-nps-next-action-notes h4 {
+  margin: 0;
+  color: #fff;
+  font-size: 0.92rem;
+}
+
+.csv-nps-next-action-notes .csv-nps-button {
+  justify-self: start;
+}
+
+.csv-nps-selected-response-card .csv-nps-table-wrap,
+.csv-nps-loop-management-grid > *,
+.csv-nps-loop-urgent-list,
+.csv-nps-case-timeline,
+.csv-nps-loop-queue,
+.csv-nps-loop-queue-table {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.csv-nps-selected-response-card p,
+.csv-nps-selected-response-card td,
+.csv-nps-selected-response-card th,
+.csv-nps-loop-urgent-item,
+.csv-nps-loop-queue-cell,
+.csv-nps-collapsible-card summary {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .csv-nps-reminder-placeholder {

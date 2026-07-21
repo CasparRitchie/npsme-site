@@ -2191,6 +2191,27 @@ function SelectedResponsePanel({
             </>
           )}
           {caseMutation.error && <div className="csv-nps-error csv-nps-error-compact">{caseMutation.error}</div>}
+
+          <div className="csv-nps-next-action-notes csv-nps-loop-action-field">
+            <h4>{copy.detail.notes}</h4>
+            <textarea
+              id="closing-loop-note"
+              aria-label={copy.detail.notes}
+              value={noteDraft}
+              onChange={(event) => onNoteChange(event.target.value)}
+              placeholder={copy.detail.notePlaceholder}
+              rows={4}
+              disabled={!hasCase || readOnly || caseMutation.loading}
+            />
+            <button
+              type="button"
+              className="csv-nps-button"
+              onClick={onAddNote}
+              disabled={!hasCase || readOnly || caseMutation.loading}
+            >
+              {caseMutation.loading ? copy.detail.saving : copy.detail.saveNote}
+            </button>
+          </div>
         </div>
 
         <div className="csv-nps-selected-response-card csv-nps-timeline-card">
@@ -2201,15 +2222,6 @@ function SelectedResponsePanel({
           {!caseEventsLoading && caseEvents.length === 0 ? <p className="csv-nps-muted-cell">{copy.detail.timelineEmpty}</p> : (
             <div className="csv-nps-case-timeline">{caseEvents.map((event) => <CaseTimelineEvent key={event.id} event={event} copy={copy} />)}</div>
           )}
-        </div>
-
-        <div className="csv-nps-selected-response-card csv-nps-notes-card csv-nps-loop-action-field">
-          <h3>{copy.detail.notes}</h3>
-          <textarea id="closing-loop-note" aria-label={copy.detail.notes} value={noteDraft} onChange={(event) => onNoteChange(event.target.value)} placeholder={copy.detail.notePlaceholder} rows={4} disabled={!hasCase || readOnly || caseMutation.loading} />
-          <button type="button" className="csv-nps-button" onClick={onAddNote} disabled={!hasCase || readOnly || caseMutation.loading}>
-            {caseMutation.loading ? copy.detail.saving : copy.detail.saveNote}
-          </button>
-          {/* TODO: Restore reminder controls when the canonical backend exposes reminder persistence. */}
         </div>
 
         <details className="csv-nps-selected-response-card csv-nps-collapsible-card">

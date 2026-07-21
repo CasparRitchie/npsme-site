@@ -6,7 +6,6 @@
   .csv-nps-customer-feedback-card,
   .csv-nps-timeline-card,
   .csv-nps-next-action-card,
-  .csv-nps-notes-card,
   .csv-nps-collapsible-card {
     grid-column: 1;
     grid-row: auto;
@@ -155,6 +154,7 @@
   }
 
   .csv-nps-loop-queue-row {
+    min-width: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px 14px;
     padding: 14px;

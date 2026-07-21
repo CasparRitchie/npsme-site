@@ -60,6 +60,10 @@ export default function CsvNpsClosingTheLoop() {
     EMPTY_CANONICAL_SUMMARY
   );
   const [canonicalPagination, setCanonicalPagination] = useState(null);
+  const [canonicalCaseState, setCanonicalCaseState] = useState("all");
+  const [canonicalBucket, setCanonicalBucket] = useState("all");
+  const [canonicalOwner, setCanonicalOwner] = useState("all");
+  const [queueSort, setQueueSort] = useState({ key: "progress", direction: "asc" });
 
   const [bucketFilter, setBucketFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -92,6 +96,9 @@ export default function CsvNpsClosingTheLoop() {
         const params = new URLSearchParams();
         params.set("limit", String(CANONICAL_PAGE_LIMIT));
         if (datasetId) params.set("datasetId", datasetId);
+        if (canonicalCaseState !== "all") params.set("caseState", canonicalCaseState);
+        if (canonicalBucket !== "all") params.set("bucket", canonicalBucket);
+        if (canonicalOwner !== "all") params.set("owner", canonicalOwner);
 
         const response = await fetch(
           `/api/workspace/closing-loop?${params.toString()}`,
@@ -296,7 +303,7 @@ export default function CsvNpsClosingTheLoop() {
     } else {
       loadWithoutDatasetId();
     }
-  }, [datasetId, isWorkspaceRoute]);
+  }, [datasetId, isWorkspaceRoute, canonicalCaseState, canonicalBucket, canonicalOwner]);
 
   useEffect(() => {
     const selectedRow = dataset?.rows?.find(
@@ -644,7 +651,9 @@ export default function CsvNpsClosingTheLoop() {
 
   const rows = useMemo(() => {
     if (mode === "canonical") {
-      return [...periodRows].sort(sortClosingLoopRows);
+      return [...periodRows].sort((left, right) =>
+        sortCanonicalQueueRows(left, right, queueSort)
+      );
     }
 
     return periodRows
@@ -658,7 +667,7 @@ export default function CsvNpsClosingTheLoop() {
         return matchesBucket && matchesStatus;
       })
       .sort(sortClosingLoopRows);
-  }, [periodRows, bucketFilter, statusFilter, mode]);
+  }, [periodRows, bucketFilter, statusFilter, mode, queueSort]);
 
   const selectedRow = useMemo(() => {
     if (!selectedResponseRef) return null;
@@ -1084,6 +1093,15 @@ function selectRow(row) {
                 onStartFollowUp={startFollowUp}
                 canMutate={permissions.canMutate}
                 copy={copy}
+                sort={queueSort}
+                onSort={setQueueSort}
+                caseStateFilter={canonicalCaseState}
+                onCaseStateFilter={setCanonicalCaseState}
+                bucketFilter={canonicalBucket}
+                onBucketFilter={setCanonicalBucket}
+                ownerFilter={canonicalOwner}
+                onOwnerFilter={setCanonicalOwner}
+                assignableOwners={assignableOwners}
               />
             ) : (
               rows.map((row) => (
@@ -1549,6 +1567,52 @@ function sortClosingLoopRows(a, b) {
   );
 }
 
+function sortCanonicalQueueRows(left, right, sort) {
+  const direction = sort.direction === "desc" ? -1 : 1;
+  const statusOrder = { in_progress: 0, open: 1, no_case: 2, closed: 3 };
+  const priorityOrder = { high: 0, normal: 1, low: 2 };
+  const activity = (row) =>
+    row.case?.updated_at || row.latestLegacyAction?.updatedAt || row.created_at || row.submitted_at || "";
+  let comparison = 0;
+
+  if (sort.key === "priority") {
+    comparison =
+      (priorityOrder[left.case?.priority || getRecommendedPriority(left.score)] ?? 99) -
+      (priorityOrder[right.case?.priority || getRecommendedPriority(right.score)] ?? 99);
+  } else if (sort.key === "score") {
+    comparison = Number(left.score ?? 999) - Number(right.score ?? 999);
+  } else if (sort.key === "response") {
+    comparison = String(left.comment || left.contact_label || "").localeCompare(
+      String(right.comment || right.contact_label || ""),
+      undefined,
+      { sensitivity: "base" }
+    );
+  } else if (sort.key === "context") {
+    comparison = String(left.company || left.stage || "").localeCompare(
+      String(right.company || right.stage || ""),
+      undefined,
+      { sensitivity: "base" }
+    );
+  } else if (sort.key === "owner") {
+    comparison = String(left.caseOwnerLabel || "").localeCompare(
+      String(right.caseOwnerLabel || ""),
+      undefined,
+      { sensitivity: "base" }
+    );
+  } else if (sort.key === "activity") {
+    comparison = String(activity(left)).localeCompare(String(activity(right)));
+  } else {
+    comparison =
+      (statusOrder[left.currentStatus] ?? 99) -
+      (statusOrder[right.currentStatus] ?? 99);
+  }
+
+  if (comparison !== 0) return comparison * direction;
+  return String(left.dataset_row_id || left.id || "").localeCompare(
+    String(right.dataset_row_id || right.id || "")
+  );
+}
+
 function matchesPeriod(isoDate, period) {
   if (!period || period === "all") return true;
 
@@ -1598,17 +1662,58 @@ function MetricCard({ label, value }) {
   );
 }
 
-function ClosingLoopQueue({ rows, selectedRow, onSelect, onStartFollowUp, canMutate, copy }) {
+function ClosingLoopQueue({
+  rows,
+  selectedRow,
+  onSelect,
+  onStartFollowUp,
+  canMutate,
+  copy,
+  sort,
+  onSort,
+  caseStateFilter,
+  onCaseStateFilter,
+  bucketFilter,
+  onBucketFilter,
+  ownerFilter,
+  onOwnerFilter,
+  assignableOwners,
+}) {
   return (
     <div className="csv-nps-loop-queue-table" role="table" aria-label={copy.queue.title}>
       <div className="csv-nps-loop-queue-columns" role="row">
-        <span role="columnheader">{copy.queue.priority}</span>
-        <span role="columnheader">{copy.queue.score}</span>
-        <span role="columnheader">{copy.queue.customerResponse}</span>
-        <span role="columnheader">{copy.queue.context}</span>
-        <span role="columnheader">{copy.queue.owner}</span>
-        <span role="columnheader">{copy.queue.progress}</span>
-        <span role="columnheader">{copy.queue.activity}</span>
+        <QueueSortHeader label={copy.queue.priority} sortKey="priority" sort={sort} onSort={onSort} copy={copy} />
+        <QueueSortHeader label={copy.queue.score} sortKey="score" sort={sort} onSort={onSort} copy={copy}>
+          <QueueHeaderFilter value={bucketFilter} onChange={onBucketFilter} label={copy.queue.bucketFilter}>
+            <option value="all">{copy.queue.all}</option>
+            <option value="detractor">{copy.buckets.detractor}</option>
+            <option value="passive">{copy.buckets.passive}</option>
+            <option value="promoter">{copy.buckets.promoter}</option>
+          </QueueHeaderFilter>
+        </QueueSortHeader>
+        <QueueSortHeader label={copy.queue.customerResponse} sortKey="response" sort={sort} onSort={onSort} copy={copy} />
+        <QueueSortHeader label={copy.queue.context} sortKey="context" sort={sort} onSort={onSort} copy={copy} />
+        <QueueSortHeader label={copy.queue.owner} sortKey="owner" sort={sort} onSort={onSort} copy={copy}>
+          <QueueHeaderFilter value={ownerFilter} onChange={onOwnerFilter} label={copy.queue.ownerFilter}>
+            <option value="all">{copy.queue.all}</option>
+            <option value="unassigned">{copy.queue.unassigned}</option>
+            {assignableOwners.map((owner) => (
+              <option key={owner.membershipId} value={owner.membershipId}>
+                {owner.fullName || owner.email}
+              </option>
+            ))}
+          </QueueHeaderFilter>
+        </QueueSortHeader>
+        <QueueSortHeader label={copy.queue.progress} sortKey="progress" sort={sort} onSort={onSort} copy={copy}>
+          <QueueHeaderFilter value={caseStateFilter} onChange={onCaseStateFilter} label={copy.queue.statusFilter}>
+            <option value="all">{copy.queue.all}</option>
+            <option value="no_case">{copy.statuses.no_case}</option>
+            <option value="open">{copy.statuses.open}</option>
+            <option value="in_progress">{copy.statuses.in_progress}</option>
+            <option value="closed">{copy.statuses.closed}</option>
+          </QueueHeaderFilter>
+        </QueueSortHeader>
+        <QueueSortHeader label={copy.queue.activity} sortKey="activity" sort={sort} onSort={onSort} copy={copy} />
         <span role="columnheader">{copy.queue.actions}</span>
       </div>
 
@@ -1632,6 +1737,44 @@ function ClosingLoopQueue({ rows, selectedRow, onSelect, onStartFollowUp, canMut
         ))}
       </div>
     </div>
+  );
+}
+
+function QueueSortHeader({ label, sortKey, sort, onSort, copy, children }) {
+  const isActive = sort.key === sortKey;
+  const nextDirection = isActive && sort.direction === "asc" ? "desc" : "asc";
+  const directionLabel = nextDirection === "asc" ? copy.queue.sortAscending : copy.queue.sortDescending;
+
+  return (
+    <span
+      className="csv-nps-loop-queue-column-control"
+      role="columnheader"
+      aria-sort={isActive ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}
+    >
+      <button
+        type="button"
+        className={`csv-nps-loop-queue-sort ${isActive ? "is-active" : ""}`}
+        onClick={() => onSort({ key: sortKey, direction: nextDirection })}
+        aria-label={`${label}: ${directionLabel}`}
+      >
+        <span>{label}</span>
+        <span aria-hidden="true">{isActive ? (sort.direction === "asc" ? "▲" : "▼") : "↕"}</span>
+      </button>
+      {children}
+    </span>
+  );
+}
+
+function QueueHeaderFilter({ value, onChange, label, children }) {
+  return (
+    <select
+      className="csv-nps-loop-queue-header-filter"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      aria-label={label}
+    >
+      {children}
+    </select>
   );
 }
 

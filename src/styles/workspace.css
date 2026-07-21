@@ -995,6 +995,54 @@
   text-transform: uppercase;
 }
 
+.csv-nps-loop-queue-column-control {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.csv-nps-loop-queue-sort {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.csv-nps-loop-queue-sort:hover,
+.csv-nps-loop-queue-sort.is-active {
+  color: var(--text, #f5f7fb);
+}
+
+.csv-nps-loop-queue-sort:focus-visible,
+.csv-nps-loop-queue-header-filter:focus-visible {
+  outline: 2px solid var(--accent, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.csv-nps-loop-queue-header-filter {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 20px 4px 6px;
+  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.16));
+  border-radius: 7px;
+  background: rgba(15, 17, 21, 0.78);
+  color: var(--text, #f5f7fb);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .csv-nps-loop-queue-row {
   position: relative;
   padding: 10px 12px;

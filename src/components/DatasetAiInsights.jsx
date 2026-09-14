@@ -1,7 +1,10 @@
 // src/components/DatasetAiInsights.jsx
 import React, { useState } from "react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function DatasetAiInsights({ datasetId }) {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const [insights, setInsights] = useState(null);
   const [generatedAt, setGeneratedAt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,10 +53,9 @@ export default function DatasetAiInsights({ datasetId }) {
     <section className="csv-nps-ai-insights">
       <div className="csv-nps-responses-header">
         <div>
-          <h2>AI insight summary</h2>
+          <h2>{tr("AI insight summary", "Synthèse IA")}</h2>
           <p>
-            Generate a practical CX readout from this dataset, including themes,
-            risks, recommended actions and close-the-loop templates.
+            {tr("Generate a practical CX readout from this dataset, including themes, risks, recommended actions and close-the-loop templates.", "Générez une synthèse CX pratique de ce dataset : thèmes, risques, actions recommandées et modèles de suivi.")}
           </p>
         </div>
 
@@ -63,7 +65,7 @@ export default function DatasetAiInsights({ datasetId }) {
           onClick={generateInsights}
           disabled={loading || !datasetId}
         >
-          {loading ? "Generating..." : insights ? "Regenerate insights" : "Generate insights"}
+          {loading ? tr("Generating...", "Génération...") : insights ? tr("Regenerate insights", "Régénérer la synthèse") : tr("Generate insights", "Générer la synthèse")}
         </button>
       </div>
 
@@ -73,9 +75,9 @@ export default function DatasetAiInsights({ datasetId }) {
         <div className="csv-nps-ai-loading">
           <div className="csv-nps-spinner" />
           <div>
-            <strong>Generating AI insights...</strong>
+            <strong>{tr("Generating AI insights...", "Génération de la synthèse IA...")}</strong>
             <p>
-              Analysing scores, comments, themes, risks and recommended actions.
+              {tr("Analysing scores, comments, themes, risks and recommended actions.", "Analyse des notes, commentaires, thèmes, risques et actions recommandées.")}
             </p>
           </div>
         </div>
@@ -83,42 +85,41 @@ export default function DatasetAiInsights({ datasetId }) {
 
       {!insights && !error && !loading && (
           <div className="csv-nps-empty-state">
-          No AI insights generated yet. Click “Generate insights” to analyse the
-          comments, scores and feedback patterns in this dataset.
+          {tr("No AI insights generated yet. Click “Generate insights” to analyse the comments, scores and feedback patterns in this dataset.", "Aucune synthèse IA n’a encore été générée. Cliquez sur « Générer la synthèse » pour analyser les commentaires, les notes et les tendances de ce dataset.")}
         </div>
       )}
 
       {insights && (
         <div className="csv-nps-ai-insights-grid">
           <section className="csv-nps-chart-card csv-nps-chart-card-wide">
-            <h3>Executive summary</h3>
-            <p>{insights.executive_summary || "No summary returned."}</p>
+            <h3>{tr("Executive summary", "Synthèse générale")}</h3>
+            <p>{insights.executive_summary || tr("No summary returned.", "Aucune synthèse disponible.")}</p>
 
             {generatedAt && (
               <p className="csv-nps-ai-generated">
-                Generated {new Date(generatedAt).toLocaleString()}
+                {tr("Generated", "Générée le")} {new Date(generatedAt).toLocaleString()}
               </p>
             )}
           </section>
 
           <section className="csv-nps-chart-card">
-            <h3>NPS readout</h3>
+            <h3>{tr("NPS readout", "Lecture du NPS")}</h3>
             <p>
-              <strong>Score:</strong>{" "}
-              {insights.nps_readout?.score ?? "Not available"}
+              <strong>{tr("Score", "Note")}:</strong>{" "}
+              {insights.nps_readout?.score ?? tr("Not available", "Non disponible")}
             </p>
-            <p>{insights.nps_readout?.interpretation || "No interpretation returned."}</p>
+            <p>{insights.nps_readout?.interpretation || tr("No interpretation returned.", "Aucune interprétation disponible.")}</p>
           </section>
 
           <InsightList
-            title="Key themes"
+            title={tr("Key themes", "Thèmes principaux")}
             items={insights.key_themes || []}
             renderItem={(item) => (
               <>
                 <h4>{item.theme}</h4>
                 <p>
-                  <strong>Sentiment:</strong> {item.sentiment || "unknown"} ·{" "}
-                  <strong>Evidence:</strong> {item.evidence_count ?? 0}
+                  <strong>{tr("Sentiment", "Sentiment")}:</strong> {item.sentiment || tr("unknown", "inconnu")} ·{" "}
+                  <strong>{tr("Evidence", "Éléments") }:</strong> {item.evidence_count ?? 0}
                 </p>
                 <QuoteList quotes={item.example_quotes} />
               </>
@@ -126,18 +127,18 @@ export default function DatasetAiInsights({ datasetId }) {
           />
 
           <InsightList
-            title="CX risks"
+            title={tr("CX risks", "Risques CX")}
             items={insights.cx_risks || []}
             renderItem={(item) => (
               <>
                 <h4>{item.risk}</h4>
                 <p>
-                  <strong>Severity:</strong> {item.severity || "unknown"}
+                  <strong>{tr("Severity", "Gravité")}:</strong> {item.severity || tr("unknown", "inconnue")}
                 </p>
                 <p>{item.why_it_matters}</p>
                 {item.who_to_review && (
                   <p>
-                    <strong>Review:</strong> {item.who_to_review}
+                    <strong>{tr("Review", "À examiner")}:</strong> {item.who_to_review}
                   </p>
                 )}
               </>
@@ -145,28 +146,28 @@ export default function DatasetAiInsights({ datasetId }) {
           />
 
           <InsightList
-            title="Recommended actions"
+            title={tr("Recommended actions", "Actions recommandées")}
             items={insights.recommended_actions || []}
             renderItem={(item) => (
               <>
                 <h4>{item.action}</h4>
                 <p>{item.why}</p>
                 <p>
-                  <strong>Impact:</strong> {item.impact || "unknown"} ·{" "}
-                  <strong>Effort:</strong> {item.effort || "unknown"}
+                  <strong>{tr("Impact", "Impact")}:</strong> {item.impact || tr("unknown", "inconnu")} ·{" "}
+                  <strong>{tr("Effort", "Effort")}:</strong> {item.effort || tr("unknown", "inconnu")}
                 </p>
               </>
             )}
           />
 
           <InsightList
-            title="Close-the-loop templates"
+            title={tr("Close-the-loop templates", "Modèles de suivi")}
             items={insights.close_the_loop_templates || []}
             renderItem={(item) => (
               <>
                 <h4>{item.segment}</h4>
                 <p>
-                  <strong>Subject:</strong> {item.subject}
+                  <strong>{tr("Subject", "Objet")}:</strong> {item.subject}
                 </p>
                 <div className="csv-nps-ai-template-body">{item.body}</div>
               </>
@@ -179,12 +180,13 @@ export default function DatasetAiInsights({ datasetId }) {
 }
 
 function InsightList({ title, items, renderItem }) {
+  const { lang } = useLanguage();
   return (
     <section className="csv-nps-chart-card">
       <h3>{title}</h3>
 
       {!items.length ? (
-        <div className="csv-nps-empty-state">No items returned.</div>
+        <div className="csv-nps-empty-state">{lang === "fr" ? "Aucun élément disponible." : "No items returned."}</div>
       ) : (
         <div className="csv-nps-ai-list">
           {items.map((item, index) => (

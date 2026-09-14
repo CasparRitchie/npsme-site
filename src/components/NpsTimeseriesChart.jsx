@@ -8,6 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { useLanguage } from "../i18n/LanguageContext";
 
 function formatDateLabel(iso, granularity) {
   const d = new Date(iso);
@@ -22,7 +23,7 @@ function formatDateLabel(iso, granularity) {
   return d.toLocaleDateString(undefined, { month: "short", day: "2-digit" }); // week
 }
 
-function tooltipLabelFormatter(label, granularity) {
+function tooltipLabelFormatter(label, granularity, lang) {
   const d = new Date(label);
   if (Number.isNaN(d.getTime())) return label;
 
@@ -32,7 +33,7 @@ function tooltipLabelFormatter(label, granularity) {
     day: "2-digit",
   });
 
-  return granularity === "week" ? `Week of ${base}` : base;
+  return granularity === "week" ? `${lang === "fr" ? "Semaine du" : "Week of"} ${base}` : base;
 }
 
 // Width-only observer (height no longer needed because we give chart a fixed px height)
@@ -84,6 +85,7 @@ export default function NpsTimeseriesChart({
   granularity = "week",
   onPointClick,
 }) {
+  const { lang } = useLanguage();
   const data = React.useMemo(
     () => [...points].sort((a, b) => new Date(a.date) - new Date(b.date)),
     [points]
@@ -125,7 +127,7 @@ export default function NpsTimeseriesChart({
             />
             <YAxis domain={[-100, 100]} />
             <Tooltip
-              labelFormatter={(label) => tooltipLabelFormatter(label, granularity)}
+              labelFormatter={(label) => tooltipLabelFormatter(label, granularity, lang)}
               formatter={(value, name) =>
                 name === "nps" ? [value, "NPS"] : [value, name]
               }

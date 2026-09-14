@@ -491,16 +491,16 @@ export default function CsvNpsPerformance() {
             {PAGE_COPY.eyebrow}
           </p>
 
-          <h1>{PAGE_COPY.title}</h1>
+          <h1>{tr(PAGE_COPY.title, "Performance")}</h1>
 
-          <p>Loading performance data...</p>
+          <p>{tr("Loading performance data...", "Chargement des données de performance...")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
           <p>
-            Loading performance data from workspace.
+            {tr("Loading performance data from workspace.", "Chargement des données depuis l’espace de travail.")}
           </p>
         </section>
       </main>
@@ -515,10 +515,10 @@ export default function CsvNpsPerformance() {
             {PAGE_COPY.eyebrow}
           </p>
 
-          <h1>{PAGE_COPY.title}</h1>
+          <h1>{tr(PAGE_COPY.title, "Performance")}</h1>
 
           <p>
-            There was a problem loading this dataset.
+            {tr("There was a problem loading this dataset.", "Un problème est survenu lors du chargement de ce dataset.")}
           </p>
         </section>
 
@@ -539,10 +539,10 @@ export default function CsvNpsPerformance() {
             {PAGE_COPY.eyebrow}
           </p>
 
-          <h1>{PAGE_COPY.title}</h1>
+          <h1>{tr(PAGE_COPY.title, "Performance")}</h1>
 
           <p>
-            No feedback dataset has been loaded yet.
+            {tr("No feedback dataset has been loaded yet.", "Aucun dataset de feedback n’a encore été chargé.")}
           </p>
         </section>
 
@@ -555,9 +555,9 @@ export default function CsvNpsPerformance() {
               className="text-link"
               href={localizePath("/workspace/import", lang)}
             >
-              Import feedback data
+              {tr("Import feedback data", "Importer des données")}
             </a>{" "}
-            and analyse or save a dataset first.
+            {tr("and analyse or save a dataset first.", "puis analysez ou enregistrez d’abord un dataset.")}
           </p>
         </section>
       </main>
@@ -678,7 +678,7 @@ export default function CsvNpsPerformance() {
                 className="text-link"
                 href={localizePath("/workspace/closing-the-loop", lang)}
               >
-                Manage follow-up
+                {tr("Manage follow-up", "Gérer le suivi")}
               </a>
             </div>
           </div>
@@ -686,19 +686,17 @@ export default function CsvNpsPerformance() {
 
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Summary</h2>
+            <h2>{tr("Summary", "Synthèse")}</h2>
 
             <p>
-              Based on {summary.total} valid NPS
-              response
-              {summary.total === 1 ? "" : "s"}.
+              {tr("Based on", "Basée sur")} {summary.total} {tr("valid NPS response", "réponse NPS valide")}{summary.total === 1 ? "" : tr("s", "s")}.
             </p>
           </div>
         </div>
 
         <div className="csv-nps-metric-grid">
           <MetricCard
-            label="Responses"
+            label={tr("Responses", "Réponses")}
             value={summary.total}
           />
 
@@ -708,32 +706,32 @@ export default function CsvNpsPerformance() {
           />
 
           <MetricCard
-            label="Promoters"
+            label={tr("Promoters", "Promoteurs")}
             value={summary.promoters}
           />
 
           <MetricCard
-            label="Passives"
+            label={tr("Passives", "Passifs")}
             value={summary.passives}
           />
 
           <MetricCard
-            label="Detractors"
+            label={tr("Detractors", "Détracteurs")}
             value={summary.detractors}
           />
 
           <MetricCard
-            label="Avg. score"
+            label={tr("Avg. score", "Note moyenne")}
             value={summary.averageScore}
           />
 
           <MetricCard
-            label="Active follow-ups"
+            label={tr("Active follow-ups", "Suivis actifs")}
             value={closeLoopSummary.active}
           />
 
           <MetricCard
-            label="Active detractors"
+            label={tr("Active detractors", "Détracteurs actifs")}
             value={
               closeLoopSummary.activeDetractors
             }
@@ -743,18 +741,17 @@ export default function CsvNpsPerformance() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
-              <h3>NPS over time</h3>
+              <h3>{tr("NPS over time", "Évolution du NPS")}</h3>
 
               <p>
-                Overall NPS trend and response volume using the selected period,
-                bucket and chart granularity filters.
+                {tr("Overall NPS trend and response volume using the selected period, bucket and chart granularity filters.", "Évolution générale du NPS et volume de réponses selon les filtres de période, de segment et de granularité sélectionnés.")}
               </p>
             </div>
           </div>
 
           {chartPoints.length === 0 ? (
             <div className="csv-nps-empty-state">
-              No usable response dates were detected for this filter set.
+              {tr("No usable response dates were detected for this filter set.", "Aucune date de réponse exploitable pour ces filtres.")}
             </div>
           ) : (
             <>
@@ -768,22 +765,22 @@ export default function CsvNpsPerformance() {
 
               <div className="csv-nps-metric-grid csv-nps-metric-grid-compact">
                 <MetricCard
-                  label="Responses in chart"
+                  label={tr("Responses in chart", "Réponses du graphique")}
                   value={chartTotals.totalResponses}
                 />
 
                 <MetricCard
-                  label="Latest NPS point"
+                  label={tr("Latest NPS point", "Dernier NPS")}
                   value={chartTotals.latestNps}
                 />
 
                 <MetricCard
-                  label="Latest period"
+                  label={tr("Latest period", "Dernière période")}
                   value={chartTotals.latestDate || "—"}
                 />
 
                 <MetricCard
-                  label="Data points"
+                  label={tr("Data points", "Points de données")}
                   value={chartTotals.points}
                 />
               </div>
@@ -795,12 +792,11 @@ export default function CsvNpsPerformance() {
           <section className="csv-nps-chart-card csv-nps-chart-card-wide">
             <div className="csv-nps-responses-header">
               <div>
-                <h3>Responses for {selectedChartPoint.date}</h3>
+                <h3>{tr("Responses for", "Réponses pour le")} {selectedChartPoint.date}</h3>
 
                 <p>
-                  {selectedChartResponses.length} response
-                  {selectedChartResponses.length === 1 ? "" : "s"} in this selected
-                  chart period.
+                  {selectedChartResponses.length} {tr("response", "réponse")}
+                  {selectedChartResponses.length === 1 ? "" : "s"} {tr("in this selected chart period.", "sur cette période sélectionnée.")}
                 </p>
               </div>
 
@@ -809,25 +805,25 @@ export default function CsvNpsPerformance() {
                 className="csv-nps-button csv-nps-button-secondary"
                 onClick={() => setSelectedChartPoint(null)}
               >
-                Close
+                {tr("Close", "Fermer")}
               </button>
             </div>
 
             {selectedChartResponses.length === 0 ? (
               <div className="csv-nps-empty-state">
-                No responses found for this chart point.
+                {tr("No responses found for this chart point.", "Aucune réponse pour ce point du graphique.")}
               </div>
             ) : (
               <div className="csv-nps-table-wrap">
                 <table className="csv-nps-table">
                   <thead>
                     <tr>
-                      <th>Date</th>
-                      <th>Score</th>
-                      <th>Bucket</th>
-                      <th>Contact</th>
-                      <th>Comment</th>
-                      <th>Actions</th>
+                      <th>{tr("Date", "Date")}</th>
+                      <th>{tr("Score", "Note")}</th>
+                      <th>{tr("Bucket", "Segment")}</th>
+                      <th>{tr("Contact", "Contact")}</th>
+                      <th>{tr("Comment", "Commentaire")}</th>
+                      <th>{tr("Actions", "Actions")}</th>
                     </tr>
                   </thead>
 
@@ -836,7 +832,7 @@ export default function CsvNpsPerformance() {
                       <tr key={row.response_id || row.id}>
                         <td>{formatCompactDate(row.submitted_at)}</td>
                         <td>{row.score ?? "—"}</td>
-                        <td>{formatBucketLabel(row.bucket)}</td>
+                        <td>{formatBucketLabel(row.bucket, lang)}</td>
                         <td>{row.contact_label || row.contact_name || "Contact"}</td>
                         <td>
                           {truncateText(
@@ -851,24 +847,24 @@ export default function CsvNpsPerformance() {
                           <div className="flex flex-wrap gap-2">
                             <a
                               className="text-link"
-                              href={`/workspace/responses?response=${encodeURIComponent(
+                              href={localizePath(`/workspace/responses?response=${encodeURIComponent(
                                 row.response_id || row.id || ""
-                              )}`}
+                              )}`, lang)}
                             >
-                              View details
+                              {tr("View details", "Voir le détail")}
                             </a>
 
                             <a
                               className="text-link"
-                              href={`/workspace/closing-the-loop?response=${encodeURIComponent(
+                              href={localizePath(`/workspace/closing-the-loop?response=${encodeURIComponent(
                                 row.db_row_id ||
                                   row.dataset_row_id ||
                                   row.response_id ||
                                   row.id ||
                                   ""
-                              )}`}
+                              )}`, lang)}
                             >
-                              Manage follow-up
+                              {tr("Manage follow-up", "Gérer le suivi")}
                             </a>
                           </div>
                         </td>
@@ -888,24 +884,23 @@ export default function CsvNpsPerformance() {
               granularity={chartGranularity}
               height={220}
               maxBars={36}
-              title="Score split over time"
-              subtitle="Promoters, passives and detractors across the same selected filters."
+              title={tr("Score split over time", "Répartition des notes dans le temps")}
+              subtitle={tr("Promoters, passives and detractors across the same selected filters.", "Promoteurs, passifs et détracteurs selon les mêmes filtres.")}
             />
           </section>
         )}
 
         <div className="csv-nps-performance-grid">
           <section className="csv-nps-chart-card">
-            <h3>Response mix</h3>
+            <h3>{tr("Response mix", "Répartition des réponses")}</h3>
 
             <p>
-              Split of responses across promoters,
-              passives and detractors.
+              {tr("Split of responses across promoters, passives and detractors.", "Répartition des réponses entre promoteurs, passifs et détracteurs.")}
             </p>
 
             <div className="csv-nps-bucket-bars">
               <BucketBar
-                label="Promoters"
+                label={tr("Promoters", "Promoteurs")}
                 count={summary.promoters}
                 percentage={
                   bucketPercentages.promoters
@@ -914,7 +909,7 @@ export default function CsvNpsPerformance() {
               />
 
               <BucketBar
-                label="Passives"
+                label={tr("Passives", "Passifs")}
                 count={summary.passives}
                 percentage={
                   bucketPercentages.passives
@@ -923,7 +918,7 @@ export default function CsvNpsPerformance() {
               />
 
               <BucketBar
-                label="Detractors"
+                label={tr("Detractors", "Détracteurs")}
                 count={summary.detractors}
                 percentage={
                   bucketPercentages.detractors
@@ -934,11 +929,10 @@ export default function CsvNpsPerformance() {
           </section>
 
           <section className="csv-nps-chart-card">
-            <h3>Score distribution</h3>
+            <h3>{tr("Score distribution", "Distribution des notes")}</h3>
 
             <p>
-              Number of responses received for each
-              score from 0 to 10.
+              {tr("Number of responses received for each score from 0 to 10.", "Nombre de réponses reçues pour chaque note de 0 à 10.")}
             </p>
 
             <div className="csv-nps-score-chart">
@@ -976,14 +970,11 @@ export default function CsvNpsPerformance() {
             <div className="csv-nps-responses-header">
               <div>
                 <h3>
-                  Average score by question
+                  {tr("Average score by question", "Note moyenne par question")}
                 </h3>
 
                 <p>
-                  Average rating out of 10 for each
-                  survey question. The recommendation
-                  question is also used to calculate the
-                  headline NPS result.
+                  {tr("Average rating out of 10 for each survey question. The recommendation question is also used to calculate the headline NPS result.", "Note moyenne sur 10 pour chaque question. La question de recommandation sert également au calcul du NPS principal.")}
                 </p>
               </div>
             </div>
@@ -1010,18 +1001,15 @@ export default function CsvNpsPerformance() {
         )}
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
-          <h3>Timeline</h3>
+          <h3>{tr("Timeline", "Chronologie")}</h3>
 
           <p>
-            NPS and response volume across the selected
-            reporting periods, where usable response
-            dates were detected.
+            {tr("NPS and response volume across the selected reporting periods, where usable response dates were detected.", "NPS et volume de réponses sur les périodes sélectionnées lorsque des dates exploitables sont disponibles.")}
           </p>
 
           {timeline.length === 0 ? (
             <div className="csv-nps-empty-state">
-              No usable response dates were detected in
-              this dataset.
+              {tr("No usable response dates were detected in this dataset.", "Aucune date de réponse exploitable n’a été détectée dans ce dataset.")}
             </div>
           ) : (
             <div className="csv-nps-table-wrap">
@@ -1029,11 +1017,11 @@ export default function CsvNpsPerformance() {
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Responses</th>
+                    <th>{tr("Responses", "Réponses")}</th>
                     <th>NPS</th>
-                    <th>Promoters</th>
-                    <th>Passives</th>
-                    <th>Detractors</th>
+                    <th>{tr("Promoters", "Promoteurs")}</th>
+                    <th>{tr("Passives", "Passifs")}</th>
+                    <th>{tr("Detractors", "Détracteurs")}</th>
                   </tr>
                 </thead>
 
@@ -1555,13 +1543,14 @@ function BucketBar({
   percentage,
   bucket,
 }) {
+  const { lang } = useLanguage();
   return (
     <div className="csv-nps-bucket-bar-row">
       <div className="csv-nps-bucket-bar-topline">
         <span>{label}</span>
 
         <span>
-          {count} responses · {percentage}%
+          {count} {lang === "fr" ? "réponses" : "responses"} · {percentage}%
         </span>
       </div>
 
@@ -1583,6 +1572,7 @@ function QuestionScoreBar({
   responses,
   isNpsQuestion,
 }) {
+  const { lang } = useLanguage();
   const score =
     normaliseNpsScore(averageScore);
 
@@ -1603,7 +1593,7 @@ function QuestionScoreBar({
           </div>
 
           <div className="csv-nps-question-score-meta">
-            {responses} response
+            {responses} {lang === "fr" ? "réponse" : "response"}
             {responses === 1 ? "" : "s"}
 
             {isNpsQuestion && (
@@ -1614,7 +1604,7 @@ function QuestionScoreBar({
                 </span>
 
                 <span className="csv-nps-question-score-badge">
-                  NPS question
+                  {lang === "fr" ? "Question NPS" : "NPS question"}
                 </span>
               </>
             )}
@@ -1635,8 +1625,8 @@ function QuestionScoreBar({
         role="progressbar"
         aria-label={`${question}: ${
           score === null
-            ? "no score"
-            : `${score} out of 10`
+            ? (lang === "fr" ? "aucune note" : "no score")
+            : (lang === "fr" ? `${score} sur 10` : `${score} out of 10`)
         }`}
         aria-valuemin="0"
         aria-valuemax="10"
@@ -2105,11 +2095,11 @@ function formatCompactDate(isoDate) {
   });
 }
 
-function formatBucketLabel(bucket) {
-  if (bucket === "promoter") return "Promoter";
-  if (bucket === "passive") return "Passive";
-  if (bucket === "detractor") return "Detractor";
-  return "Unknown";
+function formatBucketLabel(bucket, lang = "en") {
+  if (bucket === "promoter") return lang === "fr" ? "Promoteur" : "Promoter";
+  if (bucket === "passive") return lang === "fr" ? "Passif" : "Passive";
+  if (bucket === "detractor") return lang === "fr" ? "Détracteur" : "Detractor";
+  return lang === "fr" ? "Inconnu" : "Unknown";
 }
 
 function truncateText(value, maxLength = 120) {

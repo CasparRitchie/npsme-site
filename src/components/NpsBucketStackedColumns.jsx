@@ -1,5 +1,6 @@
 // src/components/NpsBucketStackedColumns.jsx
 import React from "react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 function clamp01(n) {
   if (!Number.isFinite(n)) return 0;
@@ -39,6 +40,8 @@ export default function NpsBucketStackedColumns({
   title = "Distribution over time",
   subtitle = "Promoters / Passives / Detractors per time bucket",
 }) {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const data = React.useMemo(() => {
     const arr = Array.isArray(points) ? points : [];
     return arr.slice(Math.max(0, arr.length - maxBars));
@@ -87,21 +90,21 @@ export default function NpsBucketStackedColumns({
         <div className="flex items-center gap-2 text-[11px] text-slate-300">
           <span className="inline-flex items-center gap-1">
             <span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-400/80" />
-            Promoters
+            {tr("Promoters", "Promoteurs")}
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-400/80" />
-            Passives
+            {tr("Passives", "Passifs")}
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block h-2.5 w-2.5 rounded-sm bg-rose-400/80" />
-            Detractors
+            {tr("Detractors", "Détracteurs")}
           </span>
         </div>
       </div>
 
       {!data.length ? (
-        <div className="mt-4 text-sm text-slate-400">No data yet for this period.</div>
+        <div className="mt-4 text-sm text-slate-400">{tr("No data yet for this period.", "Aucune donnée pour cette période.")}</div>
       ) : (
         <div className="mt-4">
           <svg
@@ -110,7 +113,7 @@ export default function NpsBucketStackedColumns({
             height={height}
             className="block"
             role="img"
-            aria-label="NPS bucket distribution over time"
+            aria-label={tr("NPS bucket distribution over time", "Répartition des segments NPS dans le temps")}
           >
             {[0.25, 0.5, 0.75].map((v) => {
               const y = yFor(v);
@@ -148,7 +151,7 @@ export default function NpsBucketStackedColumns({
               const yPass = yDetr - hPass;
               const yProm = yPass - hProm;
 
-              const label = `${p.date || ""} • total ${total} (P${promoters} / Pa${passives} / D${detractors})`;
+              const label = `${p.date || ""} • ${tr("total", "total")} ${total} (P${promoters} / Pa${passives} / D${detractors})`;
 
               return (
                 <g key={p.date || i}>
@@ -216,7 +219,7 @@ export default function NpsBucketStackedColumns({
           </svg>
 
           <div className="mt-3 text-xs text-slate-400">
-            Showing <span className="text-slate-200">{data.length}</span> buckets (max {maxBars}).
+            {tr("Showing", "Affichage de")} <span className="text-slate-200">{data.length}</span> {tr("buckets", "périodes")} ({tr("max", "max.")} {maxBars}).
           </div>
         </div>
       )}

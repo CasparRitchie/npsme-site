@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -77,6 +78,8 @@ function StatusPill({ status }) {
 }
 
 export default function CsvNpsInvitations() {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const { datasetId } = useParams();
 
   const [dataset, setDataset] = useState(null);
@@ -359,8 +362,8 @@ export default function CsvNpsInvitations() {
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-        <h1>{PAGE_COPY.title}</h1>
-        <p>{subtitle}</p>
+        <h1>{tr(PAGE_COPY.title, "Invitations")}</h1>
+        <p>{lang === "fr" ? "Suivez les invitations, leur statut de livraison, les réponses et le taux de réponse." : subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -370,37 +373,37 @@ export default function CsvNpsInvitations() {
       <section className="csv-nps-results">
         <div className="csv-nps-filters csv-nps-filters-three">
           <label className="csv-nps-filter-field">
-            <span>Window</span>
+            <span>{tr("Window", "Période")}</span>
             <select
               value={days}
               onChange={(e) => setDays(Number(e.target.value))}
             >
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-              <option value={180}>Last 180 days</option>
-              <option value={365}>Last 365 days</option>
+              <option value={30}>{tr("Last 30 days", "30 derniers jours")}</option>
+              <option value={90}>{tr("Last 90 days", "90 derniers jours")}</option>
+              <option value={180}>{tr("Last 180 days", "180 derniers jours")}</option>
+              <option value={365}>{tr("Last 365 days", "365 derniers jours")}</option>
             </select>
           </label>
 
           <label className="csv-nps-filter-field">
-            <span>Status</span>
+            <span>{tr("Status", "Statut")}</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="all">All</option>
-              <option value="sent">Sent</option>
-              <option value="delivered">Delivered</option>
-              <option value="opened">Started / opened</option>
-              <option value="responded">Valid NPS response</option>
-              <option value="bounced">Bounced</option>
-              <option value="failed">Failed</option>
-              <option value="completed_without_score">Completed without score</option>
+              <option value="all">{tr("All", "Tous")}</option>
+              <option value="sent">{tr("Sent", "Envoyée")}</option>
+              <option value="delivered">{tr("Delivered", "Livrée")}</option>
+              <option value="opened">{tr("Started / opened", "Commencée / ouverte")}</option>
+              <option value="responded">{tr("Valid NPS response", "Réponse NPS valide")}</option>
+              <option value="bounced">{tr("Bounced", "Rejetée")}</option>
+              <option value="failed">{tr("Failed", "Échec")}</option>
+              <option value="completed_without_score">{tr("Completed without score", "Terminée sans note")}</option>
             </select>
           </label>
 
           <div className="csv-nps-filter-field">
-            <span>Source</span>
+            <span>{tr("Source", "Source")}</span>
             <div className="text-sm text-slate-300">
               <div>
                 {source?.source_name ||

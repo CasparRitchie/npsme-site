@@ -3,12 +3,60 @@
 export const TRANSLATIONS = {
   en: {
     navbar: {
+      group: { solutions: "Solutions", resources: "Resources" },
       bookDiscovery: "Book CX review",
       languageEn: "EN",
       languageFr: "FR",
 
       admin: "Admin",
       logout: "Log out",
+    },
+    common: {
+      skipToContent: "Skip to content",
+      homeAria: "NPS Me home",
+      unknown: "Unknown", day: "Day", week: "Week", month: "Month", loading: "Loading…",
+      window: "Window", points: "Points", days: "days", from: "From", to: "To",
+      sample: "Sample", error: "Error", question: "Question", answer: "Answer", answered: "Answered", avg: "Average", count: "Count",
+      respondents: "Respondents", selections: "Selections", theme: "Theme", close: "Close",
+      returned: "Returned", substantive: "Substantive", bucket: "Bucket", selected: "Selected",
+      mentions: "Mentions", search: "Search", contact: "Contact", date: "Date", open: "Open",
+      back: "Back", view: "View", dash: "—",
+    },
+    footer: {
+      description: "Practical NPS consulting, customer feedback systems and CX insight for startups, SMEs and growing businesses.",
+      navigationAria: "Footer navigation",
+      rights: "All rights reserved.",
+      trademark: "NPS® and Net Promoter Score® are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and is not affiliated with, sponsored, or endorsed by those parties.",
+      groups: { solutions: "Solutions", workspace: "Workspace", learn: "Learn", more: "More" },
+    },
+    workspaceAuth: {
+      eyebrow: "NPS Me Workspace",
+      checking: "Checking workspace access",
+      confirming: "Confirming your workspace session...",
+      loading: "Loading workspace access.",
+    },
+    workspaceNav: {
+      ariaLabel: "NPS workspace navigation",
+      overview: "Overview",
+      import: "Import",
+      datasets: "Datasets",
+      performance: "Performance",
+      responses: "Responses",
+      invitations: "Invitations",
+      closing: "Close the loop",
+      account: "Account",
+      signOut: "Sign out",
+    },
+    workspaceDatasetHeader: {
+      help: "Use the tabs below to move between performance, responses and follow-up actions.",
+      ariaLabel: "Dataset navigation",
+    },
+    auth: {
+      privateAccess: "Private access",
+      enterPassword: "Enter the shared password to continue.",
+      password: "Password",
+      unlock: "Unlock",
+      invalidPassword: "Incorrect password.",
     },
     routes: {
       products: "Products",
@@ -4020,12 +4068,60 @@ export const TRANSLATIONS = {
 
   fr: {
     navbar: {
+      group: { solutions: "Solutions", resources: "Ressources" },
       bookDiscovery: "Réserver une revue CX",
       languageEn: "EN",
       languageFr: "FR",
 
     admin: "Admin",
     logout: "Déconnexion",
+    },
+    common: {
+      skipToContent: "Aller au contenu",
+      homeAria: "Accueil NPS Me",
+      unknown: "Inconnu", day: "Jour", week: "Semaine", month: "Mois", loading: "Chargement…",
+      window: "Période", points: "Points", days: "jours", from: "Du", to: "Au",
+      sample: "Échantillon", error: "Erreur", question: "Question", answer: "Réponse", answered: "Répondu le", avg: "Moyenne", count: "Nombre",
+      respondents: "Répondants", selections: "Sélections", theme: "Thème", close: "Fermer",
+      returned: "Affichés", substantive: "Substantiels", bucket: "Segment", selected: "Sélectionné",
+      mentions: "Mentions", search: "Rechercher", contact: "Contact", date: "Date", open: "Ouvrir",
+      back: "Retour", view: "Vue", dash: "—",
+    },
+    footer: {
+      description: "Conseil NPS pragmatique, systèmes de feedback client et analyses CX pour les startups, PME et entreprises en croissance.",
+      navigationAria: "Navigation du pied de page",
+      rights: "Tous droits réservés.",
+      trademark: "NPS® et Net Promoter Score® sont des marques de service déposées de Bain & Company, Inc., Fred Reichheld et Satmetrix Systems, Inc. Ces références sont uniquement descriptives. NPS Me est indépendant et n’est ni affilié, ni sponsorisé, ni approuvé par ces entités.",
+      groups: { solutions: "Solutions", workspace: "Espace de travail", learn: "Découvrir", more: "Plus" },
+    },
+    workspaceAuth: {
+      eyebrow: "Espace de travail NPS Me",
+      checking: "Vérification de l’accès à l’espace de travail",
+      confirming: "Vérification de votre session...",
+      loading: "Chargement de votre accès.",
+    },
+    workspaceNav: {
+      ariaLabel: "Navigation de l’espace de travail NPS",
+      overview: "Vue d’ensemble",
+      import: "Importer",
+      datasets: "Datasets",
+      performance: "Performance",
+      responses: "Réponses",
+      invitations: "Invitations",
+      closing: "Suivi client",
+      account: "Compte",
+      signOut: "Déconnexion",
+    },
+    workspaceDatasetHeader: {
+      help: "Utilisez les onglets ci-dessous pour passer de la performance aux réponses et aux actions de suivi.",
+      ariaLabel: "Navigation du dataset",
+    },
+    auth: {
+      privateAccess: "Accès privé",
+      enterPassword: "Saisissez le mot de passe partagé pour continuer.",
+      password: "Mot de passe",
+      unlock: "Accéder",
+      invalidPassword: "Mot de passe incorrect.",
     },
     routes: {
       products: "Produits",
@@ -7229,7 +7325,59 @@ export const TRANSLATIONS = {
       // Used across multiple sections
       meta: {
         publicSafe: "Public-safe (agrégé)",
+        private: "Privé (connexion requise)",
         window: "Période : 30 jours",
+      },
+
+      timeseries: {
+        title: "Évolution du NPS",
+        subtitle: "Suivez les tendances NPS par jour, semaine ou mois.",
+      },
+
+      qa: {
+        title: "Note moyenne par question",
+        subtitle: "Calculée à partir des réponses brutes de l’enquête Intercom (connexion requise).",
+        none: "Aucune réponse numérique trouvée sur cette période.",
+        note: "Le graphique et le tableau affichent les 20 questions ayant reçu le plus de réponses.",
+      },
+
+      multi: {
+        title: "Questions à choix multiples",
+        subtitle: "Questions permettant plusieurs choix (connexion requise). Cliquez pour afficher le détail.",
+        none: "Aucune question à choix multiples détectée sur cette période.",
+      },
+
+      qd: {
+        seoTitle: "Détail de la question | NPS Me",
+        seoDesc: "Preuves et verbatims au niveau de la question.",
+        title: "Détail de la question", questionId: "ID de la question",
+        noRows: "Aucune réponse trouvée pour cette question sur la période sélectionnée.",
+        countSub: "Réponses numériques (0–10)", avgSub: "Note moyenne pour cette question",
+        sample: "Échantillon", sampleSub: "Période / limite de réponses",
+        respondentsSub: "Réponses ayant sélectionné au moins une option",
+        avgSelections: "Sélections moyennes", avgSelectionsSub: "Nombre moyen d’options sélectionnées par répondant",
+        textCountSub: "Réponses ayant répondu à cette question", textReturnedSub: "Réponses libres affichées ci-dessous",
+        options: "Options sélectionnées", noOptions: "Aucune option trouvée pour cette question sur la période sélectionnée.",
+        distribution: "Répartition des notes", verbatims: "Verbatims",
+        noVerbatimsScored: "Cette question est notée de 0 à 10. Les commentaires libres se trouvent généralement dans les questions de suivi. Aucun n’a été trouvé sur cette période.",
+        noVerbatimsMulti: "Il s’agit d’une question à choix multiples. Les commentaires libres se trouvent généralement dans des questions de suivi distinctes. Aucun n’a été trouvé sur cette période.",
+        noVerbatims: "Aucune réponse libre trouvée pour cette question sur la période sélectionnée.",
+        raw: "Réponses brutes", rawSub: "Vue lisible de la réponse complète à l’enquête (questions et réponses).",
+        relevantOnly: "Pertinentes uniquement", allQuestions: "Toutes les questions", showJson: "Afficher le JSON",
+        response: "Réponse à l’enquête", selectedOptions: "Options sélectionnées", allAnswers: "Toutes les réponses",
+        relevantAnswers: "Cette question et les suivis associés", noRaw: "Aucune réponse brute trouvée pour cette réponse.",
+        rawNote: "Affichage limité aux 30 premières réponses correspondantes pour préserver les performances. Utilisez les contrôles de période et d’échantillon pour modifier la sélection.",
+        note: "Cette vue utilise les réponses brutes de l’enquête Intercom (endpoints privés, connexion requise).",
+      },
+
+      invitations: {
+        title: "Invitations",
+        subtitle: "Suivez les invitations envoyées, leur livraison, les réponses et le taux de réponse du programme d’enquête.",
+        status: { responded: "Répondu", delivered: "Livré", opened: "Ouvert", bounced: "Rejeté", failed: "Échec", sent: "Envoyé" },
+        filters: { title: "Filtres globaux", subtitle: "Ces filtres s’appliquent aux KPI d’invitation et au tableau des invitations récentes.", contentId: "content_id", window: "Période", status: "Statut", all: "Tous" },
+        state: { errorTitle: "Erreur", loading: "Chargement des invitations…", empty: "Aucune invitation trouvée pour ces filtres." },
+        kpis: { sent: "Invitations envoyées", delivered: "Livrées", responded: "Réponses", responseRate: "Taux de réponse", lastSent: "Dernière invitation envoyée" },
+        table: { title: "Invitations récentes", subtitle: "Dernière activité pour les filtres sélectionnés.", sentAt: "Envoyée", contact: "Contact", status: "Statut", score: "Note", responseId: "Réponse" },
       },
 
       filters: {
@@ -7258,6 +7406,7 @@ export const TRANSLATIONS = {
         responseRateSub: "Complété ÷ affiché",
         medianCompletion: "Temps médian de complétion",
         medianAnswerSub: "Temps médian avant première réponse :",
+        medianAnswerSubFallback: "Temps médian avant première réponse : -",
         firstAnswer: "Première réponse",
         firstAnswerFallback: "Première réponse : -",
         note:
@@ -7271,6 +7420,7 @@ export const TRANSLATIONS = {
         noData:
           "Aucune complétion sur les 30 derniers jours. Dès que des réponses arrivent, ce panneau se met à jour automatiquement.",
         kpiNps: "NPS",
+        responses: "Réponses",
         promoters: "Promoteurs",
         promotersSub: "Notes 9–10",
         passives: "Passifs",
@@ -7297,6 +7447,7 @@ export const TRANSLATIONS = {
         },
         note:
           "Prochaine étape : passer aux “drivers” (ce qui corrèle avec les détracteurs), puis générer des recommandations assistées par IA et fondées sur des preuves.",
+        detrShare: "Part des détracteurs",
       },
 
       themeLabels: {
@@ -7358,6 +7509,12 @@ export const TRANSLATIONS = {
       },
 
       trend: {
+        title: "Évolution du NPS",
+        subtitle: "Vue de tendance montrant l’évolution du ressenti. Utilisez les filtres pour affiner l’analyse.",
+        range: "Période", mode: "Vue :", rolling: "Glissante", rangeBtn: "Plage de dates", last: "Derniers",
+        noData: "Aucune donnée de tendance pour cette période.", pointsSub: "Une ligne par période",
+        cols: { period: "Période", nps: "NPS", responses: "Réponses", promoters: "Promoteurs", passives: "Passifs", detractors: "Détracteurs" },
+        note: "Affichage des 36 périodes les plus récentes pour préserver les performances.",
         granularity: "Granularité",
         totalResponses: "Réponses sur la période",
         latestNps: "Dernier point NPS",
@@ -7366,6 +7523,7 @@ export const TRANSLATIONS = {
       },
 
       top: {
+        npsOverall: "NPS (période sélectionnée)",
         splitTitle: "Répartition des scores dans le temps",
         splitSubtitle:
           "Répartition promoteurs / passifs / détracteurs avec les mêmes filtres globaux.",
@@ -7467,6 +7625,7 @@ export const TRANSLATIONS = {
         actions: {
           open: "Ouvrir",
           view: "Voir",
+          loadMore: "Afficher plus",
           startLoop: "Démarrer la boucle",
           starting: "Démarrage…",
           loopActive: "Boucle active",

@@ -91,7 +91,7 @@ export default function SiteFooter() {
       ]),
     },
     {
-      title: "Solutions",
+      title: t("footer.groups.solutions", "Solutions"),
       links: makeLinks([
         "/customer-feedback-workspace",
         "/nps-intelligence-layer",
@@ -105,13 +105,13 @@ export default function SiteFooter() {
       ]),
     },
     {
-      title: "Workspace",
+      title: t("footer.groups.workspace", "Workspace"),
       links: makeLinks([
         "/workspace/login",
       ]),
     },
     {
-      title: "Learn",
+      title: t("footer.groups.learn", "Learn"),
       links: makeLinks([
         "/what-is-nps",
         "/milestone-nps",
@@ -126,7 +126,7 @@ export default function SiteFooter() {
       ]),
     },
     {
-      title: "More",
+      title: t("footer.groups.more", "More"),
       links: makeLinks([
         "/training",
         "/speaking",
@@ -147,7 +147,7 @@ export default function SiteFooter() {
             <Link
               to={localizePath("/", lang)}
               className="inline-flex items-center gap-3"
-              aria-label="NPS Me home"
+              aria-label={t("common.homeAria", "NPS Me home")}
             >
               <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#22C55E]" />
               <span className="text-lg tracking-tight font-semibold text-white">
@@ -156,8 +156,7 @@ export default function SiteFooter() {
             </Link>
 
             <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
-              Practical NPS consulting, customer feedback systems and CX insight
-              for startups, SMEs and growing businesses.
+              {t("footer.description", "Practical NPS consulting, customer feedback systems and CX insight for startups, SMEs and growing businesses.")}
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -179,7 +178,7 @@ export default function SiteFooter() {
 
           <nav
             className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5"
-            aria-label="Footer navigation"
+            aria-label={t("footer.navigationAria", "Footer navigation")}
           >
             {groups.map((group) => (
               <FooterGroup
@@ -193,14 +192,11 @@ export default function SiteFooter() {
 
         <div className="mt-10 border-t border-white/10 pt-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <p className="text-xs text-slate-400">
-            © {new Date().getFullYear()} NPS Me. All rights reserved.
+            © {new Date().getFullYear()} NPS Me. {t("footer.rights", "All rights reserved.")}
           </p>
 
           <p className="max-w-3xl text-[11px] leading-snug text-slate-400">
-            NPS® and Net Promoter Score® are registered service marks of Bain
-            &amp; Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc.
-            References are descriptive only. NPS Me is independent and is not
-            affiliated with, sponsored, or endorsed by those parties.
+            {t("footer.trademark", "NPS® and Net Promoter Score® are registered service marks of Bain & Company, Inc., Fred Reichheld, and Satmetrix Systems, Inc. References are descriptive only. NPS Me is independent and is not affiliated with, sponsored, or endorsed by those parties.")}
           </p>
         </div>
       </div>

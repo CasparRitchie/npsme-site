@@ -906,11 +906,11 @@ export default function EnvolaExample() {
             <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div className="text-sm text-slate-200">
-                  <span className="text-slate-400">Selected:</span>{" "}
+                  <span className="text-slate-400">{tr("common.selected", "Selected")}:</span>{" "}
                   <span className="text-white font-semibold">{selectedPoint.date}</span>{" "}
                   <span className="text-slate-400">• NPS:</span>{" "}
                   <span className="text-white font-semibold">{selectedPoint.nps ?? "—"}</span>{" "}
-                  <span className="text-slate-400">• Responses:</span>{" "}
+                  <span className="text-slate-400">• {tr("common.responses", "Responses")}:</span>{" "}
                   <span className="text-white font-semibold">{selectedPoint.responses ?? "—"}</span>
                 </div>
 
@@ -922,7 +922,7 @@ export default function EnvolaExample() {
                   }}
                   className="text-sm text-slate-300 hover:text-white"
                 >
-                  Close
+                  {tr("common.close", "Close")}
                 </button>
               </div>
 

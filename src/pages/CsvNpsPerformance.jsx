@@ -5,6 +5,8 @@ import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import DatasetAiInsights from "../components/DatasetAiInsights";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
+import { useLanguage } from "../i18n/LanguageContext";
+import { localizePath } from "../i18n/pathHelpers";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -18,6 +20,8 @@ const PAGE_COPY = {
 };
 
 export default function CsvNpsPerformance() {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const { datasetId } = useParams();
 
   const [dataset, setDataset] = useState(null);
@@ -549,7 +553,7 @@ export default function CsvNpsPerformance() {
             Go to{" "}
             <a
               className="text-link"
-              href="/workspace/import"
+              href={localizePath("/workspace/import", lang)}
             >
               Import feedback data
             </a>{" "}
@@ -570,9 +574,9 @@ export default function CsvNpsPerformance() {
           {PAGE_COPY.eyebrow}
         </p>
 
-        <h1>{PAGE_COPY.title}</h1>
+        <h1>{tr(PAGE_COPY.title, "Performance")}</h1>
 
-        <p>{subtitle}</p>
+        <p>{lang === "fr" ? "Analysez les résultats NPS, la répartition des réponses et leur évolution dans le temps." : subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -584,7 +588,7 @@ export default function CsvNpsPerformance() {
       <section className="csv-nps-results">
         <div className="csv-nps-filters csv-nps-filters-four">
           <label className="csv-nps-filter-field">
-            <span>Period</span>
+            <span>{tr("Period", "Période")}</span>
 
             <select
               value={periodFilter}
@@ -593,29 +597,29 @@ export default function CsvNpsPerformance() {
               }
             >
               <option value="all">
-                All time
+                {tr("All time", "Toute la période")}
               </option>
 
               <option value="7d">
-                Last 7 days
+                {tr("Last 7 days", "7 derniers jours")}
               </option>
 
               <option value="30d">
-                Last 30 days
+                {tr("Last 30 days", "30 derniers jours")}
               </option>
 
               <option value="90d">
-                Last 90 days
+                {tr("Last 90 days", "90 derniers jours")}
               </option>
 
               <option value="this_month">
-                This month
+                {tr("This month", "Ce mois-ci")}
               </option>
             </select>
           </label>
 
           <label className="csv-nps-filter-field">
-            <span>Bucket</span>
+            <span>{tr("Bucket", "Segment")}</span>
 
             <select
               value={bucketFilter}
@@ -624,25 +628,25 @@ export default function CsvNpsPerformance() {
               }
             >
               <option value="all">
-                All
+                {tr("All", "Tous")}
               </option>
 
               <option value="promoter">
-                Promoters
+                {tr("Promoters", "Promoteurs")}
               </option>
 
               <option value="passive">
-                Passives
+                {tr("Passives", "Passifs")}
               </option>
 
               <option value="detractor">
-                Detractors
+                {tr("Detractors", "Détracteurs")}
               </option>
             </select>
           </label>
 
           <label className="csv-nps-filter-field">
-            <span>Chart granularity</span>
+            <span>{tr("Chart granularity", "Granularité du graphique")}</span>
 
             <select
               value={chartGranularity}
@@ -651,28 +655,28 @@ export default function CsvNpsPerformance() {
                 setSelectedChartPoint(null);
               }}
             >
-              <option value="day">Day</option>
-              <option value="week">Week</option>
-              <option value="month">Month</option>
+              <option value="day">{tr("Day", "Jour")}</option>
+              <option value="week">{tr("Week", "Semaine")}</option>
+              <option value="month">{tr("Month", "Mois")}</option>
             </select>
           </label>
 
           <div className="csv-nps-filter-field">
-            <span>Workspace actions</span>
+            <span>{tr("Workspace actions", "Actions")}</span>
 
             <div className="flex flex-wrap gap-2">
               <a
                 className="text-link"
-                href="/workspace/responses"
+                href={localizePath("/workspace/responses", lang)}
               >
-                Review responses
+                {tr("Review responses", "Consulter les réponses")}
               </a>
 
               <span className="text-slate-500">·</span>
 
               <a
                 className="text-link"
-                href="/workspace/closing-the-loop"
+                href={localizePath("/workspace/closing-the-loop", lang)}
               >
                 Manage follow-up
               </a>

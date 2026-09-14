@@ -6,6 +6,8 @@ import NavBar from "./components/Navbar";
 import SiteFooter from "./components/SiteFooter";
 import ScrollToTop from "./components/ScrollToTop";
 import { ROUTES } from "./routesRegistry";
+import { useLanguage } from "./i18n/LanguageContext";
+import { translations } from "./i18n/translations";
 
 function RouteFallback() {
   return (
@@ -19,6 +21,7 @@ function RouteFallback() {
 
 function AppShell() {
   const location = useLocation();
+  const { lang } = useLanguage();
 
   const bareRoutes = [
     "/live-invitation-survey",
@@ -39,7 +42,7 @@ function AppShell() {
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-black"
         >
-          Skip to content
+          {translations(lang, "common.skipToContent", "Skip to content")}
         </a>
 
         {!isBare && <NavBar />}
@@ -65,4 +68,3 @@ function AppShell() {
 }
 
 export default AppShell;
-

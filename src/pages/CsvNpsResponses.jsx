@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import { useLanguage } from "../i18n/LanguageContext";
+import { localizePath } from "../i18n/pathHelpers";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -113,6 +115,8 @@ function CellText({ children, className = "" }) {
 }
 
 export default function CsvNpsResponses() {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const { datasetId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseParam = searchParams.get("response") || "";
@@ -453,14 +457,14 @@ export default function CsvNpsResponses() {
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>Loading response data...</p>
+          <h1>{tr(PAGE_COPY.title, "Réponses")}</h1>
+          <p>{tr("Loading response data...", "Chargement des réponses...")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading response data from workspace.</p>
+          <p>{tr("Loading response data from workspace.", "Chargement des réponses depuis l’espace de travail.")}</p>
         </section>
       </main>
     );
@@ -471,8 +475,8 @@ export default function CsvNpsResponses() {
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>There was a problem loading this dataset.</p>
+          <h1>{tr(PAGE_COPY.title, "Réponses")}</h1>
+          <p>{tr("There was a problem loading this dataset.", "Un problème est survenu lors du chargement de ce dataset.")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -487,8 +491,8 @@ export default function CsvNpsResponses() {
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>No feedback dataset has been loaded yet.</p>
+          <h1>{tr(PAGE_COPY.title, "Réponses")}</h1>
+          <p>{tr("No feedback dataset has been loaded yet.", "Aucun dataset de feedback n’a encore été chargé.")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -496,8 +500,8 @@ export default function CsvNpsResponses() {
         <section className="csv-nps-panel">
           <p>
             Go to{" "}
-            <a className="text-link" href="/workspace/import">
-              Import feedback data
+            <a className="text-link" href={localizePath("/workspace/import", lang)}>
+              {tr("Import feedback data", "Importer des données")}
             </a>{" "}
             and analyse or save a dataset first.
           </p>
@@ -512,8 +516,8 @@ export default function CsvNpsResponses() {
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-        <h1>{PAGE_COPY.title}</h1>
-        <p>{subtitle}</p>
+        <h1>{tr(PAGE_COPY.title, "Réponses")}</h1>
+        <p>{lang === "fr" ? "Consultez, recherchez et filtrez les réponses clients de cette source de feedback." : subtitle}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -523,7 +527,7 @@ export default function CsvNpsResponses() {
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Responses</h2>
+            <h2>{tr("Responses", "Réponses")}</h2>
             <p>
               Showing {filteredRows.length} of {dataset.rows.length} response
               {dataset.rows.length === 1 ? "" : "s"}.
@@ -533,7 +537,7 @@ export default function CsvNpsResponses() {
 
         <div className="csv-nps-filters">
           <label className="csv-nps-filter-field">
-            <span>Search responses</span>
+            <span>{tr("Search responses", "Rechercher dans les réponses")}</span>
             <input
               type="search"
               value={searchTerm}
@@ -547,15 +551,15 @@ export default function CsvNpsResponses() {
           </label>
 
           <label className="csv-nps-filter-field">
-            <span>Bucket</span>
+            <span>{tr("Bucket", "Segment")}</span>
             <select
               value={bucketFilter}
               onChange={(e) => setBucketFilter(e.target.value)}
             >
-              <option value="all">All</option>
-              <option value="promoter">Promoters</option>
-              <option value="passive">Passives</option>
-              <option value="detractor">Detractors</option>
+              <option value="all">{tr("All", "Tous")}</option>
+              <option value="promoter">{tr("Promoters", "Promoteurs")}</option>
+              <option value="passive">{tr("Passives", "Passifs")}</option>
+              <option value="detractor">{tr("Detractors", "Détracteurs")}</option>
             </select>
           </label>
         </div>
@@ -763,26 +767,26 @@ export default function CsvNpsResponses() {
             <table className="csv-nps-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Reference</th>
-                  <th>Score</th>
-                  <th>Bucket</th>
-                  <th>Comment</th>
-                  <th>Selected options</th>
+                  <th>{tr("Date", "Date")}</th>
+                  <th>{tr("Reference", "Référence")}</th>
+                  <th>{tr("Score", "Note")}</th>
+                  <th>{tr("Bucket", "Segment")}</th>
+                  <th>{tr("Comment", "Commentaire")}</th>
+                  <th>{tr("Selected options", "Options sélectionnées")}</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan="6">No responses match the current filters.</td>
+                    <td colSpan="6">{tr("No responses match the current filters.", "Aucune réponse ne correspond aux filtres actuels.")}</td>
                   </tr>
                 ) : (
                   filteredRows.map((row) => (
                     <tr
                       key={row.response_id || row.id}
                       onClick={(event) => handleRowClick(row, event)}
-                      title="Click to view response details"
+                      title={tr("Click to view response details", "Cliquer pour afficher le détail de la réponse")}
                       className="cursor-pointer"
                     >
                       <td>{row.submitted_at?.slice(0, 10) || "—"}</td>

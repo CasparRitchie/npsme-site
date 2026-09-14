@@ -1,6 +1,8 @@
 // src/pages/NpsDatasets.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../i18n/LanguageContext";
+import { localizePath } from "../i18n/pathHelpers";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import { workspaceFetch } from "../../utils/workspaceApi";
 import {
@@ -9,6 +11,9 @@ import {
 } from "../../utils/workspaceRoles";
 
 export default function NpsDatasets() {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
+  const lp = (path) => localizePath(path, lang);
   const [datasets, setDatasets] = useState([]);
   const [workspaceRole, setWorkspaceRole] = useState("");
   const [activeIntercomSource, setActiveIntercomSource] = useState(null);
@@ -66,7 +71,7 @@ export default function NpsDatasets() {
       );
     } catch (err) {
       console.error("Failed to load NPS datasets:", err);
-      setError(err.message || "Something went wrong");
+      setError(err.message || tr("Something went wrong", "Une erreur s’est produite"));
     } finally {
       setLoading(false);
     }
@@ -74,12 +79,12 @@ export default function NpsDatasets() {
 
   async function handleDelete(datasetId) {
     if (!userCanDeleteDatasets) {
-      setError("You do not have permission to delete datasets.");
+      setError(tr("You do not have permission to delete datasets.", "Vous n’avez pas l’autorisation de supprimer des datasets."));
       return;
     }
 
     const confirmed = window.confirm(
-      "Delete this dataset? This will also delete its saved rows and close-the-loop actions. This cannot be undone."
+      tr("Delete this dataset? This will also delete its saved rows and close-the-loop actions. This cannot be undone.", "Supprimer ce dataset ? Ses lignes et actions de suivi seront également supprimées. Cette action est irréversible.")
     );
 
     if (!confirmed) return;
@@ -110,11 +115,9 @@ export default function NpsDatasets() {
     <main className="csv-nps-page">
       <section className="csv-nps-hero">
         <p className="eyebrow">NPS Me Workspace</p>
-        <h1>Datasets and sources</h1>
+        <h1>{tr("Datasets and sources", "Datasets et sources")}</h1>
         <p>
-          Switch between live connected feedback sources and saved imported
-          datasets. Open performance, responses, or close-the-loop views for the
-          data context you want to work on.
+          {tr("Switch between live connected feedback sources and saved imported datasets. Open performance, responses, or close-the-loop views for the data context you want to work on.", "Passez des sources de feedback connectées aux datasets importés. Ouvrez les vues de performance, de réponses ou de suivi correspondant aux données à analyser.")}
         </p>
       </section>
 
@@ -123,10 +126,10 @@ export default function NpsDatasets() {
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Feedback data contexts</h2>
+            <h2>{tr("Feedback data contexts", "Sources de feedback")}</h2>
             <p>
               {loading
-                ? "Loading saved datasets and connected sources..."
+                ? tr("Loading saved datasets and connected sources...", "Chargement des datasets et sources connectées...")
                 : `${visibleSavedDatasets.length} saved dataset${
                     visibleSavedDatasets.length === 1 ? "" : "s"
                   }${
@@ -151,8 +154,8 @@ export default function NpsDatasets() {
             )}
           </div>
 
-          <Link className="csv-nps-button-link" to="/workspace/import">
-            Import new data
+          <Link className="csv-nps-button-link" to={lp("/workspace/import")}>
+            {tr("Import new data", "Importer des données")}
           </Link>
         </div>
 
@@ -161,15 +164,14 @@ export default function NpsDatasets() {
         {!loading && activeIntercomSource && (
           <section className="csv-nps-datasets-section">
             <div className="csv-nps-section-heading">
-              <h3>Live source</h3>
+              <h3>{tr("Live source", "Source en direct")}</h3>
               <p>
-                Connected feedback that can be reopened directly without needing
-                a saved dataset.
+                {tr("Connected feedback that can be reopened directly without needing a saved dataset.", "Feedback connecté accessible directement, sans dataset enregistré.")}
               </p>
             </div>
 
             <div className="csv-nps-dataset-grid">
-              <LiveSourceCard source={activeIntercomSource} />
+              <LiveSourceCard source={activeIntercomSource} lang={lang} tr={tr} lp={lp} />
             </div>
           </section>
         )}
@@ -177,25 +179,23 @@ export default function NpsDatasets() {
         {!loading && !activeIntercomSource && (
           <section className="csv-nps-datasets-section">
             <div className="csv-nps-section-heading">
-              <h3>Live source</h3>
-              <p>No active Intercom source is configured for this workspace yet.</p>
+              <h3>{tr("Live source", "Source en direct")}</h3>
+              <p>{tr("No active Intercom source is configured for this workspace yet.", "Aucune source Intercom active n’est encore configurée pour cet espace.")}</p>
             </div>
           </section>
         )}
 
         <section className="csv-nps-datasets-section">
           <div className="csv-nps-section-heading">
-            <h3>Saved datasets</h3>
+            <h3>{tr("Saved datasets", "Datasets enregistrés")}</h3>
             <p>
-              Imported and saved datasets that can be reopened later for further
-              review and follow-up.
+              {tr("Imported and saved datasets that can be reopened later for further review and follow-up.", "Datasets importés et enregistrés, à rouvrir pour l’analyse et le suivi.")}
             </p>
           </div>
 
           {!loading && visibleSavedDatasets.length === 0 && !error && (
             <div className="csv-nps-empty-state">
-              No saved imported datasets yet. The live Intercom source is
-              available above.
+              {tr("No saved imported datasets yet. The live Intercom source is available above.", "Aucun dataset importé enregistré. La source Intercom en direct est disponible ci-dessus.")}
             </div>
           )}
 
@@ -207,6 +207,9 @@ export default function NpsDatasets() {
                   dataset={dataset}
                   canDelete={userCanDeleteDatasets}
                   onDelete={() => handleDelete(dataset.id)}
+                  lang={lang}
+                  tr={tr}
+                  lp={lp}
                 />
               ))}
             </div>
@@ -217,10 +220,10 @@ export default function NpsDatasets() {
   );
 }
 
-function LiveSourceCard({ source }) {
+function LiveSourceCard({ source, lang, tr, lp }) {
   const updatedAt = source?.updated_at
     ? new Date(source.updated_at).toLocaleString()
-    : "Unknown date";
+    : tr("Unknown date", "Date inconnue");
 
   return (
     <article className="csv-nps-dataset-card csv-nps-dataset-card-live">
@@ -229,48 +232,48 @@ function LiveSourceCard({ source }) {
           <span className="csv-nps-source-badge csv-nps-source-badge-live">
             LIVE
           </span>
-          <h3>{source.source_name || "Intercom source"}</h3>
+          <h3>{source.source_name || tr("Intercom source", "Source Intercom")}</h3>
           <p>{updatedAt}</p>
         </div>
       </div>
 
       <div className="csv-nps-dataset-meta">
-        <span>Source slug: {source.source_slug || "—"}</span>
-        <span>Region: {(source.intercom_region || "us").toUpperCase()}</span>
-        <span>Survey content ID: {source.survey_content_id || "—"}</span>
+        <span>{tr("Source slug", "Identifiant de source")}: {source.source_slug || "—"}</span>
+        <span>{tr("Region", "Région")}: {(source.intercom_region || "us").toUpperCase()}</span>
+        <span>{tr("Survey content ID", "Identifiant du questionnaire")}: {source.survey_content_id || "—"}</span>
       </div>
 
       {(source.survey_content_title || source.pii_mode) && (
         <div className="csv-nps-dataset-meta">
           {source.survey_content_title && (
-            <span>Survey: {source.survey_content_title}</span>
+            <span>{tr("Survey", "Questionnaire")}: {source.survey_content_title}</span>
           )}
           {source.pii_mode && <span>PII mode: {source.pii_mode}</span>}
         </div>
       )}
 
       <div className="csv-nps-dataset-actions">
-        <Link className="csv-nps-secondary-link" to="/workspace/performance">
+        <Link className="csv-nps-secondary-link" to={lp("/workspace/performance")}>
           Performance
         </Link>
 
-        <Link className="csv-nps-secondary-link" to="/workspace/responses">
-          Responses
+        <Link className="csv-nps-secondary-link" to={lp("/workspace/responses")}>
+          {tr("Responses", "Réponses")}
         </Link>
 
-        <Link className="csv-nps-secondary-link" to="/workspace/closing-the-loop">
-          Closing the loop
+        <Link className="csv-nps-secondary-link" to={lp("/workspace/closing-the-loop")}>
+          {tr("Closing the loop", "Suivi client")}
         </Link>
       </div>
     </article>
   );
 }
 
-function DatasetCard({ dataset, canDelete, onDelete }) {
+function DatasetCard({ dataset, canDelete, onDelete, lang, tr, lp }) {
   const summary = dataset.summary_json || {};
   const createdAt = dataset.created_at
     ? new Date(dataset.created_at).toLocaleString()
-    : "Unknown date";
+    : tr("Unknown date", "Date inconnue");
 
   return (
     <article className="csv-nps-dataset-card">
@@ -289,54 +292,54 @@ function DatasetCard({ dataset, canDelete, onDelete }) {
             className="csv-nps-danger-button"
             onClick={onDelete}
           >
-            Delete
+            {tr("Delete", "Supprimer")}
           </button>
         )}
       </div>
 
       {!canDelete && (
         <div className="csv-nps-empty-state csv-nps-empty-state-compact">
-          Ask a workspace owner or admin if this dataset needs to be deleted.
+          {tr("Ask a workspace owner or admin if this dataset needs to be deleted.", "Demandez à un propriétaire ou administrateur de l’espace si ce dataset doit être supprimé.")}
         </div>
       )}
 
       <div className="csv-nps-dataset-metrics">
         <MiniMetric
-          label="Responses"
+          label={tr("Responses", "Réponses")}
           value={summary.total ?? dataset.valid_row_count}
         />
         <MiniMetric label="NPS" value={summary.nps} />
-        <MiniMetric label="Promoters" value={summary.promoters} />
-        <MiniMetric label="Passives" value={summary.passives} />
-        <MiniMetric label="Detractors" value={summary.detractors} />
+        <MiniMetric label={tr("Promoters", "Promoteurs")} value={summary.promoters} />
+        <MiniMetric label={tr("Passives", "Passifs")} value={summary.passives} />
+        <MiniMetric label={tr("Detractors", "Détracteurs")} value={summary.detractors} />
       </div>
 
       <div className="csv-nps-dataset-meta">
-        <span>Raw rows: {dataset.raw_row_count}</span>
-        <span>Valid rows: {dataset.valid_row_count}</span>
-        <span>Skipped: {dataset.skipped_row_count}</span>
+        <span>{tr("Raw rows", "Lignes brutes")}: {dataset.raw_row_count}</span>
+        <span>{tr("Valid rows", "Lignes valides")}: {dataset.valid_row_count}</span>
+        <span>{tr("Skipped", "Ignorées")}: {dataset.skipped_row_count}</span>
       </div>
 
       <div className="csv-nps-dataset-actions">
         <Link
           className="csv-nps-secondary-link"
-          to={`/workspace/datasets/${dataset.id}/performance`}
+          to={lp(`/workspace/datasets/${dataset.id}/performance`)}
         >
           Performance
         </Link>
 
         <Link
           className="csv-nps-secondary-link"
-          to={`/workspace/datasets/${dataset.id}/responses`}
+          to={lp(`/workspace/datasets/${dataset.id}/responses`)}
         >
-          Responses
+          {tr("Responses", "Réponses")}
         </Link>
 
         <Link
           className="csv-nps-secondary-link"
-          to={`/workspace/datasets/${dataset.id}/closing-the-loop`}
+          to={lp(`/workspace/datasets/${dataset.id}/closing-the-loop`)}
         >
-          Closing the loop
+          {tr("Closing the loop", "Suivi client")}
         </Link>
       </div>
     </article>

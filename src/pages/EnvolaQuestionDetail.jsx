@@ -107,6 +107,8 @@ function Disclosure({ title, right, children, defaultOpen = false }) {
 }
 
 function AnswerTable({ rows, highlightQids = [], compact = false }) {
+  const { lang } = useLanguage();
+  const tr = (path, fallback) => translations(lang, path, fallback);
   const highlight = new Set((highlightQids || []).map(String));
 
   // Group answers by (qid + question_text) so multi-select becomes one row with multiple values.
@@ -146,9 +148,9 @@ function AnswerTable({ rows, highlightQids = [], compact = false }) {
       <table className="min-w-full text-left text-sm">
         <thead>
           <tr className="text-xs text-slate-400">
-            <th className="py-2 pr-4">Question</th>
-            <th className="py-2 pr-4">Answer</th>
-            {!compact ? <th className="py-2">Answered</th> : null}
+            <th className="py-2 pr-4">{tr("common.question", "Question")}</th>
+            <th className="py-2 pr-4">{tr("common.answer", "Answer")}</th>
+            {!compact ? <th className="py-2">{tr("common.answered", "Answered")}</th> : null}
           </tr>
         </thead>
 

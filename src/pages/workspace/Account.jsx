@@ -1,12 +1,16 @@
 // src/pages/workspace/Account.jsx
 import React, { useEffect, useState } from "react";
 import CsvNpsWorkspaceNav from "../../components/CsvNpsWorkspaceNav";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { localizePath } from "../../i18n/pathHelpers";
 import {
   formatWorkspaceRole,
   getWorkspaceRoleDescription,
 } from "../../../utils/workspaceRoles";
 
 export default function WorkspaceAccount() {
+  const { lang } = useLanguage();
+  const tr = (en, fr) => (lang === "fr" ? fr : en);
   const [me, setMe] = useState(null);
   const [loadingMe, setLoadingMe] = useState(true);
   const [meError, setMeError] = useState("");
@@ -37,19 +41,19 @@ export default function WorkspaceAccount() {
         if (!contentType.includes("application/json")) {
           const text = await res.text();
           console.error("Expected JSON from workspace auth me:", text.slice(0, 500));
-          throw new Error("Unexpected response while loading account details.");
+          throw new Error(tr("Unexpected response while loading account details.", "Réponse inattendue lors du chargement du compte."));
         }
 
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load account details");
+          throw new Error(data.error || tr("Failed to load account details", "Impossible de charger les informations du compte"));
         }
 
         setMe(data);
       } catch (err) {
         console.error("Failed to load workspace account:", err);
-        setMeError(err.message || "Failed to load account details");
+        setMeError(err.message || tr("Failed to load account details", "Impossible de charger les informations du compte"));
       } finally {
         setLoadingMe(false);
       }
@@ -65,22 +69,22 @@ export default function WorkspaceAccount() {
     setPasswordError("");
 
     if (!currentPassword || !newPassword || !confirmNewPassword) {
-      setPasswordError("Please complete all password fields.");
+      setPasswordError(tr("Please complete all password fields.", "Veuillez remplir tous les champs de mot de passe."));
       return;
     }
 
     if (newPassword.length < 12) {
-      setPasswordError("New password must be at least 12 characters.");
+      setPasswordError(tr("New password must be at least 12 characters.", "Le nouveau mot de passe doit contenir au moins 12 caractères."));
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      setPasswordError("The new passwords do not match.");
+      setPasswordError(tr("The new passwords do not match.", "Les nouveaux mots de passe ne correspondent pas."));
       return;
     }
 
     if (currentPassword === newPassword) {
-      setPasswordError("New password must be different from the current password.");
+      setPasswordError(tr("New password must be different from the current password.", "Le nouveau mot de passe doit être différent de l’actuel."));
       return;
     }
 
@@ -108,22 +112,22 @@ export default function WorkspaceAccount() {
           "Expected JSON from change-password endpoint:",
           text.slice(0, 500)
         );
-        throw new Error("Unexpected response while changing password.");
+        throw new Error(tr("Unexpected response while changing password.", "Réponse inattendue lors du changement de mot de passe."));
       }
 
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Failed to change password");
+        throw new Error(data.error || tr("Failed to change password", "Impossible de modifier le mot de passe"));
       }
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
-      setSuccessMessage("Password changed successfully.");
+      setSuccessMessage(tr("Password changed successfully.", "Mot de passe modifié."));
     } catch (err) {
       console.error("Failed to change workspace password:", err);
-      setPasswordError(err.message || "Failed to change password");
+      setPasswordError(err.message || tr("Failed to change password", "Impossible de modifier le mot de passe"));
     } finally {
       setSaving(false);
     }
@@ -138,7 +142,7 @@ export default function WorkspaceAccount() {
     } catch (err) {
       console.error("Workspace logout failed:", err);
     } finally {
-      window.location.href = "/workspace/login";
+      window.location.href = localizePath("/workspace/login", lang);
     }
   }
 
@@ -148,8 +152,8 @@ export default function WorkspaceAccount() {
     <main className="csv-nps-page">
       <section className="csv-nps-hero csv-nps-hero-compact">
         <p className="eyebrow">NPS Me Workspace</p>
-        <h1>Account</h1>
-        <p>Manage your workspace login, password and account access.</p>
+        <h1>{tr("Account", "Compte")}</h1>
+        <p>{tr("Manage your workspace login, password and account access.", "Gérez votre connexion, votre mot de passe et l’accès à votre espace de travail.")}</p>
       </section>
 
       <CsvNpsWorkspaceNav />
@@ -157,8 +161,8 @@ export default function WorkspaceAccount() {
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Workspace account</h2>
-            <p>View your signed-in account and change your password securely.</p>
+            <h2>{tr("Workspace account", "Compte de l’espace de travail")}</h2>
+            <p>{tr("View your signed-in account and change your password securely.", "Consultez votre compte et modifiez votre mot de passe en toute sécurité.")}</p>
           </div>
 
           <button
@@ -166,45 +170,44 @@ export default function WorkspaceAccount() {
             className="csv-nps-danger-button"
             onClick={handleWorkspaceLogout}
           >
-            Sign out
+            {tr("Sign out", "Se déconnecter")}
           </button>
         </div>
 
         {loadingMe ? (
-          <div className="csv-nps-empty-state">Loading account details...</div>
+          <div className="csv-nps-empty-state">{tr("Loading account details...", "Chargement du compte...")}</div>
         ) : meError ? (
           <div className="csv-nps-error">{meError}</div>
         ) : (
           <div className="workspace-account-grid">
             <section className="csv-nps-chart-card">
-              <h3>Your details</h3>
+              <h3>{tr("Your details", "Vos informations")}</h3>
 
               <div className="workspace-account-detail-list">
-                <AccountDetail label="Name" value={me?.user?.fullName || "—"} />
-                <AccountDetail label="Email" value={me?.user?.email || "—"} />
+                <AccountDetail label={tr("Name", "Nom")} value={me?.user?.fullName || "—"} />
+                <AccountDetail label={tr("Email", "E-mail")} value={me?.user?.email || "—"} />
 
                 <AccountDetail
-                  label="Workspace ID"
+                  label={tr("Workspace ID", "Identifiant de l’espace")}
                   value={me?.workspace?.id || "—"}
                 />
 
                 <AccountDetail
-                  label="Role"
+                  label={tr("Role", "Rôle")}
                   value={formatWorkspaceRole(role)}
                 />
 
                 <AccountDetail
-                  label="Role permissions"
+                  label={tr("Role permissions", "Autorisations du rôle")}
                   value={getWorkspaceRoleDescription(role)}
                 />
               </div>
             </section>
 
             <section className="csv-nps-chart-card">
-              <h3>Change password</h3>
+              <h3>{tr("Change password", "Modifier le mot de passe")}</h3>
               <p>
-                Use this after receiving a temporary password, or whenever you
-                want to update your workspace login.
+                {tr("Use this after receiving a temporary password, or whenever you want to update your workspace login.", "Utilisez ce formulaire après avoir reçu un mot de passe temporaire, ou pour mettre à jour votre accès.")}
               </p>
 
               <form
@@ -222,7 +225,7 @@ export default function WorkspaceAccount() {
                 )}
 
                 <label className="csv-nps-filter-field">
-                  <span>Current password</span>
+                  <span>{tr("Current password", "Mot de passe actuel")}</span>
                   <input
                     type="password"
                     value={currentPassword}
@@ -233,7 +236,7 @@ export default function WorkspaceAccount() {
                 </label>
 
                 <label className="csv-nps-filter-field">
-                  <span>New password</span>
+                  <span>{tr("New password", "Nouveau mot de passe")}</span>
                   <input
                     type="password"
                     value={newPassword}
@@ -244,7 +247,7 @@ export default function WorkspaceAccount() {
                 </label>
 
                 <label className="csv-nps-filter-field">
-                  <span>Confirm new password</span>
+                  <span>{tr("Confirm new password", "Confirmer le nouveau mot de passe")}</span>
                   <input
                     type="password"
                     value={confirmNewPassword}
@@ -267,7 +270,9 @@ export default function WorkspaceAccount() {
                       !confirmNewPassword
                     }
                   >
-                    {saving ? "Changing password..." : "Change password"}
+                    {saving
+                      ? tr("Changing password...", "Modification...")
+                      : tr("Change password", "Modifier le mot de passe")}
                   </button>
                 </div>
               </form>

@@ -1,6 +1,9 @@
 // src/components/auth/RequireWorkspaceAuth.jsx
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { translations } from "../../i18n/translations";
+import { localizePath } from "../../i18n/pathHelpers";
 
 /**
  * Protects the new NPS Me Workspace routes.
@@ -12,6 +15,8 @@ import { Navigate, useLocation } from "react-router-dom";
  */
 export default function RequireWorkspaceAuth({ children }) {
   const location = useLocation();
+  const { lang } = useLanguage();
+  const tr = (path, fallback) => translations(lang, path, fallback);
 
   const [state, setState] = useState({
     loading: true,
@@ -76,13 +81,13 @@ export default function RequireWorkspaceAuth({ children }) {
     return (
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
-          <p className="eyebrow">NPS Me Workspace</p>
-          <h1>Checking workspace access</h1>
-          <p>Confirming your workspace session...</p>
+          <p className="eyebrow">{tr("workspaceAuth.eyebrow", "NPS Me Workspace")}</p>
+          <h1>{tr("workspaceAuth.checking", "Checking workspace access")}</h1>
+          <p>{tr("workspaceAuth.confirming", "Confirming your workspace session...")}</p>
         </section>
 
         <section className="csv-nps-panel">
-          <p>Loading workspace access.</p>
+          <p>{tr("workspaceAuth.loading", "Loading workspace access.")}</p>
         </section>
       </main>
     );
@@ -91,7 +96,7 @@ export default function RequireWorkspaceAuth({ children }) {
   if (!state.authed) {
     return (
       <Navigate
-        to="/workspace/login"
+        to={localizePath("/workspace/login", lang)}
         replace
         state={{
           from: location,

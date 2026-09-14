@@ -1,10 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLanguage } from "../i18n/LanguageContext";
+import { translations } from "../i18n/translations";
+import { localizePath } from "../i18n/pathHelpers";
 
 export default function CsvNpsWorkspaceNav() {
   const { datasetId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { lang } = useLanguage();
+  const tr = (path, fallback) => translations(lang, path, fallback);
+  const lp = (path) => localizePath(path, lang);
 
   const [hasActiveIntercomSource, setHasActiveIntercomSource] = useState(false);
 
@@ -39,7 +45,7 @@ export default function CsvNpsWorkspaceNav() {
     };
   }, [location.pathname]);
 
-  const datasetBasePath = datasetId ? `/workspace/datasets/${datasetId}` : "";
+  const datasetBasePath = datasetId ? lp(`/workspace/datasets/${datasetId}`) : "";
 
   const links = useMemo(() => {
     if (datasetBasePath) {
@@ -53,20 +59,20 @@ export default function CsvNpsWorkspaceNav() {
 
     if (hasActiveIntercomSource) {
       return {
-        performance: "/workspace/performance",
-        responses: "/workspace/responses",
-        invitations: "/workspace/invitations",
-        closing: "/workspace/closing-the-loop",
+        performance: lp("/workspace/performance"),
+        responses: lp("/workspace/responses"),
+        invitations: lp("/workspace/invitations"),
+        closing: lp("/workspace/closing-the-loop"),
       };
     }
 
     return {
-      performance: "/workspace/datasets",
-      responses: "/workspace/datasets",
-      invitations: "/workspace/datasets",
-      closing: "/workspace/datasets",
+      performance: lp("/workspace/datasets"),
+      responses: lp("/workspace/datasets"),
+      invitations: lp("/workspace/datasets"),
+      closing: lp("/workspace/datasets"),
     };
-  }, [datasetBasePath, hasActiveIntercomSource]);
+  }, [datasetBasePath, hasActiveIntercomSource, lang]);
 
   async function handleWorkspaceLogout() {
     try {
@@ -77,42 +83,42 @@ export default function CsvNpsWorkspaceNav() {
     } catch (err) {
       console.error("Workspace logout failed:", err);
     } finally {
-      navigate("/workspace/login", { replace: true });
+      navigate(lp("/workspace/login"), { replace: true });
     }
   }
 
   return (
-    <nav className="csv-nps-workspace-nav" aria-label="NPS workspace navigation">
-      <NavLink to="/workspace" end>
-        Overview
+    <nav className="csv-nps-workspace-nav" aria-label={tr("workspaceNav.ariaLabel", "NPS workspace navigation")}>
+      <NavLink to={lp("/workspace")} end>
+        {tr("workspaceNav.overview", "Overview")}
       </NavLink>
 
-      <NavLink to="/workspace/import">
-        Import
+      <NavLink to={lp("/workspace/import")}>
+        {tr("workspaceNav.import", "Import")}
       </NavLink>
 
-      <NavLink to="/workspace/datasets">
-        Datasets
+      <NavLink to={lp("/workspace/datasets")}>
+        {tr("workspaceNav.datasets", "Datasets")}
       </NavLink>
 
       <NavLink to={links.performance}>
-        Performance
+        {tr("workspaceNav.performance", "Performance")}
       </NavLink>
 
       <NavLink to={links.responses}>
-        Responses
+        {tr("workspaceNav.responses", "Responses")}
       </NavLink>
 
       <NavLink to={links.invitations}>
-        Invitations
+        {tr("workspaceNav.invitations", "Invitations")}
       </NavLink>
 
       <NavLink to={links.closing}>
-        Close the loop
+        {tr("workspaceNav.closing", "Close the loop")}
       </NavLink>
 
-      <NavLink to="/workspace/account">
-        Account
+      <NavLink to={lp("/workspace/account")}>
+        {tr("workspaceNav.account", "Account")}
       </NavLink>
 
       <button
@@ -120,7 +126,7 @@ export default function CsvNpsWorkspaceNav() {
         className="csv-nps-workspace-nav-button"
         onClick={handleWorkspaceLogout}
       >
-        Sign out
+        {tr("workspaceNav.signOut", "Sign out")}
       </button>
     </nav>
   );

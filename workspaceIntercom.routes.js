@@ -1769,7 +1769,8 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
     source?.survey_content_id || query?.content_id || ""
   ).trim();
 
-  const days = clampInt(query?.days, 365, 1, 3650);
+  const window = parseInvitationWindow(query);
+  const { days, fromMs, toMs } = window;
   const statusFilter = String(query?.status || "all").trim().toLowerCase();
 
   if (!contentId) {
@@ -1814,8 +1815,6 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   const statsContentRows = (statsRows || []).filter(
     (row) => String(row?.content_id || "").trim() === contentId
   );
-
-  const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
   const responsesByReceiptId = new Map();
 
@@ -1921,7 +1920,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
         return false;
       }
 
-      return row.sent_at_ms >= cutoffMs;
+      return row.sent_at_ms >= fromMs && row.sent_at_ms <= toMs;
     })
     .sort((a, b) => {
       const aLatestActivity = Math.max(
@@ -1954,7 +1953,7 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
       return false;
     }
 
-    if (submittedAtMs < cutoffMs) {
+    if (submittedAtMs < fromMs || submittedAtMs > toMs) {
       return false;
     }
 
@@ -2193,12 +2192,52 @@ async function buildWorkspaceIntercomInvitationsPayload({ source, query }) {
   return {
     content_id: contentId,
     days,
+    period: {
+      mode: window.mode,
+      from: toYmdUtc(fromMs),
+      to: toYmdUtc(toMs),
+    },
     status: statusFilter,
     refresh: refreshInfo,
     summary,
     rows,
     ...(diagnostics ? { diagnostics } : {}),
   };
+}
+
+function parseInvitationWindow(query = {}) {
+  const fromRaw = String(query?.from || "").trim();
+  const toRaw = String(query?.to || "").trim();
+
+  if (fromRaw || toRaw) {
+    if (!fromRaw || !toRaw) {
+      throw new Error("Both from and to are required when using a custom date range");
+    }
+
+    const fromMs = Date.parse(`${fromRaw}T00:00:00.000Z`);
+    const toMs = Date.parse(`${toRaw}T23:59:59.999Z`);
+
+    if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
+      throw new Error("Invalid date range. Use YYYY-MM-DD for from and to");
+    }
+
+    if (fromMs > toMs) {
+      throw new Error("The from date must be before or equal to the to date");
+    }
+
+    return {
+      mode: "range",
+      days: Math.max(1, Math.ceil((toMs - fromMs + 1) / (24 * 60 * 60 * 1000))),
+      fromMs,
+      toMs,
+    };
+  }
+
+  const days = clampInt(query?.days, 365, 1, 3650);
+  const toMs = Date.now();
+  const fromMs = startOfUtcDay(toMs) - (days - 1) * 24 * 60 * 60 * 1000;
+
+  return { mode: "rolling", days, fromMs, toMs };
 }
 
 function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], source) {

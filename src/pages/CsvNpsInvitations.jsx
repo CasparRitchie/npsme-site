@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import { useLanguage } from "../i18n/LanguageContext";
+import { getDateRangeError } from "../utils/workspaceDateFilters";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -87,7 +88,9 @@ export default function CsvNpsInvitations() {
   const [datasetError, setDatasetError] = useState("");
   const [mode, setMode] = useState(datasetId ? "saved" : "intercom");
 
-  const [days, setDays] = useState(365);
+  const [periodFilter, setPeriodFilter] = useState("365d");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [invites, setInvites] = useState({
@@ -142,11 +145,26 @@ export default function CsvNpsInvitations() {
     async function loadInvitations() {
       setInvites({ loading: true, data: null, error: null });
 
+      const rangeError = getDateRangeError({
+        period: periodFilter,
+        from: dateFrom,
+        to: dateTo,
+      });
+
+      if (rangeError) {
+        setInvites({ loading: false, data: null, error: null });
+        return;
+      }
+
       try {
-        const qs = new URLSearchParams({
-          days: String(days || 365),
-          status: String(statusFilter || "all"),
-        });
+        const qs = new URLSearchParams({ status: String(statusFilter || "all") });
+
+        if (periodFilter === "custom") {
+          qs.set("from", dateFrom);
+          qs.set("to", dateTo);
+        } else {
+          qs.set("days", String(Number.parseInt(periodFilter, 10) || 365));
+        }
 
         if (dataset?.content_id) {
           qs.set("content_id", dataset.content_id);
@@ -184,7 +202,13 @@ export default function CsvNpsInvitations() {
     return () => {
       cancelled = true;
     };
-  }, [days, statusFilter, dataset?.content_id]);
+  }, [periodFilter, dateFrom, dateTo, statusFilter, dataset?.content_id]);
+
+  const dateRangeError = getDateRangeError({
+    period: periodFilter,
+    from: dateFrom,
+    to: dateTo,
+  });
 
   const summary = invites.data?.summary || {};
   const rows = Array.isArray(invites.data?.rows) ? invites.data.rows : [];
@@ -375,15 +399,39 @@ export default function CsvNpsInvitations() {
           <label className="csv-nps-filter-field">
             <span>{tr("Window", "Période")}</span>
             <select
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
             >
-              <option value={30}>{tr("Last 30 days", "30 derniers jours")}</option>
-              <option value={90}>{tr("Last 90 days", "90 derniers jours")}</option>
-              <option value={180}>{tr("Last 180 days", "180 derniers jours")}</option>
-              <option value={365}>{tr("Last 365 days", "365 derniers jours")}</option>
+              <option value="30d">{tr("Last 30 days", "30 derniers jours")}</option>
+              <option value="90d">{tr("Last 90 days", "90 derniers jours")}</option>
+              <option value="180d">{tr("Last 180 days", "180 derniers jours")}</option>
+              <option value="365d">{tr("Last 365 days", "365 derniers jours")}</option>
+              <option value="custom">{tr("Custom dates", "Dates personnalisées")}</option>
             </select>
           </label>
+
+          {periodFilter === "custom" && (
+            <>
+              <label className="csv-nps-filter-field">
+                <span>{tr("From", "Du")}</span>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  max={dateTo || undefined}
+                  onChange={(event) => setDateFrom(event.target.value)}
+                />
+              </label>
+              <label className="csv-nps-filter-field">
+                <span>{tr("To", "Au")}</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  min={dateFrom || undefined}
+                  onChange={(event) => setDateTo(event.target.value)}
+                />
+              </label>
+            </>
+          )}
 
           <label className="csv-nps-filter-field">
             <span>{tr("Status", "Statut")}</span>
@@ -428,6 +476,14 @@ export default function CsvNpsInvitations() {
           </div>
         </div>
 
+        {dateRangeError && (
+          <div className="csv-nps-error csv-nps-error-compact">
+            {dateRangeError === "reversed"
+              ? tr("The start date must be on or before the end date.", "La date de début doit être antérieure ou égale à la date de fin.")
+              : tr("Choose both a start date and an end date.", "Choisissez une date de début et une date de fin.")}
+          </div>
+        )}
+
         {invites.error && (
           <section className="csv-nps-error">
             {invites.error}
@@ -448,7 +504,9 @@ export default function CsvNpsInvitations() {
           <MetricCard
             label="Invitations sent"
             value={invites.loading ? "…" : summary.sent ?? "—"}
-            sub={`${days}-day window`}
+            sub={periodFilter === "custom"
+              ? tr(`${dateFrom} to ${dateTo}`, `Du ${dateFrom} au ${dateTo}`)
+              : tr(`${Number.parseInt(periodFilter, 10)}-day window`, `Période de ${Number.parseInt(periodFilter, 10)} jours`)}
             description="All survey invitations detected in the selected period."
           />
 

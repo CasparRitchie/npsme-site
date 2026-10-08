@@ -7,6 +7,11 @@ import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
+import {
+  describeWorkspaceDateFilter,
+  getDateRangeError,
+  matchesWorkspaceDateFilter,
+} from "../utils/workspaceDateFilters";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -30,6 +35,8 @@ export default function CsvNpsPerformance() {
   const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
 
   const [periodFilter, setPeriodFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [bucketFilter, setBucketFilter] = useState("all");
   const [chartGranularity, setChartGranularity] = useState("week");
   const [selectedChartPoint, setSelectedChartPoint] = useState(null);
@@ -279,36 +286,9 @@ export default function CsvNpsPerformance() {
     }
   }, [datasetId]);
 
-  const scoreDistribution = useMemo(() => {
-    const counts = Array.isArray(dataset?.scoreDistribution)
-      ? dataset.scoreDistribution
-      : Array.from({ length: 11 }, (_, score) => ({
-          score,
-          count: 0,
-        }));
-
-    const maxCount = Math.max(
-      ...counts.map((item) => Number(item.count || 0)),
-      1
-    );
-
-    return counts.map((item) => ({
-      ...item,
-      percentageOfMax: Math.round(
-        (Number(item.count || 0) / maxCount) * 100
-      ),
-    }));
-  }, [dataset]);
-
   const timeline = useMemo(() => {
     return Array.isArray(dataset?.timeline)
       ? dataset.timeline
-      : [];
-  }, [dataset]);
-
-  const questionScores = useMemo(() => {
-    return Array.isArray(dataset?.questionScores)
-      ? dataset.questionScores
       : [];
   }, [dataset]);
 
@@ -322,18 +302,56 @@ export default function CsvNpsPerformance() {
         bucketFilter === "all" ||
         row.bucket === bucketFilter;
 
-      const matchesPeriod = rowMatchesPeriod(
-        row.submitted_at,
-        periodFilter
-      );
+      const matchesPeriod = matchesWorkspaceDateFilter(row.submitted_at, {
+        period: periodFilter,
+        from: dateFrom,
+        to: dateTo,
+      });
 
       return matchesBucket && matchesPeriod;
     });
-  }, [dataset, bucketFilter, periodFilter]);
+  }, [dataset, bucketFilter, periodFilter, dateFrom, dateTo]);
+
+  const filtersActive =
+    periodFilter !== "all" || bucketFilter !== "all";
+
+  const scoreDistribution = useMemo(() => {
+    const counts = filtersActive
+      ? buildScoreDistribution(performanceRows)
+      : Array.isArray(dataset?.scoreDistribution)
+        ? dataset.scoreDistribution
+        : buildScoreDistribution(performanceRows);
+
+    const maxCount = Math.max(
+      ...counts.map((item) => Number(item.count || 0)),
+      1
+    );
+
+    return counts.map((item) => ({
+      ...item,
+      percentageOfMax: Math.round(
+        (Number(item.count || 0) / maxCount) * 100
+      ),
+    }));
+  }, [dataset, filtersActive, performanceRows]);
+
+  const questionScores = useMemo(() => {
+    const baseScores = Array.isArray(dataset?.questionScores)
+      ? dataset.questionScores
+      : [];
+
+    return filtersActive
+      ? buildQuestionScoresFromRows(baseScores, performanceRows)
+      : baseScores;
+  }, [dataset, filtersActive, performanceRows]);
 
   const chartPoints = useMemo(() => {
     if (Array.isArray(performanceRows) && performanceRows.length > 0) {
       return buildTimeseriesFromRows(performanceRows, chartGranularity);
+    }
+
+    if (filtersActive) {
+      return [];
     }
 
     return Array.isArray(timeline)
@@ -350,7 +368,7 @@ export default function CsvNpsPerformance() {
             null,
         }))
       : [];
-  }, [performanceRows, timeline, chartGranularity]);
+  }, [performanceRows, timeline, chartGranularity, filtersActive]);
 
   const chartTotals = useMemo(() => {
     if (!chartPoints.length) {
@@ -402,10 +420,6 @@ export default function CsvNpsPerformance() {
   }, [performanceRows, selectedChartPoint, chartGranularity]);
 
   const filteredSummary = useMemo(() => {
-    const filtersActive =
-      periodFilter !== "all" ||
-      bucketFilter !== "all";
-
     if (!filtersActive) {
       return (
         dataset?.summary || {
@@ -424,8 +438,17 @@ export default function CsvNpsPerformance() {
     performanceRows,
     dataset,
     periodFilter,
+    dateFrom,
+    dateTo,
     bucketFilter,
+    filtersActive,
   ]);
+
+  const dateRangeError = getDateRangeError({
+    period: periodFilter,
+    from: dateFrom,
+    to: dateTo,
+  });
 
   const bucketPercentages = useMemo(() => {
     const total = Number(
@@ -468,12 +491,18 @@ export default function CsvNpsPerformance() {
       summary: filteredSummary,
       closeLoopSummary,
       periodFilter,
+      dateFrom,
+      dateTo,
+      lang,
       bucketFilter,
     });
   }, [
     filteredSummary,
     closeLoopSummary,
     periodFilter,
+    dateFrom,
+    dateTo,
+    lang,
     bucketFilter,
   ]);
 
@@ -615,8 +644,42 @@ export default function CsvNpsPerformance() {
               <option value="this_month">
                 {tr("This month", "Ce mois-ci")}
               </option>
+
+              <option value="custom">
+                {tr("Custom dates", "Dates personnalisées")}
+              </option>
             </select>
           </label>
+
+          {periodFilter === "custom" && (
+            <>
+              <label className="csv-nps-filter-field">
+                <span>{tr("From", "Du")}</span>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  max={dateTo || undefined}
+                  onChange={(event) => {
+                    setDateFrom(event.target.value);
+                    setSelectedChartPoint(null);
+                  }}
+                />
+              </label>
+
+              <label className="csv-nps-filter-field">
+                <span>{tr("To", "Au")}</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  min={dateFrom || undefined}
+                  onChange={(event) => {
+                    setDateTo(event.target.value);
+                    setSelectedChartPoint(null);
+                  }}
+                />
+              </label>
+            </>
+          )}
 
           <label className="csv-nps-filter-field">
             <span>{tr("Bucket", "Segment")}</span>
@@ -683,6 +746,14 @@ export default function CsvNpsPerformance() {
             </div>
           </div>
         </div>
+
+        {dateRangeError && (
+          <div className="csv-nps-error csv-nps-error-compact">
+            {dateRangeError === "reversed"
+              ? tr("The start date must be on or before the end date.", "La date de début doit être antérieure ou égale à la date de fin.")
+              : tr("Choose both a start date and an end date.", "Choisissez une date de début et une date de fin.")}
+          </div>
+        )}
 
         <div className="csv-nps-responses-header">
           <div>
@@ -1007,7 +1078,7 @@ export default function CsvNpsPerformance() {
             {tr("NPS and response volume across the selected reporting periods, where usable response dates were detected.", "NPS et volume de réponses sur les périodes sélectionnées lorsque des dates exploitables sont disponibles.")}
           </p>
 
-          {timeline.length === 0 ? (
+          {chartPoints.length === 0 ? (
             <div className="csv-nps-empty-state">
               {tr("No usable response dates were detected in this dataset.", "Aucune date de réponse exploitable n’a été détectée dans ce dataset.")}
             </div>
@@ -1026,10 +1097,10 @@ export default function CsvNpsPerformance() {
                 </thead>
 
                 <tbody>
-                  {timeline.map((day) => (
+                  {chartPoints.map((day) => (
                     <tr key={day.date}>
                       <td>{day.date}</td>
-                      <td>{day.total}</td>
+                      <td>{day.responses}</td>
                       <td>{day.nps ?? "—"}</td>
                       <td>{day.promoters}</td>
                       <td>{day.passives}</td>
@@ -1450,6 +1521,65 @@ function normaliseNpsScore(value) {
   return score;
 }
 
+function buildScoreDistribution(rows) {
+  const counts = Array.from({ length: 11 }, (_, score) => ({
+    score,
+    count: 0,
+  }));
+
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    const score = normaliseNpsScore(row?.score);
+
+    if (Number.isInteger(score)) {
+      counts[score].count += 1;
+    }
+  });
+
+  return counts;
+}
+
+function buildQuestionScoresFromRows(questionScores, rows) {
+  const scoreFields = {
+    "612560": ["q_recommend_score", "score"],
+    "612566": ["q_install_score"],
+    "612568": ["q_daily_use_score"],
+    "612600": ["q_parent_relation_score"],
+    "612601": ["q_support_score"],
+  };
+
+  return questionScores.map((question) => {
+    const fields = scoreFields[String(question.questionId || "")] || [];
+    const scores = (Array.isArray(rows) ? rows : [])
+      .map((row) => {
+        const value = fields
+          .map((field) => row?.[field])
+          .find(
+            (candidate) =>
+              candidate !== null &&
+              candidate !== undefined &&
+              candidate !== ""
+          );
+
+        return normaliseNpsScore(value);
+      })
+      .filter((score) => score !== null);
+
+    const averageScore = scores.length
+      ? Math.round(
+          (scores.reduce((sum, score) => sum + score, 0) /
+            scores.length) *
+            10
+        ) / 10
+      : null;
+
+    return {
+      ...question,
+      responses: scores.length,
+      averageScore,
+    };
+  });
+}
+
 function calculateNps(rows) {
   const validRows = (
     Array.isArray(rows)
@@ -1657,70 +1787,6 @@ function getScoreClass(score) {
   return "csv-nps-score-fill-detractor";
 }
 
-function rowMatchesPeriod(
-  isoDate,
-  period
-) {
-  if (
-    !period ||
-    period === "all"
-  ) {
-    return true;
-  }
-
-  const submittedAt = new Date(
-    isoDate || ""
-  );
-
-  if (
-    Number.isNaN(
-      submittedAt.getTime()
-    )
-  ) {
-    return false;
-  }
-
-  const now = new Date();
-
-  if (period === "7d") {
-    const threshold = new Date(now);
-    threshold.setDate(
-      threshold.getDate() - 7
-    );
-
-    return submittedAt >= threshold;
-  }
-
-  if (period === "30d") {
-    const threshold = new Date(now);
-    threshold.setDate(
-      threshold.getDate() - 30
-    );
-
-    return submittedAt >= threshold;
-  }
-
-  if (period === "90d") {
-    const threshold = new Date(now);
-    threshold.setDate(
-      threshold.getDate() - 90
-    );
-
-    return submittedAt >= threshold;
-  }
-
-  if (period === "this_month") {
-    return (
-      submittedAt.getFullYear() ===
-        now.getFullYear() &&
-      submittedAt.getMonth() ===
-        now.getMonth()
-    );
-  }
-
-  return true;
-}
-
 function summariseRows(rows) {
   const validRows = (
     Array.isArray(rows)
@@ -1902,10 +1968,17 @@ function buildManagementSummary({
   summary,
   closeLoopSummary,
   periodFilter,
+  dateFrom,
+  dateTo,
+  lang,
   bucketFilter,
 }) {
-  const windowLabel =
-    formatPeriodLabel(periodFilter);
+  const windowLabel = describeWorkspaceDateFilter({
+    period: periodFilter,
+    from: dateFrom,
+    to: dateTo,
+    lang,
+  });
 
   const bucketLabel =
     bucketFilter === "all"
@@ -1945,26 +2018,6 @@ function buildManagementSummary({
   }, ${summary.passives} passive${
     summary.passives === 1 ? "" : "s"
   } and ${detractorPart}. There are ${activeFollowUpPart}. The immediate management priority is to progress active follow-ups, close any unresolved detractor cases and look for repeated issues in the latest comments.`;
-}
-
-function formatPeriodLabel(period) {
-  if (period === "7d") {
-    return "the last 7 days";
-  }
-
-  if (period === "30d") {
-    return "the last 30 days";
-  }
-
-  if (period === "90d") {
-    return "the last 90 days";
-  }
-
-  if (period === "this_month") {
-    return "this month";
-  }
-
-  return "all time";
 }
 
 function buildTimeseriesFromRows(rows, granularity = "week") {

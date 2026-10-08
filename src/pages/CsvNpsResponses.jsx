@@ -4,6 +4,10 @@ import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
+import {
+  getDateRangeError,
+  matchesWorkspaceDateFilter,
+} from "../utils/workspaceDateFilters";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -128,6 +132,9 @@ export default function CsvNpsResponses() {
   const [mode, setMode] = useState(datasetId ? "saved" : "unknown");
 
   const [bucketFilter, setBucketFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("submitted_at");
   const [dir, setDir] = useState("desc");
@@ -368,6 +375,11 @@ export default function CsvNpsResponses() {
 
     const filtered = rows.filter((row) => {
       const matchesBucket = bucketFilter === "all" || row.bucket === bucketFilter;
+      const matchesPeriod = matchesWorkspaceDateFilter(row.submitted_at, {
+        period: periodFilter,
+        from: dateFrom,
+        to: dateTo,
+      });
 
       const haystack = [
         row.contact_label,
@@ -399,7 +411,7 @@ export default function CsvNpsResponses() {
 
       const matchesSearch = !q || haystack.includes(q);
 
-      return matchesBucket && matchesSearch;
+      return matchesBucket && matchesPeriod && matchesSearch;
     });
 
     return [...filtered].sort((a, b) => {
@@ -407,17 +419,21 @@ export default function CsvNpsResponses() {
       if (result !== 0) return result;
       return compareValues(a?.submitted_at, b?.submitted_at, "desc");
     });
-  }, [dataset, bucketFilter, searchTerm, sort, dir]);
+  }, [dataset, bucketFilter, periodFilter, dateFrom, dateTo, searchTerm, sort, dir]);
 
   const selectedRow = useMemo(() => {
     const ref = String(selectedResponseRef || selectedResponseParam || "").trim();
 
     if (!ref) return null;
 
-    const rows = Array.isArray(dataset?.rows) ? dataset.rows : [];
+    return filteredRows.find((row) => responseMatchesRef(row, ref)) || null;
+  }, [filteredRows, selectedResponseRef, selectedResponseParam]);
 
-    return rows.find((row) => responseMatchesRef(row, ref)) || null;
-  }, [dataset, selectedResponseRef, selectedResponseParam]);
+  const dateRangeError = getDateRangeError({
+    period: periodFilter,
+    from: dateFrom,
+    to: dateTo,
+  });
 
   useEffect(() => {
     if (!selectedResponseParam || !dataset?.rows?.length) return;
@@ -562,7 +578,53 @@ export default function CsvNpsResponses() {
               <option value="detractor">{tr("Detractors", "Détracteurs")}</option>
             </select>
           </label>
+
+          <label className="csv-nps-filter-field">
+            <span>{tr("Period", "Période")}</span>
+            <select
+              value={periodFilter}
+              onChange={(event) => setPeriodFilter(event.target.value)}
+            >
+              <option value="all">{tr("All time", "Toute la période")}</option>
+              <option value="7d">{tr("Last 7 days", "7 derniers jours")}</option>
+              <option value="30d">{tr("Last 30 days", "30 derniers jours")}</option>
+              <option value="90d">{tr("Last 90 days", "90 derniers jours")}</option>
+              <option value="this_month">{tr("This month", "Ce mois-ci")}</option>
+              <option value="custom">{tr("Custom dates", "Dates personnalisées")}</option>
+            </select>
+          </label>
+
+          {periodFilter === "custom" && (
+            <>
+              <label className="csv-nps-filter-field">
+                <span>{tr("From", "Du")}</span>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  max={dateTo || undefined}
+                  onChange={(event) => setDateFrom(event.target.value)}
+                />
+              </label>
+              <label className="csv-nps-filter-field">
+                <span>{tr("To", "Au")}</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  min={dateFrom || undefined}
+                  onChange={(event) => setDateTo(event.target.value)}
+                />
+              </label>
+            </>
+          )}
         </div>
+
+        {dateRangeError && (
+          <div className="csv-nps-error csv-nps-error-compact">
+            {dateRangeError === "reversed"
+              ? tr("The start date must be on or before the end date.", "La date de début doit être antérieure ou égale à la date de fin.")
+              : tr("Choose both a start date and an end date.", "Choisissez une date de début et une date de fin.")}
+          </div>
+        )}
 
         {selectedRow && (
           <section

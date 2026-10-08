@@ -1166,6 +1166,26 @@ function buildReplyDraftPrompt({ row, language, tone, channel }) {
     .slice(0, 10);
 
   const mainComment = allKnownComments[0] || cleanForAi(row.comment, 500);
+  const surveySignals = [
+    ["recommendation", raw.q_recommend_score ?? raw.qRecommendScore ?? extraScores.q_recommend_score ?? extraScores.qRecommendScore ?? score, raw.q_recommend_comment ?? raw.qRecommendComment ?? extraScores.q_recommend_comment ?? extraScores.qRecommendComment ?? mainComment],
+    ["installation_and_getting_started", raw.q_install_score ?? raw.qInstallScore ?? extraScores.q_install_score ?? extraScores.qInstallScore, raw.q_install_comment ?? raw.qInstallComment ?? extraScores.q_install_comment ?? extraScores.qInstallComment],
+    ["daily_use", raw.q_daily_use_score ?? raw.qDailyUseScore ?? extraScores.q_daily_use_score ?? extraScores.qDailyUseScore, raw.q_daily_use_comment ?? raw.qDailyUseComment ?? extraScores.q_daily_use_comment ?? extraScores.qDailyUseComment],
+    ["parent_relationship", raw.q_parent_relation_score ?? raw.qParentRelationScore ?? extraScores.q_parent_relation_score ?? extraScores.qParentRelationScore, raw.q_parent_relation_comment ?? raw.qParentRelationComment ?? extraScores.q_parent_relation_comment ?? extraScores.qParentRelationComment],
+    ["envola_support", raw.q_support_score ?? raw.qSupportScore ?? extraScores.q_support_score ?? extraScores.qSupportScore, raw.q_support_comment ?? raw.qSupportComment ?? extraScores.q_support_comment ?? extraScores.qSupportComment],
+    ["final_comment", null, raw.q_final_comment ?? raw.qFinalComment ?? extraScores.q_final_comment ?? extraScores.qFinalComment],
+  ]
+    .map(([area, signalScore, comment]) => ({
+      area,
+      score:
+        signalScore !== null &&
+        signalScore !== undefined &&
+        signalScore !== "" &&
+        Number.isFinite(Number(signalScore))
+          ? Number(signalScore)
+          : null,
+      comment: cleanForAi(comment, 500),
+    }))
+    .filter((signal) => signal.score !== null || signal.comment);
 
   return {
     system: `
@@ -1184,16 +1204,22 @@ Rules:
 - The message is for ${channel || "Intercom"}, so keep it concise, warm and human.
 - Do not invent fixes, promises, compensation, timelines, discounts, or facts.
 - Do not mention internal labels like "detractor", "passive", or "promoter".
-- If the customer gave a specific free-text problem or issue, explicitly mention that issue in natural language.
-- Use the most specific issue from problem_comments when writing the reply.
+- Treat survey_signals as separate aspects of the experience, not as one undifferentiated complaint.
+- Prioritise a specific commented-on area with the lowest score. If two areas are equally low, use the clearest actionable comment.
+- If the customer gave a specific free-text problem or issue, explicitly acknowledge that issue in natural language.
 - Do not give a generic dissatisfaction reply when a specific comment is available.
-- If the specific comment is unclear, ask one simple follow-up question to understand the issue better.
+- Do not ask for information the customer has already supplied.
+- If the specific comment is unclear, ask one simple, relevant follow-up question to understand it better.
 - If the score is 0-6, be empathetic and ask for enough detail to help or investigate.
 - If the score is 7-8, thank them and ask what would make the experience better.
 - If the score is 9-10, thank them warmly and reinforce what is working.
 - Do not include personal data, real email addresses, contact IDs, or internal identifiers.
 - Avoid sounding robotic or over-formal.
 - Use "nous" rather than "je" unless the source text clearly suggests a personal reply.
+- Do not repeat the numerical score unless it is genuinely useful to the sentence.
+- Where positive and negative feedback coexist, briefly recognise one positive point before addressing the priority concern.
+- Use at most three short paragraphs. End with one clear next step or one question, not both.
+- For Intercom, set subject to null.
 - Keep the body under 160 words.
 - The body should be ready to copy into Intercom, but the human user will review it before sending.
 - Prioritise free-text problem comments over selected benefits/options.
@@ -1212,6 +1238,7 @@ Rules:
       problem_comments: allKnownComments,
       positive_or_context_options: selectedOptions.slice(0, 10),
       selected_options: selectedOptions.slice(0, 10),
+      survey_signals: surveySignals,
 
       survey_details: {
         recommend_score:

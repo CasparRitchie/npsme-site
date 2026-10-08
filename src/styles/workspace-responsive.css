@@ -30,6 +30,22 @@
   .csv-nps-filters {
     grid-template-columns: 1fr;
   }
+
+  .workspace-date-calendar {
+    width: calc(100vw - 40px);
+  }
+
+  .workspace-date-calendar-months {
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+  }
+
+  .workspace-date-range-trigger {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .workspace-date-range-calendar-icon {
+    display: none;
+  }
 }
 
 @media (max-width: 720px) {

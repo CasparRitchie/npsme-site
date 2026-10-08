@@ -5,7 +5,7 @@ import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import DatasetAiInsights from "../components/DatasetAiInsights";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
-import WorkspaceDateInput from "../components/WorkspaceDateInput";
+import WorkspaceDateRangePicker from "../components/WorkspaceDateRangePicker";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -653,33 +653,19 @@ export default function CsvNpsPerformance() {
           </label>
 
           {periodFilter === "custom" && (
-            <>
-              <label className="csv-nps-filter-field">
-                <span>{tr("From", "Du")}</span>
-                <WorkspaceDateInput
-                  value={dateFrom}
-                  max={dateTo || undefined}
-                  label={tr("Choose start date", "Choisir la date de début")}
-                  onChange={(event) => {
-                    setDateFrom(event.target.value);
-                    setSelectedChartPoint(null);
-                  }}
-                />
-              </label>
-
-              <label className="csv-nps-filter-field">
-                <span>{tr("To", "Au")}</span>
-                <WorkspaceDateInput
-                  value={dateTo}
-                  min={dateFrom || undefined}
-                  label={tr("Choose end date", "Choisir la date de fin")}
-                  onChange={(event) => {
-                    setDateTo(event.target.value);
-                    setSelectedChartPoint(null);
-                  }}
-                />
-              </label>
-            </>
+            <div className="csv-nps-filter-field csv-nps-date-range-field">
+              <span>{tr("Date range", "Plage de dates")}</span>
+              <WorkspaceDateRangePicker
+                from={dateFrom}
+                to={dateTo}
+                lang={lang}
+                onChange={(range) => {
+                  setDateFrom(range.from);
+                  setDateTo(range.to);
+                  setSelectedChartPoint(null);
+                }}
+              />
+            </div>
           )}
 
           <label className="csv-nps-filter-field">

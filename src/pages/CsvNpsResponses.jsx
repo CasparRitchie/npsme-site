@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
-import WorkspaceDateInput from "../components/WorkspaceDateInput";
+import WorkspaceDateRangePicker from "../components/WorkspaceDateRangePicker";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -598,26 +598,18 @@ export default function CsvNpsResponses() {
           </label>
 
           {periodFilter === "custom" && (
-            <>
-              <label className="csv-nps-filter-field">
-                <span>{tr("From", "Du")}</span>
-                <WorkspaceDateInput
-                  value={dateFrom}
-                  max={dateTo || undefined}
-                  label={tr("Choose start date", "Choisir la date de début")}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                />
-              </label>
-              <label className="csv-nps-filter-field">
-                <span>{tr("To", "Au")}</span>
-                <WorkspaceDateInput
-                  value={dateTo}
-                  min={dateFrom || undefined}
-                  label={tr("Choose end date", "Choisir la date de fin")}
-                  onChange={(event) => setDateTo(event.target.value)}
-                />
-              </label>
-            </>
+            <div className="csv-nps-filter-field csv-nps-date-range-field">
+              <span>{tr("Date range", "Plage de dates")}</span>
+              <WorkspaceDateRangePicker
+                from={dateFrom}
+                to={dateTo}
+                lang={lang}
+                onChange={(range) => {
+                  setDateFrom(range.from);
+                  setDateTo(range.to);
+                }}
+              />
+            </div>
           )}
         </div>
 

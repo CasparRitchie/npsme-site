@@ -477,6 +477,189 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.csv-nps-date-range-field {
+  grid-column: 1 / -1;
+}
+
+.workspace-date-range {
+  position: relative;
+  width: 100%;
+}
+
+.workspace-date-range-trigger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 62px;
+  overflow: hidden;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(32, 20, 55, 0.96));
+  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.22);
+}
+
+.workspace-date-range-trigger button {
+  display: grid;
+  gap: 3px;
+  height: 100%;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text, #f5f7fb);
+  text-align: left;
+  cursor: pointer;
+}
+
+.workspace-date-range-trigger button:hover,
+.workspace-date-range-trigger button.is-active {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.workspace-date-range-trigger button span {
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.workspace-date-range-trigger button strong {
+  font-size: 0.95rem;
+}
+
+.workspace-date-range-arrow {
+  color: #a78bfa;
+  font-weight: 900;
+}
+
+.workspace-date-range-calendar-icon {
+  padding: 0 16px 0 6px;
+  color: #86efac;
+  font-size: 1.4rem;
+}
+
+.workspace-date-calendar {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(920px, calc(100vw - 48px));
+  overflow: hidden;
+  border: 1px solid rgba(167, 139, 250, 0.38);
+  border-radius: 24px;
+  background: linear-gradient(145deg, #08111f, #13142a 62%, #171126);
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.58), 0 0 0 1px rgba(34, 197, 94, 0.06) inset;
+}
+
+.workspace-date-calendar-header,
+.workspace-date-calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 18px;
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.12), rgba(124, 58, 237, 0.14));
+}
+
+.workspace-date-calendar-header > div {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+
+.workspace-date-calendar-header span,
+.workspace-date-calendar-footer span {
+  color: #aeb8ca;
+  font-size: 0.8rem;
+}
+
+.workspace-date-calendar-header button,
+.workspace-date-calendar-footer button {
+  min-width: 38px;
+  min-height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.workspace-date-calendar-months {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  gap: 1px;
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.workspace-date-calendar-month {
+  min-width: 250px;
+  padding: 18px 14px 20px;
+  background: rgba(8, 17, 31, 0.98);
+}
+
+.workspace-date-calendar-month h3 {
+  margin: 0 0 14px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.workspace-date-calendar-weekdays,
+.workspace-date-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.workspace-date-calendar-weekdays span {
+  padding: 4px 0 8px;
+  color: #8290a5;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.workspace-date-calendar-days button,
+.workspace-date-calendar-days .is-empty {
+  min-width: 0;
+  min-height: 34px;
+}
+
+.workspace-date-calendar-days button {
+  position: relative;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #dce4ef;
+  cursor: pointer;
+}
+
+.workspace-date-calendar-days button:hover,
+.workspace-date-calendar-days button:focus-visible {
+  z-index: 1;
+  outline: none;
+  background: rgba(167, 139, 250, 0.28);
+}
+
+.workspace-date-calendar-days button.is-in-range {
+  border-radius: 0;
+  background: rgba(34, 197, 94, 0.18);
+  color: #f0fdf4;
+}
+
+.workspace-date-calendar-days button.is-start,
+.workspace-date-calendar-days button.is-end {
+  z-index: 2;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #22c55e, #7c3aed);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.28);
+}
+
 .csv-nps-filter-field input::placeholder {
   color: rgba(245, 247, 251, 0.45);
 }

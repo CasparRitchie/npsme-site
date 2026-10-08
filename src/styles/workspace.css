@@ -447,9 +447,10 @@
 
 .csv-nps-filters {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(180px, 240px);
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
   gap: 16px;
   margin-bottom: 22px;
+  align-items: end;
 }
 
 .csv-nps-filter-field {
@@ -478,7 +479,8 @@
 }
 
 .csv-nps-date-range-field {
-  grid-column: 1 / -1;
+  grid-column: span 2;
+  min-width: 320px;
 }
 
 .workspace-date-range {
@@ -490,7 +492,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 62px;
+  min-height: 46px;
   overflow: hidden;
   border: 1px solid rgba(34, 197, 94, 0.35);
   border-radius: 18px;
@@ -502,7 +504,7 @@
   display: grid;
   gap: 3px;
   height: 100%;
-  padding: 10px 16px;
+  padding: 7px 12px;
   border: 0;
   background: transparent;
   color: var(--text, #f5f7fb);
@@ -524,7 +526,7 @@
 }
 
 .workspace-date-range-trigger button strong {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 .workspace-date-range-arrow {
@@ -533,7 +535,7 @@
 }
 
 .workspace-date-range-calendar-icon {
-  padding: 0 16px 0 6px;
+  padding: 0 12px 0 4px;
   color: #86efac;
   font-size: 1.4rem;
 }
@@ -898,10 +900,7 @@
 }
 
 .csv-nps-filters-three {
-  grid-template-columns:
-    minmax(180px, 240px)
-    minmax(180px, 240px)
-    minmax(180px, 240px);
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
 }
 
 .csv-nps-loop-management-grid {
@@ -2417,5 +2416,5 @@
 
 
 .csv-nps-filters-four {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }

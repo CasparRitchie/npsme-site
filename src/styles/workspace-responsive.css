@@ -28,7 +28,7 @@
   }
 
   .csv-nps-filters {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workspace-date-calendar {
@@ -108,7 +108,7 @@
 
 @media (max-width: 760px) {
   .csv-nps-filters-three {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .csv-nps-loop-status-chart {
@@ -242,8 +242,23 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 540px) {
+  .csv-nps-filters,
+  .csv-nps-filters-three,
   .csv-nps-filters-four {
     grid-template-columns: 1fr;
+  }
+
+  .csv-nps-date-range-field {
+    grid-column: span 1;
+    min-width: 0;
+  }
+
+  .workspace-date-range-trigger button {
+    padding-inline: 9px;
+  }
+
+  .workspace-date-range-trigger button strong {
+    font-size: 0.8rem;
   }
 }

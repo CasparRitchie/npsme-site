@@ -1,7 +1,8 @@
 import React from "react";
 import {
   ResponsiveContainer,
-  LineChart,
+  ComposedChart,
+  Bar,
   Line,
   XAxis,
   YAxis,
@@ -118,22 +119,66 @@ export default function NpsTimeseriesChart({
         <div className="w-full" style={{ height: 170 }} />
       ) : (
         <ResponsiveContainer width="100%" height={170}>
-          <LineChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+          <ComposedChart data={data} margin={{ top: 10, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
               tickFormatter={(v) => formatDateLabel(v, granularity)}
               minTickGap={18}
             />
-            <YAxis domain={[-100, 100]} />
+            <YAxis yAxisId="nps" domain={[-100, 100]} />
+            <YAxis
+              yAxisId="responses"
+              orientation="right"
+              domain={[0, "dataMax"]}
+              allowDecimals={false}
+              width={32}
+              tick={{ fill: "rgba(196, 181, 253, 0.72)", fontSize: 11 }}
+              axisLine={{ stroke: "rgba(124, 58, 237, 0.24)" }}
+              tickLine={false}
+            />
             <Tooltip
               labelFormatter={(label) => tooltipLabelFormatter(label, granularity, lang)}
-              formatter={(value, name) =>
-                name === "nps" ? [value, "NPS"] : [value, name]
-              }
-              contentStyle={{ borderRadius: 12 }}
+              formatter={(value, name) => {
+                if (name === "nps") return [value, "NPS"];
+                if (name === "responses") {
+                  return [value, lang === "fr" ? "Réponses" : "Responses"];
+                }
+                return [value, name];
+              }}
+              contentStyle={{
+                borderRadius: 14,
+                border: "1px solid rgba(134, 239, 172, 0.38)",
+                background: "linear-gradient(145deg, #08111f, #171126)",
+                color: "#f8fafc",
+                boxShadow: "0 18px 44px rgba(2, 6, 23, 0.52)",
+                padding: "10px 12px",
+              }}
+              labelStyle={{
+                color: "#d8b4fe",
+                fontWeight: 800,
+                marginBottom: 4,
+              }}
+              itemStyle={{
+                color: "#86efac",
+                fontWeight: 800,
+              }}
+              cursor={{
+                fill: "rgba(124, 58, 237, 0.09)",
+              }}
+              wrapperStyle={{ zIndex: 20, outline: "none" }}
+            />
+            <Bar
+              yAxisId="responses"
+              dataKey="responses"
+              fill="#3b1d66"
+              fillOpacity={0.62}
+              radius={[5, 5, 0, 0]}
+              maxBarSize={30}
+              isAnimationActive={false}
             />
             <Line
+              yAxisId="nps"
               type="monotone"
               dataKey="nps"
               stroke="#7C3AED"
@@ -142,7 +187,7 @@ export default function NpsTimeseriesChart({
               activeDot={{ r: 6, fill: "#22C55E", stroke: "#22C55E" }}
               isAnimationActive={false}
             />
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       )}
     </div>

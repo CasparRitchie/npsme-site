@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import WorkspaceDateInput from "../components/WorkspaceDateInput";
 import { useLanguage } from "../i18n/LanguageContext";
 import { getDateRangeError } from "../utils/workspaceDateFilters";
 
@@ -31,15 +32,11 @@ function prettyDate(iso) {
   });
 }
 
-function statusLabel(status) {
-  if (status === "responded") return "Valid response";
-  if (status === "completed_without_score") return "Completed without score";
-  if (status === "delivered") return "Delivered";
-  if (status === "opened") return "Started / opened";
-  if (status === "bounced") return "Bounced";
-  if (status === "failed") return "Failed";
-  if (status === "sent") return "Sent";
-  return status || "Unknown";
+function statusLabel(status, lang) {
+  const labels = lang === "fr"
+    ? { responded: "Réponse valide", completed_without_score: "Terminée sans note", delivered: "Livrée", opened: "Commencée / ouverte", bounced: "Rejetée", failed: "Échec", sent: "Envoyée" }
+    : { responded: "Valid response", completed_without_score: "Completed without score", delivered: "Delivered", opened: "Started / opened", bounced: "Bounced", failed: "Failed", sent: "Sent" };
+  return labels[status] || status || (lang === "fr" ? "Inconnu" : "Unknown");
 }
 
 function statusPillClass(status) {
@@ -66,14 +63,14 @@ function statusPillClass(status) {
   return "border-white/10 bg-white/5 text-slate-200";
 }
 
-function StatusPill({ status }) {
+function StatusPill({ status, lang }) {
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium ${statusPillClass(
         status
       )}`}
     >
-      {statusLabel(status)}
+      {statusLabel(status, lang)}
     </span>
   );
 }
@@ -272,7 +269,7 @@ export default function CsvNpsInvitations() {
 
   const opportunitySummary = useMemo(() => {
     if (invites.loading) {
-      return "Loading invitation opportunity summary...";
+      return tr("Loading invitation opportunity summary...", "Chargement du résumé des opportunités de réponse...");
     }
 
     const {
@@ -284,7 +281,7 @@ export default function CsvNpsInvitations() {
     } = lifecycleMetrics;
 
     if (!sent) {
-      return "No invitations were found for the selected period.";
+      return tr("No invitations were found for the selected period.", "Aucune invitation n’a été trouvée pour la période sélectionnée.");
     }
 
     const startedButNotCompleted = Number(
@@ -294,6 +291,16 @@ export default function CsvNpsInvitations() {
     const noActivity = Number(
       summary.no_response_activity || 0
     );
+
+    if (lang === "fr") {
+      const followUp = [];
+      if (startedButNotCompleted > 0) followUp.push(`${startedButNotCompleted} commencée${startedButNotCompleted === 1 ? "" : "s"} mais non terminée${startedButNotCompleted === 1 ? "" : "s"}`);
+      if (noActivity > 0) followUp.push(`${noActivity} sans activité de réponse détectée`);
+      const base = `${validResponses} invitation${validResponses === 1 ? "" : "s"} sur ${sent} ont produit une réponse NPS valide. Intercom a enregistré ${explicitCompletions} événement${explicitCompletions === 1 ? "" : "s"} explicite${explicitCompletions === 1 ? "" : "s"} de fin de questionnaire.`;
+      return followUp.length
+        ? `${base} Les principales opportunités de relance sont : ${followUp.join(" et ")}. Les réponses NPS valides restent la mesure de référence.`
+        : `${base} Aucune invitation incomplète ou sans interaction ne nécessite actuellement de relance.`;
+    }
 
     const resultParts = [
       `${validResponses} of ${sent} invitations produced a valid scored NPS response`,
@@ -346,6 +353,7 @@ export default function CsvNpsInvitations() {
     lifecycleMetrics,
     summary.started_but_not_completed,
     summary.no_response_activity,
+    lang,
   ]);
 
   if (loadingDataset) {
@@ -353,14 +361,14 @@ export default function CsvNpsInvitations() {
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>Loading invitation data...</p>
+          <h1>{tr(PAGE_COPY.title, "Invitations")}</h1>
+          <p>{tr("Loading invitation data...", "Chargement des invitations...")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
 
         <section className="csv-nps-panel">
-          <p>Loading invitation data from workspace.</p>
+          <p>{tr("Loading invitation data from workspace.", "Chargement des invitations depuis l’espace de travail.")}</p>
         </section>
       </main>
     );
@@ -371,8 +379,8 @@ export default function CsvNpsInvitations() {
       <main className="csv-nps-page">
         <section className="csv-nps-hero csv-nps-hero-compact">
           <p className="eyebrow">{PAGE_COPY.eyebrow}</p>
-          <h1>{PAGE_COPY.title}</h1>
-          <p>There was a problem loading this dataset.</p>
+          <h1>{tr(PAGE_COPY.title, "Invitations")}</h1>
+          <p>{tr("There was a problem loading this dataset.", "Un problème est survenu lors du chargement de ce dataset.")}</p>
         </section>
 
         <CsvNpsWorkspaceNav />
@@ -414,19 +422,19 @@ export default function CsvNpsInvitations() {
             <>
               <label className="csv-nps-filter-field">
                 <span>{tr("From", "Du")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateFrom}
                   max={dateTo || undefined}
+                  label={tr("Choose start date", "Choisir la date de début")}
                   onChange={(event) => setDateFrom(event.target.value)}
                 />
               </label>
               <label className="csv-nps-filter-field">
                 <span>{tr("To", "Au")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateTo}
                   min={dateFrom || undefined}
+                  label={tr("Choose end date", "Choisir la date de fin")}
                   onChange={(event) => setDateTo(event.target.value)}
                 />
               </label>
@@ -456,20 +464,20 @@ export default function CsvNpsInvitations() {
               <div>
                 {source?.source_name ||
                   dataset?.datasetName ||
-                  "Active Intercom source"}
+                  tr("Active Intercom source", "Source Intercom active")}
               </div>
 
               {refresh && (
                 <div className="csv-nps-muted-cell">
                   {refresh.ran
-                    ? "Invitation data refreshed just now"
+                    ? tr("Invitation data refreshed just now", "Données d’invitation actualisées à l’instant")
                     : refresh.reason === "fresh"
-                      ? "Invitation data recently refreshed"
+                      ? tr("Invitation data recently refreshed", "Données d’invitation récemment actualisées")
                       : refresh.reason === "waited_for_existing_refresh"
-                        ? "Invitation data refreshed by another request"
+                        ? tr("Invitation data refreshed by another request", "Données d’invitation actualisées par une autre requête")
                         : refresh.error
-                          ? `Refresh warning: ${refresh.error}`
-                          : "Invitation data loaded"}
+                          ? `${tr("Refresh warning", "Avertissement d’actualisation")} : ${refresh.error}`
+                          : tr("Invitation data loaded", "Données d’invitation chargées")}
                 </div>
               )}
             </div>
@@ -492,42 +500,41 @@ export default function CsvNpsInvitations() {
 
         <div className="csv-nps-responses-header">
           <div>
-            <h2>Invitation performance</h2>
+            <h2>{tr("Invitation performance", "Performance des invitations")}</h2>
             <p>
-              Track whether survey invitations are producing responses, and find
-              quick-win follow-up opportunities.
+              {tr("Track whether survey invitations are producing responses, and find quick-win follow-up opportunities.", "Vérifiez si les invitations génèrent des réponses et identifiez rapidement les opportunités de relance.")}
             </p>
           </div>
         </div>
 
         <div className="csv-nps-metric-grid">
           <MetricCard
-            label="Invitations sent"
+            label={tr("Invitations sent", "Invitations envoyées")}
             value={invites.loading ? "…" : summary.sent ?? "—"}
             sub={periodFilter === "custom"
               ? tr(`${dateFrom} to ${dateTo}`, `Du ${dateFrom} au ${dateTo}`)
               : tr(`${Number.parseInt(periodFilter, 10)}-day window`, `Période de ${Number.parseInt(periodFilter, 10)} jours`)}
-            description="All survey invitations detected in the selected period."
+            description={tr("All survey invitations detected in the selected period.", "Toutes les invitations détectées pendant la période sélectionnée.")}
           />
 
           <MetricCard
-            label="Opened or started"
+            label={tr("Opened or started", "Ouvertes ou commencées")}
             value={invites.loading ? "…" : summary.opened ?? "—"}
-            description="Invitations with detected opening, answering or completion activity."
+            description={tr("Invitations with detected opening, answering or completion activity.", "Invitations pour lesquelles une ouverture, une réponse ou une fin de questionnaire a été détectée.")}
           />
 
           <MetricCard
-            label="Valid NPS responses"
+            label={tr("Valid NPS responses", "Réponses NPS valides")}
             value={
               invites.loading
                 ? "…"
                 : lifecycleMetrics.validResponses
             }
-            description="Canonical responses containing a usable score from 0 to 10."
+            description={tr("Canonical responses containing a usable score from 0 to 10.", "Réponses de référence contenant une note exploitable de 0 à 10.")}
           />
 
           <MetricCard
-            label="NPS response rate"
+            label={tr("NPS response rate", "Taux de réponse NPS")}
             value={
               invites.loading
                 ? "…"
@@ -535,21 +542,21 @@ export default function CsvNpsInvitations() {
                   ? "—"
                   : `${summary.response_rate_pct}%`
             }
-            description="Valid scored NPS responses divided by invitations sent."
+            description={tr("Valid scored NPS responses divided by invitations sent.", "Réponses NPS valides divisées par le nombre d’invitations envoyées.")}
           />
 
           <MetricCard
-            label="Recorded completion events"
+            label={tr("Recorded completion events", "Fins de questionnaire enregistrées")}
             value={
               invites.loading
                 ? "…"
                 : lifecycleMetrics.explicitCompletions
             }
-            description="Invitations for which Intercom exported an explicit completion timestamp."
+            description={tr("Invitations for which Intercom exported an explicit completion timestamp.", "Invitations pour lesquelles Intercom a exporté une date explicite de fin de questionnaire.")}
           />
 
           <MetricCard
-            label="Completion event rate"
+            label={tr("Completion event rate", "Taux de fin de questionnaire")}
             value={
               invites.loading
                 ? "…"
@@ -557,103 +564,87 @@ export default function CsvNpsInvitations() {
                   ? "—"
                   : `${summary.intercom_completion_rate_pct}%`
             }
-            description="Explicit Intercom completion events divided by invitations sent."
+            description={tr("Explicit Intercom completion events divided by invitations sent.", "Fins de questionnaire explicites dans Intercom divisées par les invitations envoyées.")}
           />
 
           <MetricCard
-            label="Valid responses without completion event"
+            label={tr("Valid responses without completion event", "Réponses valides sans événement de fin")}
             value={
               invites.loading
                 ? "…"
                 : lifecycleMetrics.validWithoutCompletionEvent
             }
-            description="Usable NPS responses where the invitation statistics did not include a matching completion event."
+            description={tr("Usable NPS responses where the invitation statistics did not include a matching completion event.", "Réponses NPS exploitables sans événement de fin correspondant dans les statistiques d’invitation.")}
           />
 
           <MetricCard
-            label="Completed without valid score"
+            label={tr("Completed without valid score", "Terminées sans note valide")}
             value={
               invites.loading
                 ? "…"
                 : lifecycleMetrics.completedWithoutScore
             }
-            description="Explicit Intercom completions that did not produce a usable 0–10 score."
+            description={tr("Explicit Intercom completions that did not produce a usable 0–10 score.", "Fins de questionnaire Intercom n’ayant pas produit de note exploitable de 0 à 10.")}
           />
 
           <MetricCard
-            label="Started but not completed"
+            label={tr("Started but not completed", "Commencées mais non terminées")}
             value={
               invites.loading
                 ? "…"
                 : summary.started_but_not_completed ?? "—"
             }
-            description="Invitations with response activity but no completion or valid NPS response."
+            description={tr("Invitations with response activity but no completion or valid NPS response.", "Invitations avec une activité de réponse, mais sans fin de questionnaire ni réponse NPS valide.")}
           />
 
           <MetricCard
-            label="No response activity"
+            label={tr("No response activity", "Aucune activité de réponse")}
             value={
               invites.loading
                 ? "…"
                 : summary.no_response_activity ?? "—"
             }
-            description="Invitations with no detected opening, answer, completion or response."
+            description={tr("Invitations with no detected opening, answer, completion or response.", "Invitations sans ouverture, réponse ou fin de questionnaire détectée.")}
           />
 
           <MetricCard
-            label="Last invitation"
+            label={tr("Last invitation", "Dernière invitation")}
             value={
               invites.loading
                 ? "…"
                 : prettyDate(summary.last_sent_at)
             }
-            description="Most recent invitation detected in the selected period."
+            description={tr("Most recent invitation detected in the selected period.", "Invitation la plus récente détectée pendant la période sélectionnée.")}
           />
         </div>
 
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
-              <h3>How these figures reconcile</h3>
+              <h3>{tr("How these figures reconcile", "Comment rapprocher ces chiffres")}</h3>
               <p>
-                Valid NPS responses and Intercom completion events measure different
-                parts of the survey lifecycle.
+                {tr("Valid NPS responses and Intercom completion events measure different parts of the survey lifecycle.", "Les réponses NPS valides et les événements de fin Intercom mesurent des étapes différentes du cycle du questionnaire.")}
               </p>
             </div>
           </div>
 
           <div className="csv-nps-management-summary">
             <p>
-              <strong>
-                {lifecycleMetrics.validResponses} valid NPS responses
-              </strong>{" "}
-              were found in the canonical response data. Intercom separately recorded{" "}
-              <strong>
-                {lifecycleMetrics.explicitCompletions} explicit completion events
-              </strong>
-              .
+              {tr(
+                `${lifecycleMetrics.validResponses} valid NPS responses were found in the canonical response data. Intercom separately recorded ${lifecycleMetrics.explicitCompletions} explicit completion events.`,
+                `${lifecycleMetrics.validResponses} réponses NPS valides ont été trouvées dans les données de référence. Intercom a enregistré séparément ${lifecycleMetrics.explicitCompletions} événements explicites de fin de questionnaire.`
+              )}
             </p>
 
             <p>
-              Of these results,{" "}
-              <strong>
-                {lifecycleMetrics.validWithoutCompletionEvent}
-              </strong>{" "}
-              valid response
-              {lifecycleMetrics.validWithoutCompletionEvent === 1 ? "" : "s"}{" "}
-              {lifecycleMetrics.validWithoutCompletionEvent === 1 ? "has" : "have"} no
-              matching completion event, while{" "}
-              <strong>
-                {lifecycleMetrics.completedWithoutScore}
-              </strong>{" "}
-              recorded completion
-              {lifecycleMetrics.completedWithoutScore === 1 ? "" : "s"} did not produce
-              a valid score.
+              {tr(
+                `${lifecycleMetrics.validWithoutCompletionEvent} valid response${lifecycleMetrics.validWithoutCompletionEvent === 1 ? " has" : "s have"} no matching completion event, while ${lifecycleMetrics.completedWithoutScore} recorded completion${lifecycleMetrics.completedWithoutScore === 1 ? "" : "s"} did not produce a valid score.`,
+                `${lifecycleMetrics.validWithoutCompletionEvent} réponse${lifecycleMetrics.validWithoutCompletionEvent === 1 ? " valide ne possède" : "s valides ne possèdent"} pas d’événement de fin correspondant, tandis que ${lifecycleMetrics.completedWithoutScore} fin${lifecycleMetrics.completedWithoutScore === 1 ? "" : "s"} de questionnaire enregistrée${lifecycleMetrics.completedWithoutScore === 1 ? " n’a" : "s n’ont"} pas produit de note valide.`
+              )}
             </p>
 
             <p className="csv-nps-muted-cell">
-              The valid NPS response total is used for NPS reporting. Completion events
-              are retained as a separate Intercom delivery and lifecycle diagnostic.
+              {tr("The valid NPS response total is used for NPS reporting. Completion events are retained as a separate Intercom delivery and lifecycle diagnostic.", "Le total des réponses NPS valides est utilisé pour le reporting NPS. Les événements de fin restent un indicateur Intercom distinct de diffusion et de cycle de vie.")}
             </p>
           </div>
         </section>
@@ -661,10 +652,9 @@ export default function CsvNpsInvitations() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
-              <h3>Response opportunity</h3>
+              <h3>{tr("Response opportunity", "Opportunités de réponse")}</h3>
               <p>
-                Use this to identify customers who may need a small prompt to
-                complete the survey.
+                {tr("Use this to identify customers who may need a small prompt to complete the survey.", "Utilisez cette vue pour identifier les clients qui pourraient avoir besoin d’une courte relance pour terminer le questionnaire.")}
               </p>
             </div>
           </div>
@@ -673,14 +663,14 @@ export default function CsvNpsInvitations() {
             <p>{opportunitySummary}</p>
 
             <div className="csv-nps-management-actions">
-              <a className="csv-nps-button" href="/workspace/responses">
-                Review responses
+              <a className="csv-nps-button" href={lang === "fr" ? "/fr/workspace/responses" : "/workspace/responses"}>
+                {tr("Review responses", "Consulter les réponses")}
               </a>
               <a
                 className="csv-nps-button csv-nps-button-secondary"
-                href="/workspace/performance"
+                href={lang === "fr" ? "/fr/workspace/performance" : "/workspace/performance"}
               >
-                View performance
+                {tr("View performance", "Voir la performance")}
               </a>
             </div>
           </div>
@@ -689,20 +679,20 @@ export default function CsvNpsInvitations() {
         <section className="csv-nps-chart-card csv-nps-chart-card-wide">
           <div className="csv-nps-responses-header">
             <div>
-              <h3>Recent invitations</h3>
-              <p>Latest invitation activity for the selected filter set.</p>
+              <h3>{tr("Recent invitations", "Invitations récentes")}</h3>
+              <p>{tr("Latest invitation activity for the selected filter set.", "Dernière activité d’invitation pour les filtres sélectionnés.")}</p>
             </div>
           </div>
 
           {invites.loading && (
             <p className="mt-4 text-sm text-slate-300">
-              Loading invitations...
+              {tr("Loading invitations...", "Chargement des invitations...")}
             </p>
           )}
 
           {!invites.loading && !invites.error && rows.length === 0 && (
             <div className="csv-nps-empty-state">
-              No invitations found for this filter set.
+              {tr("No invitations found for this filter set.", "Aucune invitation ne correspond à ces filtres.")}
             </div>
           )}
 
@@ -711,12 +701,12 @@ export default function CsvNpsInvitations() {
               <table className="csv-nps-table">
                 <thead>
                   <tr>
-                    <th>Sent</th>
-                    <th>Contact</th>
-                    <th>Status</th>
-                    <th>Score</th>
-                    <th>Response</th>
-                    <th>Action</th>
+                    <th>{tr("Sent", "Envoyée")}</th>
+                    <th>{tr("Contact", "Contact")}</th>
+                    <th>{tr("Status", "Statut")}</th>
+                    <th>{tr("Score", "Note")}</th>
+                    <th>{tr("Response", "Réponse")}</th>
+                    <th>{tr("Action", "Action")}</th>
                   </tr>
                 </thead>
 
@@ -737,14 +727,14 @@ export default function CsvNpsInvitations() {
                               rel="noreferrer"
                               className="text-link"
                             >
-                              Open in Intercom
+                              {tr("Open in Intercom", "Ouvrir dans Intercom")}
                             </a>
                           </div>
                         )}
                       </td>
 
                       <td>
-                        <StatusPill status={row.status} />
+                        <StatusPill status={row.status} lang={lang} />
                       </td>
 
                       <td>
@@ -759,11 +749,11 @@ export default function CsvNpsInvitations() {
                         {row.response_id ? (
                           <a
                             className="text-link"
-                            href={`/workspace/responses?q=${encodeURIComponent(
+                            href={`${lang === "fr" ? "/fr" : ""}/workspace/responses?q=${encodeURIComponent(
                               row.response_id
                             )}`}
                           >
-                            View response
+                            {tr("View response", "Voir la réponse")}
                           </a>
                         ) : row.intercom_contact_url ? (
                           <a
@@ -773,10 +763,10 @@ export default function CsvNpsInvitations() {
                             rel="noreferrer"
                           >
                             {row.status === "completed_without_score"
-                            ? "Review in Intercom"
+                            ? tr("Review in Intercom", "Examiner dans Intercom")
                             : row.status === "opened"
-                              ? "Prompt in Intercom"
-                              : "Open in Intercom"}
+                              ? tr("Prompt in Intercom", "Relancer dans Intercom")
+                              : tr("Open in Intercom", "Ouvrir dans Intercom")}
                           </a>
                         ) : (
                           "—"

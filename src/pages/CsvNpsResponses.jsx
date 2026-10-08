@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import WorkspaceDateInput from "../components/WorkspaceDateInput";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -545,8 +546,10 @@ export default function CsvNpsResponses() {
           <div>
             <h2>{tr("Responses", "Réponses")}</h2>
             <p>
-              Showing {filteredRows.length} of {dataset.rows.length} response
-              {dataset.rows.length === 1 ? "" : "s"}.
+              {tr(
+                `Showing ${filteredRows.length} of ${dataset.rows.length} response${dataset.rows.length === 1 ? "" : "s"}.`,
+                `${filteredRows.length} réponse${filteredRows.length === 1 ? "" : "s"} affichée${filteredRows.length === 1 ? "" : "s"} sur ${dataset.rows.length}.`
+              )}
             </p>
           </div>
         </div>
@@ -560,8 +563,8 @@ export default function CsvNpsResponses() {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={
                 isIntercomMode
-                  ? "Search contact, response id, Pioupiou, reader, comments, benefits..."
-                  : "Search reference, company, stage, comment, benefit..."
+                  ? tr("Search contact, response ID, Pioupiou, reader, comments, benefits...", "Rechercher un contact, un identifiant de réponse, un Pioupiou, un lecteur, un commentaire, un bénéfice...")
+                  : tr("Search reference, company, stage, comment, benefit...", "Rechercher une référence, une entreprise, une étape, un commentaire, un bénéfice...")
               }
             />
           </label>
@@ -598,19 +601,19 @@ export default function CsvNpsResponses() {
             <>
               <label className="csv-nps-filter-field">
                 <span>{tr("From", "Du")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateFrom}
                   max={dateTo || undefined}
+                  label={tr("Choose start date", "Choisir la date de début")}
                   onChange={(event) => setDateFrom(event.target.value)}
                 />
               </label>
               <label className="csv-nps-filter-field">
                 <span>{tr("To", "Au")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateTo}
                   min={dateFrom || undefined}
+                  label={tr("Choose end date", "Choisir la date de fin")}
                   onChange={(event) => setDateTo(event.target.value)}
                 />
               </label>
@@ -635,13 +638,14 @@ export default function CsvNpsResponses() {
               row={selectedRow}
               onClose={clearSelectedResponse}
               closingLoopUrl={getClosingLoopUrl(selectedRow)}
+              tr={tr}
             />
           </section>
         )}
 
         {isIntercomMode ? (
           <div className="csv-nps-table-wrap">
-            <table className="min-w-[2450px] table-fixed border-collapse text-xs csv-nps-table">
+            <table className="min-w-[2345px] table-fixed border-collapse text-xs csv-nps-table">
               <thead className="sticky top-0 z-30 bg-[#0F172A]">
                 <tr>
                   <SortableTh
@@ -661,7 +665,7 @@ export default function CsvNpsResponses() {
                     className="sticky left-[150px] z-40 w-[95px] min-w-[95px] bg-[#0F172A]"
                   />
                   <SortableTh
-                    label="Bucket"
+                    label={tr("Bucket", "Segment")}
                     sortKey="bucket"
                     sort={sort}
                     dir={dir}
@@ -670,21 +674,20 @@ export default function CsvNpsResponses() {
                   />
 
                   <SortableTh label="NPS" sortKey="score" sort={sort} dir={dir} onSort={handleSort} className="w-[70px]" />
-                  <SortableTh label="Response ID" sortKey="response_id" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
+                  <SortableTh label={tr("Response ID", "ID de réponse")} sortKey="response_id" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
                   <SortableTh label="Pioupiou" sortKey="pioupiou" sort={sort} dir={dir} onSort={handleSort} className="w-[120px]" />
-                  <SortableTh label="Reader" sortKey="reader_serial" sort={sort} dir={dir} onSort={handleSort} className="w-[110px]" />
-                  <SortableTh label="Recommend" sortKey="q_recommend_score" sort={sort} dir={dir} onSort={handleSort} className="w-[105px]" />
-                  <SortableTh label="Why?" sortKey="q_recommend_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[280px]" />
-                  <SortableTh label="Install" sortKey="q_install_score" sort={sort} dir={dir} onSort={handleSort} className="w-[90px]" />
-                  <SortableTh label="Install comment" sortKey="q_install_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
-                  <SortableTh label="Daily use" sortKey="q_daily_use_score" sort={sort} dir={dir} onSort={handleSort} className="w-[100px]" />
-                  <SortableTh label="Benefits" sortKey="q_benefits" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
-                  <SortableTh label="Parent relation" sortKey="q_parent_relation_score" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
-                  <SortableTh label="Parent relation comment" sortKey="q_parent_relation_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[260px]" />
-                  <SortableTh label="Support" sortKey="q_support_score" sort={sort} dir={dir} onSort={handleSort} className="w-[95px]" />
-                  <SortableTh label="Support comment" sortKey="q_support_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[220px]" />
-                  <SortableTh label="Final comment" sortKey="q_final_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
-                  <SortableTh label="Previous responses" sortKey="previous_response_dates" sort={sort} dir={dir} onSort={handleSort} className="w-[170px]" />
+                  <SortableTh label={tr("Reader", "Lecteur")} sortKey="reader_serial" sort={sort} dir={dir} onSort={handleSort} className="w-[110px]" />
+                  <SortableTh label={tr("Why?", "Pourquoi ?")} sortKey="q_recommend_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[280px]" />
+                  <SortableTh label={tr("Install", "Installation")} sortKey="q_install_score" sort={sort} dir={dir} onSort={handleSort} className="w-[90px]" />
+                  <SortableTh label={tr("Install comment", "Commentaire sur l’installation")} sortKey="q_install_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label={tr("Daily use", "Utilisation quotidienne")} sortKey="q_daily_use_score" sort={sort} dir={dir} onSort={handleSort} className="w-[100px]" />
+                  <SortableTh label={tr("Benefits", "Bénéfices")} sortKey="q_benefits" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label={tr("Parent relation", "Relation avec les parents")} sortKey="q_parent_relation_score" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
+                  <SortableTh label={tr("Parent relation comment", "Commentaire sur la relation avec les parents")} sortKey="q_parent_relation_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[260px]" />
+                  <SortableTh label={tr("Support", "Accompagnement")} sortKey="q_support_score" sort={sort} dir={dir} onSort={handleSort} className="w-[95px]" />
+                  <SortableTh label={tr("Support comment", "Commentaire sur l’accompagnement")} sortKey="q_support_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[220px]" />
+                  <SortableTh label={tr("Final comment", "Commentaire final")} sortKey="q_final_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  <SortableTh label={tr("Previous responses", "Réponses précédentes")} sortKey="previous_response_dates" sort={sort} dir={dir} onSort={handleSort} className="w-[170px]" />
                 </tr>
               </thead>
 
@@ -692,7 +695,7 @@ export default function CsvNpsResponses() {
                 {filteredRows.length === 0 ? (
                   <tr>
                     <td colSpan="18" className="px-3 py-4">
-                      No responses match the current filters.
+                      {tr("No responses match the current filters.", "Aucune réponse ne correspond aux filtres actuels.")}
                     </td>
                   </tr>
                 ) : (
@@ -704,7 +707,7 @@ export default function CsvNpsResponses() {
                       <tr
                         key={row.response_id || `${row.contact_name}-${row.submitted_at}-${i}`}
                         onClick={(event) => handleRowClick(row, event)}
-                        title="Click to view response details"
+                        title={tr("Click to view response details", "Cliquer pour afficher le détail de la réponse")}
                         className={`cursor-pointer border-b border-white/10 align-top hover:bg-white/5 ${rowBg}`}
                       >
                         <td className={`sticky left-0 z-20 w-[150px] min-w-[150px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
@@ -716,14 +719,14 @@ export default function CsvNpsResponses() {
                               onClick={() => selectResponse(row)}
                               className="inline-flex items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-[11px] font-medium text-sky-200 hover:bg-sky-500/20"
                             >
-                              View details
+                              {tr("View details", "Voir le détail")}
                             </button>
 
                             <a
                               href={getClosingLoopUrl(row)}
                               className="inline-flex items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/20"
                             >
-                              Manage follow-up
+                              {tr("Manage follow-up", "Gérer le suivi")}
                             </a>
 
                             {row.intercom_contact_url ? (
@@ -733,7 +736,7 @@ export default function CsvNpsResponses() {
                                 rel="noreferrer"
                                 className="inline-flex items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-200 hover:bg-indigo-500/20"
                               >
-                                Open
+                                {tr("Open", "Ouvrir")}
                               </a>
                             ) : (
                               <span className="text-slate-500">—</span>
@@ -747,7 +750,7 @@ export default function CsvNpsResponses() {
 
                         <td className={`sticky left-[245px] z-20 w-[88px] min-w-[88px] border-r border-white/10 px-3 py-3 ${stickyBg}`}>
                           <span className={`inline-flex rounded-full border px-2 py-1 text-[11px] font-semibold ${bucketBadge(row.bucket)}`}>
-                            {row.bucket || "—"}
+                            {formatBucketLabel(row.bucket, tr)}
                           </span>
                         </td>
 
@@ -760,12 +763,6 @@ export default function CsvNpsResponses() {
                         <td className="px-3 py-3"><CellText>{row.response_id}</CellText></td>
                         <td className="px-3 py-3"><CellText>{row.pioupiou}</CellText></td>
                         <td className="px-3 py-3"><CellText>{row.reader_serial}</CellText></td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(row.q_recommend_score))}>
-                            {row.q_recommend_score ?? "—"}
-                          </span>
-                        </td>
 
                         <td className="px-3 py-3"><CellText>{row.q_recommend_comment}</CellText></td>
 
@@ -870,7 +867,7 @@ export default function CsvNpsResponses() {
                               rel="noreferrer"
                               className="text-link"
                             >
-                              Open in Intercom
+                              {tr("Open in Intercom", "Ouvrir dans Intercom")}
                             </a>
                           </div>
                         )}
@@ -880,7 +877,7 @@ export default function CsvNpsResponses() {
 
                       <td>
                         <span className={`csv-nps-bucket csv-nps-bucket-${row.bucket}`}>
-                          {row.bucket}
+                          {formatBucketLabel(row.bucket, tr)}
                         </span>
                       </td>
 
@@ -919,16 +916,16 @@ function responseMatchesRef(row, ref) {
     .some((value) => String(value) === target);
 }
 
-function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
-  const surveyRows = buildSurveyQuestionRows(row);
+function ResponseDetailPanel({ row, onClose, closingLoopUrl, tr }) {
+  const surveyRows = buildSurveyQuestionRows(row, tr);
 
   return (
     <div className="space-y-6">
       <div className="csv-nps-responses-header">
         <div>
-          <h3>Selected response</h3>
+          <h3>{tr("Selected response", "Réponse sélectionnée")}</h3>
           <p>
-            {row.contact_name || row.contact_label || "Contact"} · Score {row.score ?? "—"} · {row.bucket || "unknown"} · {shortDate(row.submitted_at)}
+            {row.contact_name || row.contact_label || "Contact"} · {tr("Score", "Note")} {row.score ?? "—"} · {formatBucketLabel(row.bucket, tr)} · {shortDate(row.submitted_at)}
           </p>
         </div>
 
@@ -940,12 +937,12 @@ function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
               rel="noreferrer"
               className="csv-nps-secondary-link"
             >
-              Open in Intercom
+              {tr("Open in Intercom", "Ouvrir dans Intercom")}
             </a>
           )}
 
           <a className="csv-nps-button" href={closingLoopUrl}>
-            Manage follow-up
+            {tr("Manage follow-up", "Gérer le suivi")}
           </a>
 
           <button
@@ -953,7 +950,7 @@ function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
             className="csv-nps-button csv-nps-button-secondary"
             onClick={onClose}
           >
-            Close details
+            {tr("Close details", "Fermer le détail")}
           </button>
         </div>
       </div>
@@ -962,9 +959,9 @@ function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
         <table className="csv-nps-table">
           <thead>
             <tr>
-              <th>Question</th>
-              <th>Score</th>
-              <th>Comment / answer</th>
+              <th>{tr("Question", "Question")}</th>
+              <th>{tr("Score", "Note")}</th>
+              <th>{tr("Comment / answer", "Commentaire / réponse")}</th>
             </tr>
           </thead>
 
@@ -998,7 +995,7 @@ function ResponseDetailPanel({ row, onClose, closingLoopUrl }) {
   );
 }
 
-function buildSurveyQuestionRows(row) {
+function buildSurveyQuestionRows(row, tr = (en) => en) {
   const benefits = uniqueStrings([
     row?.q_benefits,
     ...(Array.isArray(row?.selected_options) ? row.selected_options : []),
@@ -1007,44 +1004,44 @@ function buildSurveyQuestionRows(row) {
   const rows = [
     {
       key: "recommend",
-      question: "Recommendation",
-      description: "NPS question",
+      question: tr("Recommendation", "Recommandation"),
+      description: tr("NPS question", "Question NPS"),
       score: row?.q_recommend_score ?? row?.score ?? null,
       comment: row?.q_recommend_comment || row?.comment || "",
     },
     {
       key: "install",
-      question: "Installation and getting started",
+      question: tr("Installation and getting started", "Installation et prise en main"),
       score: row?.q_install_score ?? null,
       comment: row?.q_install_comment || "",
     },
     {
       key: "daily_use",
-      question: "Daily use",
+      question: tr("Daily use", "Utilisation quotidienne"),
       score: row?.q_daily_use_score ?? null,
       comment: "",
     },
     {
       key: "benefits",
-      question: "Benefits selected",
+      question: tr("Benefits selected", "Bénéfices sélectionnés"),
       score: null,
       comment: benefits.join(", "),
     },
     {
       key: "parent_relationship",
-      question: "Parent relationship impact",
+      question: tr("Parent relationship impact", "Impact sur la relation avec les parents"),
       score: row?.q_parent_relation_score ?? null,
       comment: row?.q_parent_relation_comment || "",
     },
     {
       key: "support",
-      question: "Envola support",
+      question: tr("Envola support", "Accompagnement Envola"),
       score: row?.q_support_score ?? null,
       comment: row?.q_support_comment || "",
     },
     {
       key: "final",
-      question: "Final comment",
+      question: tr("Final comment", "Commentaire final"),
       score: null,
       comment: row?.q_final_comment || "",
     },
@@ -1060,7 +1057,7 @@ function buildSurveyQuestionRows(row) {
   ) {
     rows.push({
       key: "main_comment",
-      question: "Additional comment",
+      question: tr("Additional comment", "Commentaire complémentaire"),
       score: null,
       comment: row.comment,
     });
@@ -1071,6 +1068,13 @@ function buildSurveyQuestionRows(row) {
     const hasComment = String(item.comment || "").trim();
     return hasScore || hasComment || item.key === "benefits";
   });
+}
+
+function formatBucketLabel(bucket, tr) {
+  if (bucket === "promoter") return tr("Promoter", "Promoteur");
+  if (bucket === "passive") return tr("Passive", "Passif");
+  if (bucket === "detractor") return tr("Detractor", "Détracteur");
+  return bucket || "—";
 }
 
 function uniqueStrings(values) {

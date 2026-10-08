@@ -5,6 +5,7 @@ import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import DatasetAiInsights from "../components/DatasetAiInsights";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
+import WorkspaceDateInput from "../components/WorkspaceDateInput";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -655,10 +656,10 @@ export default function CsvNpsPerformance() {
             <>
               <label className="csv-nps-filter-field">
                 <span>{tr("From", "Du")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateFrom}
                   max={dateTo || undefined}
+                  label={tr("Choose start date", "Choisir la date de début")}
                   onChange={(event) => {
                     setDateFrom(event.target.value);
                     setSelectedChartPoint(null);
@@ -668,10 +669,10 @@ export default function CsvNpsPerformance() {
 
               <label className="csv-nps-filter-field">
                 <span>{tr("To", "Au")}</span>
-                <input
-                  type="date"
+                <WorkspaceDateInput
                   value={dateTo}
                   min={dateFrom || undefined}
+                  label={tr("Choose end date", "Choisir la date de fin")}
                   onChange={(event) => {
                     setDateTo(event.target.value);
                     setSelectedChartPoint(null);

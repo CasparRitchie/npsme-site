@@ -130,26 +130,28 @@ export default function NpsDatasets() {
             <p>
               {loading
                 ? tr("Loading saved datasets and connected sources...", "Chargement des datasets et sources connectées...")
-                : `${visibleSavedDatasets.length} saved dataset${
-                    visibleSavedDatasets.length === 1 ? "" : "s"
-                  }${
-                    activeIntercomSource ? " and 1 live Intercom source" : ""
-                  } available.`}
+                : tr(
+                    `${visibleSavedDatasets.length} saved dataset${visibleSavedDatasets.length === 1 ? "" : "s"}${activeIntercomSource ? " and 1 live Intercom source" : ""} available.`,
+                    `${visibleSavedDatasets.length} dataset${visibleSavedDatasets.length === 1 ? " enregistré" : "s enregistrés"}${activeIntercomSource ? " et 1 source Intercom en direct" : ""} disponible${visibleSavedDatasets.length === 1 && !activeIntercomSource ? "" : "s"}.`
+                  )}
             </p>
 
             {!loading && workspaceRole && (
               <p className="csv-nps-muted-note">
-                Signed in as {formatWorkspaceRole(workspaceRole)}.
-                {!userCanDeleteDatasets &&
-                  " Dataset deletion is restricted to workspace owners and admins."}
+                {tr("Signed in as", "Connecté en tant que")} {lang === "fr" ? formatWorkspaceRoleFr(workspaceRole) : formatWorkspaceRole(workspaceRole)}.
+                {!userCanDeleteDatasets && tr(
+                  " Dataset deletion is restricted to workspace owners and admins.",
+                  " La suppression des datasets est réservée aux propriétaires et administrateurs de l’espace."
+                )}
               </p>
             )}
 
             {!loading && hiddenIntercomMirrorCount > 0 && (
               <p className="csv-nps-muted-note">
-                {hiddenIntercomMirrorCount} Intercom backing dataset
-                {hiddenIntercomMirrorCount === 1 ? " is" : "s are"} hidden
-                from this list because the live Intercom source is shown above.
+                {tr(
+                  `${hiddenIntercomMirrorCount} Intercom backing dataset${hiddenIntercomMirrorCount === 1 ? " is" : "s are"} hidden from this list because the live Intercom source is shown above.`,
+                  `${hiddenIntercomMirrorCount} dataset${hiddenIntercomMirrorCount === 1 ? " technique Intercom est masqué" : "s techniques Intercom sont masqués"} dans cette liste, car la source Intercom en direct est affichée ci-dessus.`
+                )}
               </p>
             )}
           </div>
@@ -353,4 +355,15 @@ function MiniMetric({ label, value }) {
       <strong>{value ?? "—"}</strong>
     </div>
   );
+}
+
+function formatWorkspaceRoleFr(role) {
+  const labels = {
+    owner: "Propriétaire",
+    admin: "Administrateur",
+    member: "Membre",
+    viewer: "Lecteur",
+  };
+
+  return labels[String(role || "").toLowerCase()] || formatWorkspaceRole(role);
 }

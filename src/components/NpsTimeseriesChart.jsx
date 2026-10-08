@@ -133,8 +133,8 @@ export default function NpsTimeseriesChart({
               domain={[0, "dataMax"]}
               allowDecimals={false}
               width={32}
-              tick={{ fill: "rgba(196, 181, 253, 0.72)", fontSize: 11 }}
-              axisLine={{ stroke: "rgba(124, 58, 237, 0.24)" }}
+              tick={{ fill: "rgba(203, 213, 225, 0.78)", fontSize: 11 }}
+              axisLine={{ stroke: "rgba(148, 163, 184, 0.28)" }}
               tickLine={false}
             />
             <Tooltip
@@ -164,15 +164,21 @@ export default function NpsTimeseriesChart({
                 fontWeight: 800,
               }}
               cursor={{
-                fill: "rgba(124, 58, 237, 0.09)",
+                fill: "rgba(148, 163, 184, 0.1)",
               }}
               wrapperStyle={{ zIndex: 20, outline: "none" }}
             />
             <Bar
               yAxisId="responses"
               dataKey="responses"
-              fill="#3b1d66"
-              fillOpacity={0.62}
+              fill="#94a3b8"
+              fillOpacity={0.38}
+              activeBar={{
+                fill: "#cbd5e1",
+                fillOpacity: 0.52,
+                stroke: "rgba(226, 232, 240, 0.5)",
+                strokeWidth: 1,
+              }}
               radius={[5, 5, 0, 0]}
               maxBarSize={30}
               isAnimationActive={false}

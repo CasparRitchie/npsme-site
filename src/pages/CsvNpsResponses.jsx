@@ -125,6 +125,7 @@ export default function CsvNpsResponses() {
   const { datasetId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseParam = searchParams.get("response") || "";
+  const sourceId = searchParams.get("source") || "";
   const selectedDetailRef = useRef(null);
 
   const [dataset, setDataset] = useState(null);
@@ -163,6 +164,7 @@ export default function CsvNpsResponses() {
         if (sourceType === "workspace_intercom") {
           const params = new URLSearchParams();
           params.set("limit", "2000");
+          if (sourceId) params.set("source_id", sourceId);
 
           const intercomRes = await fetch(
             `/api/workspace-intercom/responses?${params.toString()}`,
@@ -221,6 +223,7 @@ export default function CsvNpsResponses() {
       try {
         const params = new URLSearchParams();
         params.set("limit", "2000");
+        if (sourceId) params.set("source_id", sourceId);
 
         const res = await fetch(
           `/api/workspace-intercom/responses?${params.toString()}`,
@@ -299,7 +302,7 @@ export default function CsvNpsResponses() {
     } else {
       loadWithoutDatasetId();
     }
-  }, [datasetId]);
+  }, [datasetId, sourceId]);
 
   function handleSort(sortKey) {
     if (sort === sortKey) {
@@ -313,12 +316,12 @@ export default function CsvNpsResponses() {
 
   function getClosingLoopUrl(row) {
     const responseRef = getResponseRef(row);
+    const params = new URLSearchParams();
+    if (sourceId) params.set("source", sourceId);
+    if (responseRef) params.set("response", responseRef);
 
-    if (!responseRef) {
-      return "/workspace/closing-the-loop";
-    }
-
-    return `/workspace/closing-the-loop?response=${encodeURIComponent(responseRef)}`;
+    const query = params.toString();
+    return `/workspace/closing-the-loop${query ? `?${query}` : ""}`;
   }
 
   function getResponseRef(row) {

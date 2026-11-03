@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import WorkspaceDateRangePicker from "../components/WorkspaceDateRangePicker";
@@ -79,6 +79,8 @@ export default function CsvNpsInvitations() {
   const { lang } = useLanguage();
   const tr = (en, fr) => (lang === "fr" ? fr : en);
   const { datasetId } = useParams();
+  const [searchParams] = useSearchParams();
+  const sourceId = searchParams.get("source") || "";
 
   const [dataset, setDataset] = useState(null);
   const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
@@ -89,6 +91,10 @@ export default function CsvNpsInvitations() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const appendSource = (url) =>
+    sourceId
+      ? `${url}${url.includes("?") ? "&" : "?"}source=${encodeURIComponent(sourceId)}`
+      : url;
 
   const [invites, setInvites] = useState({
     loading: true,
@@ -155,6 +161,7 @@ export default function CsvNpsInvitations() {
 
       try {
         const qs = new URLSearchParams({ status: String(statusFilter || "all") });
+        if (sourceId) qs.set("source_id", sourceId);
 
         if (periodFilter === "custom") {
           qs.set("from", dateFrom);
@@ -199,7 +206,7 @@ export default function CsvNpsInvitations() {
     return () => {
       cancelled = true;
     };
-  }, [periodFilter, dateFrom, dateTo, statusFilter, dataset?.content_id]);
+  }, [periodFilter, dateFrom, dateTo, statusFilter, dataset?.content_id, sourceId]);
 
   const dateRangeError = getDateRangeError({
     period: periodFilter,
@@ -655,12 +662,12 @@ export default function CsvNpsInvitations() {
             <p>{opportunitySummary}</p>
 
             <div className="csv-nps-management-actions">
-              <a className="csv-nps-button" href={lang === "fr" ? "/fr/workspace/responses" : "/workspace/responses"}>
+              <a className="csv-nps-button" href={appendSource(lang === "fr" ? "/fr/workspace/responses" : "/workspace/responses")}>
                 {tr("Review responses", "Consulter les réponses")}
               </a>
               <a
                 className="csv-nps-button csv-nps-button-secondary"
-                href={lang === "fr" ? "/fr/workspace/performance" : "/workspace/performance"}
+                href={appendSource(lang === "fr" ? "/fr/workspace/performance" : "/workspace/performance")}
               >
                 {tr("View performance", "Voir la performance")}
               </a>
@@ -741,9 +748,9 @@ export default function CsvNpsInvitations() {
                         {row.response_id ? (
                           <a
                             className="text-link"
-                            href={`${lang === "fr" ? "/fr" : ""}/workspace/responses?q=${encodeURIComponent(
+                            href={appendSource(`${lang === "fr" ? "/fr" : ""}/workspace/responses?q=${encodeURIComponent(
                               row.response_id
-                            )}`}
+                            )}`)}
                           >
                             {tr("View response", "Voir la réponse")}
                           </a>

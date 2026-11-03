@@ -16,7 +16,7 @@ export default function NpsDatasets() {
   const lp = (path) => localizePath(path, lang);
   const [datasets, setDatasets] = useState([]);
   const [workspaceRole, setWorkspaceRole] = useState("");
-  const [activeIntercomSource, setActiveIntercomSource] = useState(null);
+  const [intercomSources, setIntercomSources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -41,34 +41,33 @@ export default function NpsDatasets() {
     ).length;
   }, [datasets]);
 
+  const visibleIntercomSources = useMemo(() => {
+    const byContentId = new Map();
+
+    for (const source of Array.isArray(intercomSources) ? intercomSources : []) {
+      if (source?.is_active === false) continue;
+      const key = String(source?.survey_content_id || source?.id || "").trim();
+      if (!key) continue;
+      byContentId.set(key, source);
+    }
+
+    return Array.from(byContentId.values());
+  }, [intercomSources]);
+
   async function loadDatasets() {
     setLoading(true);
     setError("");
 
     try {
-      const [meData, datasetsData, activeSourceData] = await Promise.all([
+      const [meData, datasetsData, sourcesData] = await Promise.all([
         workspaceFetch("/api/workspace-auth/me"),
         workspaceFetch("/api/nps-data/datasets"),
-        workspaceFetch("/api/workspace-intercom/sources/active").catch((err) => {
-          if (
-            String(err?.message || "")
-              .toLowerCase()
-              .includes("no active intercom source")
-          ) {
-            return { ok: false, source: null };
-          }
-
-          throw err;
-        }),
+        workspaceFetch("/api/workspace-intercom/sources"),
       ]);
 
       setWorkspaceRole(meData?.workspace?.role || "");
       setDatasets(datasetsData?.datasets || []);
-      setActiveIntercomSource(
-        activeSourceData?.ok && activeSourceData?.source
-          ? activeSourceData.source
-          : null
-      );
+      setIntercomSources(sourcesData?.sources || []);
     } catch (err) {
       console.error("Failed to load NPS datasets:", err);
       setError(err.message || tr("Something went wrong", "Une erreur s’est produite"));
@@ -131,8 +130,8 @@ export default function NpsDatasets() {
               {loading
                 ? tr("Loading saved datasets and connected sources...", "Chargement des datasets et sources connectées...")
                 : tr(
-                    `${visibleSavedDatasets.length} saved dataset${visibleSavedDatasets.length === 1 ? "" : "s"}${activeIntercomSource ? " and 1 live Intercom source" : ""} available.`,
-                    `${visibleSavedDatasets.length} dataset${visibleSavedDatasets.length === 1 ? " enregistré" : "s enregistrés"}${activeIntercomSource ? " et 1 source Intercom en direct" : ""} disponible${visibleSavedDatasets.length === 1 && !activeIntercomSource ? "" : "s"}.`
+                    `${visibleSavedDatasets.length} saved dataset${visibleSavedDatasets.length === 1 ? "" : "s"}${visibleIntercomSources.length ? ` and ${visibleIntercomSources.length} live Intercom source${visibleIntercomSources.length === 1 ? "" : "s"}` : ""} available.`,
+                    `${visibleSavedDatasets.length} dataset${visibleSavedDatasets.length === 1 ? " enregistré" : "s enregistrés"}${visibleIntercomSources.length ? ` et ${visibleIntercomSources.length} source${visibleIntercomSources.length === 1 ? "" : "s"} Intercom en direct` : ""} disponible${visibleSavedDatasets.length === 1 && visibleIntercomSources.length === 0 ? "" : "s"}.`
                   )}
             </p>
 
@@ -163,7 +162,7 @@ export default function NpsDatasets() {
 
         {error && <div className="csv-nps-error">{error}</div>}
 
-        {!loading && activeIntercomSource && (
+        {!loading && visibleIntercomSources.length > 0 && (
           <section className="csv-nps-datasets-section">
             <div className="csv-nps-section-heading">
               <h3>{tr("Live source", "Source en direct")}</h3>
@@ -173,12 +172,14 @@ export default function NpsDatasets() {
             </div>
 
             <div className="csv-nps-dataset-grid">
-              <LiveSourceCard source={activeIntercomSource} lang={lang} tr={tr} lp={lp} />
+              {visibleIntercomSources.map((source) => (
+                <LiveSourceCard key={source.id} source={source} lang={lang} tr={tr} lp={lp} />
+              ))}
             </div>
           </section>
         )}
 
-        {!loading && !activeIntercomSource && (
+        {!loading && visibleIntercomSources.length === 0 && (
           <section className="csv-nps-datasets-section">
             <div className="csv-nps-section-heading">
               <h3>{tr("Live source", "Source en direct")}</h3>
@@ -226,6 +227,9 @@ function LiveSourceCard({ source, lang, tr, lp }) {
   const updatedAt = source?.updated_at
     ? new Date(source.updated_at).toLocaleString()
     : tr("Unknown date", "Date inconnue");
+  const sourceQuery = source?.id
+    ? `?source=${encodeURIComponent(source.id)}`
+    : "";
 
   return (
     <article className="csv-nps-dataset-card csv-nps-dataset-card-live">
@@ -255,15 +259,19 @@ function LiveSourceCard({ source, lang, tr, lp }) {
       )}
 
       <div className="csv-nps-dataset-actions">
-        <Link className="csv-nps-secondary-link" to={lp("/workspace/performance")}>
+        <Link className="csv-nps-secondary-link" to={`${lp("/workspace/performance")}${sourceQuery}`}>
           Performance
         </Link>
 
-        <Link className="csv-nps-secondary-link" to={lp("/workspace/responses")}>
+        <Link className="csv-nps-secondary-link" to={`${lp("/workspace/responses")}${sourceQuery}`}>
           {tr("Responses", "Réponses")}
         </Link>
 
-        <Link className="csv-nps-secondary-link" to={lp("/workspace/closing-the-loop")}>
+        <Link className="csv-nps-secondary-link" to={`${lp("/workspace/invitations")}${sourceQuery}`}>
+          {tr("Invitations", "Invitations")}
+        </Link>
+
+        <Link className="csv-nps-secondary-link" to={`${lp("/workspace/closing-the-loop")}${sourceQuery}`}>
           {tr("Closing the loop", "Suivi client")}
         </Link>
       </div>

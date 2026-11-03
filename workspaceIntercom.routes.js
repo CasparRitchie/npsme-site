@@ -178,7 +178,10 @@ export function createWorkspaceIntercomRouter() {
       ensureSupabase();
 
       const workspaceId = getRequestWorkspaceId(req);
-      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+      const source = await resolveWorkspaceIntercomSource(
+        workspaceId,
+        req.query.source_id
+      );
 
       if (!source) {
         return res.status(404).json({
@@ -220,7 +223,10 @@ export function createWorkspaceIntercomRouter() {
       ensureSupabase();
 
       const workspaceId = getRequestWorkspaceId(req);
-      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+      const source = await resolveWorkspaceIntercomSource(
+        workspaceId,
+        req.query.source_id
+      );
 
       if (!source) {
         return res.status(404).json({
@@ -261,7 +267,10 @@ export function createWorkspaceIntercomRouter() {
       ensureSupabase();
 
       const workspaceId = getRequestWorkspaceId(req);
-      const source = await getActiveWorkspaceIntercomSource(workspaceId);
+      const source = await resolveWorkspaceIntercomSource(
+        workspaceId,
+        req.query.source_id
+      );
 
       if (!source) {
         return res.status(404).json({
@@ -299,7 +308,10 @@ router.get("/invitations/reconcile", async (req, res) => {
     ensureSupabase();
 
     const workspaceId = getRequestWorkspaceId(req);
-    const source = await getActiveWorkspaceIntercomSource(workspaceId);
+    const source = await resolveWorkspaceIntercomSource(
+      workspaceId,
+      req.query.source_id
+    );
 
     if (!source) {
       return res.status(404).json({
@@ -599,6 +611,47 @@ async function getActiveWorkspaceIntercomSource(workspaceId) {
   return data || null;
 }
 
+async function resolveWorkspaceIntercomSource(workspaceId, requestedSourceId) {
+  const sourceId = String(requestedSourceId || "").trim();
+
+  if (!sourceId) {
+    return getActiveWorkspaceIntercomSource(workspaceId);
+  }
+
+  if (!isUuid(sourceId)) {
+    throw new Error("Valid source_id is required");
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("workspace_intercom_sources")
+    .select(
+      [
+        "id",
+        "workspace_id",
+        "source_name",
+        "source_slug",
+        "is_active",
+        "intercom_app_id",
+        "intercom_region",
+        "survey_content_id",
+        "survey_content_title",
+        "ingest_mode",
+        "pii_mode",
+        "created_at",
+        "updated_at",
+      ].join(",")
+    )
+    .eq("id", sourceId)
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data || null;
+}
+
 async function getOrCreateWorkspaceIntercomDataset({ source, contentId, summary, rowCount }) {
   const workspaceId = String(source?.workspace_id || "").trim();
 
@@ -721,34 +774,31 @@ async function syncWorkspaceIntercomRows({ dataset, rows }) {
     (row) => !existingByResponseId.has(String(row.response_id))
   );
 
+  const persistencePayload = (row, rowNumber) => ({
+    submitted_at: row.submitted_at || null,
+    score: normaliseNpsScore(row.score),
+    bucket: row.bucket || "unknown",
+    customer_name: null,
+    customer_email: null,
+    company: row.company || null,
+    stage: row.stage || null,
+    comment: row.comment || null,
+    contact_id: row.contact_id || null,
+    intercom_contact_url: row.intercom_contact_url || null,
+    selected_options_json: Array.isArray(row.selected_options_json)
+      ? row.selected_options_json
+      : [],
+    extra_scores_json: row.extra_scores_json || {},
+    raw_json: row,
+    ...(rowNumber == null ? {} : { row_number: rowNumber }),
+  });
+
   if (missingRows.length > 0) {
     const payload = missingRows.map((row, index) => ({
       dataset_id: dataset.id,
       response_id: row.response_id,
       source: "workspace_intercom",
-      row_number: index + 1,
-      submitted_at: row.submitted_at || null,
-      score: normaliseNpsScore(row.score),
-      bucket: row.bucket || "unknown",
-
-      // Keep PII minimised in the workspace dataset.
-      customer_name: null,
-      customer_email: null,
-
-      company: row.company || null,
-      stage: row.stage || null,
-      comment: row.comment || null,
-
-      // Keep the contact id for the Intercom deep link/back-office connection,
-      // but avoid showing it as the visible contact label in the frontend.
-      contact_id: row.contact_id || null,
-      intercom_contact_url: row.intercom_contact_url || null,
-
-      selected_options_json: Array.isArray(row.selected_options_json)
-        ? row.selected_options_json
-        : [],
-      extra_scores_json: row.extra_scores_json || {},
-      raw_json: row,
+      ...persistencePayload(row, index + 1),
     }));
 
     const { error: insertError } = await supabaseAdmin
@@ -757,6 +807,35 @@ async function syncWorkspaceIntercomRows({ dataset, rows }) {
 
     if (insertError) {
       throw new Error(insertError.message);
+    }
+  }
+
+  const existingRowsToRefresh = rowsWithResponseIds.filter((row) => {
+    const existing = existingByResponseId.get(String(row.response_id));
+    if (!existing) return false;
+
+    return (
+      normaliseNpsScore(existing.score) !== normaliseNpsScore(row.score) ||
+      String(existing.bucket || "") !== String(row.bucket || "") ||
+      String(existing.comment || "") !== String(row.comment || "") ||
+      JSON.stringify(existing.selected_options_json || []) !==
+        JSON.stringify(row.selected_options_json || []) ||
+      JSON.stringify(existing.extra_scores_json || {}) !==
+        JSON.stringify(row.extra_scores_json || {}) ||
+      JSON.stringify(existing.raw_json || {}) !== JSON.stringify(row)
+    );
+  });
+
+  for (const row of existingRowsToRefresh) {
+    const existing = existingByResponseId.get(String(row.response_id));
+    const { error: updateError } = await supabaseAdmin
+      .from("dataset_rows")
+      .update(persistencePayload(row, null))
+      .eq("id", existing.id)
+      .eq("dataset_id", dataset.id);
+
+    if (updateError) {
+      throw new Error(updateError.message);
     }
   }
 
@@ -2258,6 +2337,7 @@ function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], s
 
   const score = normaliseNpsScore(row?.score_0_10);
   const bucket = scoreBucket(score);
+  const dynamicAnswers = buildDynamicSurveyAnswerFields(answers);
 
   return {
     id: row?.response_id || null,
@@ -2290,7 +2370,8 @@ function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], s
       .map((x) => x?.response_id)
       .filter(Boolean),
 
-    q_recommend_score: firstAnswerByQuestionId(answers, 612560),
+    q_recommend_score:
+      firstAnswerByQuestionId(answers, 612560) ?? dynamicAnswers.npsScore,
     q_recommend_comment: firstAnswerByQuestionId(answers, 612565),
 
     q_install_score: firstAnswerByQuestionId(answers, 612566),
@@ -2309,7 +2390,7 @@ function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], s
     q_final_comment: firstAnswerByQuestionId(answers, 612603),
 
     selected_options_json: benefits,
-    extra_scores_json: {},
+    extra_scores_json: dynamicAnswers.additionalAnswers,
     close_loop_actions: [],
     source_meta: {
       source_id: source?.id || null,
@@ -2318,6 +2399,55 @@ function flattenWorkspaceIntercomResponseForTable(row, allRowsForContact = [], s
       content_id: source?.survey_content_id || null,
     },
   };
+}
+
+export function buildDynamicSurveyAnswerFields(answers) {
+  const additionalAnswers = {};
+  let npsScore = null;
+  const legacyQuestionIds = new Set([
+    "612560",
+    "612565",
+    "612566",
+    "612567",
+    "612568",
+    "612570",
+    "612571",
+    "612600",
+    "612601",
+    "612602",
+    "612603",
+  ]);
+
+  for (const answer of Array.isArray(answers) ? answers : []) {
+    const rawResponse = answer?.response;
+    if (rawResponse === null || rawResponse === undefined || rawResponse === "") {
+      continue;
+    }
+
+    const numeric = normaliseNpsScore(rawResponse);
+    if (npsScore === null && numeric !== null) {
+      npsScore = numeric;
+      continue;
+    }
+
+    const questionId = String(answer?.question_id || "").trim();
+    if (legacyQuestionIds.has(questionId)) continue;
+
+    const questionText = String(answer?.question_text || "").trim();
+    const baseLabel = questionText || (questionId ? `Question ${questionId}` : "Question");
+    let label = baseLabel;
+    let suffix = 2;
+
+    while (Object.prototype.hasOwnProperty.call(additionalAnswers, label)) {
+      label = `${baseLabel} (${suffix})`;
+      suffix += 1;
+    }
+
+    additionalAnswers[label] =
+      numeric !== null ? numeric : redactFreeText(String(rawResponse), 500);
+  }
+
+  return { npsScore, additionalAnswers };
 }
 
 function firstAnswerByQuestionId(answers, qid) {

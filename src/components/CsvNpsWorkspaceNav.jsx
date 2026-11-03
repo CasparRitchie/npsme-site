@@ -46,6 +46,9 @@ export default function CsvNpsWorkspaceNav() {
   }, [location.pathname]);
 
   const datasetBasePath = datasetId ? lp(`/workspace/datasets/${datasetId}`) : "";
+  const sourceId = new URLSearchParams(location.search).get("source") || "";
+  const withSource = (path) =>
+    sourceId ? `${path}?source=${encodeURIComponent(sourceId)}` : path;
 
   const links = useMemo(() => {
     if (datasetBasePath) {
@@ -59,10 +62,10 @@ export default function CsvNpsWorkspaceNav() {
 
     if (hasActiveIntercomSource) {
       return {
-        performance: lp("/workspace/performance"),
-        responses: lp("/workspace/responses"),
-        invitations: lp("/workspace/invitations"),
-        closing: lp("/workspace/closing-the-loop"),
+        performance: withSource(lp("/workspace/performance")),
+        responses: withSource(lp("/workspace/responses")),
+        invitations: withSource(lp("/workspace/invitations")),
+        closing: withSource(lp("/workspace/closing-the-loop")),
       };
     }
 
@@ -72,7 +75,7 @@ export default function CsvNpsWorkspaceNav() {
       invitations: lp("/workspace/datasets"),
       closing: lp("/workspace/datasets"),
     };
-  }, [datasetBasePath, hasActiveIntercomSource, lang]);
+  }, [datasetBasePath, hasActiveIntercomSource, lang, sourceId]);
 
   async function handleWorkspaceLogout() {
     try {

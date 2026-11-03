@@ -44,6 +44,7 @@ export default function CsvNpsClosingTheLoop() {
   );
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedResponseRef = searchParams.get("response");
+  const sourceId = searchParams.get("source") || "";
   const isWorkspaceRoute = /^\/(?:fr\/)?workspace(?:\/|$)/.test(
     window.location.pathname
   );
@@ -97,9 +98,31 @@ export default function CsvNpsClosingTheLoop() {
       setDatasetError("");
 
       try {
+        let queueDatasetId = datasetId || "";
+
+        if (!queueDatasetId && sourceId) {
+          const sourceParams = new URLSearchParams({
+            source_id: sourceId,
+            limit: "1",
+          });
+          const sourceResponse = await fetch(
+            `/api/workspace-intercom/responses?${sourceParams.toString()}`,
+            { credentials: "include" }
+          );
+          const sourceData = await sourceResponse.json();
+
+          if (!sourceResponse.ok || !sourceData.ok) {
+            throw new Error(
+              sourceData.error || "Failed to load the selected Intercom source"
+            );
+          }
+
+          queueDatasetId = sourceData?.dataset?.id || "";
+        }
+
         const params = new URLSearchParams();
         params.set("limit", String(CANONICAL_PAGE_LIMIT));
-        if (datasetId) params.set("datasetId", datasetId);
+        if (queueDatasetId) params.set("datasetId", queueDatasetId);
         if (canonicalCaseState !== "all") params.set("caseState", canonicalCaseState);
         if (canonicalBucket !== "all") params.set("bucket", canonicalBucket);
         if (canonicalOwner !== "all") params.set("owner", canonicalOwner);
@@ -307,7 +330,7 @@ export default function CsvNpsClosingTheLoop() {
     } else {
       loadWithoutDatasetId();
     }
-  }, [datasetId, isWorkspaceRoute, canonicalCaseState, canonicalBucket, canonicalOwner]);
+  }, [datasetId, sourceId, isWorkspaceRoute, canonicalCaseState, canonicalBucket, canonicalOwner]);
 
   useEffect(() => {
     const selectedRow = dataset?.rows?.find(

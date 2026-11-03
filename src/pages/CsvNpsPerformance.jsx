@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import DatasetAiInsights from "../components/DatasetAiInsights";
@@ -29,6 +29,8 @@ export default function CsvNpsPerformance() {
   const { lang } = useLanguage();
   const tr = (en, fr) => (lang === "fr" ? fr : en);
   const { datasetId } = useParams();
+  const [searchParams] = useSearchParams();
+  const sourceId = searchParams.get("source") || "";
 
   const [dataset, setDataset] = useState(null);
   const [loadingDataset, setLoadingDataset] = useState(Boolean(datasetId));
@@ -41,6 +43,10 @@ export default function CsvNpsPerformance() {
   const [bucketFilter, setBucketFilter] = useState("all");
   const [chartGranularity, setChartGranularity] = useState("week");
   const [selectedChartPoint, setSelectedChartPoint] = useState(null);
+  const appendSource = (url) =>
+    sourceId
+      ? `${url}${url.includes("?") ? "&" : "?"}source=${encodeURIComponent(sourceId)}`
+      : url;
 
   useEffect(() => {
     async function loadSavedDataset() {
@@ -73,6 +79,10 @@ export default function CsvNpsPerformance() {
 
           const responseParams = new URLSearchParams();
           responseParams.set("limit", "5000");
+          if (sourceId) {
+            performanceParams.set("source_id", sourceId);
+            responseParams.set("source_id", sourceId);
+          }
 
           const [performanceRes, responsesRes] = await Promise.all([
             fetch(
@@ -159,6 +169,10 @@ export default function CsvNpsPerformance() {
 
         const responseParams = new URLSearchParams();
         responseParams.set("limit", "5000");
+        if (sourceId) {
+          performanceParams.set("source_id", sourceId);
+          responseParams.set("source_id", sourceId);
+        }
 
         const [performanceRes, responsesRes] = await Promise.all([
           fetch(
@@ -285,7 +299,7 @@ export default function CsvNpsPerformance() {
     } else {
       loadWithoutDatasetId();
     }
-  }, [datasetId]);
+  }, [datasetId, sourceId]);
 
   const timeline = useMemo(() => {
     return Array.isArray(dataset?.timeline)
@@ -717,7 +731,7 @@ export default function CsvNpsPerformance() {
             <div className="flex flex-wrap gap-2">
               <a
                 className="text-link"
-                href={localizePath("/workspace/responses", lang)}
+                href={appendSource(localizePath("/workspace/responses", lang))}
               >
                 {tr("Review responses", "Consulter les réponses")}
               </a>
@@ -726,7 +740,7 @@ export default function CsvNpsPerformance() {
 
               <a
                 className="text-link"
-                href={localizePath("/workspace/closing-the-loop", lang)}
+                href={appendSource(localizePath("/workspace/closing-the-loop", lang))}
               >
                 {tr("Manage follow-up", "Gérer le suivi")}
               </a>
@@ -905,22 +919,22 @@ export default function CsvNpsPerformance() {
                           <div className="flex flex-wrap gap-2">
                             <a
                               className="text-link"
-                              href={localizePath(`/workspace/responses?response=${encodeURIComponent(
+                              href={appendSource(localizePath(`/workspace/responses?response=${encodeURIComponent(
                                 row.response_id || row.id || ""
-                              )}`, lang)}
+                              )}`, lang))}
                             >
                               {tr("View details", "Voir le détail")}
                             </a>
 
                             <a
                               className="text-link"
-                              href={localizePath(`/workspace/closing-the-loop?response=${encodeURIComponent(
+                              href={appendSource(localizePath(`/workspace/closing-the-loop?response=${encodeURIComponent(
                                 row.db_row_id ||
                                   row.dataset_row_id ||
                                   row.response_id ||
                                   row.id ||
                                   ""
-                              )}`, lang)}
+                              )}`, lang))}
                             >
                               {tr("Manage follow-up", "Gérer le suivi")}
                             </a>

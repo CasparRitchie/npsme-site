@@ -345,6 +345,8 @@ function normalizeCompletionEvent(e) {
     raw: {
       stat_type: e.stat_type || null,
       topic: e.topic || null,
+      ruleset_id: e.ruleset_id || null,
+      ruleset_version_id: e.ruleset_version_id || null,
     },
   };
 }
@@ -782,14 +784,9 @@ async function loadLiveResponses() {
   return parseCsvWithHeader(csv);
 }
 
-export async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_ID } = {}) {
-  const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
-  const rawEvents = parseJsonl(rawText);
-
-  const completions = rawEvents.filter(
-    (e) =>
-      String(e?.stat_type || "").toLowerCase() === "completion" &&
-      String(e?.content_id || "") === String(contentId)
+export function buildCanonicalResponsesFromSurveyEvents(rawEvents) {
+  const completions = (Array.isArray(rawEvents) ? rawEvents : []).filter(
+    (event) => String(event?.stat_type || "").toLowerCase() === "completion"
   );
 
   const normalized = completions
@@ -797,30 +794,36 @@ export async function rebuildEnvolaResponsesFile({ contentId = DEFAULT_CONTENT_I
     .filter(Boolean);
 
   const byId = new Map();
-  for (const r of normalized) {
-    const existing = byId.get(r.response_id);
+  for (const response of normalized) {
+    const existing = byId.get(response.response_id);
     if (!existing) {
-      byId.set(r.response_id, r);
+      byId.set(response.response_id, response);
       continue;
     }
 
     const existingTs = Date.parse(existing.submitted_at || "") || 0;
-    const newTs = Date.parse(r.submitted_at || "") || 0;
+    const newTs = Date.parse(response.submitted_at || "") || 0;
     if (newTs >= existingTs) {
-      byId.set(r.response_id, r);
+      byId.set(response.response_id, response);
     }
   }
 
-  const canonical = Array.from(byId.values()).sort((a, b) =>
+  return Array.from(byId.values()).sort((a, b) =>
     String(b.submitted_at || "").localeCompare(String(a.submitted_at || ""))
   );
+}
+
+export async function rebuildEnvolaResponsesFile() {
+  const rawText = await readDropboxFile(INTERCOM_SURVEY_EVENTS_PATH).catch(() => null);
+  const rawEvents = parseJsonl(rawText);
+  const canonical = buildCanonicalResponsesFromSurveyEvents(rawEvents);
 
   await writeDropboxFile(ENVOLA_RESPONSES_PATH, jsonlStringify(canonical));
   invalidateResponsesCache();
 
   return {
     ok: true,
-    content_id: contentId,
+    content_ids: uniqueStrings(canonical.map((row) => row.content_id)),
     rebuilt_rows: canonical.length,
     path: ENVOLA_RESPONSES_PATH,
   };
@@ -849,8 +852,7 @@ export function createEnvolaRouter() {
   // Public to ingest-token only
   router.post("/rebuild", requireIngestToken, async (req, res) => {
     try {
-      const contentId = String(req.query.content_id || DEFAULT_CONTENT_ID).trim();
-      const out = await rebuildEnvolaResponsesFile({ contentId });
+      const out = await rebuildEnvolaResponsesFile();
       return res.json(out);
     } catch (err) {
       console.error("[envola] rebuild error", err);

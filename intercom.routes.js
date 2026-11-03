@@ -517,7 +517,12 @@ return {
 
   answers: Array.isArray(answers) ? answers : [],
 
-  raw: { stat_type: e.stat_type || null, topic: e.topic || null },
+  raw: {
+    stat_type: e.stat_type || null,
+    topic: e.topic || null,
+    ruleset_id: e.ruleset_id || null,
+    ruleset_version_id: e.ruleset_version_id || null,
+  },
 };
 }
 
@@ -1322,6 +1327,8 @@ export function createIntercomRouter() {
         receipt_id: cs?.receipt_id,
         stat_type: cs?.stat_type,
         content_title: cs?.content_title,
+        ruleset_id: cs?.ruleset_id || null,
+        ruleset_version_id: cs?.ruleset_version_id || null,
         contact_id: contact?.id,
         external_id: contact?.external_id,
         email: contact?.email,
@@ -1350,9 +1357,7 @@ export function createIntercomRouter() {
           const ingestOut = await ingestSurveyCompletionsToCleanStore();
           console.log("[intercom webhook] clean store updated", ingestOut);
 
-          const rebuildOut = await rebuildEnvolaResponsesFile({
-            contentId: String(record.content_id || "").trim() || process.env.ENVOLA_CONTENT_ID || "189616",
-          });
+          const rebuildOut = await rebuildEnvolaResponsesFile();
           console.log("[intercom webhook] envola responses rebuilt", rebuildOut);
         } catch (err) {
           console.error("[intercom webhook] post-ingest rebuild error", err);

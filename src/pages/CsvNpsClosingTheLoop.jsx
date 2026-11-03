@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
+import WorkspaceSurveySourceSelector from "../components/WorkspaceSurveySourceSelector";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import {
@@ -100,7 +101,7 @@ export default function CsvNpsClosingTheLoop() {
       try {
         let queueDatasetId = datasetId || "";
 
-        if (!queueDatasetId && sourceId) {
+        if (sourceId) {
           const sourceParams = new URLSearchParams({
             source_id: sourceId,
             limit: "1",
@@ -962,6 +963,16 @@ function selectRow(row) {
 
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
 
+      <WorkspaceSurveySourceSelector
+        enabled={mode === "canonical" || mode === "intercom"}
+        contentId={dataset?.content_id}
+        onChange={() => {
+          setCanonicalCaseState("all");
+          setCanonicalBucket("all");
+          setCanonicalOwner("all");
+        }}
+      />
+
       <section className="csv-nps-results">
         <div className="csv-nps-metric-grid csv-nps-loop-summary-strip">
           <MetricCard label={copy.summary.total} value={counts.total} />
@@ -1226,7 +1237,7 @@ function normaliseCanonicalClosingLoop(apiResponse, requestedDatasetId) {
       firstDataset.dataset_name ||
       (requestedDatasetId ? "Workspace dataset" : "Workspace feedback"),
     sourceType: firstDataset.source_type || "workspace",
-    content_id: null,
+    content_id: firstDataset.content_id || null,
     rawRowCount: apiResponse.summary?.totalMatchingResponses ?? rows.length,
     validRowCount: apiResponse.summary?.totalMatchingResponses ?? rows.length,
     skippedRowCount: 0,

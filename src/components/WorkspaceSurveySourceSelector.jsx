@@ -5,6 +5,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 export default function WorkspaceSurveySourceSelector({
   enabled = true,
   contentId = "",
+  onChange,
 }) {
   const { lang } = useLanguage();
   const tr = (en, fr) => (lang === "fr" ? fr : en);
@@ -83,6 +84,7 @@ export default function WorkspaceSurveySourceSelector({
   if (!enabled || (!loading && availableSources.length < 2)) return null;
 
   function handleChange(event) {
+    onChange?.(event.target.value);
     const next = new URLSearchParams(searchParams);
     next.set("source", event.target.value);
     next.delete("response");

@@ -696,6 +696,57 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.workspace-survey-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 24px;
+  align-items: end;
+  margin: 0 auto 20px;
+  padding: 20px 22px;
+  max-width: 1180px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(76, 29, 149, 0.22), rgba(15, 23, 42, 0.92)),
+    #0f172a;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2);
+}
+
+.workspace-survey-selector strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.workspace-survey-selector p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.workspace-survey-selector-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #c4b5fd;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.workspace-survey-selector-field {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .workspace-survey-selector {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-inline: 16px;
+    padding: 18px;
+  }
+}
+
 .csv-nps-filter-field input:-webkit-autofill,
 .csv-nps-filter-field input:-webkit-autofill:hover,
 .csv-nps-filter-field input:-webkit-autofill:focus {

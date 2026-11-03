@@ -6,6 +6,7 @@ import DatasetAiInsights from "../components/DatasetAiInsights";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
 import NpsBucketStackedColumns from "../components/NpsBucketStackedColumns";
 import WorkspaceDateRangePicker from "../components/WorkspaceDateRangePicker";
+import WorkspaceSurveySourceSelector from "../components/WorkspaceSurveySourceSelector";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -628,6 +629,11 @@ export default function CsvNpsPerformance() {
       {datasetId && (
         <WorkspaceDatasetHeader dataset={dataset} />
       )}
+
+      <WorkspaceSurveySourceSelector
+        enabled={mode === "intercom"}
+        contentId={dataset?.content_id}
+      />
 
       <section className="csv-nps-results">
         <div className="csv-nps-filters csv-nps-filters-four">

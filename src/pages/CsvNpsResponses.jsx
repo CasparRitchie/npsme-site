@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import WorkspaceDatasetHeader from "../components/WorkspaceDatasetHeader";
 import WorkspaceDateRangePicker from "../components/WorkspaceDateRangePicker";
+import WorkspaceSurveySourceSelector from "../components/WorkspaceSurveySourceSelector";
 import { useLanguage } from "../i18n/LanguageContext";
 import { localizePath } from "../i18n/pathHelpers";
 import {
@@ -543,6 +544,11 @@ export default function CsvNpsResponses() {
       <CsvNpsWorkspaceNav />
 
       {datasetId && <WorkspaceDatasetHeader dataset={dataset} />}
+
+      <WorkspaceSurveySourceSelector
+        enabled={isIntercomMode}
+        contentId={dataset?.content_id}
+      />
 
       <section className="csv-nps-results">
         <div className="csv-nps-responses-header">

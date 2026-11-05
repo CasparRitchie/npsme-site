@@ -963,6 +963,9 @@ async function buildWorkspaceIntercomResponsesPayload({ source, query }) {
         row.q_support_score,
         row.q_support_comment,
         row.q_final_comment,
+        ...Object.entries(row.extra_scores_json || {}).flatMap(
+          ([question, answer]) => [question, answer]
+        ),
         ...(Array.isArray(row.selected_options_json)
           ? row.selected_options_json
           : []),

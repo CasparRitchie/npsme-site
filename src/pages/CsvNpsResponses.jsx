@@ -10,6 +10,7 @@ import {
   getDateRangeError,
   matchesWorkspaceDateFilter,
 } from "../utils/workspaceDateFilters";
+import { buildAdditionalSurveyQuestionRows } from "../utils/workspaceSurveyAnswers";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -1001,6 +1002,8 @@ function buildSurveyQuestionRows(row, tr = (en) => en) {
     row?.q_benefits,
     ...(Array.isArray(row?.selected_options) ? row.selected_options : []),
   ]);
+  const additionalRows = buildAdditionalSurveyQuestionRows(row?.extra_scores);
+  const hasAdditionalRows = additionalRows.length > 0;
 
   const rows = [
     {
@@ -1008,7 +1011,8 @@ function buildSurveyQuestionRows(row, tr = (en) => en) {
       question: tr("Recommendation", "Recommandation"),
       description: tr("NPS question", "Question NPS"),
       score: row?.q_recommend_score ?? row?.score ?? null,
-      comment: row?.q_recommend_comment || row?.comment || "",
+      comment:
+        row?.q_recommend_comment || (!hasAdditionalRows ? row?.comment : "") || "",
     },
     {
       key: "install",
@@ -1048,6 +1052,8 @@ function buildSurveyQuestionRows(row, tr = (en) => en) {
     },
   ];
 
+  rows.push(...additionalRows);
+
   const knownComments = uniqueStrings(
     rows.map((item) => item.comment).filter(Boolean)
   );
@@ -1067,7 +1073,7 @@ function buildSurveyQuestionRows(row, tr = (en) => en) {
   return rows.filter((item) => {
     const hasScore = item.score !== null && item.score !== undefined && item.score !== "";
     const hasComment = String(item.comment || "").trim();
-    return hasScore || hasComment || item.key === "benefits";
+    return hasScore || hasComment;
   });
 }
 

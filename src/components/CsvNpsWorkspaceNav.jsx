@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
 import { translations } from "../i18n/translations";
 import { localizePath } from "../i18n/pathHelpers";
 
 export default function CsvNpsWorkspaceNav() {
   const { datasetId } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const { lang } = useLanguage();
   const tr = (path, fallback) => translations(lang, path, fallback);
@@ -77,19 +76,6 @@ export default function CsvNpsWorkspaceNav() {
     };
   }, [datasetBasePath, hasActiveIntercomSource, lang, sourceId]);
 
-  async function handleWorkspaceLogout() {
-    try {
-      await fetch("/api/workspace-auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Workspace logout failed:", err);
-    } finally {
-      navigate(lp("/workspace/login"), { replace: true });
-    }
-  }
-
   return (
     <nav className="csv-nps-workspace-nav" aria-label={tr("workspaceNav.ariaLabel", "NPS workspace navigation")}>
       <NavLink to={lp("/workspace")} end>
@@ -120,17 +106,14 @@ export default function CsvNpsWorkspaceNav() {
         {tr("workspaceNav.closing", "Close the loop")}
       </NavLink>
 
+      <NavLink to={lp("/workspace/journey")}>
+        {tr("workspaceNav.journey", "Journey")}
+      </NavLink>
+
       <NavLink to={lp("/workspace/account")}>
         {tr("workspaceNav.account", "Account")}
       </NavLink>
 
-      <button
-        type="button"
-        className="csv-nps-workspace-nav-button"
-        onClick={handleWorkspaceLogout}
-      >
-        {tr("workspaceNav.signOut", "Sign out")}
-      </button>
     </nav>
   );
 }

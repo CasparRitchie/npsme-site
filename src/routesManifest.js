@@ -105,6 +105,9 @@ export const ROUTES_MANIFEST = [
   { path: "/workspace/closing-the-loop",                       label: "Workspace Closing the Loop", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/closing-the-loop",                    label: "Boucle de feedback workspace", labelKey: "routes.workspaceClosingTheLoop", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 
+  { path: "/workspace/journey",                               label: "Workspace Journey", labelKey: "routes.workspaceJourney", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
+  { path: "/fr/workspace/journey",                            label: "Parcours workspace", labelKey: "routes.workspaceJourney", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
+
   { path: "/workspace/datasets/:datasetId/performance",         label: "Dataset Performance",  labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "en", authMode: "workspace_cookie" },
   { path: "/fr/workspace/datasets/:datasetId/performance",      label: "Performance dataset",  labelKey: "routes.workspaceDatasetPerformance", enabled: true, indexable: false, inHeader: false, inFooter: false, lang: "fr", authMode: "workspace_cookie" },
 

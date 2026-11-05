@@ -67,6 +67,7 @@ const CsvNpsPerformance = React.lazy(() => import("./pages/CsvNpsPerformance"));
 const CsvNpsResponses = React.lazy(() => import("./pages/CsvNpsResponses"));
 const CsvNpsInvitations = React.lazy(() => import("./pages/CsvNpsInvitations"));
 const CsvNpsClosingTheLoop = React.lazy(() => import("./pages/CsvNpsClosingTheLoop"));
+const CsvNpsJourney = React.lazy(() => import("./pages/CsvNpsJourney"));
 const NpsDatasets = React.lazy(() => import("./pages/NpsDatasets"));
 
 const WorkspaceHome = React.lazy(() => import("./pages/WorkspaceHome"));
@@ -178,6 +179,9 @@ const COMPONENTS = {
 
   "/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
   "/fr/workspace/closing-the-loop": workspaceProtect(CsvNpsClosingTheLoop),
+
+  "/workspace/journey": workspaceProtect(CsvNpsJourney),
+  "/fr/workspace/journey": workspaceProtect(CsvNpsJourney),
 
   "/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),
   "/fr/workspace/datasets/:datasetId/performance": workspaceProtect(CsvNpsPerformance),

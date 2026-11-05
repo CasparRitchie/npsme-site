@@ -1,9 +1,11 @@
 // workspaceIntercom.routes.js
 import express from "express";
+import { createHash } from "node:crypto";
 import { supabaseAdmin } from "./supabaseClient.js";
 import { requireWorkspaceAuth } from "./utils/workspaceAuth.js";
 import { getCanonicalResponses, getSurveyStatsRows } from "./envola.routes.js";
 import { refreshIntercomSurveyStatsIfStale } from "./intercom.routes.js";
+import { detectClosingLoopThemes } from "./shared/closingLoopThemes.js";
 
 
 export function createWorkspaceIntercomRouter() {
@@ -98,6 +100,37 @@ export function createWorkspaceIntercomRouter() {
       return res.status(500).json({
         ok: false,
         error: err.message || "Failed to load active Intercom source",
+      });
+    }
+  });
+
+  // --------------------------------------------------
+  // GET /api/workspace-intercom/journey
+  //
+  // Longitudinal view across the workspace's configured survey sources.
+  // Contact identifiers are joined server-side and never returned directly.
+  // --------------------------------------------------
+  router.get("/journey", async (req, res) => {
+    try {
+      ensureSupabase();
+
+      const workspaceId = getRequestWorkspaceId(req);
+      const sources = await getWorkspaceIntercomSources(workspaceId);
+      const canonicalRows = await getCanonicalResponses();
+
+      return res.json({
+        ok: true,
+        ...buildWorkspaceJourneyPayload({
+          workspaceId,
+          sources,
+          rows: canonicalRows,
+        }),
+      });
+    } catch (err) {
+      console.error("[workspace-intercom] GET /journey error", err);
+      return res.status(500).json({
+        ok: false,
+        error: err.message || "Failed to load the workspace journey",
       });
     }
   });
@@ -609,6 +642,34 @@ async function getActiveWorkspaceIntercomSource(workspaceId) {
   }
 
   return data || null;
+}
+
+async function getWorkspaceIntercomSources(workspaceId) {
+  const { data, error } = await supabaseAdmin
+    .from("workspace_intercom_sources")
+    .select(
+      [
+        "id",
+        "workspace_id",
+        "source_name",
+        "source_slug",
+        "is_active",
+        "intercom_app_id",
+        "intercom_region",
+        "survey_content_id",
+        "survey_content_title",
+        "ingest_mode",
+        "pii_mode",
+        "created_at",
+        "updated_at",
+      ].join(",")
+    )
+    .eq("workspace_id", workspaceId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return data || [];
 }
 
 async function resolveWorkspaceIntercomSource(workspaceId, requestedSourceId) {
@@ -2517,6 +2578,278 @@ function redactFreeText(value, maxLength = 500) {
   }
 
   return text;
+}
+
+export function buildWorkspaceJourneyPayload({ workspaceId, sources, rows }) {
+  const sourceByContentId = new Map();
+
+  for (const source of Array.isArray(sources) ? sources : []) {
+    const contentId = String(source?.survey_content_id || "").trim();
+    if (!contentId) continue;
+    sourceByContentId.set(contentId, source);
+  }
+
+  const scopedRows = (Array.isArray(rows) ? rows : [])
+    .filter((row) => sourceByContentId.has(String(row?.content_id || "").trim()))
+    .filter((row) => normaliseNpsScore(row?.score_0_10) !== null);
+
+  const rowsByContact = new Map();
+  for (const row of scopedRows) {
+    const contactId = String(row?.contact_id || "").trim();
+    if (!contactId) continue;
+    const contactRows = rowsByContact.get(contactId) || [];
+    contactRows.push(row);
+    rowsByContact.set(contactId, contactRows);
+  }
+
+  const contacts = [];
+  const repeatResponseIds = new Set();
+
+  for (const [contactId, contactRows] of rowsByContact.entries()) {
+    const distinctSources = new Set(
+      contactRows.map((row) => String(row?.content_id || "").trim()).filter(Boolean)
+    );
+    if (distinctSources.size < 2) continue;
+
+    const chronological = [...contactRows].sort((a, b) =>
+      String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || ""))
+    );
+    const firstScore = normaliseNpsScore(chronological[0]?.score_0_10);
+    const latestScore = normaliseNpsScore(chronological.at(-1)?.score_0_10);
+    const delta = roundOneDecimal(latestScore - firstScore);
+    const direction = delta > 0 ? "improving" : delta < 0 ? "declining" : "stable";
+    const signal =
+      direction === "declining"
+        ? "churn_risk"
+        : direction === "improving" && latestScore >= 9
+          ? "ambassador"
+          : direction;
+
+    const responses = chronological.map((row) => {
+      const source = sourceByContentId.get(String(row?.content_id || "").trim());
+      const projected = projectJourneyAnswers(row?.answers);
+      const themeText = [row?.comment, ...projected.map((answer) => answer.answer)]
+        .filter(Boolean)
+        .join(" ");
+      const responseId = String(row?.response_id || "").trim() || null;
+      if (responseId) repeatResponseIds.add(responseId);
+
+      return {
+        response_id: responseId,
+        submitted_at: row?.submitted_at || null,
+        score: normaliseNpsScore(row?.score_0_10),
+        bucket: scoreBucket(normaliseNpsScore(row?.score_0_10)),
+        source: projectJourneySource(source),
+        answers: projected,
+        themes: detectClosingLoopThemes(themeText),
+        comment: redactFreeText(row?.comment, 500),
+      };
+    });
+
+    contacts.push({
+      contact_ref: journeyContactRef(workspaceId, contactId),
+      response_count: responses.length,
+      survey_count: distinctSources.size,
+      first_score: firstScore,
+      latest_score: latestScore,
+      delta,
+      direction,
+      signal,
+      first_response_at: chronological[0]?.submitted_at || null,
+      latest_response_at: chronological.at(-1)?.submitted_at || null,
+      responses,
+    });
+  }
+
+  contacts.sort((a, b) => {
+    const priority = { declining: 0, improving: 1, stable: 2 };
+    return (
+      priority[a.direction] - priority[b.direction] ||
+      String(b.latest_response_at || "").localeCompare(String(a.latest_response_at || ""))
+    );
+  });
+
+  const repeatRows = scopedRows.filter((row) =>
+    repeatResponseIds.has(String(row?.response_id || "").trim())
+  );
+  const milestones = Array.from(sourceByContentId.values())
+    .map((source) => {
+      const sourceRows = repeatRows.filter(
+        (row) => String(row?.content_id || "").trim() === String(source.survey_content_id || "").trim()
+      );
+      const allSourceRows = scopedRows.filter(
+        (row) => String(row?.content_id || "").trim() === String(source.survey_content_id || "").trim()
+      );
+      return {
+        ...projectJourneySource(source),
+        order: journeySourceOrder(source),
+        repeat_cohort: summariseJourneyRows(sourceRows),
+        all_responses: summariseJourneyRows(allSourceRows),
+      };
+    })
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+
+  const globalContentIds = new Set(
+    milestones.filter((source) => source.kind === "global").map((source) => source.content_id)
+  );
+  const globalRows = repeatRows.filter((row) =>
+    globalContentIds.has(String(row?.content_id || "").trim())
+  );
+
+  return {
+    summary: {
+      repeat_contacts: contacts.length,
+      improving: contacts.filter((contact) => contact.direction === "improving").length,
+      stable: contacts.filter((contact) => contact.direction === "stable").length,
+      declining: contacts.filter((contact) => contact.direction === "declining").length,
+      ambassadors: contacts.filter((contact) => contact.signal === "ambassador").length,
+      churn_risks: contacts.filter((contact) => contact.signal === "churn_risk").length,
+      average_first_score: average(contacts.map((contact) => contact.first_score)),
+      average_latest_score: average(contacts.map((contact) => contact.latest_score)),
+      average_delta: average(contacts.map((contact) => contact.delta)),
+    },
+    global_trend: buildJourneyMonthlyTrend(globalRows),
+    milestones,
+    themes: buildJourneyThemeSummary(contacts),
+    contacts,
+  };
+}
+
+function projectJourneySource(source) {
+  const sourceText = [source?.source_name, source?.survey_content_title, source?.source_slug]
+    .filter(Boolean)
+    .join(" ");
+  const order = journeySourceOrder(source);
+  return {
+    id: source?.id || null,
+    content_id: String(source?.survey_content_id || "").trim(),
+    name: source?.survey_content_title || source?.source_name || "Survey",
+    slug: source?.source_slug || "",
+    kind: /j\s*\+?\s*40|40\s*jour/i.test(sourceText)
+      ? "j40"
+      : /3\s*mois|3\s*month/i.test(sourceText)
+        ? "month3"
+        : /1\s*an|12\s*mois|1\s*year|annual/i.test(sourceText)
+          ? "year1"
+          : order === 0
+            ? "global"
+            : "milestone",
+  };
+}
+
+function journeySourceOrder(source) {
+  const text = [source?.source_name, source?.survey_content_title, source?.source_slug]
+    .filter(Boolean)
+    .join(" ");
+  if (/j\s*\+?\s*40|40\s*jour/i.test(text)) return 10;
+  if (/3\s*mois|3\s*month/i.test(text)) return 20;
+  if (/1\s*an|12\s*mois|1\s*year|annual/i.test(text)) return 30;
+  if (/global|g[eé]n[eé]ral|overall/i.test(text)) return 0;
+  return 0;
+}
+
+function projectJourneyAnswers(answers) {
+  return (Array.isArray(answers) ? answers : [])
+    .map((answer, index) => {
+      const raw = answer?.response;
+      if (raw === null || raw === undefined || raw === "") return null;
+      const numeric = normaliseNpsScore(raw);
+      const display = Array.isArray(raw)
+        ? raw.join(", ")
+        : typeof raw === "object"
+          ? JSON.stringify(raw)
+          : String(raw);
+      return {
+        question: redactFreeText(
+          answer?.question_text || `Question ${index + 1}`,
+          300
+        ),
+        score: numeric,
+        answer: numeric === null ? redactFreeText(display, 500) : null,
+      };
+    })
+    .filter(Boolean);
+}
+
+function summariseJourneyRows(rows) {
+  return summariseWorkspaceIntercomRows(
+    (Array.isArray(rows) ? rows : []).map((row) => ({ score: row?.score_0_10 }))
+  );
+}
+
+function buildJourneyMonthlyTrend(rows) {
+  const periods = new Map();
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const date = new Date(row?.submitted_at);
+    const score = normaliseNpsScore(row?.score_0_10);
+    if (Number.isNaN(date.getTime()) || score === null) continue;
+    const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-01`;
+    const period = periods.get(key) || { date: key, responses: 0, promoters: 0, detractors: 0 };
+    period.responses += 1;
+    if (scoreBucket(score) === "promoter") period.promoters += 1;
+    if (scoreBucket(score) === "detractor") period.detractors += 1;
+    periods.set(key, period);
+  }
+  return Array.from(periods.values())
+    .map((period) => ({
+      date: period.date,
+      responses: period.responses,
+      nps: Math.round(((period.promoters - period.detractors) / period.responses) * 100),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function buildJourneyThemeSummary(contacts) {
+  const groups = { declining: new Map(), improving: new Map() };
+  for (const contact of contacts) {
+    if (!groups[contact.direction]) continue;
+    for (const response of contact.responses) {
+      for (const theme of response.themes) {
+        const current = groups[contact.direction].get(theme) || {
+          key: theme,
+          mentions: 0,
+          contacts: new Set(),
+          examples: [],
+        };
+        current.mentions += 1;
+        current.contacts.add(contact.contact_ref);
+        const example = response.comment || response.answers.find((answer) => answer.answer)?.answer;
+        if (example && current.examples.length < 2 && !current.examples.includes(example)) {
+          current.examples.push(example);
+        }
+        groups[contact.direction].set(theme, current);
+      }
+    }
+  }
+  return Object.fromEntries(
+    Object.entries(groups).map(([direction, themes]) => [
+      direction,
+      Array.from(themes.values())
+        .map((theme) => ({
+          key: theme.key,
+          mentions: theme.mentions,
+          contact_count: theme.contacts.size,
+          examples: theme.examples,
+        }))
+        .sort((a, b) => b.contact_count - a.contact_count || b.mentions - a.mentions),
+    ])
+  );
+}
+
+function journeyContactRef(workspaceId, contactId) {
+  const digest = createHash("sha256")
+    .update(`${workspaceId}:${contactId}`)
+    .digest("hex")
+    .slice(0, 8)
+    .toUpperCase();
+  return `Contact #${digest}`;
+}
+
+function average(values) {
+  const numbers = values.filter(Number.isFinite);
+  return numbers.length
+    ? roundOneDecimal(numbers.reduce((sum, value) => sum + value, 0) / numbers.length)
+    : null;
 }
 
 function toWorkspaceIntercomSourceSummary(row) {

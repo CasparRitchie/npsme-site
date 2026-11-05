@@ -26,3 +26,20 @@ export function buildAdditionalSurveyQuestionRows(extraAnswers) {
         item.score !== null || String(item.comment || "").trim().length > 0
     );
 }
+
+export function collectAdditionalSurveyQuestions(rows) {
+  const questions = new Set();
+
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const extraAnswers = row?.extra_scores;
+    if (!extraAnswers || typeof extraAnswers !== "object" || Array.isArray(extraAnswers)) {
+      continue;
+    }
+
+    for (const question of Object.keys(extraAnswers)) {
+      if (String(question || "").trim()) questions.add(question);
+    }
+  }
+
+  return Array.from(questions);
+}

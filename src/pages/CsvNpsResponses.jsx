@@ -10,7 +10,10 @@ import {
   getDateRangeError,
   matchesWorkspaceDateFilter,
 } from "../utils/workspaceDateFilters";
-import { buildAdditionalSurveyQuestionRows } from "../utils/workspaceSurveyAnswers";
+import {
+  buildAdditionalSurveyQuestionRows,
+  collectAdditionalSurveyQuestions,
+} from "../utils/workspaceSurveyAnswers";
 
 const PAGE_COPY = {
   eyebrow: "NPS Me Workspace",
@@ -87,6 +90,14 @@ function compareValues(a, b, dir = "asc") {
   if (as < bs) return -1 * direction;
   if (as > bs) return 1 * direction;
   return 0;
+}
+
+function getResponseSortValue(row, sortKey) {
+  if (String(sortKey || "").startsWith("extra:")) {
+    return row?.extra_scores?.[String(sortKey).slice("extra:".length)] ?? "";
+  }
+
+  return row?.[sortKey];
 }
 
 function SortableTh({ label, sortKey, sort, dir, onSort, className = "" }) {
@@ -421,11 +432,45 @@ export default function CsvNpsResponses() {
     });
 
     return [...filtered].sort((a, b) => {
-      const result = compareValues(a?.[sort], b?.[sort], dir);
+      const result = compareValues(
+        getResponseSortValue(a, sort),
+        getResponseSortValue(b, sort),
+        dir
+      );
       if (result !== 0) return result;
       return compareValues(a?.submitted_at, b?.submitted_at, "desc");
     });
   }, [dataset, bucketFilter, periodFilter, dateFrom, dateTo, searchTerm, sort, dir]);
+
+  const additionalQuestionColumns = useMemo(
+    () => collectAdditionalSurveyQuestions(dataset?.rows),
+    [dataset]
+  );
+  const hasLegacyQuestionData = useMemo(
+    () =>
+      (dataset?.rows || []).some((row) =>
+        [
+          row.q_recommend_comment,
+          row.q_install_score,
+          row.q_install_comment,
+          row.q_daily_use_score,
+          row.q_benefits,
+          row.q_parent_relation_score,
+          row.q_parent_relation_comment,
+          row.q_support_score,
+          row.q_support_comment,
+          row.q_final_comment,
+        ].some((value) => value !== null && value !== undefined && value !== "")
+      ),
+    [dataset]
+  );
+  const usesDynamicSurveyColumns =
+    additionalQuestionColumns.length > 0 && !hasLegacyQuestionData;
+  const intercomTableColumnCount =
+    6 + (usesDynamicSurveyColumns ? additionalQuestionColumns.length : 12);
+  const intercomTableMinWidth = usesDynamicSurveyColumns
+    ? 688 + additionalQuestionColumns.length * 240
+    : 2345;
 
   const selectedRow = useMemo(() => {
     const ref = String(selectedResponseRef || selectedResponseParam || "").trim();
@@ -647,7 +692,10 @@ export default function CsvNpsResponses() {
 
         {isIntercomMode ? (
           <div className="csv-nps-table-wrap">
-            <table className="min-w-[2345px] table-fixed border-collapse text-xs csv-nps-table">
+            <table
+              className="table-fixed border-collapse text-xs csv-nps-table"
+              style={{ minWidth: `${intercomTableMinWidth}px` }}
+            >
               <thead className="sticky top-0 z-30 bg-[#0F172A]">
                 <tr>
                   <SortableTh
@@ -677,18 +725,34 @@ export default function CsvNpsResponses() {
 
                   <SortableTh label="NPS" sortKey="score" sort={sort} dir={dir} onSort={handleSort} className="w-[70px]" />
                   <SortableTh label={tr("Response ID", "ID de réponse")} sortKey="response_id" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
-                  <SortableTh label="Pioupiou" sortKey="pioupiou" sort={sort} dir={dir} onSort={handleSort} className="w-[120px]" />
-                  <SortableTh label={tr("Reader", "Lecteur")} sortKey="reader_serial" sort={sort} dir={dir} onSort={handleSort} className="w-[110px]" />
-                  <SortableTh label={tr("Why?", "Pourquoi ?")} sortKey="q_recommend_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[280px]" />
-                  <SortableTh label={tr("Install", "Installation")} sortKey="q_install_score" sort={sort} dir={dir} onSort={handleSort} className="w-[90px]" />
-                  <SortableTh label={tr("Install comment", "Commentaire sur l’installation")} sortKey="q_install_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
-                  <SortableTh label={tr("Daily use", "Utilisation quotidienne")} sortKey="q_daily_use_score" sort={sort} dir={dir} onSort={handleSort} className="w-[100px]" />
-                  <SortableTh label={tr("Benefits", "Bénéfices")} sortKey="q_benefits" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
-                  <SortableTh label={tr("Parent relation", "Relation avec les parents")} sortKey="q_parent_relation_score" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
-                  <SortableTh label={tr("Parent relation comment", "Commentaire sur la relation avec les parents")} sortKey="q_parent_relation_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[260px]" />
-                  <SortableTh label={tr("Support", "Accompagnement")} sortKey="q_support_score" sort={sort} dir={dir} onSort={handleSort} className="w-[95px]" />
-                  <SortableTh label={tr("Support comment", "Commentaire sur l’accompagnement")} sortKey="q_support_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[220px]" />
-                  <SortableTh label={tr("Final comment", "Commentaire final")} sortKey="q_final_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                  {usesDynamicSurveyColumns ? (
+                    additionalQuestionColumns.map((question) => (
+                      <SortableTh
+                        key={question}
+                        label={question}
+                        sortKey={`extra:${question}`}
+                        sort={sort}
+                        dir={dir}
+                        onSort={handleSort}
+                        className="w-[240px]"
+                      />
+                    ))
+                  ) : (
+                    <>
+                      <SortableTh label="Pioupiou" sortKey="pioupiou" sort={sort} dir={dir} onSort={handleSort} className="w-[120px]" />
+                      <SortableTh label={tr("Reader", "Lecteur")} sortKey="reader_serial" sort={sort} dir={dir} onSort={handleSort} className="w-[110px]" />
+                      <SortableTh label={tr("Why?", "Pourquoi ?")} sortKey="q_recommend_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[280px]" />
+                      <SortableTh label={tr("Install", "Installation")} sortKey="q_install_score" sort={sort} dir={dir} onSort={handleSort} className="w-[90px]" />
+                      <SortableTh label={tr("Install comment", "Commentaire sur l’installation")} sortKey="q_install_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                      <SortableTh label={tr("Daily use", "Utilisation quotidienne")} sortKey="q_daily_use_score" sort={sort} dir={dir} onSort={handleSort} className="w-[100px]" />
+                      <SortableTh label={tr("Benefits", "Bénéfices")} sortKey="q_benefits" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                      <SortableTh label={tr("Parent relation", "Relation avec les parents")} sortKey="q_parent_relation_score" sort={sort} dir={dir} onSort={handleSort} className="w-[115px]" />
+                      <SortableTh label={tr("Parent relation comment", "Commentaire sur la relation avec les parents")} sortKey="q_parent_relation_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[260px]" />
+                      <SortableTh label={tr("Support", "Accompagnement")} sortKey="q_support_score" sort={sort} dir={dir} onSort={handleSort} className="w-[95px]" />
+                      <SortableTh label={tr("Support comment", "Commentaire sur l’accompagnement")} sortKey="q_support_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[220px]" />
+                      <SortableTh label={tr("Final comment", "Commentaire final")} sortKey="q_final_comment" sort={sort} dir={dir} onSort={handleSort} className="w-[240px]" />
+                    </>
+                  )}
                   <SortableTh label={tr("Previous responses", "Réponses précédentes")} sortKey="previous_response_dates" sort={sort} dir={dir} onSort={handleSort} className="w-[170px]" />
                 </tr>
               </thead>
@@ -696,7 +760,7 @@ export default function CsvNpsResponses() {
               <tbody>
                 {filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan="18" className="px-3 py-4">
+                    <td colSpan={intercomTableColumnCount} className="px-3 py-4">
                       {tr("No responses match the current filters.", "Aucune réponse ne correspond aux filtres actuels.")}
                     </td>
                   </tr>
@@ -763,44 +827,41 @@ export default function CsvNpsResponses() {
                         </td>
 
                         <td className="px-3 py-3"><CellText>{row.response_id}</CellText></td>
-                        <td className="px-3 py-3"><CellText>{row.pioupiou}</CellText></td>
-                        <td className="px-3 py-3"><CellText>{row.reader_serial}</CellText></td>
+                        {usesDynamicSurveyColumns ? (
+                          additionalQuestionColumns.map((question) => {
+                            const answer = row.extra_scores?.[question];
+                            const isNumeric =
+                              typeof answer === "number" && Number.isFinite(answer);
 
-                        <td className="px-3 py-3"><CellText>{row.q_recommend_comment}</CellText></td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(row.q_install_score))}>
-                            {row.q_install_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3"><CellText>{row.q_install_comment}</CellText></td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(row.q_daily_use_score))}>
-                            {row.q_daily_use_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3"><CellText>{row.q_benefits}</CellText></td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(row.q_parent_relation_score))}>
-                            {row.q_parent_relation_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3"><CellText>{row.q_parent_relation_comment}</CellText></td>
-
-                        <td className="px-3 py-3 text-center">
-                          <span className={scoreTextClass(Number(row.q_support_score))}>
-                            {row.q_support_score ?? "—"}
-                          </span>
-                        </td>
-
-                        <td className="px-3 py-3"><CellText>{row.q_support_comment}</CellText></td>
-
-                        <td className="px-3 py-3"><CellText>{row.q_final_comment}</CellText></td>
+                            return (
+                              <td
+                                key={`${row.response_id || i}-${question}`}
+                                className={`px-3 py-3 ${isNumeric ? "text-center" : ""}`}
+                              >
+                                {isNumeric ? (
+                                  <span className={scoreTextClass(answer)}>{answer}</span>
+                                ) : (
+                                  <CellText>{answer}</CellText>
+                                )}
+                              </td>
+                            );
+                          })
+                        ) : (
+                          <>
+                            <td className="px-3 py-3"><CellText>{row.pioupiou}</CellText></td>
+                            <td className="px-3 py-3"><CellText>{row.reader_serial}</CellText></td>
+                            <td className="px-3 py-3"><CellText>{row.q_recommend_comment}</CellText></td>
+                            <td className="px-3 py-3 text-center"><span className={scoreTextClass(Number(row.q_install_score))}>{row.q_install_score ?? "—"}</span></td>
+                            <td className="px-3 py-3"><CellText>{row.q_install_comment}</CellText></td>
+                            <td className="px-3 py-3 text-center"><span className={scoreTextClass(Number(row.q_daily_use_score))}>{row.q_daily_use_score ?? "—"}</span></td>
+                            <td className="px-3 py-3"><CellText>{row.q_benefits}</CellText></td>
+                            <td className="px-3 py-3 text-center"><span className={scoreTextClass(Number(row.q_parent_relation_score))}>{row.q_parent_relation_score ?? "—"}</span></td>
+                            <td className="px-3 py-3"><CellText>{row.q_parent_relation_comment}</CellText></td>
+                            <td className="px-3 py-3 text-center"><span className={scoreTextClass(Number(row.q_support_score))}>{row.q_support_score ?? "—"}</span></td>
+                            <td className="px-3 py-3"><CellText>{row.q_support_comment}</CellText></td>
+                            <td className="px-3 py-3"><CellText>{row.q_final_comment}</CellText></td>
+                          </>
+                        )}
 
                         <td className="px-3 py-3 text-[11px] text-slate-300">
                           {Array.isArray(row.previous_response_dates) &&

@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildAdditionalSurveyQuestionRows } from "../src/utils/workspaceSurveyAnswers.js";
+import {
+  buildAdditionalSurveyQuestionRows,
+  collectAdditionalSurveyQuestions,
+} from "../src/utils/workspaceSurveyAnswers.js";
 
 test("renders every retained milestone answer as a response-detail row", () => {
   const rows = buildAdditionalSurveyQuestionRows({
@@ -36,4 +39,14 @@ test("ignores empty or invalid additional-answer containers", () => {
   assert.deepEqual(buildAdditionalSurveyQuestionRows(null), []);
   assert.deepEqual(buildAdditionalSurveyQuestionRows([]), []);
   assert.deepEqual(buildAdditionalSurveyQuestionRows({ Empty: "" }), []);
+});
+
+test("collects milestone question columns once and preserves survey order", () => {
+  assert.deepEqual(
+    collectAdditionalSurveyQuestions([
+      { extra_scores: { "Question 2": "Oui", "Question 3": 8 } },
+      { extra_scores: { "Question 2": "Non", "Question 4": "Commentaire" } },
+    ]),
+    ["Question 2", "Question 3", "Question 4"]
+  );
 });

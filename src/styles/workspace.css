@@ -2772,6 +2772,11 @@
   text-transform: uppercase;
 }
 
+.workspace-journey-detail {
+  scroll-margin-top: 1.25rem;
+  outline: none;
+}
+
 .workspace-journey-detail-header h2 { margin: 0; color: #f8fafc; }
 
 .workspace-journey-detail-header button {

@@ -2801,39 +2801,83 @@ function buildJourneyMonthlyTrend(rows) {
 
 function buildJourneyThemeSummary(contacts) {
   const groups = { declining: new Map(), improving: new Map() };
+  const cohortSizes = {
+    declining: contacts.filter((contact) => contact.direction === "declining").length,
+    improving: contacts.filter((contact) => contact.direction === "improving").length,
+  };
+
   for (const contact of contacts) {
     if (!groups[contact.direction]) continue;
     for (const response of contact.responses) {
-      for (const theme of response.themes) {
-        const current = groups[contact.direction].get(theme) || {
-          key: theme,
-          mentions: 0,
-          contacts: new Set(),
-          examples: [],
-        };
-        current.mentions += 1;
-        current.contacts.add(contact.contact_ref);
-        const example = response.comment || response.answers.find((answer) => answer.answer)?.answer;
-        if (example && current.examples.length < 2 && !current.examples.includes(example)) {
-          current.examples.push(example);
+      const evidence = [
+        response.comment,
+        ...response.answers.map((answer) => answer.answer),
+      ].filter(Boolean);
+
+      for (const example of evidence) {
+        for (const theme of detectClosingLoopThemes(example)) {
+          const current = groups[contact.direction].get(theme) || {
+            key: theme,
+            mentions: 0,
+            contacts: new Set(),
+            examples: [],
+          };
+          current.mentions += 1;
+          current.contacts.add(contact.contact_ref);
+          if (current.examples.length < 2 && !current.examples.includes(example)) {
+            current.examples.push(example);
+          }
+          groups[contact.direction].set(theme, current);
         }
-        groups[contact.direction].set(theme, current);
       }
     }
   }
-  return Object.fromEntries(
-    Object.entries(groups).map(([direction, themes]) => [
-      direction,
-      Array.from(themes.values())
-        .map((theme) => ({
-          key: theme.key,
-          mentions: theme.mentions,
-          contact_count: theme.contacts.size,
-          examples: theme.examples,
-        }))
-        .sort((a, b) => b.contact_count - a.contact_count || b.mentions - a.mentions),
-    ])
-  );
+
+  const output = { declining: [], improving: [] };
+  const themeKeys = new Set([
+    ...groups.declining.keys(),
+    ...groups.improving.keys(),
+  ]);
+
+  for (const key of themeKeys) {
+    const declining = groups.declining.get(key);
+    const improving = groups.improving.get(key);
+    const decliningRate = cohortSizes.declining
+      ? (declining?.contacts.size || 0) / cohortSizes.declining
+      : 0;
+    const improvingRate = cohortSizes.improving
+      ? (improving?.contacts.size || 0) / cohortSizes.improving
+      : 0;
+
+    // Equal prevalence is shared context rather than a differentiating driver.
+    if (decliningRate === improvingRate) continue;
+
+    const direction = decliningRate > improvingRate ? "declining" : "improving";
+    const selected = groups[direction].get(key);
+    const selectedRate = direction === "declining" ? decliningRate : improvingRate;
+    const comparisonRate = direction === "declining" ? improvingRate : decliningRate;
+
+    output[direction].push({
+      key,
+      mentions: selected?.mentions || 0,
+      contact_count: selected?.contacts.size || 0,
+      cohort_contact_count: cohortSizes[direction],
+      prevalence_percent: Math.round(selectedRate * 100),
+      difference_pp: Math.round((selectedRate - comparisonRate) * 100),
+      examples: selected?.examples || [],
+    });
+  }
+
+  for (const direction of Object.keys(output)) {
+    output[direction].sort(
+      (a, b) =>
+        b.difference_pp - a.difference_pp ||
+        b.contact_count - a.contact_count ||
+        b.mentions - a.mentions
+    );
+  }
+
+  return output;
 }
 
 function journeyContactRef(workspaceId, contactId) {

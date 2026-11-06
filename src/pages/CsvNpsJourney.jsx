@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import CsvNpsWorkspaceNav from "../components/CsvNpsWorkspaceNav";
 import NpsTimeseriesChart from "../components/NpsTimeseriesChart";
@@ -29,6 +29,7 @@ export default function CsvNpsJourney() {
   const [error, setError] = useState("");
   const [direction, setDirection] = useState("all");
   const [selectedContact, setSelectedContact] = useState("");
+  const detailRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +56,20 @@ export default function CsvNpsJourney() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedContact) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      detailRef.current?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedContact]);
 
   const contacts = useMemo(() => {
     const all = data?.contacts || [];
@@ -148,13 +163,13 @@ export default function CsvNpsJourney() {
             <SectionHeading
               title={tr("What may be driving the change", "Ce qui peut expliquer l’évolution")}
               copy={tr(
-                "Themes detected from redacted comments and open-text answers in the repeat-response cohort.",
-                "Thèmes détectés dans les commentaires et réponses ouvertes expurgés du groupe de répondants récurrents."
+                "Differentiating themes from redacted comments and open-text answers. Each theme appears only where it is more prevalent; equally shared themes are omitted.",
+                "Thèmes différenciants issus des commentaires et réponses ouvertes expurgés. Chaque thème apparaît uniquement là où il est le plus fréquent ; les thèmes également partagés sont écartés."
               )}
             />
             <div className="workspace-journey-theme-columns">
-              <ThemeGroup title={tr("Declining journeys", "Parcours en baisse")} themes={data.themes?.declining} lang={lang} tone="red" empty={tr("No recurring themes yet.", "Aucun thème récurrent pour le moment.")} />
-              <ThemeGroup title={tr("Improving journeys", "Parcours en progression")} themes={data.themes?.improving} lang={lang} tone="green" empty={tr("No recurring themes yet.", "Aucun thème récurrent pour le moment.")} />
+              <ThemeGroup title={tr("Declining journeys", "Parcours en baisse")} themes={data.themes?.declining} lang={lang} tone="red" empty={tr("No differentiating themes yet.", "Aucun thème différenciant pour le moment.")} />
+              <ThemeGroup title={tr("Improving journeys", "Parcours en progression")} themes={data.themes?.improving} lang={lang} tone="green" empty={tr("No differentiating themes yet.", "Aucun thème différenciant pour le moment.")} />
             </div>
           </section>
 
@@ -202,7 +217,7 @@ export default function CsvNpsJourney() {
           </section>
 
           {selected && (
-            <section className="workspace-journey-section workspace-journey-detail">
+            <section ref={detailRef} className="workspace-journey-section workspace-journey-detail" tabIndex="-1">
               <div className="workspace-journey-detail-header">
                 <div>
                   <p>{tr("Selected journey", "Parcours sélectionné")}</p>
@@ -258,7 +273,12 @@ function ThemeGroup({ title, themes = [], lang, tone, empty }) {
       <h3>{title}</h3>
       {!themes.length ? <p>{empty}</p> : themes.slice(0, 6).map((theme) => (
         <div key={theme.key}>
-          <header><b>{THEME_LABELS[theme.key]?.[lang === "fr" ? 1 : 0] || theme.key.replaceAll("_", " ")}</b><span>{theme.contact_count} {lang === "fr" ? "contacts" : "contacts"}</span></header>
+          <header>
+            <b>{THEME_LABELS[theme.key]?.[lang === "fr" ? 1 : 0] || theme.key.replaceAll("_", " ")}</b>
+            <span>
+              {theme.contact_count}/{theme.cohort_contact_count} {lang === "fr" ? "contacts" : "contacts"} · {theme.prevalence_percent}%
+            </span>
+          </header>
           {theme.examples?.[0] && <blockquote>“{theme.examples[0]}”</blockquote>}
         </div>
       ))}

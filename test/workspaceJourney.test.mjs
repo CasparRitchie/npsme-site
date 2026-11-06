@@ -105,3 +105,56 @@ test("journey payload keeps falling scores separate from milestone NPS", () => {
   assert.equal(payload.milestones.find((item) => item.kind === "global").repeat_cohort.nps, 100);
   assert.equal(payload.milestones.find((item) => item.kind === "j40").repeat_cohort.nps, 0);
 });
+
+test("journey themes appear only in the cohort where they are more prevalent", () => {
+  const rows = [];
+  const addJourney = (contactId, firstScore, latestScore, comment) => {
+    rows.push(
+      {
+        response_id: `global:${contactId}`,
+        content_id: "global",
+        contact_id: contactId,
+        submitted_at: "2026-01-10T12:00:00.000Z",
+        score_0_10: firstScore,
+        answers: [],
+      },
+      {
+        response_id: `j40:${contactId}`,
+        content_id: "j40",
+        contact_id: contactId,
+        submitted_at: "2026-03-10T12:00:00.000Z",
+        score_0_10: latestScore,
+        comment,
+        answers: [],
+      }
+    );
+  };
+
+  addJourney("declining-a", 10, 7, "Le suivi des heures est difficile");
+  addJourney("declining-b", 9, 6, "Problème avec les horaires");
+  addJourney("improving-a", 6, 9, "Les horaires sont maintenant simples");
+  addJourney("improving-b", 7, 10, "Support très réactif");
+
+  const payload = buildWorkspaceJourneyPayload({
+    workspaceId: "workspace-a",
+    sources,
+    rows,
+  });
+
+  const decliningKeys = payload.themes.declining.map((theme) => theme.key);
+  const improvingKeys = payload.themes.improving.map((theme) => theme.key);
+  assert.equal(decliningKeys.includes("time_tracking"), true);
+  assert.equal(improvingKeys.includes("time_tracking"), false);
+  assert.equal(improvingKeys.includes("support_speed"), true);
+  assert.deepEqual(
+    decliningKeys.filter((key) => improvingKeys.includes(key)),
+    []
+  );
+
+  const timeTracking = payload.themes.declining.find(
+    (theme) => theme.key === "time_tracking"
+  );
+  assert.equal(timeTracking.prevalence_percent, 100);
+  assert.equal(timeTracking.difference_pp, 50);
+  assert.equal(timeTracking.examples[0], "Le suivi des heures est difficile");
+});

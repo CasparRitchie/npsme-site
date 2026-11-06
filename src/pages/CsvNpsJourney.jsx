@@ -226,11 +226,11 @@ export default function CsvNpsJourney() {
                 <button type="button" onClick={() => setSelectedContact("")}>{tr("Close detail", "Fermer le détail")}</button>
               </div>
               <div className="workspace-journey-response-track">
-                {selected.responses.map((response, index) => (
+                {sortJourneyResponses(selected.responses).map((response, index) => (
                   <article key={response.response_id || `${response.submitted_at}-${index}`}>
                     <header>
                       <span>{index + 1}</span>
-                      <div><h3>{response.source.name}</h3><time>{formatDate(response.submitted_at, lang)}</time></div>
+                      <div><h3>{formatSurveyName(response.source.name)}</h3><time>{formatDate(response.submitted_at, lang)}</time></div>
                       <strong>{response.score}<small>/10</small></strong>
                     </header>
                     <div className="workspace-journey-answer-list">
@@ -292,6 +292,25 @@ function formatScore(value) {
 
 function formatSurveyName(value) {
   return String(value || "").replace(/\s*\(copy\)\s*$/i, "").trim();
+}
+
+function sortJourneyResponses(responses) {
+  const stageOrder = {
+    global: 0,
+    j40: 10,
+    month3: 20,
+    year1: 30,
+    milestone: 40,
+  };
+
+  return [...(responses || [])].sort((a, b) => {
+    const aOrder = stageOrder[a?.source?.kind] ?? 50;
+    const bOrder = stageOrder[b?.source?.kind] ?? 50;
+    return (
+      aOrder - bOrder ||
+      String(a?.submitted_at || "").localeCompare(String(b?.submitted_at || ""))
+    );
+  });
 }
 
 function formatDelta(value) {

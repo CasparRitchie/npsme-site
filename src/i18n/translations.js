@@ -3047,11 +3047,11 @@ export const TRANSLATIONS = {
     },
     intercomNps: {
       seo: {
-        title: "Intercom NPS analytics: turn feedback into actions | NPS Me",
-        description: "Connect Intercom NPS and turn comments into decision-grade insight: themes, drivers, prioritised actions and measurable retention impact.",
+        title: "Intercom Helpdesk NPS analytics (Fin) | NPS Me",
+        description: "Connect Intercom Helpdesk from Fin and turn NPS comments into decision-grade insight: themes, drivers, prioritised actions and retention impact.",
       },
-      h1: "Intercom NPS analytics that turns comments into actions",
-      intro: "Intercom helps you collect NPS. NPS Me adds the intelligence layer: sampling checks, theme and driver analysis, prioritisation, close-the-loop workflows and impact tracking.",
+      h1: "Intercom Helpdesk NPS analytics that turns comments into actions",
+      intro: "Intercom is now the helpdesk product from Fin. It helps you collect NPS; NPS Me adds the intelligence layer: sampling checks, theme and driver analysis, prioritisation, close-the-loop workflows and impact tracking.",
       cta: "Book a free discovery",
       secondaryCta: "Try the demo",
       pillarLinkPrefix: "This is one example. The core approach is explained in the",
@@ -3062,9 +3062,9 @@ export const TRANSLATIONS = {
       tag: "NPS Me / Intercom NPS",
     },
     comparison: {
-      title: "Intercom gives you the collection layer. NPS Me adds the decision layer.",
-      body: "Intercom is useful for sending surveys and viewing raw responses. NPS Me helps teams interpret what the feedback means, decide what matters most, and move from comments to action.",
-      intercomTitle: "Intercom gives you",
+      title: "Intercom Helpdesk gives you the collection layer. NPS Me adds the decision layer.",
+      body: "Intercom Helpdesk from Fin is useful for sending surveys and viewing raw responses. NPS Me helps teams interpret what the feedback means, decide what matters most, and move from comments to action.",
+      intercomTitle: "Intercom Helpdesk gives you",
       intercom: [
         "Survey delivery inside a familiar customer messaging environment",
         "Scores, comments and user-level response visibility",
@@ -3080,8 +3080,12 @@ export const TRANSLATIONS = {
       ],
     },
     faq: {
-      title: "Common questions about Intercom NPS",
+      title: "Common questions about Intercom, Fin and NPS",
       items: [
+        {
+          q: "Is Intercom now called Fin?",
+          a: "The company is now called Fin, while Intercom Helpdesk remains the name of its customer service software. If you use Intercom for NPS surveys today, you are using the Intercom Helpdesk product from Fin.",
+        },
         {
           q: "Can Intercom collect NPS on its own?",
           a: "Yes. Intercom is a good collection layer for NPS surveys. The gap usually appears later, when teams want stronger analysis, prioritisation and a clearer operating rhythm around the feedback.",
@@ -7181,11 +7185,11 @@ export const TRANSLATIONS = {
     },
     intercomNps: {
       seo: {
-        title: "Analyse NPS Intercom: du feedback aux actions | NPS Me",
-        description: "Connectez Intercom NPS et transformez le verbatim en insights actionnables: thèmes, drivers, priorisation, close-the-loop et impact sur la rétention.",
+        title: "Analyse NPS Intercom Helpdesk (Fin) | NPS Me",
+        description: "Connectez Intercom Helpdesk de Fin et transformez les verbatims NPS en insights actionnables: thèmes, drivers, priorisation et impact sur la rétention.",
       },
-      h1: "Analyse NPS Intercom: transformer le verbatim en actions",
-      intro: "Intercom aide à collecter le NPS. NPS Me ajoute la couche d’intelligence: contrôles d’échantillonnage, analyse des thèmes et drivers, priorisation, workflows de suivi et mesure d’impact.",
+      h1: "Analyse NPS Intercom Helpdesk: transformer le verbatim en actions",
+      intro: "Intercom est désormais le helpdesk proposé par Fin. Il aide à collecter le NPS; NPS Me ajoute la couche d’intelligence: contrôles d’échantillonnage, analyse des thèmes et drivers, priorisation, workflows de suivi et mesure d’impact.",
       cta: "Réserver un échange",
       secondaryCta: "Tester la démo",
       pillarLinkPrefix: "Ceci est un exemple. L’approche centrale est expliquée dans la",
@@ -7196,10 +7200,10 @@ export const TRANSLATIONS = {
         tag: "NPS Me / NPS Intercom",
       },
       comparison: {
-        title: "Intercom vous donne la couche de collecte. NPS Me ajoute la couche de décision.",
+        title: "Intercom Helpdesk vous donne la couche de collecte. NPS Me ajoute la couche de décision.",
         body:
-          "Intercom est utile pour envoyer les enquêtes et consulter les réponses brutes. NPS Me aide les équipes à interpréter ce que le feedback veut dire, décider de ce qui compte le plus, et passer des verbatims à l’action.",
-        intercomTitle: "Intercom vous donne",
+          "Intercom Helpdesk de Fin permet d’envoyer les enquêtes et de consulter les réponses brutes. NPS Me aide les équipes à interpréter ce que le feedback veut dire, décider de ce qui compte le plus, et passer des verbatims à l’action.",
+        intercomTitle: "Intercom Helpdesk vous donne",
         intercom: [
           "L’envoi des enquêtes dans un environnement de messagerie déjà familier aux clients",
           "Les scores, commentaires et réponses visibles au niveau utilisateur",
@@ -7216,8 +7220,12 @@ export const TRANSLATIONS = {
       },
 
       faq: {
-        title: "Questions fréquentes sur le NPS dans Intercom",
+        title: "Questions fréquentes sur Intercom, Fin et le NPS",
         items: [
+          {
+            q: "Intercom s’appelle-t-il désormais Fin ?",
+            a: "L’entreprise s’appelle désormais Fin, tandis qu’Intercom Helpdesk reste le nom de son logiciel de service client. Si vous utilisez Intercom pour vos enquêtes NPS, vous utilisez aujourd’hui le produit Intercom Helpdesk proposé par Fin.",
+          },
           {
             q: "Intercom peut-il collecter le NPS à lui seul ?",
             a: "Oui. Intercom est une bonne couche de collecte pour les enquêtes NPS. Le manque apparaît surtout ensuite, quand les équipes veulent une analyse plus forte, une meilleure priorisation et un rythme plus clair autour du feedback.",

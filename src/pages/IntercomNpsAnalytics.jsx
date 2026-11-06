@@ -12,6 +12,9 @@ export default function IntercomNpsAnalytics() {
   const { lang } = useLanguage();
   const tr = (p, f) => translations(lang, p, f);
   const location = useLocation();
+  const comparisonIntercom = tr("intercomNps.comparison.intercom", []);
+  const comparisonNpsMe = tr("intercomNps.comparison.npsMe", []);
+  const faqItems = tr("intercomNps.faq.items", []);
   const [live, setLive] = useState({ loading: true, data: null, error: null });
   useEffect(() => {
     let cancelled = false;
@@ -42,6 +45,26 @@ export default function IntercomNpsAnalytics() {
           fr: "/fr/analyse-nps-intercom",
         }}
       />
+
+      {Array.isArray(faqItems) && faqItems.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqItems.map((item) => ({
+                "@type": "Question",
+                name: item.q,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.a,
+                },
+              })),
+            }),
+          }}
+        />
+      )}
 
 
       <PageHeader iconLabel="NPS Me" tag="NPS Me / Intercom NPS">
@@ -86,6 +109,29 @@ export default function IntercomNpsAnalytics() {
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+          <h2 className="text-2xl font-semibold text-white md:text-3xl">
+            {tr("intercomNps.comparison.title")}
+          </h2>
+          <p className="mt-3 max-w-3xl text-slate-300">
+            {tr("intercomNps.comparison.body")}
+          </p>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            <ComparisonList
+              title={tr("intercomNps.comparison.intercomTitle")}
+              items={comparisonIntercom}
+            />
+            <ComparisonList
+              title={tr("intercomNps.comparison.npsMeTitle")}
+              items={comparisonNpsMe}
+              accent
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">
             {tr("intercomNps.sections.whatIntercomDoesWell.title")}
           </h2>
@@ -94,6 +140,30 @@ export default function IntercomNpsAnalytics() {
           </p>
         </div>
       </section>
+
+      {Array.isArray(faqItems) && faqItems.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-20">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+            <h2 className="text-2xl font-semibold text-white md:text-3xl">
+              {tr("intercomNps.faq.title")}
+            </h2>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {faqItems.map((item) => (
+                <article
+                  key={item.q}
+                  className="rounded-2xl border border-white/10 bg-black/10 p-5"
+                >
+                  <h3 className="font-semibold text-white">{item.q}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    {item.a}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -253,7 +323,30 @@ export default function IntercomNpsAnalytics() {
         </div>
       </section>
 
-      {/* TODO: sections we’ll write next: What Intercom gives you / What’s missing / How NPS Me fills the gap / FAQs */}
     </div>
+  );
+}
+
+function ComparisonList({ title, items, accent = false }) {
+  return (
+    <article
+      className={`rounded-2xl border p-5 ${
+        accent
+          ? "border-[#22C55E]/30 bg-[#22C55E]/5"
+          : "border-white/10 bg-black/10"
+      }`}
+    >
+      <h3 className="font-semibold text-white">{title}</h3>
+      <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+        {(Array.isArray(items) ? items : []).map((item) => (
+          <li key={item} className="flex gap-3">
+            <span aria-hidden="true" className={accent ? "text-[#22C55E]" : "text-slate-500"}>
+              •
+            </span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
   );
 }

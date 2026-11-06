@@ -149,7 +149,7 @@ export default function CsvNpsJourney() {
                   {index > 0 && <span className="workspace-journey-connector" aria-hidden="true">→</span>}
                   <article className={`workspace-journey-milestone workspace-journey-milestone-${milestone.kind}`}>
                     <span>{index + 1}</span>
-                    <h3>{milestone.name}</h3>
+                    <h3>{formatSurveyName(milestone.name)}</h3>
                     <strong>{milestone.repeat_cohort.nps ?? "—"}</strong>
                     <small>NPS · {milestone.repeat_cohort.validResponses} {tr("responses", "réponses")}</small>
                     <p>{tr("All respondents", "Tous les répondants")}: <b>{milestone.all_responses.nps ?? "—"}</b> NPS</p>
@@ -288,6 +288,10 @@ function ThemeGroup({ title, themes = [], lang, tone, empty }) {
 
 function formatScore(value) {
   return Number.isFinite(value) ? `${value}/10` : "—";
+}
+
+function formatSurveyName(value) {
+  return String(value || "").replace(/\s*\(copy\)\s*$/i, "").trim();
 }
 
 function formatDelta(value) {
